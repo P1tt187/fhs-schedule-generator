@@ -12,7 +12,7 @@ import models.fhs.pages.timeslot.MTimeslot
 /**
  * Created by fabian on 23.01.14.
  */
-object CTimeslot extends Controller {
+object CTimeslotdefintion extends Controller {
 
   val timeslotForm: Form[MTimeslot] = Form(
     mapping(
@@ -25,15 +25,17 @@ object CTimeslot extends Controller {
   )
 
   def page = Action {
-    Ok(views.html.timeslot.render("Timeslots",timeslotForm))
+    Ok(views.html.timeslotdefinition("Timeslots",timeslotForm))
     //Ok(views.html.index("test"))
   }
 
   def submit = Action {
     implicit request=>
-      timeslotForm.bindFromRequest.fold(
-      errors => BadRequest(views.html.timeslot("Timeslots",errors)),
-      timeslot => Ok(views.html.index("hat geklappt"))
+      val timeslot= timeslotForm.bindFromRequest
+
+      timeslot.fold(
+      errors => BadRequest(views.html.timeslotdefinition("Timeslots",errors)),
+      timeslot => Ok(views.html.timeslotdisplay("hat geklappt",List(timeslot)))
 
       )
   }

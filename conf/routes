@@ -4,8 +4,8 @@
 
 # Home page
 GET        /                    controllers.CIndex.index()
-GET        /timeslots           controllers.CTimeslot.page()
-POST       /submitTimeslot      controllers.CTimeslot.submit()
+GET        /timeslots           controllers.CTimeslotdefintion.page()
+POST       /submitTimeslot      controllers.CTimeslotdefintion.submit()
 
 # Map static resources from the /public folder to the /assets URL path
 GET        /assets/*file        controllers.Assets.at(path="/public", file)

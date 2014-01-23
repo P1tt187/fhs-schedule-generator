@@ -9,4 +9,4 @@ libraryDependencies ++= Seq(
   cache
 )
 
-play.Project.playJavaSettings
+play.Project.playScalaSettings
