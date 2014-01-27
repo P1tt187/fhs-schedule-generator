@@ -1,17 +1,15 @@
 @(message: String, timeslotForm: Form[models.fhs.pages.timeslot.MTimeslot])
-@import models.fhs.pages.timeslot.MTimeslot
+
 
 
 @import helper._
 @import helper.twitterBootstrap._
 
 
-@main(message) {
-    @sidebar()
-} {
+@main(message, controllers.CTimeslotDefintion.NAV) {
     <h1>Timeslot Hinzufügen</h1>
 
-    @form(action = routes.CTimeslotdefintion.submit, 'class -> "col-md-12 form-inline form-horizontal") {
+    @form(action = routes.CTimeslotDefintion.submit, 'class -> "col-md-12 form-inline form-horizontal") {
         <h4>Beginn:</h4>
         <div class="input-group col-sm-7">
             @inputText(timeslotForm("startHour"), '_class -> "form-control ",'placeholder -> "Stunde", '_label -> None)
@@ -24,13 +22,9 @@
             @inputText(timeslotForm("stopMinute"), '_class -> "form-control ",'placeholder -> "Minute", '_label -> None)
         </div>
 
-        @checkbox(timeslotForm("tolerance"), '_label -> "Tollerant",'_help -> "")
-
-
-
         <div class="actions">
             <p><input type="submit" class="btn btn-success " value="senden" />
-                <a href="@routes.CTimeslotdefintion.page" class="btn btn-danger btn-sm" role="button">Abbrechen</a>
+                <a href="@routes.CTimeslotDefintion.page" class="btn btn-danger btn-sm" role="button">Abbrechen</a>
             </p>
         </div>
 

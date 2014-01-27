@@ -6,7 +6,9 @@ libraryDependencies ++= Seq(
   javaJdbc,
   javaEbean,
   javaWs,
-  cache
+  javaJpa,
+  cache,
+  "org.hibernate" % "hibernate-entitymanager" % "3.6.9.Final"
 )
 
 play.Project.playScalaSettings

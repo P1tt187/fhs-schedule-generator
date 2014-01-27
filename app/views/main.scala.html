@@ -1,4 +1,4 @@
-@(title: String)(sidebar: Html)(content: Html)
+@(title: String,nav:String)(content: Html)
 
 
 <!DOCTYPE html>
@@ -18,7 +18,7 @@
     </head>
     <body>
         <div id="wrap">
-            <nav class="navbar navbar-fixed-top navbar-inverse" >
+            <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
                     <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-inverse-collapse">
@@ -30,16 +30,19 @@
                     <a class="navbar-brand" href="@routes.CIndex.index"> Schedule Generator</a>
                 </div>
 
+                <ul class="nav nav-pills nav-tabs-justified " >
+                    @sidebar(nav)
+                </ul>
             </nav>
 
             <nav class="collapse navbar-collapse " role="navigation">
                 <ul class="nav navbar-left navbar-pills nav-stacked" style="max-width : 300px ; margin-top : 50px">
-                    <li class="active"><a href="@routes.CIndex.index">Home</a></li>
+                    <li class="@("active".when(nav == controllers.CIndex.NAV))"><a href="@routes.CIndex.index">Home</a></li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" href="#" data-toggle="dropdown">Menü
                             <span class="caret"></span>
                         </a>
-                        <ul class="dropdown-menu">@sidebar</ul>
+                        <ul class="dropdown-menu">@sidebar(nav)</ul>
 
                     </li>
 

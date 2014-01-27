@@ -8,8 +8,10 @@ import play.api._
  */
 object CIndex extends Controller{
 
+  val NAV="index"
+
   def index = Action{
-    Ok(views.html.index("Your new application is ready."))
+    Ok(views.html.index("Home"))
   }
 
 }
