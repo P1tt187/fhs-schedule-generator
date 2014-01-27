@@ -5,6 +5,7 @@ import play.api.mvc._
 import play.db.ebean.Transactional
 import models.persistence.Timeslot
 import scala.collection.JavaConversions._
+import models._
 
 /**
  * Created by fabian on 27.01.14.
@@ -16,7 +17,10 @@ object CTimeslotDisplay extends Controller{
   @Transactional
   def page() = Action {
 
-    Ok(views.html.timeslotdisplay("Timeslots", Timeslot.find.all().toList))
+
+    Ok(views.html.timeslotdisplay("Timeslots", TIMESLOT_FINDER.all().toList))
+
+
   }
 
 }

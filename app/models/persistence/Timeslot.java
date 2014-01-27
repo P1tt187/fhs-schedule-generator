@@ -12,5 +12,5 @@ import play.db.ebean.Model.Finder;
 public class Timeslot extends AbstractTimeSlot {
 
 
-    public static Finder<Long,Timeslot> find = new Finder<>(Long.class,Timeslot.class);
+ //   public static Finder<Long,Timeslot> find = new Finder<>(Long.class,Timeslot.class);
 }

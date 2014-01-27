@@ -14,6 +14,7 @@ import play.db.ebean.Model;
 /**
  * Created by fabian on 27.01.14.
  */
+
 @MappedSuperclass
 public abstract class AbstractTimeSlot extends Model {
 

@@ -8,7 +8,7 @@ import play.api.data.Forms._
 import scala.collection.JavaConversions._
 
 import play.db.jpa._
-
+import play.libs.F._
 
 import models.fhs.pages.timeslot.MTimeslot
 import models.persistence.Timeslot
@@ -50,6 +50,7 @@ object CTimeslotDefintion extends Controller {
           slot.startMinute = timeslot.startMinutes
           slot.stopHour = timeslot.stopHour
           slot.stopMinute = timeslot.stopMinutes
+
 
           slot.save()
 
