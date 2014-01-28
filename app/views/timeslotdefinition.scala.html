@@ -1,4 +1,4 @@
-@(message: String, timeslotForm: Form[models.fhs.pages.timeslot.MTimeslot], weekdays: List[String])
+@(message: String, timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: List[String])
 
 
 
@@ -12,14 +12,15 @@
         @form(action = routes.CTimeslotDefintion.submit, 'class -> "col-xs-12 form-inline form-horizontal") {
             <h4>Beginn:</h4>
             <div class="input-group col-xs-7">
-                @inputText(timeslotForm("startHour"), '_class -> "form-control ", 'placeholder -> "Stunde", '_label -> None)
-                @inputText(timeslotForm("startMinute"), '_class -> "form-control", 'placeholder -> "Minute", '_label -> None)
+                @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ", '_label -> None, '_help -> "Stunde")
+                @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ",  '_label -> None, '_help -> "Minute")
             </div>
             <h4>Ende:</h4>
             <div class="input-group col-xs-7">
 
-                @inputText(timeslotForm("stopHour"), '_class -> "form-control ", 'placeholder -> "Stunde", '_label -> None)
-                @inputText(timeslotForm("stopMinute"), '_class -> "form-control ", 'placeholder -> "Minute", '_label -> None)
+                @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ", '_label -> None, '_help -> "Stunde")
+                @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ",  '_label -> None, '_help -> "Minute")
+
             </div>
             <h4>Wochentage:</h4>
             <div class="input-group col-xs-12">

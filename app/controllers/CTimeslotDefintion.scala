@@ -10,7 +10,7 @@ import scala.collection.JavaConversions._
 import play.db.jpa._
 import play.libs.F._
 
-import models.fhs.pages.timeslot.MTimeslot
+import models.fhs.pages.timeslot.MTimeslotDefine
 import models.persistence.{Node, Timeslot}
 import models._
 import java.util
@@ -23,14 +23,14 @@ object CTimeslotDefintion extends Controller {
 
   val NAV = "timeslotdefinition"
 
-  val timeslotForm: Form[MTimeslot] = Form(
+  val timeslotForm: Form[MTimeslotDefine] = Form(
     mapping(
       "startHour" -> number(min = 0, max = 23),
       "startMinute" -> number(min = 0, max = 59),
       "stopHour" -> number(min = 0, max = 23),
       "stopMinute" -> number(min = 0, max = 59),
       "weekdays" -> list(nonEmptyText)
-    )(MTimeslot.apply)(MTimeslot.unapply)
+    )(MTimeslotDefine.apply)(MTimeslotDefine.unapply)
   )
 
   @Transactional(readOnly = true)

@@ -13,4 +13,14 @@ import javax.persistence.Entity;
 public class Weekday extends Node{
     @Constraints.Required
     public String name;
+
+    @Constraints.Required
+    public Integer index;
+
+    @Override
+    public String toString() {
+        return "Weekday{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }

@@ -12,6 +12,7 @@ create table TBLNODE (
   STOPHOUR                  integer,
   STOPMINUTE                integer,
   name                      varchar(255),
+  index                     integer,
   constraint pk_TBLNODE primary key (ID))
 ;
 

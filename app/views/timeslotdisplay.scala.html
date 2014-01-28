@@ -1,5 +1,5 @@
-@(message: String, timeslots: List[models.persistence.Timeslot])
-@import models.persistence.Weekday
+@(message: String, timeslots: List[models.fhs.pages.timeslot.MTimeslotDisplay])
+
 
     @main(message, controllers.CTimeslotDisplay.NAV ) {
         <h1>
@@ -18,13 +18,13 @@
             @for(slot <- timeslots) {
                 <tr>
                     <td>
-                        @slot.startHour.formatted("%02d") : @slot.startMinute.formatted("%02d")
+                        @slot.startHour.formatted("%02d") : @slot.startMinutes.formatted("%02d")
                     </td>
                     <td>
-                        @slot.stopHour.formatted("%02d") : @slot.stopMinute.formatted("%02d")
+                        @slot.stopHour.formatted("%02d") : @slot.stopMinutes.formatted("%02d")
                     </td>
                     <td>
-                        @slot.parent.asInstanceOf[Weekday].name
+                        @slot.weekday
                 </td>
                 </tr>
             }
