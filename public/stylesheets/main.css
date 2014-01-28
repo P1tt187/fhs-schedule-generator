@@ -36,3 +36,9 @@ body {
 .container .text-muted {
     margin: 20px 0;
 }
+
+.selectwidthauto
+{
+    width:250px !important;
+    height: 130px !important;
+}

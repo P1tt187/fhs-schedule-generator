@@ -24,9 +24,9 @@
             </div>
             <h4>Wochentage:</h4>
             <div class="input-group col-xs-12">
-                <div class="control-group ">
+                <div class="control-group form-control">
                     <label class="control-label" for="weekdays"></label>
-                    <select class="form-control " id="weekdays" name="weekdays[]" multiple >
+                    <select class=" form-control "  id="weekdays" name="weekdays[]" multiple >
                     @for(dayname <- weekdays) {
                         <option value="@dayname">@dayname</option>
                     }
