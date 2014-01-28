@@ -1,4 +1,4 @@
-@(title: String,nav:String)(content: Html)
+@(title: String, nav: String)(content: Html)
 
 
 <!DOCTYPE html>
@@ -29,7 +29,7 @@
                 </div>
 
                 <ul class="nav nav-pills nav-tabs-justified " >
-                    @sidebar(nav)
+                @sidebar(nav)
                 </ul>
             </nav>
 
@@ -46,15 +46,15 @@
 
                 </ul>
             </nav>
-
-            <div class="container pagination-centered">
-                <section class="clearfix "> @content </section>
+            <div class="container">
+                    <div class="clearfix col-md-9" role="main"> @content </div>
             </div>
         </div>
         <footer id="footer">
             <div class="container" style="text-align : center">
                 <p class="text-muted">
-                    <a href="http://www.playframework.com">www.playframework.com</a>
+                    <a href="http://www.playframework.com">www.playframework.com</a> <br/>
+                    <a href="http://getbootstrap.com/">twitter brootstrap</a>
                 </p>
             </div>
         </footer>

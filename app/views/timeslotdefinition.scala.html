@@ -9,23 +9,23 @@
     @main(message, controllers.CTimeslotDefintion.NAV) {
         <h1>Timeslot Hinzufügen</h1>
 
-        @form(action = routes.CTimeslotDefintion.submit, 'class -> "col-md-12 form-inline form-horizontal") {
+        @form(action = routes.CTimeslotDefintion.submit, 'class -> "col-xs-12 form-inline form-horizontal") {
             <h4>Beginn:</h4>
-            <div class="input-group col-sm-7">
+            <div class="input-group col-xs-7">
                 @inputText(timeslotForm("startHour"), '_class -> "form-control ", 'placeholder -> "Stunde", '_label -> None)
                 @inputText(timeslotForm("startMinute"), '_class -> "form-control", 'placeholder -> "Minute", '_label -> None)
             </div>
             <h4>Ende:</h4>
-            <div class="input-group col-sm-7">
+            <div class="input-group col-xs-7">
 
                 @inputText(timeslotForm("stopHour"), '_class -> "form-control ", 'placeholder -> "Stunde", '_label -> None)
                 @inputText(timeslotForm("stopMinute"), '_class -> "form-control ", 'placeholder -> "Minute", '_label -> None)
             </div>
             <h4>Wochentage:</h4>
-            <div class="input-group col-sm-7">
-                <div class="control-group">
+            <div class="input-group col-xs-12">
+                <div class="control-group ">
                     <label class="control-label" for="weekdays"></label>
-                    <select class="checkbox" id="weekdays" name="weekdays[]" multiple="multiple" >
+                    <select class="form-control " id="weekdays" name="weekdays[]" multiple >
                     @for(dayname <- weekdays) {
                         <option value="@dayname">@dayname</option>
                     }
@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <div class="actions">
+            <div class="actions" style="margin-top: 30px">
                 <p><input type="submit" class="btn btn-success " value="senden" />
                     <a href="@routes.CTimeslotDefintion.page" class="btn btn-danger btn-sm" role="button">Abbrechen</a>
                 </p>
