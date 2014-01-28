@@ -1,33 +1,35 @@
 @(message: String, timeslots: List[models.fhs.pages.timeslot.MTimeslotDisplay])
 
 
-    @main(message, controllers.CTimeslotDisplay.NAV ) {
-        <h1>
-            Alle Timeslots
-        </h1>
+@main(message, controllers.CTimeslotDisplay.NAV) {
+    <h1>
+        Alle Timeslots
+    </h1>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Beginn</th>
-                    <th>Ende</th>
-                    <th>Wochentag</th>
-                </tr>
-            </thead>
-            <tbody>
-            @for(slot <- timeslots) {
-                <tr>
-                    <td>
-                        @slot.startHour.formatted("%02d") : @slot.startMinutes.formatted("%02d")
-                    </td>
-                    <td>
-                        @slot.stopHour.formatted("%02d") : @slot.stopMinutes.formatted("%02d")
-                    </td>
-                    <td>
-                        @slot.weekday
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Wochentag</th>
+                <th>Beginn</th>
+                <th>Ende</th>
+            </tr>
+        </thead>
+        <tbody>
+        @for(slot <- timeslots) {
+            <tr>
+                <td>
+                @slot.weekday
                 </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    }
+
+                <td>
+                    @slot.startHour.formatted("%02d") : @slot.startMinutes.formatted("%02d")
+                </td>
+                <td>
+                    @slot.stopHour.formatted("%02d") : @slot.stopMinutes.formatted("%02d")
+                </td>
+
+            </tr>
+        }
+        </tbody>
+    </table>
+}

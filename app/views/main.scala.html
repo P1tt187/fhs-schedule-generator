@@ -56,7 +56,8 @@
             <div class="container" style="text-align : center">
                 <p class="text-muted">
                     <a href="http://www.playframework.com">www.playframework.com</a> <br/>
-                    <a href="http://getbootstrap.com/">twitter brootstrap</a>
+                    <a href="http://getbootstrap.com/">twitter brootstrap</a><br/>
+                    <a href="http://silviomoreto.github.io/bootstrap-select/">Bootstrap-select</a>
                 </p>
             </div>
         </footer>
@@ -66,12 +67,11 @@
         <script type="text/javascript">
         $ ( window ).on ( 'load', function ( ) {
 
-        $ ( "select" ).addClass ( "selectpicker" ).attr ( 'data-live-search', true ) ;
-
-
+        $ ( "select" ).addClass ( "selectpicker" ).attr ( 'data-live-search', true );
 
         $ ( '.selectpicker' ).selectpicker ( {
-        'selectedText' : 'cat'
+        'selectedText' : 'cat',
+        'style':'btn-warning'
         } ) ;
 
         // $('.selectpicker').selectpicker('hide');
