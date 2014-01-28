@@ -1,4 +1,4 @@
-import models.persistence.Timeslot
+import models.persistence.{Weekday, Timeslot}
 import play.db.ebean.Model.Finder
 
 /**
@@ -7,5 +7,6 @@ import play.db.ebean.Model.Finder
 package object models {
 
   val TIMESLOT_FINDER = new Finder(classOf[Long],classOf[Timeslot])
+  val WEEKDAY_FINDER = new Finder(classOf[Long],classOf[Weekday])
 
 }

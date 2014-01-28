@@ -1,6 +1,8 @@
 package models.persistence;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import play.db.ebean.Model.Finder;
 
@@ -8,9 +10,9 @@ import play.db.ebean.Model.Finder;
  * Created by fabian on 27.01.14.
  */
 @Entity
-@Table(name = "TBLTIMESLOT")
+@DiscriminatorValue("TIMESLOT")
 public class Timeslot extends AbstractTimeSlot {
 
 
- //   public static Finder<Long,Timeslot> find = new Finder<>(Long.class,Timeslot.class);
+
 }

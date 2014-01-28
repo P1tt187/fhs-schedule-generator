@@ -3,17 +3,22 @@
 
 # --- !Ups
 
-create table TBLTIMESLOT (
-  ID                        bigint not null,
+create table TBLNODE (
+  dtype                     varchar(10) not null,
+  ID                        integer not null,
+  parent_ID                 integer,
   STARTHOUR                 integer,
   STARTMINUTE               integer,
   STOPHOUR                  integer,
   STOPMINUTE                integer,
-  constraint pk_TBLTIMESLOT primary key (ID))
+  name                      varchar(255),
+  constraint pk_TBLNODE primary key (ID))
 ;
 
-create sequence TBLTIMESLOT_seq;
+create sequence TBLNODE_seq;
 
+alter table TBLNODE add constraint fk_TBLNODE_parent_1 foreign key (parent_ID) references TBLNODE (ID) on delete restrict on update restrict;
+create index ix_TBLNODE_parent_1 on TBLNODE (parent_ID);
 
 
 
@@ -21,9 +26,9 @@ create sequence TBLTIMESLOT_seq;
 
 SET REFERENTIAL_INTEGRITY FALSE;
 
-drop table if exists TBLTIMESLOT;
+drop table if exists TBLNODE;
 
 SET REFERENTIAL_INTEGRITY TRUE;
 
-drop sequence if exists TBLTIMESLOT_seq;
+drop sequence if exists TBLNODE_seq;
 

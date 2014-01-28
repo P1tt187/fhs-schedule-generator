@@ -1,4 +1,5 @@
 @(message: String, timeslots: List[models.persistence.Timeslot])
+@import models.persistence.Weekday
 
     @main(message, controllers.CTimeslotDisplay.NAV ) {
         <h1>
@@ -10,7 +11,7 @@
                 <tr>
                     <th>Beginn</th>
                     <th>Ende</th>
-                    <th>Tollerant</th>
+                    <th>Wochentag</th>
                 </tr>
             </thead>
             <tbody>
@@ -23,6 +24,7 @@
                         @slot.stopHour.formatted("%02d") : @slot.stopMinute.formatted("%02d")
                     </td>
                     <td>
+                        @slot.parent.asInstanceOf[Weekday].name
                 </td>
                 </tr>
             }
