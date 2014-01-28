@@ -1,7 +1,6 @@
 @(message: String, timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: List[String])
 
 
-
     @import helper._
     @import helper.twitterBootstrap._
 
@@ -12,15 +11,13 @@
         @form(action = routes.CTimeslotDefintion.submit, 'class -> "col-xs-12 form-inline form-horizontal") {
             <h4>Beginn:</h4>
             <div class="input-group col-xs-7">
-                @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ", '_label -> None, '_help -> "Stunde")
-                @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ",  '_label -> None, '_help -> "Minute")
+                @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ", '_label -> "Stunde", '_help -> "")
+                @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ",  '_label -> "Minute", '_help -> "")
             </div>
             <h4>Ende:</h4>
             <div class="input-group col-xs-7">
-
-                @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ", '_label -> None, '_help -> "Stunde")
-                @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ",  '_label -> None, '_help -> "Minute")
-
+                @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ", '_label -> "Stunde", '_help -> "")
+                @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i=>(i.toString,i.toString)), '_class -> "form-control ",  '_label -> "Minute", '_help -> "")
             </div>
             <h4>Wochentage:</h4>
             <div class="input-group col-xs-12">
@@ -35,8 +32,8 @@
             </div>
 
             <div class="actions" style="margin-top: 30px">
-                <p><input type="submit" class="btn btn-success " value="senden" />
-                    <a href="@routes.CTimeslotDefintion.page" class="btn btn-danger btn-sm" role="button">Abbrechen</a>
+                <p ><input type="submit" class="btn btn-success " value="senden" />
+                    <a href="@routes.CTimeslotDefintion.page" class=" btn btn-danger btn-sm" role="button">Abbrechen</a>
                 </p>
             </div>
 

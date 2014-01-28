@@ -2,6 +2,7 @@ package models.persistence;
 
 import play.data.validation.Constraints;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
@@ -11,9 +12,12 @@ import javax.persistence.Entity;
 @Entity
 @DiscriminatorValue("WEEKDAY")
 public class Weekday extends Node{
+
+    @Column(name="NAME")
     @Constraints.Required
     public String name;
 
+    @Column(name="INDEX")
     @Constraints.Required
     public Integer index;
 

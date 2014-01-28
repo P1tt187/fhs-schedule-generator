@@ -4,7 +4,7 @@
 
 # Home page
 GET         /                      controllers.CIndex.index()
-GET         /timeslots             controllers.CTimeslotDefintion.page()
+GET         /defineTimeslots       controllers.CTimeslotDefintion.page()
 GET         /listTimeslots         controllers.CTimeslotDisplay.page()
 POST        /submitTimeslot        controllers.CTimeslotDefintion.submit()
 

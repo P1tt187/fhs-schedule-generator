@@ -1,19 +1,14 @@
 package models.persistence;
 
-import javax.persistence.*;
+import play.data.validation.Constraints;
 
-import play.db.ebean.*;
-import play.data.format.*;
-import play.data.validation.*;
-
-
-import play.data.validation.Validation;
-
-import play.db.ebean.Model;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 
 /**
  * Created by fabian on 27.01.14.
  */
+
 
 @Entity
 public abstract class AbstractTimeSlot extends Node {
