@@ -1,4 +1,4 @@
-import models.persistence.{Weekday, Timeslot}
+import models.persistence.scheduletree.{Timeslot, Weekday}
 import play.db.ebean.Model.Finder
 
 /**

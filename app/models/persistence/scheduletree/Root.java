@@ -1,4 +1,4 @@
-package models.persistence;
+package models.persistence.scheduletree;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;

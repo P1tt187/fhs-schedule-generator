@@ -1,10 +1,10 @@
-package models.persistence;
+package models.persistence.lecture;
 
+import models.persistence.participants.Participant;
 import play.data.validation.Constraints;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by fabian on 28.01.14.
@@ -16,4 +16,7 @@ public class Lecture extends AbstractLecture {
     @Column(name = "NAME")
     @Constraints.Required
     public String name;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lecture")
+    public List<Participant> participants;
 }

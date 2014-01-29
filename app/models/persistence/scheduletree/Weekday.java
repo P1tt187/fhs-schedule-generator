@@ -1,4 +1,4 @@
-package models.persistence;
+package models.persistence.scheduletree;
 
 import play.data.validation.Constraints;
 
@@ -19,7 +19,7 @@ public class Weekday extends Node{
 
     @Column(name="INDEX")
     @Constraints.Required
-    public Integer index;
+    public Integer sortIndex;
 
     @Override
     public String toString() {

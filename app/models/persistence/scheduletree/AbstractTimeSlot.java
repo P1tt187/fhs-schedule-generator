@@ -1,4 +1,4 @@
-package models.persistence;
+package models.persistence.scheduletree;
 
 import play.data.validation.Constraints;
 

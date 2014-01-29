@@ -8,12 +8,11 @@ import play.api.data.Forms._
 import scala.collection.JavaConversions._
 
 import play.db.jpa._
-import play.libs.F._
 
 import models.fhs.pages.timeslot.MTimeslotDefine
-import models.persistence.{Node, Timeslot}
 import models._
 import java.util
+import models.persistence.scheduletree.{Node, Timeslot}
 
 
 /**

@@ -1,5 +1,6 @@
 package models.persistence;
 
+import models.persistence.scheduletree.AbstractTimeSlot;
 import play.data.validation.Constraints;
 
 import javax.persistence.Column;

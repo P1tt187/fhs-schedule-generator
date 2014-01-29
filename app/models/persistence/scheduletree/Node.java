@@ -1,4 +1,4 @@
-package models.persistence;
+package models.persistence.scheduletree;
 
 import org.hibernate.annotations.DiscriminatorOptions;
 import play.db.ebean.Model;

@@ -3,7 +3,7 @@
  */
 
 import java.util
-import models.persistence.{Node, Weekday}
+import models.persistence.scheduletree.{Node, Weekday}
 import play.api._
 import models._
 
@@ -21,7 +21,7 @@ object Global extends GlobalSettings {
         daytuple =>
           val day = new Weekday
           day.name = daytuple._1
-          day.index = daytuple._2
+          day.sortIndex = daytuple._2
           day.children = new util.LinkedList[Node]
           day.save()
       }
