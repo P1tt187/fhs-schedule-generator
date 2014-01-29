@@ -34,51 +34,54 @@ object CTimeslotDefintion extends Controller {
 
   @Transactional(readOnly = true)
   def page = Action {
-    val weekdays= WEEKDAY_FINDER.all().map(_.name).toList
-    Ok(views.html.timeslotdefinition("Timeslots", timeslotForm,weekdays))
+    val weekdays = WEEKDAY_FINDER.all().map(_.name).toList
+    Ok(views.html.timeslotdefinition("Timeslots", List[String](), timeslotForm, weekdays))
     //Ok(views.html.index("test"))
   }
 
   @Transactional
   def submit = Action {
     implicit request =>
-      val timeslot = timeslotForm.bindFromRequest
+      val timeslotResult = timeslotForm.bindFromRequest
 
 
-      timeslot.fold(
-        errors =>{
-          val weekdays= WEEKDAY_FINDER.all().map(_.name).toList
-          BadRequest(views.html.timeslotdefinition("Timeslots", errors,weekdays))
+      timeslotResult.fold(
+        errors => {
+          val weekdays = WEEKDAY_FINDER.all().map(_.name).toList
+          BadRequest(views.html.timeslotdefinition("Timeslots", List[String](), errors, weekdays))
         },
         timeslot => {
 
           Logger.debug("weekdays" + timeslot.weekdays)
 
-          timeslot.weekdays.foreach{
-            dayname=>
+          if (timeslot.weekdays.isEmpty) {
+            val weekdays = WEEKDAY_FINDER.all().map(_.name).toList
+            BadRequest(views.html.timeslotdefinition("Timeslots", List("weekdays"), timeslotForm.fill(timeslot), weekdays))
+          } else {
 
-              val day = WEEKDAY_FINDER.where().eq("name",dayname).findUnique()
+            timeslot.weekdays.foreach {
+              dayname =>
 
-              val slot = new Timeslot
-              slot.startHour = timeslot.startHour
-              slot.startMinute = timeslot.startMinutes
-              slot.stopHour = timeslot.stopHour
-              slot.stopMinute = timeslot.stopMinutes
+                val day = WEEKDAY_FINDER.where().eq("name", dayname).findUnique()
 
-              slot.children=new util.LinkedList[Node]()
+                val slot = new Timeslot
+                slot.startHour = timeslot.startHour
+                slot.startMinute = timeslot.startMinutes
+                slot.stopHour = timeslot.stopHour
+                slot.stopMinute = timeslot.stopMinutes
 
-              slot.parent=day
-              day.children.add(slot)
+                slot.children = new util.LinkedList[Node]()
 
-              slot.save()
-              day.update()
+                slot.parent = day
+                day.children.add(slot)
 
+                slot.save()
+                day.update()
+
+            }
+
+            Redirect(routes.CTimeslotDisplay.page)
           }
-
-
-
-
-          Redirect(routes.CTimeslotDisplay.page)
         }
       )
   }
