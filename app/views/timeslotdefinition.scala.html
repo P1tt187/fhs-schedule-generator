@@ -1,9 +1,9 @@
 @(message: String, errorIds:List[String],timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: List[String])
 
-
     @import helper._
     @import helper.twitterBootstrap._
 
+@errorSelect=@{errorIds.contains("weekdays")}
 
     @main(message, controllers.CTimeslotDefintion.NAV) {
         <h1>Timeslot Hinzufügen</h1>
@@ -21,8 +21,8 @@
             </div>
             <h4>Wochentage:</h4>
             <div class="input-group col-xs-12">
-                <div class="control-group form-control @("alert alert-danger".when(errorIds.contains("weekdays")))">
-                    <label class="control-label" for="weekdays"></label>
+                <div class="control-group form-control @("alert alert-danger".when(errorSelect))">
+                    <label class="control-label" for="weekdays">@("Mindestens ein Wochentag muss ausgewählt sein".when(errorSelect))</label>
                     <select class=" form-control "  id="weekdays" name="weekdays[]" multiple title="nichts Ausgewählt">
                     @for(dayname <- weekdays) {
                         <option value="@dayname">@dayname</option>
