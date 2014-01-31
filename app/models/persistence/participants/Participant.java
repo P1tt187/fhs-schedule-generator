@@ -19,7 +19,7 @@ public abstract class Participant extends Model{
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long id;
 
-    @Column(name="SIZE")
+    @Column(name="SIZE", nullable = false)
     @Constraints.Required
     public Integer size;
 

@@ -36,7 +36,7 @@
 
             <nav class="collapse navbar-collapse " role="navigation">
                 <ul class="nav navbar-left navbar-pills nav-stacked" style="max-width : 300px ; margin-top :50px">
-                    <li class="@("active".when(nav == controllers.CIndex.NAV))"><a href="@routes.CIndex.index">
+                    <li class="@if(nav == controllers.CIndex.NAV){active}"><a href="@routes.CIndex.index">
                         Home</a></li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" href="#" data-toggle="dropdown">Menü
@@ -49,7 +49,7 @@
                 </ul>
             </nav>
             <div class="container">
-                <div class="clearfix col-md-9" role="main"> @content </div>
+                <article class="clearfix col-md-9" role="main"> @content </article>
             </div>
         </div>
         <footer id="footer">

@@ -10,7 +10,7 @@ import java.util.List;
 @DiscriminatorValue("COURSE")
 public class Course extends Participant {
 
-    @Column(name="NAME")
+    @Column(name="NAME", nullable = false)
     public String name;
 
     @OneToMany(cascade = CascadeType.ALL,mappedBy = "course")

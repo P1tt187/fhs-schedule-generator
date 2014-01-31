@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "TBLLECTURE")
 public class Lecture extends AbstractLecture {
 
-    @Column(name = "NAME")
+    @Column(name = "NAME", nullable = false)
     @Constraints.Required
     public String name;
 
