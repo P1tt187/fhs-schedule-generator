@@ -11,6 +11,7 @@ import javax.persistence.Entity;
  */
 @Entity
 @DiscriminatorValue("WEEKDAY")
+/**A weekday is a Node, containing a list of Timeslots*/
 public class Weekday extends Node{
 
     @Column(name="NAME")

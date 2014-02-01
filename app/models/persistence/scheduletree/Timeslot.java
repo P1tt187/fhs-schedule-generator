@@ -11,6 +11,7 @@ import javax.persistence.Entity;
  */
 @Entity
 @DiscriminatorValue("TIMESLOT")
+/** A timeslot is a Node*/
 public class Timeslot extends Node {
 
 

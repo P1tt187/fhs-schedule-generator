@@ -50,6 +50,7 @@ create table TBLParticipants (
 create table TBLROOM (
   ID                        bigint not null,
   CAPACITY                  integer not null,
+  HOUSE                     varchar(255),
   NUMBER                    integer not null,
   TOLERANCE                 boolean not null,
   PCPOOL                    boolean not null,

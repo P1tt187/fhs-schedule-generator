@@ -8,5 +8,9 @@ import javax.persistence.Entity;
  */
 @Entity
 @DiscriminatorValue("NROOT")
-public class Root extends Node{
+/**
+ * the root node of the scheduletree
+ * containing a list of Weekdays
+ */
+public class Root extends Node {
 }
