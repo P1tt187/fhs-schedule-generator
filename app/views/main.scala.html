@@ -38,8 +38,8 @@
             </nav>
 
             <nav class="collapse navbar-collapse " role="navigation">
-                <ul class="nav navbar-left navbar-pills nav-stacked" style="max-width : 300px ; margin-top :50px">
-                    <li class="@if(nav == controllers.CIndex.NAV){active}"><a href="@routes.CIndex.index">
+                <ul class="nav navbar-left navbar-pills nav-stacked" style="max-width : 300px ; margin-top : 50px">
+                    <li class="@if(nav == controllers.CIndex.NAV) {active}"><a href="@routes.CIndex.index">
                         Home</a></li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" href="#" data-toggle="dropdown">Menü
@@ -68,15 +68,15 @@
         <script type="text/javascript">
         $ ( window ).on ( 'load', function ( ) {
 
-        $ ( "select" ).addClass ( "selectpicker" ).attr ( 'data-live-search', true );
-
-        $ ( '.selectpicker' ).selectpicker ( {
+        $ ( "select" ).selectpicker ( {
         //'selectedText' : 'cat',
-        'style':'btn-warning'
+        'style' : 'btn-warning'
         } ) ;
 
         // $('.selectpicker').selectpicker('hide');
-        } ) ;
+        } ).attr ( 'data-live-search', true ) ;
+
+
         </script>
     </body>
 </html>
