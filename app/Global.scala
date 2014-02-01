@@ -2,6 +2,7 @@
  * Created by fabian on 28.01.14.
  */
 
+
 import java.util
 import models.persistence.scheduletree.{Node, Weekday}
 import play.api._
