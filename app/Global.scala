@@ -27,6 +27,7 @@ object Global extends GlobalSettings {
       }
       Logger.info("insert complete")
     }
+
     Logger.info("successfully initialized")
   }
 

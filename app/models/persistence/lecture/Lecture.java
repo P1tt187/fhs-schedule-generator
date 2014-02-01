@@ -1,5 +1,6 @@
 package models.persistence.lecture;
 
+import models.persistence.Docent;
 import models.persistence.participants.Participant;
 import play.data.validation.Constraints;
 
@@ -19,4 +20,8 @@ public class Lecture extends AbstractLecture {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lecture")
     public List<Participant> participants;
+
+    @OneToOne(optional = false)
+    @JoinColumn(name = "fk_docent")
+    public Docent docent;
 }
