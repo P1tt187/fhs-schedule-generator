@@ -13,7 +13,8 @@ import models.fhs.pages.timeslot.MTimeslotDefine
 import models._
 import java.util
 import models.persistence.scheduletree.{Node, Timeslot}
-
+import play.api.cache.Cached
+import play.api.Play._
 
 /**
  * Created by fabian on 23.01.14.
@@ -33,11 +34,14 @@ object CTimeslotDefintion extends Controller {
   )
 
   @Transactional(readOnly = true)
-  def page = Action {
-    val weekdays = WEEKDAY_FINDER.all().map(_.name).toList
-    Ok(views.html.timeslotdefinition("Timeslots", List[String](), timeslotForm, weekdays))
-    //Ok(views.html.index("test"))
-  }
+  def page =
+    Cached("CTIMESLOT") {
+      Action {
+        val weekdays = WEEKDAY_FINDER.all().map(_.name).toList
+        Ok(views.html.timeslotdefinition("Timeslots", List[String](), timeslotForm, weekdays))
+        //Ok(views.html.index("test"))
+      }
+    }
 
   @Transactional
   def submit = Action {
