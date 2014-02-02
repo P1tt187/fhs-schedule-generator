@@ -24,4 +24,28 @@ public class Lecture extends AbstractLecture {
     @OneToOne(optional = false)
     @JoinColumn(name = "fk_docent")
     public Docent docent;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Lecture lecture = (Lecture) o;
+
+        if (docent != null ? !docent.equals(lecture.docent) : lecture.docent != null) return false;
+        if (name != null ? !name.equals(lecture.name) : lecture.name != null) return false;
+        return !(participants != null ? !participants.equals(lecture.participants) : lecture.participants != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (participants != null ? participants.hashCode() : 0);
+        result = 31 * result + (docent != null ? docent.hashCode() : 0);
+        return result;
+    }
 }

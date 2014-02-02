@@ -20,7 +20,7 @@
     </head>
     <body>
         <div id="wrap">
-            <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+            <nav class="navbar navbar-fixed-top navbar-inverse collapse navbar-collapse navbar-inverse-collapse" role="navigation">
                     <!-- Brand and toggle get grouped for better mobile display -->
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="navbar-inverse-collapse">
@@ -32,7 +32,7 @@
                     <a class="navbar-brand" href="@routes.CIndex.index"> Schedule Generator</a>
                 </div>
 
-                <ul class="nav nav-pills nav-tabs-justified " >
+                <ul class="nav navbar-nav nav-tabs-justified nav-pills" style="">
                 @sidebar(nav)
                 </ul>
             </nav>
@@ -52,7 +52,7 @@
                 </ul>
             </nav>
             <div class="container">
-                <article class="clearfix col-md-9" role="main"> @content </article>
+                <article class="clearfix col-xs-12" role="main"> @content </article>
             </div>
         </div>
         <footer id="footer">
@@ -68,13 +68,15 @@
         <script type="text/javascript">
         $ ( window ).on ( 'load', function ( ) {
 
-        $ ( "select" ).selectpicker ( {
+        $ ( "select" ).attr ( 'data-live-search', true ).selectpicker ( {
         //'selectedText' : 'cat',
-        'style' : 'btn-warning'
+        'style' : 'btn-default'
         } ) ;
 
+
+
         // $('.selectpicker').selectpicker('hide');
-        } ).attr ( 'data-live-search', true ) ;
+        } ) ;
 
 
         </script>

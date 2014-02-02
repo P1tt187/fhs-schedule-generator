@@ -12,13 +12,13 @@ import javax.persistence.Entity;
 @Entity
 @DiscriminatorValue("WEEKDAY")
 /**A weekday is a Node, containing a list of Timeslots*/
-public class Weekday extends Node{
+public class Weekday extends Node implements Comparable<Weekday> {
 
-    @Column(name="NAME")
+    @Column(name = "NAME")
     @Constraints.Required
     public String name;
 
-    @Column(name="INDEX")
+    @Column(name = "INDEX")
     @Constraints.Required
     public Integer sortIndex;
 
@@ -27,5 +27,11 @@ public class Weekday extends Node{
         return "Weekday{" +
                 "name='" + name + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Weekday that) {
+        if (that == null) throw new IllegalArgumentException("that must not be null");
+        return sortIndex.compareTo(that.sortIndex);
     }
 }

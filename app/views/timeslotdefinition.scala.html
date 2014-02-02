@@ -8,21 +8,21 @@
     }
 
 @main(message, controllers.CTimeslotDefintion.NAV) {
-    <h1>Timeslot Hinzufügen</h1>
+    <h1>Zeitslot Hinzufügen</h1>
 
-    @form(action = routes.CTimeslotDefintion.submit, 'class -> "col-xs-12 form-inline form-horizontal") {
+    @form(action = routes.CTimeslotDefintion.submit, 'class -> "col-xs-8 form-inline form-horizontal") {
         <h4>Beginn:</h4>
-        <div class="input-group col-xs-7">
-            @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.toString)), '_class -> "form-control ", '_label -> "Stunde", '_help -> "")
-            @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.toString)), '_class -> "form-control ", '_label -> "Minute", '_help -> "")
+        <div class="input-group col-xs-12">
+            @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-control ", '_label -> "Stunde", '_help -> "")
+            @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d") )), '_class -> "form-control ", '_label -> "Minute", '_help -> "")
         </div>
         <h4>Ende:</h4>
-        <div class="input-group col-xs-7">
-            @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.toString)), '_class -> "form-control ", '_label -> "Stunde", '_help -> "")
-            @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.toString)), '_class -> "form-control ", '_label -> "Minute", '_help -> "")
+        <div class="input-group col-xs-12">
+            @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-control ", '_label -> "Stunde", '_help -> "")
+            @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-control ", '_label -> "Minute", '_help -> "")
         </div>
         <h4>Wochentage:</h4>
-        <div class="input-group col-xs-12">
+        <div class="input-group col-xs-12" style="margin-bottom : 30px">
             <div class='control-group form-control @if(errorSelect) {alert alert-danger}'>
                 <label class="control-label" for="weekdays">
                 @if(errorSelect) {
@@ -37,7 +37,7 @@
             </div>
         </div>
 
-        <div class="actions" style="margin-top : 30px">
+        <div class="input-group-btn" >
             <p ><input type="submit" class="btn btn-success " value="senden" />
                 <a href="@routes.CTimeslotDefintion.page" class=" btn btn-danger btn-sm" role="button">Abbrechen</a>
             </p>
