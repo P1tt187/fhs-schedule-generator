@@ -20,8 +20,8 @@ create table TBLLECTURE (
 
 create table TBLNODE (
   dtype                     varchar(10) not null,
-  ID                        integer not null,
-  parent_ID                 integer,
+  ID                        bigint not null,
+  parent_ID                 bigint,
   NAME                      varchar(255),
   INDEX                     integer,
   STARTHOUR                 integer,
@@ -38,13 +38,13 @@ create table TBLPARALLELLECTURE (
 
 create table TBLParticipants (
   dtype                     varchar(10) not null,
-  id                        bigint not null,
+  ID                        bigint not null,
   SIZE                      integer not null,
   lecture_ID                bigint,
+  parent_ID                 bigint,
+  course_ID                 bigint,
   NAME                      varchar(255) not null,
-  parent_id                 bigint,
-  course_id                 bigint,
-  constraint pk_TBLParticipants primary key (id))
+  constraint pk_TBLParticipants primary key (ID))
 ;
 
 create table TBLROOM (
@@ -65,7 +65,7 @@ create table TBLTIMESLOTCRITERIA (
   STARTMINUTE               integer not null,
   STOPHOUR                  integer not null,
   STOPMINUTE                integer not null,
-  fk_weekday                integer not null,
+  fk_weekday                bigint not null,
   constraint pk_TBLTIMESLOTCRITERIA primary key (ID))
 ;
 
@@ -91,10 +91,10 @@ alter table TBLNODE add constraint fk_TBLNODE_parent_3 foreign key (parent_ID) r
 create index ix_TBLNODE_parent_3 on TBLNODE (parent_ID);
 alter table TBLParticipants add constraint fk_TBLParticipants_lecture_4 foreign key (lecture_ID) references TBLLECTURE (ID) on delete restrict on update restrict;
 create index ix_TBLParticipants_lecture_4 on TBLParticipants (lecture_ID);
-alter table TBLParticipants add constraint fk_TBLParticipants_parent_5 foreign key (parent_id) references TBLParticipants (id) on delete restrict on update restrict;
-create index ix_TBLParticipants_parent_5 on TBLParticipants (parent_id);
-alter table TBLParticipants add constraint fk_TBLParticipants_course_6 foreign key (course_id) references TBLParticipants (id) on delete restrict on update restrict;
-create index ix_TBLParticipants_course_6 on TBLParticipants (course_id);
+alter table TBLParticipants add constraint fk_TBLParticipants_parent_5 foreign key (parent_ID) references TBLParticipants (ID) on delete restrict on update restrict;
+create index ix_TBLParticipants_parent_5 on TBLParticipants (parent_ID);
+alter table TBLParticipants add constraint fk_TBLParticipants_course_6 foreign key (course_ID) references TBLParticipants (ID) on delete restrict on update restrict;
+create index ix_TBLParticipants_course_6 on TBLParticipants (course_ID);
 alter table TBLTIMESLOTCRITERIA add constraint fk_TBLTIMESLOTCRITERIA_weekday_7 foreign key (fk_weekday) references TBLNODE (ID) on delete restrict on update restrict;
 create index ix_TBLTIMESLOTCRITERIA_weekday_7 on TBLTIMESLOTCRITERIA (fk_weekday);
 

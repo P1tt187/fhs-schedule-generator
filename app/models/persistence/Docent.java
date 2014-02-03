@@ -1,20 +1,16 @@
 package models.persistence;
 
-import play.db.ebean.Model;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * Created by fabian on 01.02.14.
  */
 @Entity
 @Table(name="TBLDOCENT")
-public class Docent extends Model{
+public class Docent extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name="ID")
-    public Long id;
 
     @Column(name = "FIRSTNAME")
     public String firstName;

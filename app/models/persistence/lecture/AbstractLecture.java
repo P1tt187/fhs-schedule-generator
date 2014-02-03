@@ -1,18 +1,14 @@
 package models.persistence.lecture;
 
-import play.db.ebean.Model;
+import models.persistence.AbstractEntity;
 
-import javax.persistence.*;
+import javax.persistence.MappedSuperclass;
 
 /**
  * Created by fabian on 28.01.14.
  */
 @MappedSuperclass
-public abstract class AbstractLecture extends Model {
+public abstract class AbstractLecture extends AbstractEntity {
 
 
-    @Id
-    @Column(name="ID")
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
 }

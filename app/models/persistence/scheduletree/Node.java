@@ -1,7 +1,7 @@
 package models.persistence.scheduletree;
 
+import models.persistence.AbstractEntity;
 import org.hibernate.annotations.DiscriminatorOptions;
-import play.db.ebean.Model;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,12 +15,7 @@ import java.util.List;
 @Table(name = "TBLNODE")
 @DiscriminatorOptions(force = true)
 /**superclass of all nodes. required to construct the schedule tree*/
-public abstract class Node extends Model {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID")
-    public Integer id;
+public abstract class Node extends AbstractEntity {
 
     /**
      * each node knows his parent node

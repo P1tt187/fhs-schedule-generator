@@ -1,9 +1,9 @@
 package models.persistence.participants;
 
+import models.persistence.AbstractEntity;
 import models.persistence.lecture.Lecture;
 import org.hibernate.annotations.DiscriminatorOptions;
 import play.data.validation.Constraints;
-import play.db.ebean.Model;
 
 import javax.persistence.*;
 
@@ -14,10 +14,7 @@ import javax.persistence.*;
 @Table(name="TBLParticipants")
 @DiscriminatorOptions(force = true)
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Participant extends Model{
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Long id;
+public abstract class Participant extends AbstractEntity{
 
     @Column(name="SIZE", nullable = false)
     @Constraints.Required

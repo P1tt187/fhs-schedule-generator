@@ -3,7 +3,6 @@ package models.persistence;
 
 import models.persistence.scheduletree.Weekday;
 import play.data.validation.Constraints;
-import play.db.ebean.Model;
 
 import javax.persistence.*;
 
@@ -12,14 +11,7 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "TBLTIMESLOTCRITERIA")
-public class TimeslotCriteria extends Model {
-
-
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID", nullable = false)
-    public Long id;
+public class TimeslotCriteria extends AbstractEntity {
 
     @Constraints.Required
     @Column(name = "TOLERANCE", nullable = false)
