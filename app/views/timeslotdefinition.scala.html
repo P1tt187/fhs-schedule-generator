@@ -8,9 +8,10 @@
     }
 
 @main(message, controllers.CTimeslotDefintion.NAV) {
-    <h1>Zeitslot Hinzufügen</h1>
-
-    @form(action = routes.CTimeslotDefintion.submit, 'class -> "col-xs-8 form-inline form-horizontal") {
+    <div class="page-header">
+        <h1>Zeitslot Hinzufügen</h1>
+    </div>
+    @form(action = routes.CTimeslotDefintion.submit, 'class -> "col-xs-8 form-inline ") {
         <h4>Beginn:</h4>
         <div class="input-group col-xs-12">
             @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-control ", '_label -> "Stunde", '_help -> "")
@@ -23,13 +24,13 @@
         </div>
         <h4>Wochentage:</h4>
         <div class="input-group col-xs-12" style="margin-bottom : 30px">
-            <div class='control-group form-control @if(errorSelect) {alert alert-danger}'>
+            <div class='control-group form-control @if(errorSelect) {alert alert-warning}'>
                 <label class="control-label" for="weekdays">
                 @if(errorSelect) {
                     Mindestens ein Wochentag <strong>muss</strong> ausgewählt sein!
                 }
                 </label>
-                <select class=" form-control " id="weekdays" name="weekdays[]" multiple title="nichts Ausgewählt">
+                <select class=" form-control @if(errorSelect){has-error}" id="weekdays" name="weekdays[]" multiple title="nichts Ausgewählt">
                 @for(dayname <- weekdays) {
                     <option value="@dayname">@dayname</option>
                 }
@@ -37,9 +38,9 @@
             </div>
         </div>
 
-        <div class="input-group " >
-            <span class=" input-group-btn"><input type="submit" class="form-control btn btn-success " value="senden" /> </span>
-            <span class=" input-group-btn"><a href="@routes.CTimeslotDefintion.page" class=" btn btn-danger form-control " role="button">Abbrechen</a></span>
+        <div class="btn-group btn-group-justified" >
+            <span class=" btn-group"><input type="submit" class="form-control btn btn-success " value="senden" /> </span>
+            <span class=" btn-group"><a href="@routes.CTimeslotDefintion.page" class=" btn btn-danger form-control " role="button">Abbrechen</a></span>
 
         </div>
 

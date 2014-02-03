@@ -52,7 +52,9 @@
                 </ul>
             </nav>
             <div class="container">
-                <article class="clearfix col-xs-12" role="main"> @content </article>
+            <div class="container-fluid">
+                <article class="clearfix row" role="main"> @content </article>
+            </div>
             </div>
         </div>
         <footer id="footer">
@@ -72,8 +74,6 @@
         //'selectedText' : 'cat',
         'style' : 'btn-default'
         } ) ;
-
-
 
         // $('.selectpicker').selectpicker('hide');
         } ) ;

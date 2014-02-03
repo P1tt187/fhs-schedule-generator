@@ -15,6 +15,7 @@ import java.util
 import models.persistence.scheduletree.{Node, Timeslot}
 import play.api.cache.Cached
 import play.api.Play._
+import com.avaje.ebean.Ebean
 
 /**
  * Created by fabian on 23.01.14.
@@ -88,6 +89,15 @@ object CTimeslotDefintion extends Controller {
           }
         }
       )
+  }
+
+
+  @Transactional
+  def delete(id:Long)= Action {
+
+   Ebean.delete (Ebean.find(classOf[Timeslot],id))
+
+    Redirect(routes.CTimeslotDisplay.page)
   }
 
 }

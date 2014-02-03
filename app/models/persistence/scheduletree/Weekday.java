@@ -18,7 +18,7 @@ public class Weekday extends Node implements Comparable<Weekday> {
     @Constraints.Required
     public String name;
 
-    @Column(name = "INDEX")
+    @Column(name = "SORTINDEX")
     @Constraints.Required
     public Integer sortIndex;
 

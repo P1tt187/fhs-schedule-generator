@@ -55,4 +55,15 @@ public class Timeslot extends Node {
         result = 31 * result + (stopMinute != null ? stopMinute.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Timeslot{" +
+                "startHour=" + startHour +
+                ", startMinute=" + startMinute +
+                ", stopHour=" + stopHour +
+                ", stopMinute=" + stopMinute +
+                ", weekday=" + parent+
+                '}';
+    }
 }

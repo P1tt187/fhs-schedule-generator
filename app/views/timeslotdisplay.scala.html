@@ -2,34 +2,40 @@
 
 
 @main(message, controllers.CTimeslotDisplay.NAV) {
-    <h1>
-        Alle Zeitslots
-    </h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Wochentag</th>
-                <th>Beginn</th>
-                <th>Ende</th>
-            </tr>
-        </thead>
-        <tbody>
-        @for(slot <- timeslots) {
-            <tr>
-                <td>
-                @slot.weekday
-                </td>
-
-                <td>
-                    @slot.startHour.formatted("%02d") : @slot.startMinutes.formatted("%02d")
-                </td>
-                <td>
-                    @slot.stopHour.formatted("%02d") : @slot.stopMinutes.formatted("%02d")
-                </td>
-
-            </tr>
-        }
-        </tbody>
-    </table>
+    <div class="page-header">
+        <h1>
+            Alle Zeitslots
+        </h1>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-condensed">
+            <thead>
+                <tr class="text-info">
+                    <th>Wochentag</th>
+                    <th>Beginn</th>
+                    <th>Ende</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="">
+            @for(slot <- timeslots) {
+                <tr class="active">
+                    <td>
+                    @slot.weekday
+                    </td>
+                    <td>
+                        @slot.startHour.formatted("%02d") : @slot.startMinutes.formatted("%02d")
+                    </td>
+                    <td>
+                        @slot.stopHour.formatted("%02d") : @slot.stopMinutes.formatted("%02d")
+                    </td>
+                    <td>
+                        <a class="btn btn-primary btn-sm" href="@routes.CTimeslotDefintion.delete(slot.id)">Löschen</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 }

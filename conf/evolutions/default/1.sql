@@ -4,14 +4,14 @@
 # --- !Ups
 
 create table TBLDOCENT (
-  ID                        bigint not null,
+  ID                        bigint auto_increment not null,
   FIRSTNAME                 varchar(255),
   LASTNAME                  varchar(255),
   constraint pk_TBLDOCENT primary key (ID))
 ;
 
 create table TBLLECTURE (
-  ID                        bigint not null,
+  ID                        bigint auto_increment not null,
   fk_lecture                bigint not null,
   NAME                      varchar(255) not null,
   fk_docent                 bigint not null,
@@ -20,10 +20,10 @@ create table TBLLECTURE (
 
 create table TBLNODE (
   dtype                     varchar(10) not null,
-  ID                        bigint not null,
+  ID                        bigint auto_increment not null,
   parent_ID                 bigint,
   NAME                      varchar(255),
-  INDEX                     integer,
+  SORTINDEX                 integer,
   STARTHOUR                 integer,
   STARTMINUTE               integer,
   STOPHOUR                  integer,
@@ -32,35 +32,34 @@ create table TBLNODE (
 ;
 
 create table TBLPARALLELLECTURE (
-  ID                        bigint not null,
+  ID                        bigint auto_increment not null,
   constraint pk_TBLPARALLELLECTURE primary key (ID))
 ;
 
 create table TBLParticipants (
   dtype                     varchar(10) not null,
-  ID                        bigint not null,
+  ID                        bigint auto_increment not null,
   SIZE                      integer not null,
   lecture_ID                bigint,
+  NAME                      varchar(255) not null,
   parent_ID                 bigint,
   course_ID                 bigint,
-  NAME                      varchar(255) not null,
   constraint pk_TBLParticipants primary key (ID))
 ;
 
 create table TBLROOM (
-  ID                        bigint not null,
+  ID                        bigint auto_increment not null,
   CAPACITY                  integer not null,
   HOUSE                     varchar(255),
   NUMBER                    integer not null,
-  TOLERANCE                 boolean not null,
-  PCPOOL                    boolean not null,
-  BEAMER                    boolean not null,
+  PCPOOL                    tinyint(1) default 0 not null,
+  BEAMER                    tinyint(1) default 0 not null,
   constraint pk_TBLROOM primary key (ID))
 ;
 
 create table TBLTIMESLOTCRITERIA (
-  ID                        bigint not null,
-  TOLERANCE                 boolean not null,
+  ID                        bigint auto_increment not null,
+  TOLERANCE                 tinyint(1) default 0 not null,
   STARTHOUR                 integer not null,
   STARTMINUTE               integer not null,
   STOPHOUR                  integer not null,
@@ -69,22 +68,8 @@ create table TBLTIMESLOTCRITERIA (
   constraint pk_TBLTIMESLOTCRITERIA primary key (ID))
 ;
 
-create sequence TBLDOCENT_seq;
-
-create sequence TBLLECTURE_seq;
-
-create sequence TBLNODE_seq;
-
-create sequence TBLPARALLELLECTURE_seq;
-
-create sequence TBLParticipants_seq;
-
-create sequence TBLROOM_seq;
-
-create sequence TBLTIMESLOTCRITERIA_seq;
-
-alter table TBLLECTURE add constraint fk_TBLLECTURE_TBLPARALLELLECTU_1 foreign key (fk_lecture) references TBLPARALLELLECTURE (ID) on delete restrict on update restrict;
-create index ix_TBLLECTURE_TBLPARALLELLECTU_1 on TBLLECTURE (fk_lecture);
+alter table TBLLECTURE add constraint fk_TBLLECTURE_TBLPARALLELLECTURE_1 foreign key (fk_lecture) references TBLPARALLELLECTURE (ID) on delete restrict on update restrict;
+create index ix_TBLLECTURE_TBLPARALLELLECTURE_1 on TBLLECTURE (fk_lecture);
 alter table TBLLECTURE add constraint fk_TBLLECTURE_docent_2 foreign key (fk_docent) references TBLDOCENT (ID) on delete restrict on update restrict;
 create index ix_TBLLECTURE_docent_2 on TBLLECTURE (fk_docent);
 alter table TBLNODE add constraint fk_TBLNODE_parent_3 foreign key (parent_ID) references TBLNODE (ID) on delete restrict on update restrict;
@@ -102,35 +87,21 @@ create index ix_TBLTIMESLOTCRITERIA_weekday_7 on TBLTIMESLOTCRITERIA (fk_weekday
 
 # --- !Downs
 
-SET REFERENTIAL_INTEGRITY FALSE;
+SET FOREIGN_KEY_CHECKS=0;
 
-drop table if exists TBLDOCENT;
+drop table TBLDOCENT;
 
-drop table if exists TBLLECTURE;
+drop table TBLLECTURE;
 
-drop table if exists TBLNODE;
+drop table TBLNODE;
 
-drop table if exists TBLPARALLELLECTURE;
+drop table TBLPARALLELLECTURE;
 
-drop table if exists TBLParticipants;
+drop table TBLParticipants;
 
-drop table if exists TBLROOM;
+drop table TBLROOM;
 
-drop table if exists TBLTIMESLOTCRITERIA;
+drop table TBLTIMESLOTCRITERIA;
 
-SET REFERENTIAL_INTEGRITY TRUE;
-
-drop sequence if exists TBLDOCENT_seq;
-
-drop sequence if exists TBLLECTURE_seq;
-
-drop sequence if exists TBLNODE_seq;
-
-drop sequence if exists TBLPARALLELLECTURE_seq;
-
-drop sequence if exists TBLParticipants_seq;
-
-drop sequence if exists TBLROOM_seq;
-
-drop sequence if exists TBLTIMESLOTCRITERIA_seq;
+SET FOREIGN_KEY_CHECKS=1;
 

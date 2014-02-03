@@ -1,5 +1,13 @@
-@(nav:String)
+@(nav: String)
 
+    @navList = @{
+        List(
+            (CTimeslotDefintion.NAV, routes.CTimeslotDefintion.page, "Zeitslots Definieren"),
+            (CTimeslotDisplay.NAV, routes.CTimeslotDisplay.page, "Zeitslots Anzeigen")
+        )
+    }
 
-<li class="@("active".when(nav == CTimeslotDefintion.NAV))"><a href="@routes.CTimeslotDefintion.page">Zeitslots Definieren</a></li>
-<li class="@("active".when(nav == CTimeslotDisplay.NAV))"><a  href="@routes.CTimeslotDisplay.page">Zeitslots Anzeigen</a></li>
+    @for(element <- navList) {
+        <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+    }
+

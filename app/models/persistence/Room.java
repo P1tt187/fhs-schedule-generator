@@ -34,9 +34,6 @@ public class Room extends AbstractEntity {
     @Constraints.Required
     public Integer number;
 
-    @Column(name = "TOLERANCE", nullable = false)
-    @Constraints.Required
-    public Boolean tolerance;
 
     /**
      * Room is pc pool
@@ -44,6 +41,13 @@ public class Room extends AbstractEntity {
     @Column(name = "PCPOOL", nullable = false)
     @Constraints.Required
     public Boolean pcPool;
+
+    /**
+     * Room has beamer
+     */
+    @Column(name = "BEAMER", nullable = false)
+    @Constraints.Required
+    public Boolean beamer;
 
     @Override
     public boolean equals(Object o) {
@@ -58,7 +62,6 @@ public class Room extends AbstractEntity {
         if (house != null ? !house.equals(room.house) : room.house != null) return false;
         if (number != null ? !number.equals(room.number) : room.number != null) return false;
         if (pcPool != null ? !pcPool.equals(room.pcPool) : room.pcPool != null) return false;
-        if (tolerance != null ? !tolerance.equals(room.tolerance) : room.tolerance != null) return false;
 
         return true;
     }
@@ -69,17 +72,10 @@ public class Room extends AbstractEntity {
         result = 31 * result + (capacity != null ? capacity.hashCode() : 0);
         result = 31 * result + (house != null ? house.hashCode() : 0);
         result = 31 * result + (number != null ? number.hashCode() : 0);
-        result = 31 * result + (tolerance != null ? tolerance.hashCode() : 0);
         result = 31 * result + (pcPool != null ? pcPool.hashCode() : 0);
         result = 31 * result + (beamer != null ? beamer.hashCode() : 0);
         return result;
     }
 
-    /**
-     * Room has beamer
-     */
-    @Column(name = "BEAMER", nullable = false)
-    @Constraints.Required
-    public Boolean beamer;
 
 }
