@@ -3,11 +3,12 @@
     @navList = @{
         List(
             (CTimeslotDefintion.NAV, routes.CTimeslotDefintion.page, "Zeitslots Definieren"),
-            (CTimeslotDisplay.NAV, routes.CTimeslotDisplay.page, "Zeitslots Anzeigen")
+            (CTimeslotDisplay.NAV, routes.CTimeslotDisplay.page, "Zeitslots Anzeigen"),
+            (CRoomDefinition.NAV, routes.CRoomDefinition.page, "Räume erstellen")
         )
     }
 
-    @for(element <- navList) {
-        <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
-    }
+@for(element <- navList) {
+    <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+}
 

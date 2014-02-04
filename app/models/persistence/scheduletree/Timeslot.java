@@ -70,6 +70,10 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
     @Override
     public int compareTo(Timeslot that) {
 
+        if (that == null) {
+            return -1;
+        }
+
         Weekday thisWeekday = (Weekday) parent;
         Weekday thatWeekday = (Weekday) that.parent;
 

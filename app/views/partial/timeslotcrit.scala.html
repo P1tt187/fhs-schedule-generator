@@ -1,0 +1,86 @@
+@(roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion])
+@* @repeat(roomDefForm("timeCriterias"),min=1){ element =>
+<h4>Beginn:</h4>
+
+@select(element("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span2 ", '_label -> "Stunde", '_help -> "")
+@select(element("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d") )), '_class -> "form-group span2 ", '_label -> "Minute", '_help -> "")
+
+<h4>Ende:</h4>
+
+@select(element("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span2 ", '_label -> "Stunde", '_help -> "")
+@select(element("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span2 ", '_label -> "Minute", '_help -> "")
+
+} *@
+    @hours = @{
+        (0 to 23).map {
+            i =>
+                new Html("'<option value=" + i + ">" + i.formatted("%02d") + "</option>'+")
+        }
+    }
+
+    @minutes = @{
+        (0 to 59 by 5).map {
+            i =>
+                new Html("'<option value=" + i + ">" + i.formatted("%02d") + "</option>'+")
+        }
+    }
+<script type="text/javascript">
+var i = 0 ;
+function addTimeCritInput ( ) {
+$ ( "#timeslotcrit" ).append (
+'<div class="panel panel-info container-fluid"> ' +
+'<div class="row-fluid"> ' +
+'<h4>Beginn:</h4>' +
+'<div class="clearfix form-group span2  " id="timeCriterias_' + i + '_startHour_field">' +
+'<label for="timeCriterias_' + i + '_startHour">Stunde</label>' +
+'<div class="input">' +
+'<select id="timeCriterias_0_startHour" name="timeCriterias[' + i + '].startHour" >' +
+    @hours
+'</select>' +
+'<span class="help-inline"></span>' +
+'<span class="help-block"></span>' +
+'</div>' +
+'</div>' +
+'<div class="clearfix form-group span2  " id="timeCriterias_' + i + '_startMinute_field">' +
+'<label for="timeCriterias_' + i + '_startMinute">Minute</label>' +
+'<div class="input">' +
+'<select id="timeCriterias_' + i + '_startMinute" name="timeCriterias[' + i + '].startMinute" >' +
+    @minutes
+'</select>' +
+'<span class="help-inline"></span>' +
+'<span class="help-block"></span>' +
+'</div>' +
+'</div>' +
+'<h4>Ende:</h4>' +
+'<div class="clearfix form-group span2  " id="timeCriterias_' + i + '_stopHour_field">' +
+'<label for="timeCriterias_' + i + '_stopHour">Stunde</label>' +
+'<div class="input">' +
+'<select id="timeCriterias_' + i + '_stopHour" name="timeCriterias[' + i + '].stopHour" >' +
+    @hours
+'</select>' +
+'<span class="help-inline"></span>' +
+'<span class="help-block"></span>' +
+'</div>' +
+'</div>' +
+'<div class="clearfix form-group span2  " id="timeCriterias_' + i + '_stopMinute_field">' +
+'<label for="timeCriterias_' + i + '_stopMinute">Minute</label>' +
+'<div class="input">' +
+'<select id="timeCriterias_' + i + '_stopMinute" name="timeCriterias[' + i + '].stopMinute" >' +
+    @minutes
+'</select>' +
+'<span class="help-inline"></span>' +
+'<span class="help-block"></span>' +
+'</div>' +
+'</div>' +
+'</div>' +
+'</div>' ) ;
+i ++ ;
+$ ( "select" ).attr ( 'data-live-search', true ).selectpicker ( {
+//'selectedText' : 'cat',
+'style' : 'btn-default'
+} ) ;
+
+
+}
+</script>
+

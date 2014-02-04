@@ -1,0 +1,38 @@
+@(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion])
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@main(title, CRoomDefinition.NAV) {
+    @partial.timeslotcrit(roomDefForm)
+    <div class="page-header">
+        <h1> Räume </h1>
+    </div>
+
+    <div class="clearfix">
+        <div class="row-fluid">
+        @form(action = routes.CRoomDefinition.addRoom, 'class -> "span12  form-inline") {
+
+            <fieldset>
+                @inputText(roomDefForm("capacity"), '_class -> "form-group span2")
+                @inputText(roomDefForm("house"), '_class -> "form-group span2")
+                @inputText(roomDefForm("number"), '_class -> "form-group span2")
+                <br/>
+                @checkbox(roomDefForm("pcpool"), '_class -> "form-group span2")
+                @checkbox(roomDefForm("beamer"), '_class -> "form-group span2")
+            </fieldset>
+            <fieldset>
+
+                <input class="btn btn-primary" value="+Zeitkriterium" onclick="addTimeCritInput();" />
+
+                <div id="timeslotcrit">
+
+                </div>
+
+            </fieldset>
+
+        }
+        </div>
+    </div>
+
+}
