@@ -1,21 +1,24 @@
 package models.persistence;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import models.persistence.criteria.CriteriaContainer;
+import play.data.validation.Constraints;
+
+import javax.persistence.*;
 
 /**
  * Created by fabian on 01.02.14.
  */
 @Entity
-@Table(name="TBLDOCENT")
+@Table(name = "TBLDOCENT")
 public class Docent extends AbstractEntity {
 
 
     @Column(name = "FIRSTNAME")
+    @Constraints.Required
     public String firstName;
 
     @Column(name = "LASTNAME")
+    @Constraints.Required
     public String lastName;
 
     @Override
@@ -32,6 +35,14 @@ public class Docent extends AbstractEntity {
 
         return true;
     }
+
+    /**
+     * contains all criterias
+     */
+    @JoinTable(name = "fk_critcontainer")
+    @OneToOne(cascade = CascadeType.ALL)
+    @Constraints.Required
+    public CriteriaContainer criteriaContainer;
 
     @Override
     public int hashCode() {

@@ -20,14 +20,14 @@ object CTimeslotDisplay extends Controller {
   @Transactional(readOnly = true)
   def page() = Action {
 
-    val timeslots= TIMESLOT_FINDER.findList()
+    val timeslots = TIMESLOT_FINDER.findList()
 
     Logger.debug(timeslots.toString)
 
     val timeslotDisplay = timeslots.map {
       entry =>
 
-        MTimeslotDisplay(entry.id ,entry.startHour, entry.startMinute, entry.stopHour, entry.stopMinute, entry.parent.asInstanceOf[Weekday].name, entry.parent.asInstanceOf[Weekday].sortIndex)
+        MTimeslotDisplay(entry.id, entry.startHour, entry.startMinute, entry.stopHour, entry.stopMinute, entry.parent.asInstanceOf[Weekday].name, entry.parent.asInstanceOf[Weekday].sortIndex)
     }.sortWith(_ < _).toList
 
 

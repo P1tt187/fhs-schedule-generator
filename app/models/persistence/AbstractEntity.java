@@ -3,9 +3,7 @@ package models.persistence;
 import play.data.validation.Constraints;
 import play.db.ebean.Model;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 
 /**
  * Created by fabian on 03.02.14.
@@ -17,7 +15,8 @@ public abstract class AbstractEntity extends Model {
      * database id
      */
     @Id
-    @Column(name = "ID", nullable = false)
+    @Column(name = "THE_ID", nullable = false)
     @Constraints.Required
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public Long id;
 }

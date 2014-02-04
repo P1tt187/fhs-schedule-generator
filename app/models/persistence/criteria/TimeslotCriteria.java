@@ -1,4 +1,4 @@
-package models.persistence;
+package models.persistence.criteria;
 
 
 import models.persistence.scheduletree.Weekday;
@@ -10,12 +10,9 @@ import javax.persistence.*;
  * Created by fabian on 28.01.14.
  */
 @Entity
-@Table(name = "TBLTIMESLOTCRITERIA")
-public class TimeslotCriteria extends AbstractEntity {
+@DiscriminatorValue("TSLOTCRIT")
+public class TimeslotCriteria extends AbstractCriteria {
 
-    @Constraints.Required
-    @Column(name = "TOLERANCE", nullable = false)
-    public Boolean tolerance;
 
     @Column(name = "STARTHOUR", nullable = false)
     @Constraints.Required

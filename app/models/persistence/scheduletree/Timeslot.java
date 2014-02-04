@@ -12,7 +12,7 @@ import javax.persistence.Entity;
 @Entity
 @DiscriminatorValue("TIMESLOT")
 /** A timeslot is a Node*/
-public class Timeslot extends Node {
+public class Timeslot extends Node implements Comparable<Timeslot> {
 
 
     @Column(name = "STARTHOUR")
@@ -63,7 +63,36 @@ public class Timeslot extends Node {
                 ", startMinute=" + startMinute +
                 ", stopHour=" + stopHour +
                 ", stopMinute=" + stopMinute +
-                ", weekday=" + parent+
+                ", weekday=" + parent +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Timeslot that) {
+
+        Weekday thisWeekday = (Weekday) parent;
+        Weekday thatWeekday = (Weekday) that.parent;
+
+        int ret = thisWeekday.compareTo(thatWeekday);
+        if (ret != 0) {
+            return ret;
+        }
+        ret = this.startHour.compareTo(that.startHour);
+        if (ret != 0) {
+            return ret;
+        }
+
+        ret = this.startMinute.compareTo(that.startMinute);
+        if (ret != 0) {
+            return ret;
+        }
+        ret = this.stopHour.compareTo(that.stopHour);
+        if (ret != 0) {
+            return ret;
+
+        }
+
+
+        return this.stopMinute.compareTo(that.stopMinute);
     }
 }

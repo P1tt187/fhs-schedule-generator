@@ -1,10 +1,9 @@
 package models.persistence;
 
+import models.persistence.criteria.CriteriaContainer;
 import play.data.validation.Constraints;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Created by fabian on 31.01.14.
@@ -48,6 +47,14 @@ public class Room extends AbstractEntity {
     @Column(name = "BEAMER", nullable = false)
     @Constraints.Required
     public Boolean beamer;
+
+    /**
+     * contains all criterias
+     */
+    @JoinTable(name = "fk_critcontainer")
+    @OneToOne(cascade = CascadeType.ALL)
+    @Constraints.Required
+    public CriteriaContainer criteriaContainer;
 
     @Override
     public boolean equals(Object o) {
