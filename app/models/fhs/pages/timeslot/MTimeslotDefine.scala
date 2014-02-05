@@ -3,7 +3,7 @@ package models.fhs.pages.timeslot
 /**
  * Created by fabian on 23.01.14.
  */
-case class MTimeslotDefine(startHour: Int, startMinutes: Int, stopHour: Int, stopMinutes: Int, weekdays: List[String])
+case class MTimeslotDefine(startHour: Int, startMinutes: Int, stopHour: Int, stopMinutes: Int, weekdays: List[Int])
 
 case class MTimeslotDisplay(id: Long, startHour: Int, startMinutes: Int, stopHour: Int, stopMinutes: Int, weekday: String, weekdayIndex: Int) extends Ordered[MTimeslotDisplay] {
   def compare(that: MTimeslotDisplay): Int = {

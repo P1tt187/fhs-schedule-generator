@@ -1,4 +1,4 @@
-@(message: String, errorIds: List[String], timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: List[String])
+@(message: String, errorIds: List[String], timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: Seq[(String,String)])
 
 @import helper._
 @import helper.twitterBootstrap._
@@ -32,7 +32,7 @@
                 </label>
                 <select class=" form-control @if(errorSelect){has-error}" id="weekdays" name="weekdays[]" multiple title="nichts Ausgewählt">
                 @for(dayname <- weekdays) {
-                    <option value="@dayname">@dayname</option>
+                    <option value="@dayname._1">@dayname._2</option>
                 }
                 </select>
             </div>
