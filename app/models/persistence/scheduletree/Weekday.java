@@ -1,7 +1,5 @@
 package models.persistence.scheduletree;
 
-import play.data.validation.Constraints;
-
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -16,12 +14,10 @@ import java.util.LinkedList;
 public class Weekday extends Node implements Comparable<Weekday> {
 
     @Column(name = "NAME")
-    @Constraints.Required
-    public String name;
+    private String name;
 
     @Column(name = "SORTINDEX")
-    @Constraints.Required
-    public Integer sortIndex;
+    private Integer sortIndex;
 
     /** constructor for fields */
     public Weekday(String name, int sortIndex) {
@@ -83,5 +79,21 @@ public class Weekday extends Node implements Comparable<Weekday> {
         }
 
         return new Weekday(name, sortIndex);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getSortIndex() {
+        return sortIndex;
+    }
+
+    public void setSortIndex(Integer sortIndex) {
+        this.sortIndex = sortIndex;
     }
 }

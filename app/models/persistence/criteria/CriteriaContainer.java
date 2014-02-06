@@ -15,6 +15,14 @@ public class CriteriaContainer extends AbstractEntity {
     /** criterias */
     @JoinColumn(name = "fk_criteria", referencedColumnName = "ID")
     @OneToMany(cascade = CascadeType.ALL)
-    public List<AbstractCriteria> criterias;
+    private List<AbstractCriteria> criterias;
 
+
+    public List<AbstractCriteria> getCriterias() {
+        return criterias;
+    }
+
+    public void setCriterias(List<AbstractCriteria> criterias) {
+        this.criterias = criterias;
+    }
 }

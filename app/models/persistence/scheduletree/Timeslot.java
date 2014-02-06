@@ -1,7 +1,5 @@
 package models.persistence.scheduletree;
 
-import play.data.validation.Constraints;
-
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -14,20 +12,60 @@ import javax.persistence.Entity;
 /** A timeslot is a Node*/
 public class Timeslot extends Node implements Comparable<Timeslot> {
 
+    public Timeslot(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute) {
+        this.startHour = startHour;
+        this.startMinute = startMinute;
+        this.stopHour = stopHour;
+        this.stopMinute = stopMinute;
+    }
 
-    @Column(name = "STARTHOUR")
-    @Constraints.Required
-    public Integer startHour;
-    @Column(name = "STARTMINUTE")
-    @Constraints.Required
-    public Integer startMinute;
+    public Timeslot() {
 
-    @Constraints.Required
-    @Column(name = "STOPHOUR")
-    public Integer stopHour;
-    @Constraints.Required
-    @Column(name = "STOPMINUTE")
-    public Integer stopMinute;
+    }
+
+    @Column(name = "STARTHOUR", nullable = false)
+    private Integer startHour;
+    @Column(name = "STARTMINUTE", nullable = false)
+    private Integer startMinute;
+
+
+    @Column(name = "STOPHOUR", nullable = false)
+    private Integer stopHour;
+
+    @Column(name = "STOPMINUTE", nullable = false)
+    private Integer stopMinute;
+
+    public Integer getStartHour() {
+        return startHour;
+    }
+
+    public void setStartHour(Integer startHour) {
+        this.startHour = startHour;
+    }
+
+    public Integer getStartMinute() {
+        return startMinute;
+    }
+
+    public void setStartMinute(Integer startMinute) {
+        this.startMinute = startMinute;
+    }
+
+    public Integer getStopHour() {
+        return stopHour;
+    }
+
+    public void setStopHour(Integer stopHour) {
+        this.stopHour = stopHour;
+    }
+
+    public Integer getStopMinute() {
+        return stopMinute;
+    }
+
+    public void setStopMinute(Integer stopMinute) {
+        this.stopMinute = stopMinute;
+    }
 
     @Override
     public boolean equals(Object o) {

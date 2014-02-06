@@ -5,13 +5,12 @@ import play.api.data._
 import play.api.data.Forms._
 import models.fhs.pages.roomdefinition.{MTtimeslotCritDefine, MRoomdefintion}
 import play.api.Logger
-import models.persistence.Room
-import models.persistence.criteria.{TimeslotCriteria, AbstractCriteria, CriteriaContainer}
+import models.persistence.criteria.CriteriaContainer
 import java.util
-import play.db.ebean.Transactional
 import models._
-import scala.collection.JavaConversions._
 import models.persistence.scheduletree.Weekday
+import models.persistence.Room
+import models.persistence.criteria.{AbstractCriteria, TimeslotCriteria}
 
 /**
  * Created by fabian on 04.02.14.
@@ -42,7 +41,6 @@ object CRoomDefinition extends Controller {
     Ok(views.html.roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS))
   }
 
-  @Transactional
   def submitRoom = Action {
     implicit request =>
 
@@ -55,34 +53,34 @@ object CRoomDefinition extends Controller {
 
           val roomDAO = new Room(room.capacity, room.house, room.number, room.pcpools, room.beamer)
 
-          roomDAO.criteriaContainer = new CriteriaContainer
-          roomDAO.criteriaContainer.criterias = new util.LinkedList[AbstractCriteria]()
-          //roomDAO.criteriaContainer.save()
-          //roomDAO.save()
+          roomDAO.setCriteriaContainer(new CriteriaContainer)
+          roomDAO.getCriteriaContainer.setCriterias(new util.LinkedList[AbstractCriteria]())
+
           room.timeCriterias foreach {
             crit =>
               crit.weekdays foreach {
                 sortIndex =>
-                  val weekdayList = WEEKDAY_FINDER.where.eq("sortIndex", sortIndex).findList()
+                  val dbResult = MRoomdefintion.findWeekdayBySortIndex(sortIndex)
 
-                  val filterList = weekdayList.filter(_.parent == null)
-
-                  val weekday = if (filterList.isEmpty) {
+                  val weekday = if (dbResult == null) {
                     val day = Weekday.createWeekdayFromSortIndex(sortIndex)
-                    day.save()
                     day
                   } else {
-                    filterList(0)
+                    dbResult
                   }
                   val timeslotCriteria = new TimeslotCriteria(crit.startHour, crit.startMinutes, crit.stopHour, crit.stopMinutes, weekday)
-                  timeslotCriteria.priority = 10
-                  timeslotCriteria.tolerance = false
-                  //timeslotCriteria.save()
+                  timeslotCriteria.setPriority( 10)
+                  timeslotCriteria.setTolerance( false)
 
-                  roomDAO.criteriaContainer.criterias.add(timeslotCriteria)
+
+                  roomDAO.getCriteriaContainer.getCriterias.add(timeslotCriteria)
               }
           }
-          roomDAO.save()
+          Transactions {
+            implicit entitiManager =>
+              entitiManager.persist(roomDAO)
+          }
+
           Redirect(routes.CRoomDefinition.page)
         }
       )

@@ -17,21 +17,21 @@ public class Room extends AbstractEntity {
      */
     @Column(name = "CAPACITY", nullable = false)
     @Constraints.Required
-    public Integer capacity;
+    private Integer capacity;
 
     /**
      * in wich house is the room
      */
     @Column(name = "HOUSE")
     @Constraints.Required
-    public String house;
+    private String house;
 
     /**
      * number of room in house
      */
     @Column(name = "NUMBER", nullable = false)
     @Constraints.Required
-    public Integer number;
+    private Integer number;
 
 
     /**
@@ -39,14 +39,14 @@ public class Room extends AbstractEntity {
      */
     @Column(name = "PCPOOL", nullable = false)
     @Constraints.Required
-    public Boolean pcPool;
+    private Boolean pcPool;
 
     /**
      * Room has beamer
      */
     @Column(name = "BEAMER", nullable = false)
     @Constraints.Required
-    public Boolean beamer;
+    private Boolean beamer;
 
     /**
      * contains all criterias
@@ -54,7 +54,55 @@ public class Room extends AbstractEntity {
     //@JoinTable(name = "fk_critcontainer")
     @OneToOne(cascade = CascadeType.ALL, targetEntity = CriteriaContainer.class)
     @Constraints.Required
-    public CriteriaContainer criteriaContainer;
+    private CriteriaContainer criteriaContainer;
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    public String getHouse() {
+        return house;
+    }
+
+    public void setHouse(String house) {
+        this.house = house;
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    public Boolean getPcPool() {
+        return pcPool;
+    }
+
+    public void setPcPool(Boolean pcPool) {
+        this.pcPool = pcPool;
+    }
+
+    public Boolean getBeamer() {
+        return beamer;
+    }
+
+    public void setBeamer(Boolean beamer) {
+        this.beamer = beamer;
+    }
+
+    public CriteriaContainer getCriteriaContainer() {
+        return criteriaContainer;
+    }
+
+    public void setCriteriaContainer(CriteriaContainer criteriaContainer) {
+        this.criteriaContainer = criteriaContainer;
+    }
 
     /**
      * default constructor

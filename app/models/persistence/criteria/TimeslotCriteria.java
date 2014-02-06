@@ -2,7 +2,6 @@ package models.persistence.criteria;
 
 
 import models.persistence.scheduletree.Weekday;
-import play.data.validation.Constraints;
 
 import javax.persistence.*;
 
@@ -27,23 +26,62 @@ public class TimeslotCriteria extends AbstractCriteria {
     }
 
     @Column(name = "STARTHOUR", nullable = false)
-    @Constraints.Required
-    public Integer startHour;
+    private Integer startHour;
     @Column(name = "STARTMINUTE", nullable = false)
-    @Constraints.Required
-    public Integer startMinute;
+    private Integer startMinute;
 
-    @Constraints.Required
+
     @Column(name = "STOPHOUR", nullable = false)
-    public Integer stopHour;
-    @Constraints.Required
+    private Integer stopHour;
+
+
     @Column(name = "STOPMINUTE", nullable = false)
-    public Integer stopMinute;
+    private Integer stopMinute;
 
     @JoinColumn(name = "fk_weekday")
-    @Constraints.Required
     @OneToOne(fetch = FetchType.EAGER, optional = false)
-    public Weekday weekday;
+    private Weekday weekday;
+
+
+    public Integer getStartHour() {
+        return startHour;
+    }
+
+    public void setStartHour(Integer startHour) {
+        this.startHour = startHour;
+    }
+
+    public Integer getStartMinute() {
+        return startMinute;
+    }
+
+    public void setStartMinute(Integer startMinute) {
+        this.startMinute = startMinute;
+    }
+
+    public Integer getStopHour() {
+        return stopHour;
+    }
+
+    public void setStopHour(Integer stopHour) {
+        this.stopHour = stopHour;
+    }
+
+    public Integer getStopMinute() {
+        return stopMinute;
+    }
+
+    public void setStopMinute(Integer stopMinute) {
+        this.stopMinute = stopMinute;
+    }
+
+    public Weekday getWeekday() {
+        return weekday;
+    }
+
+    public void setWeekday(Weekday weekday) {
+        this.weekday = weekday;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -58,7 +96,8 @@ public class TimeslotCriteria extends AbstractCriteria {
         if (startMinute != null ? !startMinute.equals(that.startMinute) : that.startMinute != null) return false;
         if (stopHour != null ? !stopHour.equals(that.stopHour) : that.stopHour != null) return false;
         if (stopMinute != null ? !stopMinute.equals(that.stopMinute) : that.stopMinute != null) return false;
-        if (tolerance != null ? !tolerance.equals(that.tolerance) : that.tolerance != null) return false;
+        if (getTolerance() != null ? !getTolerance().equals(that.getTolerance()) : that.getTolerance() != null)
+            return false;
         if (weekday != null ? !weekday.equals(that.weekday) : that.weekday != null) return false;
 
         return true;
@@ -68,7 +107,7 @@ public class TimeslotCriteria extends AbstractCriteria {
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (id != null ? id.hashCode() : 0);
-        result = 31 * result + (tolerance != null ? tolerance.hashCode() : 0);
+        result = 31 * result + (getTolerance() != null ? getTolerance().hashCode() : 0);
         result = 31 * result + (startHour != null ? startHour.hashCode() : 0);
         result = 31 * result + (startMinute != null ? startMinute.hashCode() : 0);
         result = 31 * result + (stopHour != null ? stopHour.hashCode() : 0);

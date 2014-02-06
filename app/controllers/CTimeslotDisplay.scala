@@ -5,7 +5,7 @@ import play.api.mvc._
 
 import scala.collection.JavaConversions._
 import models.fhs.pages.timeslot.MTimeslotDisplay
-import models.persistence.scheduletree.Weekday
+import models.persistence.scheduletree.{Timeslot, Weekday}
 import models._
 import play.db.jpa.Transactional
 import play.api.Logger
@@ -20,14 +20,16 @@ object CTimeslotDisplay extends Controller {
   @Transactional(readOnly = true)
   def page() = Action {
 
-    val timeslots = TIMESLOT_FINDER.findList()
+    val timeslots = Transactions.hibernateAction{
+      implicit session =>
+        session.createCriteria(classOf[Timeslot]).list().asInstanceOf[java.util.List[Timeslot]]
+    }
 
     Logger.debug(timeslots.toString)
 
     val timeslotDisplay = timeslots.map {
       entry =>
-
-        MTimeslotDisplay(entry.id, entry.startHour, entry.startMinute, entry.stopHour, entry.stopMinute, entry.parent.asInstanceOf[Weekday].name, entry.parent.asInstanceOf[Weekday].sortIndex)
+        MTimeslotDisplay(entry.getId, entry.getStartHour, entry.getStartMinute, entry.getStopHour, entry.getStopMinute, entry.getParent.asInstanceOf[Weekday].getName, entry.getParent.asInstanceOf[Weekday].getSortIndex)
     }.sortWith(_ < _).toList
 
 

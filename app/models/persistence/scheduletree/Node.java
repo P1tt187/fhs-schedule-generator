@@ -21,12 +21,27 @@ public abstract class Node extends AbstractEntity {
      * each node knows his parent node
      */
     @ManyToOne(optional = true)
-    public Node parent;
+    protected Node parent;
 
     /**
      * each node has a list of children
      */
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
-    public List<Node> children;
+    protected List<Node> children;
 
+    public Node getParent() {
+        return parent;
+    }
+
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
+
+    public List<Node> getChildren() {
+        return children;
+    }
+
+    public void setChildren(List<Node> children) {
+        this.children = children;
+    }
 }

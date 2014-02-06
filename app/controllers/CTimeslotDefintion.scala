@@ -12,8 +12,10 @@ import models.fhs.pages.timeslot.MTimeslotDefine
 import java.util
 import models.persistence.scheduletree.{Weekday, Node, Timeslot}
 import play.api.cache.Cached
-import play.api.Play._
-import com.avaje.ebean.Ebean
+
+import models.Transactions
+import org.hibernate.criterion.Restrictions
+import play.api.Play.current
 
 /**
  * Created by fabian on 23.01.14.
@@ -22,7 +24,7 @@ object CTimeslotDefintion extends Controller {
 
   val NAV = "timeslotdefinition"
 
-  val WEEKDAYS = Seq(("1","Montag"),("2","Dienstag"),("3","Mittwoch"),("4","Donnerstag"),("5","Freitag"),("6","Samstag"),("0","Sonntag"))
+  val WEEKDAYS = Seq(("1", "Montag"), ("2", "Dienstag"), ("3", "Mittwoch"), ("4", "Donnerstag"), ("5", "Freitag"), ("6", "Samstag"), ("0", "Sonntag"))
 
   val timeslotForm: Form[MTimeslotDefine] = Form(
     mapping(
@@ -30,7 +32,7 @@ object CTimeslotDefintion extends Controller {
       "startMinute" -> number(min = 0, max = 59),
       "stopHour" -> number(min = 0, max = 23),
       "stopMinute" -> number(min = 0, max = 59),
-      "weekdays" -> list(number(min=0,max=6))
+      "weekdays" -> list(number(min = 0, max = 6))
     )(MTimeslotDefine.apply)(MTimeslotDefine.unapply)
   )
 
@@ -66,21 +68,23 @@ object CTimeslotDefintion extends Controller {
               sortIndex =>
 
                 val day = Weekday.createWeekdayFromSortIndex(sortIndex)
-                day.save()
 
-                val slot = new Timeslot
-                slot.startHour = timeslot.startHour
-                slot.startMinute = timeslot.startMinutes
-                slot.stopHour = timeslot.stopHour
-                slot.stopMinute = timeslot.stopMinutes
 
-                slot.children = new util.LinkedList[Node]()
+                val slot = new Timeslot(timeslot.startHour, timeslot.startMinutes, timeslot.stopHour, timeslot.stopMinutes)
 
-                slot.parent = day
-                day.children.add(slot)
 
-                slot.save()
-                day.update()
+                slot.setChildren(new util.LinkedList[Node]())
+
+                slot.setParent(day)
+                day.getChildren.add(slot)
+
+                Transactions {
+                  implicit entitiManager =>
+
+                    entitiManager.persist(slot)
+                    entitiManager.persist(day)
+
+                }
 
             }
 
@@ -91,10 +95,13 @@ object CTimeslotDefintion extends Controller {
   }
 
 
-  @Transactional
-  def delete(id:Long)= Action {
+  def delete(id: Long) = Action {
 
-   Ebean.delete (Ebean.find(classOf[Timeslot],id))
+    Transactions.hibernateAction {
+      implicit session =>
+        val victom = session.createCriteria(classOf[Timeslot]).add(Restrictions.idEq(id)).uniqueResult()
+        session.delete(victom)
+    }
 
     Redirect(routes.CTimeslotDisplay.page)
   }

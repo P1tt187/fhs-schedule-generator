@@ -16,13 +16,33 @@ import javax.persistence.*;
 @DiscriminatorOptions(force = true)
 public abstract class AbstractCriteria extends AbstractEntity {
 
-    /** is the system allowed to use other possibilitys*/
+    /**
+     * is the system allowed to use other possibilitys
+     */
     @Constraints.Required
     @Column(name = "TOLERANCE", nullable = false)
-    public Boolean tolerance;
+    private Boolean tolerance;
 
-    /** priority of this criteria */
+    /**
+     * priority of this criteria
+     */
     @Constraints.Required
-    @Column(name="PRIORITY")
-    public Integer priority;
+    @Column(name = "PRIORITY")
+    private Integer priority;
+
+    public Boolean getTolerance() {
+        return tolerance;
+    }
+
+    public void setTolerance(Boolean tolerance) {
+        this.tolerance = tolerance;
+    }
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
 }

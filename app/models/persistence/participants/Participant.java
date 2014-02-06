@@ -3,7 +3,6 @@ package models.persistence.participants;
 import models.persistence.AbstractEntity;
 import models.persistence.lecture.Lecture;
 import org.hibernate.annotations.DiscriminatorOptions;
-import play.data.validation.Constraints;
 
 import javax.persistence.*;
 
@@ -17,9 +16,24 @@ import javax.persistence.*;
 public abstract class Participant extends AbstractEntity{
 
     @Column(name="SIZE", nullable = false)
-    @Constraints.Required
-    public Integer size;
+    protected Integer size;
 
     @ManyToOne
-    public Lecture lecture;
+    protected Lecture lecture;
+
+    public Integer getSize() {
+        return size;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
+    }
+
+    public Lecture getLecture() {
+        return lecture;
+    }
+
+    public void setLecture(Lecture lecture) {
+        this.lecture = lecture;
+    }
 }

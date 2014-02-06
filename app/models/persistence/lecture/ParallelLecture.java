@@ -12,7 +12,15 @@ public class ParallelLecture extends AbstractLecture{
 
     @JoinColumn(name = "fk_lecture")
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    public List<Lecture> lectures;
+    private List<Lecture> lectures;
+
+    public List<Lecture> getLectures() {
+        return lectures;
+    }
+
+    public void setLectures(List<Lecture> lectures) {
+        this.lectures = lectures;
+    }
 
     @Override
     public boolean equals(Object o) {

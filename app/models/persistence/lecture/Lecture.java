@@ -2,7 +2,6 @@ package models.persistence.lecture;
 
 import models.persistence.Docent;
 import models.persistence.participants.Participant;
-import play.data.validation.Constraints;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,16 +14,38 @@ import java.util.List;
 public class Lecture extends AbstractLecture {
 
     @Column(name = "NAME", nullable = false)
-    @Constraints.Required
-    public String name;
+    private String name;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lecture")
-    public List<Participant> participants;
+    private List<Participant> participants;
 
     @OneToOne(optional = false)
     @JoinColumn(name = "fk_docent")
-    public Docent docent;
+    private Docent docent;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Participant> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<Participant> participants) {
+        this.participants = participants;
+    }
+
+    public Docent getDocent() {
+        return docent;
+    }
+
+    public void setDocent(Docent docent) {
+        this.docent = docent;
+    }
 
     @Override
     public boolean equals(Object o) {

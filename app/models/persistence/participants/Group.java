@@ -10,14 +10,38 @@ import java.util.List;
 @DiscriminatorValue("GROUP")
 public class Group extends Participant {
 
-    @ManyToOne
-    public Group parent;
+    @ManyToOne(optional = true)
+    private Group parent;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
-    public List<Group> subGroups;
+    private List<Group> subGroups;
 
-    @ManyToOne
-    public Course course;
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Course course;
+
+    public Group getParent() {
+        return parent;
+    }
+
+    public void setParent(Group parent) {
+        this.parent = parent;
+    }
+
+    public List<Group> getSubGroups() {
+        return subGroups;
+    }
+
+    public void setSubGroups(List<Group> subGroups) {
+        this.subGroups = subGroups;
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
 
     @Override
     public boolean equals(Object o) {
