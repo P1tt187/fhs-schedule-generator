@@ -1,14 +1,14 @@
 package models.persistence.criteria;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * Created by fabian on 04.02.14.
  */
 @Entity
-@DiscriminatorValue("ROOMCRIT")
+@Table(name="TBLROOMCRITERIA")
 public class RoomCriteria extends AbstractCriteria {
     /**
      * how many people can be in the room

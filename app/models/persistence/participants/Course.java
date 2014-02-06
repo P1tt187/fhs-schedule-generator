@@ -7,7 +7,7 @@ import java.util.List;
  * Created by fabian on 29.01.14.
  */
 @Entity
-@DiscriminatorValue("COURSE")
+@Table(name = "TBLCOURSE")
 public class Course extends Participant {
 
     @Override

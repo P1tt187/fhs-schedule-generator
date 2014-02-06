@@ -19,8 +19,8 @@ public class Lecture extends AbstractLecture {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lecture")
     private List<Participant> participants;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "fk_docent")
+    @OneToOne(optional = false,targetEntity = Docent.class)
+   // @JoinColumn(name = "fk_docent")
     private Docent docent;
 
     public String getName() {

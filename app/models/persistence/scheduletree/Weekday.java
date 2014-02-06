@@ -1,15 +1,15 @@
 package models.persistence.scheduletree;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.LinkedList;
 
 /**
  * Created by fabian on 28.01.14.
  */
 @Entity
-@DiscriminatorValue("WEEKDAY")
+@Table(name = "TBLWEEKDAY")
 /**A weekday is a Node, containing a list of Timeslots*/
 public class Weekday extends Node implements Comparable<Weekday> {
 

@@ -1,14 +1,14 @@
 package models.persistence.scheduletree;
 
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * Created by fabian on 27.01.14.
  */
 @Entity
-@DiscriminatorValue("TIMESLOT")
+@Table(name = "TBLTIMESLOT")
 /** A timeslot is a Node*/
 public class Timeslot extends Node implements Comparable<Timeslot> {
 

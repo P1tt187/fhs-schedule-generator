@@ -1,7 +1,6 @@
 package models.persistence.scheduletree;
 
 import models.persistence.AbstractEntity;
-import org.hibernate.annotations.DiscriminatorOptions;
 
 import javax.persistence.*;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.List;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "TBLNODE")
-@DiscriminatorOptions(force = true)
+//@DiscriminatorOptions(force = true)
 /**superclass of all nodes. required to construct the schedule tree*/
 public abstract class Node extends AbstractEntity {
 

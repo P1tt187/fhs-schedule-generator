@@ -2,7 +2,6 @@ package models.persistence.participants;
 
 import models.persistence.AbstractEntity;
 import models.persistence.lecture.Lecture;
-import org.hibernate.annotations.DiscriminatorOptions;
 
 import javax.persistence.*;
 
@@ -10,12 +9,11 @@ import javax.persistence.*;
  * Created by fabian on 29.01.14.
  */
 @Entity
-@Table(name="TBLParticipants")
-@DiscriminatorOptions(force = true)
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Participant extends AbstractEntity{
+@Table(name = "TBLPARTICIPANTS")
+public abstract class Participant extends AbstractEntity {
 
-    @Column(name="SIZE", nullable = false)
+    @Column(name = "SIZE", nullable = false)
     protected Integer size;
 
     @ManyToOne

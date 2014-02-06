@@ -10,8 +10,8 @@ import java.util.List;
 @Table(name="TBLPARALLELLECTURE")
 public class ParallelLecture extends AbstractLecture{
 
-    @JoinColumn(name = "fk_lecture")
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+   // @JoinColumn(name = "fk_lecture")
+    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER,targetEntity = Lecture.class)
     private List<Lecture> lectures;
 
     public List<Lecture> getLectures() {

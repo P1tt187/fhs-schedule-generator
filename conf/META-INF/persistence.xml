@@ -5,16 +5,16 @@
              
     <persistence-unit name="defaultPersistenceUnit" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <!--<non-jta-data-source>DefaultDS</non-jta-data-source> -->
+        <non-jta-data-source>DefaultDS</non-jta-data-source>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
             <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.format_sql" value="true"/>
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
+           <!-- <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/sgenerator"/>
             <property name="javax.persistence.jdbc.user" value="sgenerator"/>
-            <property name="javax.persistence.jdbc.password" value="sgenerator"/>
+            <property name="javax.persistence.jdbc.password" value="sgenerator"/> -->
         </properties>
     </persistence-unit>
     

@@ -1,13 +1,13 @@
 package models.persistence.scheduletree;
 
-import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * Created by fabian on 28.01.14.
  */
 @Entity
-@DiscriminatorValue("NROOT")
+@Table(name = "TBLROOT")
 /**
  * the root node of the scheduletree
  * containing a list of Weekdays

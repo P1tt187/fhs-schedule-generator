@@ -64,13 +64,18 @@ object CRoomDefinition extends Controller {
 
                   val weekday = if (dbResult == null) {
                     val day = Weekday.createWeekdayFromSortIndex(sortIndex)
+                    Transactions {
+                      implicit entitiManager =>
+                        entitiManager.persist(day)
+                    }
+
                     day
                   } else {
                     dbResult
                   }
                   val timeslotCriteria = new TimeslotCriteria(crit.startHour, crit.startMinutes, crit.stopHour, crit.stopMinutes, weekday)
-                  timeslotCriteria.setPriority( 10)
-                  timeslotCriteria.setTolerance( false)
+                  timeslotCriteria.setPriority(10)
+                  timeslotCriteria.setTolerance(false)
 
 
                   roomDAO.getCriteriaContainer.getCriterias.add(timeslotCriteria)

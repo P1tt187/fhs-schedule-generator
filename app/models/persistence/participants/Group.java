@@ -7,7 +7,7 @@ import java.util.List;
  * Created by fabian on 29.01.14.
  */
 @Entity
-@DiscriminatorValue("GROUP")
+@Table(name="TBLGROUP")
 public class Group extends Participant {
 
     @ManyToOne(optional = true)

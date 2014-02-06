@@ -9,7 +9,8 @@ import javax.persistence.*;
  * Created by fabian on 28.01.14.
  */
 @Entity
-@DiscriminatorValue("TSLOTCRIT")
+//@DiscriminatorValue("TSLOTCRIT")
+@Table(name="TBLTIMESLOT_CRITERIA")
 public class TimeslotCriteria extends AbstractCriteria {
 
 
