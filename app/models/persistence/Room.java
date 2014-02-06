@@ -51,10 +51,28 @@ public class Room extends AbstractEntity {
     /**
      * contains all criterias
      */
-    @JoinTable(name = "fk_critcontainer")
-    @OneToOne(cascade = CascadeType.ALL)
+    //@JoinTable(name = "fk_critcontainer")
+    @OneToOne(cascade = CascadeType.ALL, targetEntity = CriteriaContainer.class)
     @Constraints.Required
     public CriteriaContainer criteriaContainer;
+
+    /**
+     * default constructor
+     */
+    public Room() {
+        this(null, null, null, null, null);
+    }
+
+    /**
+     * parameter constructor
+     */
+    public Room(Integer capacity, String house, Integer number, Boolean pcPool, Boolean beamer) {
+        this.capacity = capacity;
+        this.house = house;
+        this.number = number;
+        this.pcPool = pcPool;
+        this.beamer = beamer;
+    }
 
     @Override
     public boolean equals(Object o) {

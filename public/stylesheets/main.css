@@ -42,3 +42,7 @@ body {
     width:250px !important;
     height: 130px !important;
 }
+
+label {
+    display: block;
+}

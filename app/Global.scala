@@ -3,7 +3,7 @@
  */
 
 
-import models.persistence.scheduletree.Node
+
 import play.api._
 
 object Global extends GlobalSettings {

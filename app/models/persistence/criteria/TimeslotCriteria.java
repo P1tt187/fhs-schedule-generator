@@ -14,6 +14,18 @@ import javax.persistence.*;
 public class TimeslotCriteria extends AbstractCriteria {
 
 
+    public TimeslotCriteria(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute, Weekday weekday) {
+        this.startHour = startHour;
+        this.startMinute = startMinute;
+        this.stopHour = stopHour;
+        this.stopMinute = stopMinute;
+        this.weekday = weekday;
+    }
+
+    public TimeslotCriteria() {
+
+    }
+
     @Column(name = "STARTHOUR", nullable = false)
     @Constraints.Required
     public Integer startHour;

@@ -1,36 +1,58 @@
-@(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion])
+@(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion],weekdays:Seq[(String,String)])
 
 @import helper._
 @import helper.twitterBootstrap._
 
 @main(title, CRoomDefinition.NAV) {
-    @partial.timeslotcrit(roomDefForm)
+    @partial.timeslotcrit(weekdays)
     <div class="page-header">
         <h1> Räume </h1>
     </div>
 
     <div class="clearfix">
         <div class="row-fluid">
-        @form(action = routes.CRoomDefinition.addRoom, 'class -> "span12  form-inline") {
+        @form(action = routes.CRoomDefinition.submitRoom, 'class -> "span12  form-inline") {
 
             <fieldset>
-                @inputText(roomDefForm("capacity"), '_class -> "form-group span2")
-                @inputText(roomDefForm("house"), '_class -> "form-group span2")
-                @inputText(roomDefForm("number"), '_class -> "form-group span2")
+                @inputText(roomDefForm("capacity"), '_class -> "form-group span2", '_label -> "Kapazität",'_help ->"Wieviele Personen?")
+                @inputText(roomDefForm("house"), '_class -> "form-group span2" , '_label -> "Haus",'_help ->"Gebäude")
+                @inputText(roomDefForm("number"), '_class -> "form-group span2",'_label -> "Nummer",'_help ->"Raumnummer")
                 <br/>
-                @checkbox(roomDefForm("pcpool"), '_class -> "form-group span2")
-                @checkbox(roomDefForm("beamer"), '_class -> "form-group span2")
+                @checkbox(roomDefForm("pcpool"), '_class -> "form-group span2",'_label -> "PC Pool",'_help ->"Ist PC Pool?")
+                @checkbox(roomDefForm("beamer"), '_class -> "form-group span2",'_label -> "Beamer",'_help ->"hat Beamer?")
             </fieldset>
             <fieldset>
 
-                <input class="btn btn-primary" value="+Zeitkriterium" onclick="addTimeCritInput();" />
+                <label for="addTcrit" class="control-label" >Eingeschränkte Verfügbarkeit </label>
+                <input id="addTcrit" class="btn btn-warning btn-sm span1" value="+" onclick="addTimeCritInput();" />
+                @*
+                 @repeat(roomDefForm("timeCriterias"),min=1){ element =>
+                <h4>Beginn:</h4>
 
+                @select(element("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span2 ", '_label -> "Stunde", '_help -> "")
+                @select(element("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d") )), '_class -> "form-group span2 ", '_label -> "Minute", '_help -> "")
+
+                <h4>Ende:</h4>
+
+                @select(element("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span2 ", '_label -> "Stunde", '_help -> "")
+                @select(element("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span2 ", '_label -> "Minute", '_help -> "")
+                 <br>
+                @select(element("priority"), (0 to 10).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span2 ", '_label -> "Priorität", '_help -> "0=niedrig 10=sehr hoch")
+
+                }
+                *@
                 <div id="timeslotcrit">
 
                 </div>
 
             </fieldset>
+            <fieldset style="margin-top: 1%">
+                <div class="form-group ">
+                    <span class=" btn-group span4"><input type="submit" class="form-control btn btn-success " value="senden" /> </span>
+                    <span class=" btn-group span2"><a href="@routes.CRoomDefinition.page" class=" btn btn-danger form-control " role="button">Abbrechen</a></span>
 
+                </div>
+            </fieldset>
         }
         </div>
     </div>

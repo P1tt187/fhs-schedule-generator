@@ -1,31 +1,35 @@
-@(roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion])
-@* @repeat(roomDefForm("timeCriterias"),min=1){ element =>
-<h4>Beginn:</h4>
+@(weekdays: Seq[(String, String)])
 
-@select(element("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span2 ", '_label -> "Stunde", '_help -> "")
-@select(element("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d") )), '_class -> "form-group span2 ", '_label -> "Minute", '_help -> "")
-
-<h4>Ende:</h4>
-
-@select(element("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span2 ", '_label -> "Stunde", '_help -> "")
-@select(element("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span2 ", '_label -> "Minute", '_help -> "")
-
-} *@
     @hours = @{
         (0 to 23).map {
             i =>
-                new Html("'<option value=" + i + ">" + i.formatted("%02d") + "</option>'+")
+                new Html("'<option value=\"" + i + "\">" + i.formatted("%02d") + "</option>'+")
         }
     }
 
     @minutes = @{
         (0 to 59 by 5).map {
             i =>
-                new Html("'<option value=" + i + ">" + i.formatted("%02d") + "</option>'+")
+                new Html("'<option value=\"" + i + "\">" + i.formatted("%02d") + "</option>'+")
+        }
+    }
+
+    @priority = @{
+        (0 to 10).map {
+            i =>
+                new Html("'<option value=\"" + i + "\">" + i.formatted("%02d") + "</option>'+")
+        }
+    }
+
+    @weedayOption = @{
+        weekdays map {
+            dayname =>
+                new Html("'<option  value=\"" + dayname._1 + "\">" + dayname._2 + "</option>'+ ")
         }
     }
 <script type="text/javascript">
 var i = 0 ;
+
 function addTimeCritInput ( ) {
 $ ( "#timeslotcrit" ).append (
 '<div class="panel panel-info container-fluid"> ' +
@@ -71,6 +75,16 @@ $ ( "#timeslotcrit" ).append (
 '<span class="help-inline"></span>' +
 '<span class="help-block"></span>' +
 '</div>' +
+'</div> <br/>' +
+'<div class="form-group span6 ">' +
+'<label class="control-label" for="timeCriterias_' + i + '_weekdays" style="display:block">' +
+'Wochentage:' +
+'</label>' +
+'<select id="timeCriterias_' + i + '_weekdays" name="timeCriterias[' + i + '].weekdays[]" multiple title="nichts Ausgewählt"> ' +
+    @weedayOption
+'</select>' +
+'</div>' +
+
 '</div>' +
 '</div>' +
 '</div>' ) ;

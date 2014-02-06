@@ -13,7 +13,7 @@ import java.util.List;
 public class CriteriaContainer extends AbstractEntity {
 
     /** criterias */
-    @JoinColumn(name = "fk_criteria")
+    @JoinColumn(name = "fk_criteria", referencedColumnName = "ID")
     @OneToMany(cascade = CascadeType.ALL)
     public List<AbstractCriteria> criterias;
 

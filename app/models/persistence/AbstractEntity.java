@@ -15,7 +15,7 @@ public abstract class AbstractEntity extends Model {
      * database id
      */
     @Id
-    @Column(name = "THE_ID", nullable = false)
+    @Column(name = "ID", nullable = false)
     @Constraints.Required
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Long id;
