@@ -1,7 +1,7 @@
 package models.persistence.criteria;
 
 
-import models.persistence.scheduletree.Weekday;
+import models.persistence.template.WeekdayTemplate;
 
 import javax.persistence.*;
 
@@ -10,11 +10,11 @@ import javax.persistence.*;
  */
 @Entity
 //@DiscriminatorValue("TSLOTCRIT")
-@Table(name="TBLTIMESLOT_CRITERIA")
+@Table(name = "TBLTIMESLOT_CRITERIA")
 public class TimeslotCriteria extends AbstractCriteria {
 
 
-    public TimeslotCriteria(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute, Weekday weekday) {
+    public TimeslotCriteria(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute, WeekdayTemplate weekday) {
         this.startHour = startHour;
         this.startMinute = startMinute;
         this.stopHour = stopHour;
@@ -39,9 +39,9 @@ public class TimeslotCriteria extends AbstractCriteria {
     @Column(name = "STOPMINUTE", nullable = false)
     private Integer stopMinute;
 
-    @JoinColumn(name = "fk_weekday")
-    @OneToOne(fetch = FetchType.EAGER, optional = false)
-    private Weekday weekday;
+
+    @OneToOne(fetch = FetchType.EAGER, optional = false,targetEntity = WeekdayTemplate.class)
+    private WeekdayTemplate weekday;
 
 
     public Integer getStartHour() {
@@ -76,11 +76,11 @@ public class TimeslotCriteria extends AbstractCriteria {
         this.stopMinute = stopMinute;
     }
 
-    public Weekday getWeekday() {
+    public WeekdayTemplate getWeekday() {
         return weekday;
     }
 
-    public void setWeekday(Weekday weekday) {
+    public void setWeekday(WeekdayTemplate weekday) {
         this.weekday = weekday;
     }
 

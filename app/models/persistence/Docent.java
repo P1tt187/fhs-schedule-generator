@@ -1,7 +1,6 @@
 package models.persistence;
 
 import models.persistence.criteria.CriteriaContainer;
-import play.data.validation.Constraints;
 
 import javax.persistence.*;
 
@@ -14,11 +13,9 @@ public class Docent extends AbstractEntity {
 
 
     @Column(name = "FIRSTNAME")
-    @Constraints.Required
     private String firstName;
 
     @Column(name = "LASTNAME")
-    @Constraints.Required
     private String lastName;
 
     @Override
@@ -62,9 +59,8 @@ public class Docent extends AbstractEntity {
     /**
      * contains all criterias
      */
-    @JoinTable(name = "fk_critcontainer")
-    @OneToOne(cascade = CascadeType.ALL)
-    @Constraints.Required
+    //@JoinTable(name = "fk_critcontainer")
+    @OneToOne(cascade = CascadeType.ALL, targetEntity = CriteriaContainer.class)
     private CriteriaContainer criteriaContainer;
 
     @Override

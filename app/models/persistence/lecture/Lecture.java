@@ -1,6 +1,7 @@
 package models.persistence.lecture;
 
 import models.persistence.Docent;
+import models.persistence.enumerations.EDuration;
 import models.persistence.participants.Participant;
 
 import javax.persistence.*;
@@ -19,9 +20,20 @@ public class Lecture extends AbstractLecture {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lecture")
     private List<Participant> participants;
 
-    @OneToOne(optional = false,targetEntity = Docent.class)
-   // @JoinColumn(name = "fk_docent")
+    @OneToOne(optional = false, targetEntity = Docent.class)
     private Docent docent;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "duration", nullable = false)
+    private EDuration duration;
+
+    public EDuration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(EDuration duration) {
+        this.duration = duration;
+    }
 
     public String getName() {
         return name;
@@ -50,23 +62,25 @@ public class Lecture extends AbstractLecture {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (!(o instanceof Lecture)) return false;
 
         Lecture lecture = (Lecture) o;
 
         if (docent != null ? !docent.equals(lecture.docent) : lecture.docent != null) return false;
+        if (duration != lecture.duration) return false;
         if (name != null ? !name.equals(lecture.name) : lecture.name != null) return false;
-        return !(participants != null ? !participants.equals(lecture.participants) : lecture.participants != null);
+        if (participants != null ? !participants.equals(lecture.participants) : lecture.participants != null)
+            return false;
 
+        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (name != null ? name.hashCode() : 0);
+        int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (participants != null ? participants.hashCode() : 0);
         result = 31 * result + (docent != null ? docent.hashCode() : 0);
+        result = 31 * result + (duration != null ? duration.hashCode() : 0);
         return result;
     }
 }

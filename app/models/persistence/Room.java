@@ -1,7 +1,6 @@
 package models.persistence;
 
 import models.persistence.criteria.CriteriaContainer;
-import play.data.validation.Constraints;
 
 import javax.persistence.*;
 
@@ -16,21 +15,18 @@ public class Room extends AbstractEntity {
      * how many people can be in the room
      */
     @Column(name = "CAPACITY", nullable = false)
-    @Constraints.Required
     private Integer capacity;
 
     /**
      * in wich house is the room
      */
     @Column(name = "HOUSE")
-    @Constraints.Required
     private String house;
 
     /**
      * number of room in house
      */
     @Column(name = "NUMBER", nullable = false)
-    @Constraints.Required
     private Integer number;
 
 
@@ -38,14 +34,12 @@ public class Room extends AbstractEntity {
      * Room is pc pool
      */
     @Column(name = "PCPOOL", nullable = false)
-    @Constraints.Required
     private Boolean pcPool;
 
     /**
      * Room has beamer
      */
     @Column(name = "BEAMER", nullable = false)
-    @Constraints.Required
     private Boolean beamer;
 
     /**
@@ -53,7 +47,6 @@ public class Room extends AbstractEntity {
      */
     //@JoinTable(name = "fk_critcontainer")
     @OneToOne(cascade = CascadeType.ALL, targetEntity = CriteriaContainer.class)
-    @Constraints.Required
     private CriteriaContainer criteriaContainer;
 
     public Integer getCapacity() {

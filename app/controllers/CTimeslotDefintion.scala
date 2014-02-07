@@ -9,13 +9,13 @@ import play.api.data.Forms._
 import play.db.jpa._
 
 import models.fhs.pages.timeslot.MTimeslotDefine
-import java.util
-import models.persistence.scheduletree.{Weekday, Node, Timeslot}
+import models.persistence.scheduletree.Timeslot
 import play.api.cache.Cached
 
 import models.Transactions
 import org.hibernate.criterion.Restrictions
 import play.api.Play.current
+import models.persistence.template.{TimeslotTemplate, WeekdayTemplate}
 
 /**
  * Created by fabian on 23.01.14.
@@ -67,22 +67,32 @@ object CTimeslotDefintion extends Controller {
             timeslot.weekdays.foreach {
               sortIndex =>
 
-                val day = Weekday.createWeekdayFromSortIndex(sortIndex)
+                val dbResult = Transactions.hibernateAction {
+                  implicit session =>
+                    session.createCriteria(classOf[WeekdayTemplate]).add(Restrictions.eq("sortIndex", sortIndex)).uniqueResult().asInstanceOf[WeekdayTemplate]
+                }
+
+                val day = if (dbResult == null) {
+                  val theDay = WeekdayTemplate.createWeekdayFromSortIndex(sortIndex)
+                  Transactions {
+                    implicit emf =>
+                      emf.persist(theDay)
+                  }
+                  theDay
+                } else {
+                  dbResult
+                }
 
 
-                val slot = new Timeslot(timeslot.startHour, timeslot.startMinutes, timeslot.stopHour, timeslot.stopMinutes)
+                val slot = new TimeslotTemplate(timeslot.startHour, timeslot.startMinutes, timeslot.stopHour, timeslot.stopMinutes, day)
 
-
-                slot.setChildren(new util.LinkedList[Node]())
-
-                slot.setParent(day)
                 day.getChildren.add(slot)
 
                 Transactions {
                   implicit entitiManager =>
 
                     entitiManager.persist(slot)
-                    entitiManager.persist(day)
+                    entitiManager.merge(day)
 
                 }
 

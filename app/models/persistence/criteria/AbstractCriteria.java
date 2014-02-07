@@ -2,6 +2,7 @@ package models.persistence.criteria;
 
 
 import models.persistence.AbstractEntity;
+import models.persistence.enumerations.EPriority;
 
 import javax.persistence.*;
 
@@ -25,7 +26,8 @@ public abstract class AbstractCriteria extends AbstractEntity {
      */
 
     @Column(name = "PRIORITY", nullable = false)
-    private Integer priority;
+    @Enumerated(EnumType.STRING)
+    private EPriority priority;
 
     public Boolean getTolerance() {
         return tolerance;
@@ -35,11 +37,11 @@ public abstract class AbstractCriteria extends AbstractEntity {
         this.tolerance = tolerance;
     }
 
-    public Integer getPriority() {
+    public EPriority getPriority() {
         return priority;
     }
 
-    public void setPriority(Integer priority) {
+    public void setPriority(EPriority priority) {
         this.priority = priority;
     }
 }

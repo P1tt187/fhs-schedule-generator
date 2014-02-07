@@ -8,9 +8,10 @@ import play.api.Logger
 import models.persistence.criteria.CriteriaContainer
 import java.util
 import models._
-import models.persistence.scheduletree.Weekday
 import models.persistence.Room
 import models.persistence.criteria.{AbstractCriteria, TimeslotCriteria}
+import models.persistence.enumerations.EPriority
+import models.persistence.template.WeekdayTemplate
 
 /**
  * Created by fabian on 04.02.14.
@@ -63,7 +64,7 @@ object CRoomDefinition extends Controller {
                   val dbResult = MRoomdefintion.findWeekdayBySortIndex(sortIndex)
 
                   val weekday = if (dbResult == null) {
-                    val day = Weekday.createWeekdayFromSortIndex(sortIndex)
+                    val day = WeekdayTemplate.createWeekdayFromSortIndex(sortIndex)
                     Transactions {
                       implicit entitiManager =>
                         entitiManager.persist(day)
@@ -74,7 +75,7 @@ object CRoomDefinition extends Controller {
                     dbResult
                   }
                   val timeslotCriteria = new TimeslotCriteria(crit.startHour, crit.startMinutes, crit.stopHour, crit.stopMinutes, weekday)
-                  timeslotCriteria.setPriority(10)
+                  timeslotCriteria.setPriority(EPriority.HIGH)
                   timeslotCriteria.setTolerance(false)
 
 
