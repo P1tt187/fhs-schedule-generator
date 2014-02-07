@@ -9,7 +9,6 @@ import play.api.data.Forms._
 import play.db.jpa._
 
 import models.fhs.pages.timeslot.MTimeslotDefine
-import models.persistence.scheduletree.Timeslot
 import play.api.cache.Cached
 
 import models.Transactions
@@ -109,7 +108,9 @@ object CTimeslotDefintion extends Controller {
 
     Transactions.hibernateAction {
       implicit session =>
-        val victom = session.createCriteria(classOf[Timeslot]).add(Restrictions.idEq(id)).uniqueResult()
+        val victom = session.createCriteria(classOf[TimeslotTemplate]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[TimeslotTemplate]
+        victom.getParent.getChildren.remove(victom)
+        Logger.debug("delete " + victom)
         session.delete(victom)
     }
 

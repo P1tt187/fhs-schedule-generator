@@ -1,55 +1,55 @@
-@(message: String, errorIds: List[String], timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: Seq[(String,String)])
+@(message: String, errorIds: List[String], timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: Seq[(String, String)])
 
-@import helper._
-@import helper.twitterBootstrap._
+    @import helper._
+    @import helper.twitterBootstrap._
 
     @errorWeekdaySelect = @{
         errorIds.contains("weekdays")
     }
 
-@main(message, controllers.CTimeslotDefintion.NAV) {
-    <div class="page-header">
-        <h1>Zeitslot Hinzufügen</h1>
-    </div>
-    <div class="clearfix">
-        <div class="row-fluid">
-    @form(action = routes.CTimeslotDefintion.submit, 'class -> "span12 form-inline ") {
-        <fieldset>
-        <h4>Beginn:</h4>
-
-            @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
-            @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d") )), '_class -> "form-group span4", '_label -> "Minute", '_help -> "")
-
-        <h4>Ende:</h4>
-
-            @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
-            @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Minute", '_help -> "")
-
-        <h4>Wochentage:</h4>
-
-            <div class='form-group span6 @if(errorWeekdaySelect) {alert alert-danger}'>
-                <label class="control-label" for="weekdays" style="display:block ;">
-                @if(errorWeekdaySelect) {
-                    Mindestens ein Wochentag <strong>muss</strong> ausgewählt sein!
-                }
-                </label>
-                <select class="  @if(errorWeekdaySelect){has-error}" id="weekdays" name="weekdays[]" multiple title="nichts Ausgewählt">
-                @for(dayname <- weekdays) {
-                    <option class="@if(errorWeekdaySelect){alert alert-danger}" value="@dayname._1">@dayname._2</option>
-                }
-                </select>
-            </div>
-
-        </fieldset>
-        <fieldset style="margin-top: 1%">
-        <div class="form-group ">
-            <span class=" btn-group span4"><input type="submit" class="form-control btn btn-success " value="senden" /> </span>
-            <span class=" btn-group span2"><a href="@routes.CTimeslotDefintion.page" class=" btn btn-danger form-control " role="button">Abbrechen</a></span>
-
+    @main(message, controllers.CTimeslotDefintion.NAV) {
+        <div class="page-header">
+            <h1>Zeitslot Hinzufügen</h1>
         </div>
-        </fieldset>
-    }
+        <div class="clearfix">
+            <div class="row-fluid">
+            @form(action = routes.CTimeslotDefintion.submit, 'class -> "span12 form-inline ") {
+                <fieldset>
+                    <h4>Beginn:</h4>
 
-</div>
-    </div>
-}
+                    @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
+                    @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4", '_label -> "Minute", '_help -> "")
+
+                    <h4>Ende:</h4>
+
+                    @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
+                    @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Minute", '_help -> "")
+
+                    <h4>Wochentage:</h4>
+
+                    <div class='form-group span6 @if(errorWeekdaySelect) {alert alert-danger}'>
+                        <label class="control-label" for="weekdays" style="display : block ;">
+                        @if(errorWeekdaySelect) {
+                            Mindestens ein Wochentag <strong>muss</strong> ausgewählt sein!
+                        }
+                        </label>
+                        <select class=" @if(errorWeekdaySelect) {has-error}" id="weekdays" name="weekdays[]" multiple title="nichts Ausgewählt">
+                        @for(dayname <- weekdays) {
+                            <option class="@if(errorWeekdaySelect) {alert alert-danger}" value="@dayname._1">@dayname._2</option>
+                        }
+                        </select>
+                    </div>
+                    <br/>
+
+                    <div class="form-group " style="margin-top : 1%">
+                        <span class=" btn-group span4"><input type="submit" class="form-control btn btn-success " value="senden" /> </span>
+                        <span class=" btn-group span2"><a href="@routes.CTimeslotDefintion.page" class=" btn btn-danger form-control " role="button">
+                            Abbrechen</a></span>
+
+                    </div>
+                </fieldset>
+            }
+
+            </div>
+        </div>
+    }

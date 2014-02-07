@@ -39,7 +39,7 @@ object CRoomDefinition extends Controller {
   )
 
   def page = Action {
-    Ok(views.html.roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS))
+    Ok(views.html.roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS,MRoomdefintion.findAllRooms()))
   }
 
   def submitRoom = Action {
@@ -48,7 +48,7 @@ object CRoomDefinition extends Controller {
       val roomResult = roomDefForm.bindFromRequest
 
       roomResult.fold(
-        errors => BadRequest(views.html.roomdefinition("Räume", errors, CTimeslotDefintion.WEEKDAYS)),
+        errors => BadRequest(views.html.roomdefinition("Räume", errors, CTimeslotDefintion.WEEKDAYS,MRoomdefintion.findAllRooms())),
         room => {
           Logger.info(room.timeCriterias.toString)
 

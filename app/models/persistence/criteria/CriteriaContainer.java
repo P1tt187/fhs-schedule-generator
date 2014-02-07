@@ -2,10 +2,7 @@ package models.persistence.criteria;
 
 import models.persistence.AbstractEntity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 /**
@@ -15,9 +12,11 @@ import java.util.List;
 @Table(name = "TBLCRITERIACONTAINER")
 public class CriteriaContainer extends AbstractEntity {
 
-    /** criterias */
+    /**
+     * criterias
+     */
     //@JoinColumn(name = "FK_CRITERIA", referencedColumnName = "ID")
-    @OneToMany(cascade = CascadeType.ALL,targetEntity = AbstractCriteria.class)
+    @OneToMany(cascade = CascadeType.ALL, targetEntity = AbstractCriteria.class, fetch = FetchType.EAGER)
     private List<AbstractCriteria> criterias;
 
 

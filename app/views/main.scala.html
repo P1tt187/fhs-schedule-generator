@@ -1,6 +1,4 @@
 @(title: String, nav: String)(content: Html)
-
-
 <!DOCTYPE html>
 
 <html>
@@ -37,26 +35,36 @@
                 </ul>
             </nav>
 
-            <nav class="collapse navbar-collapse " role="navigation">
-                <ul class="nav navbar-left navbar-pills nav-stacked" style="max-width : 300px ; margin-top : 50px">
-                    <li class="@if(nav == controllers.CIndex.NAV) {active}"><a href="@routes.CIndex.index">
-                        Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" href="#" data-toggle="dropdown">Menü
-                            <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">@sidebar(nav)</ul>
+            <div class="container-fluid" style="margin-top : 4%">
+                <div class="row-fluid span1">
+                    <div class="column col-md-2 ">
+                        <nav class="collapse navbar-collapse " role="navigation">
+                            <ul class="nav navbar-left navbar-pills nav-stacked" >
+                                <li class="@if(nav == controllers.CIndex.NAV) {active}"><a href="@routes.CIndex.index">
+                                    Home</a></li>
+                                <li class="dropdown">
+                                    <a class="dropdown-toggle" href="#" data-toggle="dropdown">Menü
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu">@sidebar(nav)</ul>
 
-                    </li>
+                                </li>
 
-                </ul>
-            </nav>
-            <div class="container  ">
-            <div class="container-fluid ">
-                <article class="clearfix row " role="main"> @content </article>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <div class="row-fluid span12">
+                    <div class="column col-md-9 ">
+                        <article class=" " role="main"> @content </article>
+                    </div>
+                </div>
             </div>
-            </div>
+
+
         </div>
+
         <footer id="footer">
             <div class="container" style="text-align : center">
                 <p class="text-muted">
