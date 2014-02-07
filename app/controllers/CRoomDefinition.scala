@@ -11,7 +11,6 @@ import models._
 import models.persistence.Room
 import models.persistence.criteria.{AbstractCriteria, TimeslotCriteria}
 import models.persistence.enumerations.EPriority
-import models.persistence.template.WeekdayTemplate
 
 /**
  * Created by fabian on 04.02.14.
@@ -61,19 +60,9 @@ object CRoomDefinition extends Controller {
             crit =>
               crit.weekdays foreach {
                 sortIndex =>
-                  val dbResult = MRoomdefintion.findWeekdayBySortIndex(sortIndex)
 
-                  val weekday = if (dbResult == null) {
-                    val day = WeekdayTemplate.createWeekdayFromSortIndex(sortIndex)
-                    Transactions {
-                      implicit entitiManager =>
-                        entitiManager.persist(day)
-                    }
+                  val weekday =MRoomdefintion.getWeekayTemplate(sortIndex)
 
-                    day
-                  } else {
-                    dbResult
-                  }
                   val timeslotCriteria = new TimeslotCriteria(crit.startHour, crit.startMinutes, crit.stopHour, crit.stopMinutes, weekday)
                   timeslotCriteria.setPriority(EPriority.HIGH)
                   timeslotCriteria.setTolerance(false)

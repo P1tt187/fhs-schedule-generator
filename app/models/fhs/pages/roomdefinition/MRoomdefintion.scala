@@ -41,4 +41,21 @@ object MRoomdefintion {
         MRoomdisplay(element.getCapacity, element.getHouse, element.getNumber, element.getPcPool, element.getBeamer, timeslotCrit.toList)
     }
   }
+
+  def getWeekayTemplate(sortIndex: Int): WeekdayTemplate = {
+    val dbResult = MRoomdefintion.findWeekdayBySortIndex(sortIndex)
+
+    if (dbResult == null) {
+      val day = WeekdayTemplate.createWeekdayFromSortIndex(sortIndex)
+      Transactions {
+        implicit entitiManager =>
+          entitiManager.persist(day)
+      }
+
+      day
+    } else {
+      dbResult
+    }
+  }
+
 }
