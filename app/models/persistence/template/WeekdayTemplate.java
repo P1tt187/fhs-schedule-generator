@@ -1,6 +1,7 @@
 package models.persistence.template;
 
 import models.persistence.AbstractEntity;
+import play.data.validation.Constraints;
 
 import javax.persistence.*;
 import java.util.LinkedList;
@@ -13,9 +14,11 @@ import java.util.List;
 @Table(name = "TBLWEEKDAY_TEMPLATE")
 public class WeekdayTemplate extends AbstractEntity {
 
+    @Constraints.Required
     @Column(name = "NAME")
     private String name;
 
+    @Constraints.Required
     @Column(name = "SORTINDEX")
     private Integer sortIndex;
 
@@ -76,6 +79,15 @@ public class WeekdayTemplate extends AbstractEntity {
         result = 31 * result + (sortIndex != null ? sortIndex.hashCode() : 0);
         result = 31 * result + (children != null ? children.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("WeekdayTemplate{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", sortIndex=").append(sortIndex);
+        sb.append('}');
+        return sb.toString();
     }
 
     /**

@@ -1,19 +1,19 @@
 package models.fhs.pages.roomdefinition
 
 import models.Transactions
-import org.hibernate.criterion.Restrictions
+import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
 import models.persistence.template.WeekdayTemplate
 import models.fhs.pages.timeslot.MTimeslotDisplay
-import models.persistence.Room
 import scala.collection.JavaConversions._
 import models.persistence.criteria.TimeslotCriteria
+import models.persistence.location.RoomEntity
 
 /**
  * Created by fabian on 04.02.14.
  */
 case class MRoomdefintion(capacity: Int, house: String, number: Int, pcpools: Boolean, beamer: Boolean, timeCriterias: List[MTtimeslotCritDefine])
 
-case class MRoomdisplay(capacity: Int, house: String, number: Int, pcpools: Boolean, beamer: Boolean, timeCriterias: List[MTimeslotDisplay])
+case class MRoomdisplay(id: Long, capacity: Int, house: String, number: Int, pcpools: Boolean, beamer: Boolean, timeCriterias: List[MTimeslotDisplay])
 
 object MRoomdefintion {
   def findWeekdayBySortIndex(sortIndex: Int): WeekdayTemplate = {
@@ -26,7 +26,7 @@ object MRoomdefintion {
   def findAllRooms(): List[MRoomdisplay] = {
     val dbResult = Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[Room]).list().asInstanceOf[java.util.List[Room]]
+        session.createCriteria(classOf[RoomEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[java.util.List[RoomEntity]]
     }
 
     dbResult.toList.map {
@@ -38,7 +38,7 @@ object MRoomdefintion {
 
             }
         }
-        MRoomdisplay(element.getCapacity, element.getHouse, element.getNumber, element.getPcPool, element.getBeamer, timeslotCrit.toList)
+        MRoomdisplay(element.getId, element.getCapacity, element.getHouse, element.getNumber, element.getPcPool, element.getBeamer, timeslotCrit.toList)
     }
   }
 

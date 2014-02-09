@@ -1,6 +1,7 @@
 package models.persistence.subject;
 
 import models.persistence.participants.Course;
+import play.data.validation.Constraints;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,8 +13,10 @@ import javax.persistence.OneToOne;
 @Entity
 public class ExersiseSubject extends AbstractSubject {
 
+    @Constraints.Required
     @Column(name = "GROUPTYPE")
     private String groupType;
+
 
     @OneToOne(targetEntity = Course.class)
     private Course course;

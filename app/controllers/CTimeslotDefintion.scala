@@ -110,6 +110,7 @@ object CTimeslotDefintion extends Controller {
       implicit session =>
         val victom = session.createCriteria(classOf[TimeslotTemplate]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[TimeslotTemplate]
         victom.getParent.getChildren.remove(victom)
+        session.saveOrUpdate(victom.getParent)
         Logger.debug("delete " + victom)
         session.delete(victom)
     }

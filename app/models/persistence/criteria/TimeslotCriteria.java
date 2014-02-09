@@ -1,7 +1,7 @@
 package models.persistence.criteria;
 
-
 import models.persistence.template.WeekdayTemplate;
+import play.data.validation.Constraints;
 
 import javax.persistence.*;
 
@@ -9,7 +9,6 @@ import javax.persistence.*;
  * Created by fabian on 28.01.14.
  */
 @Entity
-//@DiscriminatorValue("TSLOTCRIT")
 @Table(name = "TBLTIMESLOT_CRITERIA")
 public class TimeslotCriteria extends AbstractCriteria {
 
@@ -25,17 +24,27 @@ public class TimeslotCriteria extends AbstractCriteria {
     public TimeslotCriteria() {
 
     }
-
+    @Constraints.Required
+    @Constraints.Max(value = 23)
+    @Constraints.Min(value = 0)
     @Column(name = "STARTHOUR", nullable = false)
     private Integer startHour;
+
+    @Constraints.Max(value = 59)
+    @Constraints.Min(value = 0)
+    @Constraints.Required
     @Column(name = "STARTMINUTE", nullable = false)
     private Integer startMinute;
 
-
+    @Constraints.Max(value = 23)
+    @Constraints.Min(value = 0)
+    @Constraints.Required
     @Column(name = "STOPHOUR", nullable = false)
     private Integer stopHour;
 
-
+    @Constraints.Max(value = 59)
+    @Constraints.Min(value = 0)
+    @Constraints.Required
     @Column(name = "STOPMINUTE", nullable = false)
     private Integer stopMinute;
 
@@ -97,7 +106,7 @@ public class TimeslotCriteria extends AbstractCriteria {
         if (startMinute != null ? !startMinute.equals(that.startMinute) : that.startMinute != null) return false;
         if (stopHour != null ? !stopHour.equals(that.stopHour) : that.stopHour != null) return false;
         if (stopMinute != null ? !stopMinute.equals(that.stopMinute) : that.stopMinute != null) return false;
-        if (getTolerance() != null ? !getTolerance().equals(that.getTolerance()) : that.getTolerance() != null)
+        if (isTolerance() != null ? !isTolerance().equals(that.isTolerance()) : that.isTolerance() != null)
             return false;
         if (weekday != null ? !weekday.equals(that.weekday) : that.weekday != null) return false;
 
@@ -108,7 +117,7 @@ public class TimeslotCriteria extends AbstractCriteria {
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (id != null ? id.hashCode() : 0);
-        result = 31 * result + (getTolerance() != null ? getTolerance().hashCode() : 0);
+        result = 31 * result + (isTolerance() != null ? isTolerance().hashCode() : 0);
         result = 31 * result + (startHour != null ? startHour.hashCode() : 0);
         result = 31 * result + (startMinute != null ? startMinute.hashCode() : 0);
         result = 31 * result + (stopHour != null ? stopHour.hashCode() : 0);

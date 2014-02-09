@@ -2,6 +2,7 @@ package models.persistence.participants;
 
 import models.persistence.AbstractEntity;
 import models.persistence.lecture.Lecture;
+import play.data.validation.Constraints;
 
 import javax.persistence.*;
 
@@ -13,6 +14,7 @@ import javax.persistence.*;
 @Table(name = "TBLPARTICIPANTS")
 public abstract class Participant extends AbstractEntity {
 
+    @Constraints.Required
     @Column(name = "SIZE", nullable = false)
     protected Integer size;
 

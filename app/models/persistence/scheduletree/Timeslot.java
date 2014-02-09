@@ -1,5 +1,8 @@
 package models.persistence.scheduletree;
 
+
+import play.data.validation.Constraints;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -23,17 +26,31 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
 
     }
 
+    @Constraints.Required
+    @Constraints.Max(value = 23)
+    @Constraints.Min(value = 0)
     @Column(name = "STARTHOUR", nullable = false)
     private Integer startHour;
+
+    @Constraints.Max(value = 59)
+    @Constraints.Min(value = 0)
+    @Constraints.Required
     @Column(name = "STARTMINUTE", nullable = false)
     private Integer startMinute;
 
-
+    @Constraints.Max(value = 23)
+    @Constraints.Min(value = 0)
+    @Constraints.Required
     @Column(name = "STOPHOUR", nullable = false)
     private Integer stopHour;
 
+    @Constraints.Max(value = 59)
+    @Constraints.Min(value = 0)
+    @Constraints.Required
     @Column(name = "STOPMINUTE", nullable = false)
     private Integer stopMinute;
+
+
 
     public Integer getStartHour() {
         return startHour;

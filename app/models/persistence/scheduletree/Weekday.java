@@ -1,5 +1,7 @@
 package models.persistence.scheduletree;
 
+import play.data.validation.Constraints;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -13,9 +15,11 @@ import java.util.LinkedList;
 /**A weekday is a Node, containing a list of Timeslots*/
 public class Weekday extends Node implements Comparable<Weekday> {
 
+    @Constraints.Required
     @Column(name = "NAME")
     private String name;
 
+    @Constraints.Required
     @Column(name = "SORTINDEX")
     private Integer sortIndex;
 

@@ -8,9 +8,9 @@ import play.api.Logger
 import models.persistence.criteria.CriteriaContainer
 import java.util
 import models._
-import models.persistence.Room
 import models.persistence.criteria.{AbstractCriteria, TimeslotCriteria}
 import models.persistence.enumerations.EPriority
+import models.persistence.location.RoomEntity
 
 /**
  * Created by fabian on 04.02.14.
@@ -38,7 +38,17 @@ object CRoomDefinition extends Controller {
   )
 
   def page = Action {
-    Ok(views.html.roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS,MRoomdefintion.findAllRooms()))
+
+    val rooms = MRoomdefintion.findAllRooms()
+
+    rooms map {
+      room =>
+        Logger.debug(room.toString)
+    }
+
+
+
+    Ok(views.html.roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS,rooms))
   }
 
   def submitRoom = Action {
@@ -51,7 +61,7 @@ object CRoomDefinition extends Controller {
         room => {
           Logger.info(room.timeCriterias.toString)
 
-          val roomDAO = new Room(room.capacity, room.house, room.number, room.pcpools, room.beamer)
+          val roomDAO = new RoomEntity(room.capacity, room.house, room.number, room.pcpools, room.beamer)
 
           roomDAO.setCriteriaContainer(new CriteriaContainer)
           roomDAO.getCriteriaContainer.setCriterias(new util.LinkedList[AbstractCriteria]())

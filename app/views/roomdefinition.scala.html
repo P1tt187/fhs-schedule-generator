@@ -57,28 +57,28 @@
                         </tr>
                     </thead>
                     <tbody>
-                    @for(room <- existingRooms) {
+                    @for(roomEntity <- existingRooms) {
                         <tr>
                             <td>
-                            @room.house
+                            @roomEntity.house
                             </td>
                             <td>
-                            @room.number
+                            @roomEntity.number
                             </td>
                             <td>
-                            @room.capacity
+                            @roomEntity.capacity
                             </td>
                             <td>
-                                <input type="checkbox" disabled class="disabled checkbox" @if(room.beamer) {checked="checked" } />
+                                <span class="glyphicon  @if(roomEntity.beamer) { glyphicon-ok } else{ glyphicon-remove } " ></span>
                             </td>
                             <td>
-                                <input type="checkbox" disabled class="disabled checkbox" @if(room.pcpools) {checked="checked" } />
+                                <span class="glyphicon  @if(roomEntity.pcpools) { glyphicon-ok } else{ glyphicon-remove } " ></span>
                             </td>
                             <td>
-                            @if(room.timeCriterias.isEmpty) {
+                            @if(roomEntity.timeCriterias.isEmpty) {
                                 Immer
                             } else {
-                                @for(tcrit <- room.timeCriterias) {
+                                @for(tcrit <- roomEntity.timeCriterias) {
                                     @tcrit.weekday.substring(0, 2) @tcrit.startHour.formatted("%02d") : @tcrit.startMinutes.formatted("%02d") - @tcrit.stopHour.formatted("%02d") : @tcrit.stopMinutes.formatted("%02d") <br/>
                                 }
                             }

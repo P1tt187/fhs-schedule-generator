@@ -1,6 +1,7 @@
 package models.persistence;
 
 import models.persistence.criteria.CriteriaContainer;
+import play.data.validation.Constraints;
 
 import javax.persistence.*;
 
@@ -11,10 +12,11 @@ import javax.persistence.*;
 @Table(name = "TBLDOCENT")
 public class Docent extends AbstractEntity {
 
-
+    @Constraints.Required
     @Column(name = "FIRSTNAME")
     private String firstName;
 
+    @Constraints.Required
     @Column(name = "LASTNAME")
     private String lastName;
 
