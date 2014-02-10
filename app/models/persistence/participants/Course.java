@@ -1,7 +1,5 @@
 package models.persistence.participants;
 
-import play.data.validation.Constraints;
-
 import javax.persistence.*;
 import java.util.List;
 
@@ -34,7 +32,7 @@ public class Course extends Participant {
         return result;
     }
 
-    @Constraints.Required
+
     @Column(name = "NAME", nullable = false)
     public String name;
 

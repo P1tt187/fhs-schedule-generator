@@ -38,7 +38,7 @@ object MRoomdefintion {
 
             }
         }
-        MRoomdisplay(element.getId, element.getCapacity, element.getHouse, element.getNumber, element.getPcPool, element.getBeamer, timeslotCrit.toList)
+        MRoomdisplay(element.getId, element.getCapacity, element.getHouse.getName, element.getNumber, element.getRoomAttributes.getPcpool, element.getRoomAttributes.getBeamer, timeslotCrit.toList)
     }
   }
 

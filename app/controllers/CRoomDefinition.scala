@@ -10,7 +10,7 @@ import java.util
 import models._
 import models.persistence.criteria.{AbstractCriteria, TimeslotCriteria}
 import models.persistence.enumerations.EPriority
-import models.persistence.location.RoomEntity
+import models.persistence.location.{RoomAttributesEntity, HouseEntity, RoomEntity}
 
 /**
  * Created by fabian on 04.02.14.
@@ -48,7 +48,7 @@ object CRoomDefinition extends Controller {
 
 
 
-    Ok(views.html.roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS,rooms))
+    Ok(views.html.roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS, rooms))
   }
 
   def submitRoom = Action {
@@ -57,11 +57,11 @@ object CRoomDefinition extends Controller {
       val roomResult = roomDefForm.bindFromRequest
 
       roomResult.fold(
-        errors => BadRequest(views.html.roomdefinition("Räume", errors, CTimeslotDefintion.WEEKDAYS,MRoomdefintion.findAllRooms())),
+        errors => BadRequest(views.html.roomdefinition("Räume", errors, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms())),
         room => {
           Logger.info(room.timeCriterias.toString)
 
-          val roomDAO = new RoomEntity(room.capacity, room.house, room.number, room.pcpools, room.beamer)
+          val roomDAO = new RoomEntity(room.capacity, room.number, new HouseEntity(room.house), new RoomAttributesEntity(room.beamer, room.pcpools, false, false))
 
           roomDAO.setCriteriaContainer(new CriteriaContainer)
           roomDAO.getCriteriaContainer.setCriterias(new util.LinkedList[AbstractCriteria]())
@@ -71,7 +71,7 @@ object CRoomDefinition extends Controller {
               crit.weekdays foreach {
                 sortIndex =>
 
-                  val weekday =MRoomdefintion.getWeekayTemplate(sortIndex)
+                  val weekday = MRoomdefintion.getWeekayTemplate(sortIndex)
 
                   val timeslotCriteria = new TimeslotCriteria(crit.startHour, crit.startMinutes, crit.stopHour, crit.stopMinutes, weekday)
                   timeslotCriteria.setPriority(EPriority.HIGH)

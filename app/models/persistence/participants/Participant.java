@@ -2,9 +2,9 @@ package models.persistence.participants;
 
 import models.persistence.AbstractEntity;
 import models.persistence.lecture.Lecture;
-import play.data.validation.Constraints;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by fabian on 29.01.14.
@@ -14,12 +14,15 @@ import javax.persistence.*;
 @Table(name = "TBLPARTICIPANTS")
 public abstract class Participant extends AbstractEntity {
 
-    @Constraints.Required
+
     @Column(name = "SIZE", nullable = false)
     protected Integer size;
 
     @ManyToOne
     protected Lecture lecture;
+
+    @ManyToMany(mappedBy = "participants")
+    protected List<Student> students;
 
     public Integer getSize() {
         return size;

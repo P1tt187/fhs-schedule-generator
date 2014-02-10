@@ -1,7 +1,5 @@
 package models.persistence.criteria;
 
-import play.data.validation.Constraints;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -15,7 +13,7 @@ public class RoomCriteria extends AbstractCriteria {
     /**
      * how many people can be in the room
      */
-    @Constraints.Required
+
     @Column(name = "CAPACITY", nullable = false)
     private Integer capacity;
 
@@ -28,7 +26,7 @@ public class RoomCriteria extends AbstractCriteria {
     /**
      * number of room in house
      */
-    @Constraints.Required
+
     @Column(name = "NUMBER", nullable = false)
     private Integer number;
 

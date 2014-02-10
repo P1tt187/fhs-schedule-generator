@@ -3,7 +3,6 @@ package models.persistence.lecture;
 import models.persistence.Docent;
 import models.persistence.enumerations.EDuration;
 import models.persistence.participants.Participant;
-import play.data.validation.Constraints;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,17 +14,17 @@ import java.util.List;
 @Table(name = "TBLLECTURE")
 public class Lecture extends AbstractLecture {
 
-    @Constraints.Required
+
     @Column(name = "NAME", nullable = false)
     private String name;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lecture")
     private List<Participant> participants;
-    @Constraints.Required
+
     @OneToOne(optional = false, targetEntity = Docent.class)
     private Docent docent;
 
-    @Constraints.Required
+
     @Enumerated(EnumType.STRING)
     @Column(name = "duration", nullable = false)
     private EDuration duration;
