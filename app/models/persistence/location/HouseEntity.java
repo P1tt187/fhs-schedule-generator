@@ -1,6 +1,8 @@
 package models.persistence.location;
 
 import models.persistence.AbstractEntity;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,7 +18,8 @@ public class HouseEntity extends AbstractEntity{
     private String name;
 
     @Transient
-    @OneToMany(mappedBy = "house",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
     private List<RoomEntity> rooms;
 
     public HouseEntity(){
@@ -25,7 +28,6 @@ public class HouseEntity extends AbstractEntity{
 
     public HouseEntity(String name) {
         this.name = name;
-        this.rooms = rooms;
     }
 
     public String getName() {

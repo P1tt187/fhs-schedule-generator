@@ -10,7 +10,8 @@ import java.util
 import models._
 import models.persistence.criteria.{AbstractCriteria, TimeslotCriteria}
 import models.persistence.enumerations.EPriority
-import models.persistence.location.{RoomAttributesEntity, HouseEntity, RoomEntity}
+import models.persistence.location.{RoomAttributesEntity, RoomEntity}
+import scala.collection.JavaConversions._
 
 /**
  * Created by fabian on 04.02.14.
@@ -24,8 +25,7 @@ object CRoomDefinition extends Controller {
       "capacity" -> number,
       "house" -> nonEmptyText,
       "number" -> number,
-      "pcpool" -> boolean,
-      "beamer" -> boolean,
+      "attributes" -> list(nonEmptyText),
       "timeCriterias" -> list(mapping(
         "startHour" -> number(min = 0, max = 23),
         "startMinute" -> number(min = 0, max = 59),
@@ -61,10 +61,16 @@ object CRoomDefinition extends Controller {
         room => {
           Logger.info(room.timeCriterias.toString)
 
-          val roomDAO = new RoomEntity(room.capacity, room.number, new HouseEntity(room.house), new RoomAttributesEntity(room.beamer, room.pcpools, false, false))
+          val roomAttributes = room.attributes map (new RoomAttributesEntity(_))
 
-          roomDAO.setCriteriaContainer(new CriteriaContainer)
-          roomDAO.getCriteriaContainer.setCriterias(new util.LinkedList[AbstractCriteria]())
+          val houseDO = MRoomdefintion.findOrCreateHouseEntityByName(room.house)
+
+          val roomDO = new RoomEntity(room.capacity, room.number, houseDO )
+          houseDO.getRooms.add(roomDO)
+          roomDO.setRoomAttributes(roomAttributes)
+
+          roomDO.setCriteriaContainer(new CriteriaContainer)
+          roomDO.getCriteriaContainer.setCriterias(new util.LinkedList[AbstractCriteria]())
 
           room.timeCriterias foreach {
             crit =>
@@ -78,12 +84,13 @@ object CRoomDefinition extends Controller {
                   timeslotCriteria.setTolerance(false)
 
 
-                  roomDAO.getCriteriaContainer.getCriterias.add(timeslotCriteria)
+                  roomDO.getCriteriaContainer.getCriterias.add(timeslotCriteria)
               }
           }
           Transactions {
             implicit entitiManager =>
-              entitiManager.persist(roomDAO)
+              entitiManager.persist(roomDO)
+              entitiManager.merge(houseDO)
           }
 
           Redirect(routes.CRoomDefinition.page)

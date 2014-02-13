@@ -6,16 +6,36 @@ import models.persistence.template.WeekdayTemplate
 import models.fhs.pages.timeslot.MTimeslotDisplay
 import scala.collection.JavaConversions._
 import models.persistence.criteria.TimeslotCriteria
-import models.persistence.location.RoomEntity
+import models.persistence.location.{HouseEntity, RoomAttributesEntity, RoomEntity}
 
 /**
  * Created by fabian on 04.02.14.
  */
-case class MRoomdefintion(capacity: Int, house: String, number: Int, pcpools: Boolean, beamer: Boolean, timeCriterias: List[MTtimeslotCritDefine])
+case class MRoomdefintion(capacity: Int, house: String, number: Int, attributes:List[String], timeCriterias: List[MTtimeslotCritDefine])
 
-case class MRoomdisplay(id: Long, capacity: Int, house: String, number: Int, pcpools: Boolean, beamer: Boolean, timeCriterias: List[MTimeslotDisplay])
+case class MRoomdisplay(id: Long, capacity: Int, house: String, number: Int, roomAttributes:List[RoomAttributesEntity], timeCriterias: List[MTimeslotDisplay])
 
 object MRoomdefintion {
+  /**
+   * predefinded constants for the attribute
+   */
+  final val ATTRIBUTES: Array[String] = Array[String]("PC-Pool", "Beamer", "Whiteboard", "Blackboard")
+
+
+  def findOrCreateHouseEntityByName(name:String):HouseEntity={
+    Transactions.hibernateAction{
+      implicit session =>
+        var result = session.createCriteria(classOf[HouseEntity]).add(Restrictions.eq("name",name)).uniqueResult().asInstanceOf[HouseEntity]
+        if(result ==null){
+         result = new HouseEntity(name)
+          result.setRooms(new java.util.LinkedList[RoomEntity]())
+          session.saveOrUpdate(result)
+        }
+
+        result
+    }
+  }
+
   def findWeekdayBySortIndex(sortIndex: Int): WeekdayTemplate = {
     Transactions.hibernateAction {
       implicit session =>
@@ -38,7 +58,7 @@ object MRoomdefintion {
 
             }
         }
-        MRoomdisplay(element.getId, element.getCapacity, element.getHouse.getName, element.getNumber, element.getRoomAttributes.getPcpool, element.getRoomAttributes.getBeamer, timeslotCrit.toList)
+        MRoomdisplay(element.getId, element.getCapacity, element.getHouse.getName, element.getNumber, element.getRoomAttributes.toList , timeslotCrit.toList)
     }
   }
 

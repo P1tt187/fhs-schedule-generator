@@ -1,14 +1,17 @@
 package models.persistence.criteria;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import models.persistence.location.RoomAttributesEntity;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
+import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by fabian on 04.02.14.
  */
 @Entity
-@Table(name="TBLROOMCRITERIA")
+@Table(name = "TBLROOMCRITERIA")
 public class RoomCriteria extends AbstractCriteria {
     /**
      * how many people can be in the room
@@ -31,24 +34,16 @@ public class RoomCriteria extends AbstractCriteria {
     private Integer number;
 
 
-    /**
-     * RoomEntity is pc pool
-     */
-    @Column(name = "PCPOOL", nullable = false)
-    private Boolean pcPool;
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = RoomAttributesEntity.class,cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<RoomAttributesEntity> roomAttributes;
 
-    /**
-     * RoomEntity has beamer
-     */
-    @Column(name = "BEAMER", nullable = false)
-    private Boolean beamer;
-
-    public Boolean getBeamer() {
-        return beamer;
+    public List<RoomAttributesEntity> getRoomAttributes() {
+        return roomAttributes;
     }
 
-    public void setBeamer(Boolean beamer) {
-        this.beamer = beamer;
+    public void setRoomAttributes(List<RoomAttributesEntity> roomAttributes) {
+        this.roomAttributes = roomAttributes;
     }
 
     public Integer getCapacity() {
@@ -73,14 +68,6 @@ public class RoomCriteria extends AbstractCriteria {
 
     public void setNumber(Integer number) {
         this.number = number;
-    }
-
-    public Boolean getPcPool() {
-        return pcPool;
-    }
-
-    public void setPcPool(Boolean pcPool) {
-        this.pcPool = pcPool;
     }
 
 

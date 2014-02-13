@@ -2,8 +2,11 @@ package models.persistence.location;
 
 import models.persistence.AbstractEntity;
 import models.persistence.criteria.CriteriaContainer;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created by fabian on 31.01.14.
@@ -38,15 +41,17 @@ public class RoomEntity extends AbstractEntity {
         this.house = house;
     }
 
-    @OneToOne(targetEntity = RoomAttributesEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private RoomAttributesEntity roomAttributes;
 
-    public void setRoomAttributes(RoomAttributesEntity roomAttributes) {
-        this.roomAttributes = roomAttributes;
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = RoomAttributesEntity.class,cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<RoomAttributesEntity> roomAttributes;
+
+    public List<RoomAttributesEntity> getRoomAttributes() {
+        return roomAttributes;
     }
 
-    public RoomAttributesEntity getRoomAttributes() {
-        return roomAttributes;
+    public void setRoomAttributes(List<RoomAttributesEntity> roomAttributes) {
+        this.roomAttributes = roomAttributes;
     }
 
     /**
@@ -86,17 +91,17 @@ public class RoomEntity extends AbstractEntity {
      * default constructor
      */
     public RoomEntity() {
-        this(null, null, null, null);
+        this(null, null, null);
     }
 
     /**
      * parameter constructor
      */
-    public RoomEntity(Integer capacity, Integer number, HouseEntity house, RoomAttributesEntity roomAttributes) {
+    public RoomEntity(Integer capacity, Integer number, HouseEntity house) {
         this.capacity = capacity;
         this.number = number;
         this.house = house;
-        this.roomAttributes = roomAttributes;
+
     }
 
 

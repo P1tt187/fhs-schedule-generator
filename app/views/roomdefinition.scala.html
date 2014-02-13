@@ -1,7 +1,9 @@
 @(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion], weekdays: Seq[(String, String)], existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay])
+@import models.fhs.pages.roomdefinition._
 
 @import helper._
 @import helper.twitterBootstrap._
+
 
 @main(title, CRoomDefinition.NAV) {
     @partial.timeslotcrit(weekdays)
@@ -21,15 +23,23 @@
                     <br/>
                     @inputText(roomDefForm("capacity"), '_class -> "form-group span1", '_label -> "Kapazität", '_help -> "Wieviele Personen?")
                     <br/>
-                    @checkbox(roomDefForm("pcpool"), '_class -> "form-group span2", '_label -> "PC Pool", '_help -> "Ist PC Pool?")
-                    @checkbox(roomDefForm("beamer"), '_class -> "form-group span2", '_label -> "Beamer", '_help -> "hat Beamer?")
+
+                    <label class="control-label" for="attributes" style="display : block ;">
+                        Eigenschaften
+                    </label>
+                    <select id="attributes" name="attributes[]" multiple title="nichts Ausgewählt">
+                    @for(attr <- MRoomdefintion.ATTRIBUTES) {
+                        <option value="@attr">@attr</option>
+                    }
+                    </select>
+
                 </fieldset>
                 <fieldset>
                     <label for="addTcrit" class="control-label" >Eingeschränkte Verfügbarkeit </label>
                     <input id="addTcrit" class="btn btn-warning btn-sm span1" value="+" onclick="addTimeCritInput ( ) ;" />
-                    <div id="timeslotcrit" />
+                    <div id="timeslotcrit" ></div>
                 </fieldset>
-                <fieldset style="margin-top : 1%">
+                <fieldset style="margin-top : 1 %">
                     <div class="form-group ">
                         <span class=" btn-group span4"><input type="submit" class="form-control btn btn-success " value="senden" /> </span>
                         <span class=" btn-group span2">
@@ -45,14 +55,16 @@
             <!-- Display existing Rooms -->
         <div class="row-fluid ">
             <div class="col-md-6">
-                <table class="table table-striped table-hover table-condensed" style="text-align: center">
+                <table class="table table-striped table-hover table-condensed" style="text-align : center">
                     <thead>
                         <tr class="text-info">
                             <th>Haus</th>
                             <th>Nummer</th>
                             <th>Kapazität</th>
-                            <th>Beamer</th>
-                            <th>PC Pool</th>
+                            @for(e <- MRoomdefintion.ATTRIBUTES) {
+                                <th>@e</th>
+                            }
+
                             <th>Verfügbar</th>
                         </tr>
                     </thead>
@@ -68,12 +80,10 @@
                             <td>
                             @roomEntity.capacity
                             </td>
-                            <td>
-                                <span class="glyphicon  @if(roomEntity.beamer) { glyphicon-ok } else{ glyphicon-remove } " ></span>
-                            </td>
-                            <td>
-                                <span class="glyphicon  @if(roomEntity.pcpools) { glyphicon-ok } else{ glyphicon-remove } " ></span>
-                            </td>
+                            @for(e <- MRoomdefintion.ATTRIBUTES) {
+                                <td><span class="glyphicon  @if(roomEntity.roomAttributes.filter(_.getAttribute.equalsIgnoreCase(e))) { glyphicon-ok } else { glyphicon-remove } " ></span></td>
+                            }
+
                             <td>
                             @if(roomEntity.timeCriterias.isEmpty) {
                                 Immer
