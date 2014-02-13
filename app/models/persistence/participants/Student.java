@@ -6,7 +6,8 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * Created by fabian on 10.02.14.
+ * @author  fabian
+ * on 10.02.14.
  */
 @Entity
 @Table(name="TBLSTUDENT")

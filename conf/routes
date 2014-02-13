@@ -5,7 +5,6 @@
 # Home page
 GET         /                          controllers.CIndex.index()
 GET         /defineTimeslots           controllers.CTimeslotDefintion.page()
-GET         /listTimeslots             controllers.CTimeslotDisplay.page()
 POST        /submitTimeslot            controllers.CTimeslotDefintion.submit()
 GET         /deleteTimeslot/:id        controllers.CTimeslotDefintion.delete(id:Long)
 

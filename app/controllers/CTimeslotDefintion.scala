@@ -8,12 +8,10 @@ import play.api.data.Forms._
 
 import play.db.jpa._
 
-import models.fhs.pages.timeslot.MTimeslotDefine
-import play.api.cache.Cached
+import models.fhs.pages.timeslot.{MTimeslotDisplay, MTimeslotDefine}
 
 import models.Transactions
 import org.hibernate.criterion.Restrictions
-import play.api.Play.current
 import models.persistence.template.{TimeslotTemplate, WeekdayTemplate}
 
 /**
@@ -37,13 +35,12 @@ object CTimeslotDefintion extends Controller {
 
   @Transactional(readOnly = true)
   def page =
-    Cached("CTIMESLOT") {
       Action {
 
-        Ok(views.html.timeslotdefinition("Timeslots", List[String](), timeslotForm, WEEKDAYS))
+        Ok(views.html.timeslotdefinition("Timeslots", List[String](), timeslotForm, WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
         //Ok(views.html.index("test"))
       }
-    }
+
 
   @Transactional
   def submit = Action {
@@ -53,14 +50,14 @@ object CTimeslotDefintion extends Controller {
 
       timeslotResult.fold(
         errors => {
-          BadRequest(views.html.timeslotdefinition("Timeslots", List[String](), errors, WEEKDAYS))
+          BadRequest(views.html.timeslotdefinition("Timeslots", List[String](), errors, WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
         },
         timeslot => {
 
           Logger.debug("weekdays" + timeslot.weekdays)
 
           if (timeslot.weekdays.isEmpty) {
-            BadRequest(views.html.timeslotdefinition("Timeslots", List("weekdays"), timeslotForm.fill(timeslot), WEEKDAYS))
+            BadRequest(views.html.timeslotdefinition("Timeslots", List("weekdays"), timeslotForm.fill(timeslot), WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
           } else {
 
             timeslot.weekdays.foreach {
@@ -97,7 +94,7 @@ object CTimeslotDefintion extends Controller {
 
             }
 
-            Redirect(routes.CTimeslotDisplay.page)
+            Redirect(routes.CTimeslotDefintion.page)
           }
         }
       )
@@ -115,7 +112,7 @@ object CTimeslotDefintion extends Controller {
         session.delete(victom)
     }
 
-    Redirect(routes.CTimeslotDisplay.page)
+    Redirect(routes.CTimeslotDefintion.page)
   }
 
 }
