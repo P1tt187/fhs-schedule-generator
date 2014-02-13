@@ -13,7 +13,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "TBLTIMESLOT_TEMPLATE")
-public class TimeslotTemplate extends AbstractEntity {
+public class TimeslotTemplate extends AbstractEntity implements Comparable<TimeslotTemplate>{
 
     @ManyToOne
     private WeekdayTemplate parent;
@@ -103,5 +103,38 @@ public class TimeslotTemplate extends AbstractEntity {
                 ", stopHour=" + stopHour +
                 ", stopMinute=" + stopMinute +
                 '}';
+    }
+
+    @Override
+    public int compareTo(TimeslotTemplate that) {
+        if (that == null) {
+            return -1;
+        }
+
+        WeekdayTemplate thisWeekday = (WeekdayTemplate) parent;
+        WeekdayTemplate thatWeekday = (WeekdayTemplate) that.parent;
+
+        int ret = thisWeekday.compareTo(thatWeekday);
+        if (ret != 0) {
+            return ret;
+        }
+        ret = this.startHour.compareTo(that.startHour);
+        if (ret != 0) {
+            return ret;
+        }
+
+        ret = this.startMinute.compareTo(that.startMinute);
+        if (ret != 0) {
+            return ret;
+        }
+        ret = this.stopHour.compareTo(that.stopHour);
+        if (ret != 0) {
+            return ret;
+
+        }
+
+
+        return this.stopMinute.compareTo(that.stopMinute);
+
     }
 }

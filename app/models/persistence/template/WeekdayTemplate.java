@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "TBLWEEKDAY_TEMPLATE")
-public class WeekdayTemplate extends AbstractEntity {
+public class WeekdayTemplate extends AbstractEntity implements Comparable<WeekdayTemplate>{
 
     @Constraints.Required
     @Column(name = "NAME")
@@ -123,5 +123,10 @@ public class WeekdayTemplate extends AbstractEntity {
         }
 
         return new WeekdayTemplate(name, sortIndex);
+    }
+
+    @Override
+    public int compareTo(WeekdayTemplate o) {
+        return sortIndex.compareTo(o.sortIndex);
     }
 }

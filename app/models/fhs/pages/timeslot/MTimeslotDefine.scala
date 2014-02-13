@@ -3,6 +3,8 @@ package models.fhs.pages.timeslot
 import models.Transactions
 import models.persistence.template.TimeslotTemplate
 import scala.collection.JavaConversions._
+import scala.math.Ordering.Implicits._
+import java.util.Collections
 
 /**
  * Created by fabian on 23.01.14.
@@ -25,15 +27,14 @@ object MTimeslotDisplay {
   def findAllTimeslots = {
     val timeslots = Transactions.hibernateAction{
       implicit session =>
-        session.createCriteria(classOf[TimeslotTemplate]).list().asInstanceOf[java.util.List[TimeslotTemplate]]
+        val dbReslut = session.createCriteria(classOf[TimeslotTemplate]).list().asInstanceOf[java.util.List[TimeslotTemplate]]
+        Collections.sort(dbReslut)
+        dbReslut.toList
     }
 
 
 
-     timeslots.map {
-      entry =>
-        MTimeslotDisplay(entry.getId, entry.getStartHour, entry.getStartMinute, entry.getStopHour, entry.getStopMinute, entry.getParent.getName, entry.getParent.getSortIndex)
-    }.sortWith(_ < _).toList
+     timeslots
   }
 
 }
