@@ -11,5 +11,8 @@ GET         /deleteTimeslot/:id        controllers.CTimeslotDefintion.delete(id:
 GET         /defineRooms               controllers.CRoomDefinition.page
 POST        /addRoom                   controllers.CRoomDefinition.submitRoom
 
+GET         /blaimport                 controllers.CBLAFileUpload.page
+POST        /blaUpload                 controllers.CBLAFileUpload.uploadFile
+
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file              controllers.Assets.at(path="/public", file)

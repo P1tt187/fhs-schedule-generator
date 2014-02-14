@@ -1,0 +1,12 @@
+@(message:String)
+
+@main(message,CBLAFileUpload.NAV){
+
+    @helper.form(action = routes.CBLAFileUpload.uploadFile, 'enctype -> "multipart/form-data") {
+        <input class="btn btn-primary" type="file" name="fileUpload" title="Datei Auswählen">
+        <p>
+            <input class="btn btn-success" type="submit" value="Upload">
+        </p>
+    }
+
+}
