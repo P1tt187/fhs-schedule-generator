@@ -3,7 +3,6 @@ package models.persistence.criteria;
 
 import models.persistence.AbstractEntity;
 import models.persistence.enumerations.EPriority;
-import play.data.validation.Constraints;
 
 import javax.persistence.*;
 
@@ -18,15 +17,12 @@ public abstract class AbstractCriteria extends AbstractEntity {
     /**
      * is the system allowed to use other possibilitys
      */
-    @Constraints.Required
     @Column(name = "TOLERANCE", nullable = false)
     private Boolean tolerance;
 
     /**
      * priority of this criteria
      */
-
-    @Constraints.Required
     @Column(name = "PRIORITY", nullable = false)
     @Enumerated(EnumType.STRING)
     private EPriority priority;

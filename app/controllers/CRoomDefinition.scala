@@ -12,6 +12,8 @@ import models.persistence.criteria.{AbstractCriteria, TimeslotCriteria}
 import models.persistence.enumerations.EPriority
 import models.persistence.location.{RoomAttributesEntity, RoomEntity}
 import scala.collection.JavaConversions._
+import views.html.roomdefinition._
+
 
 /**
  * Created by fabian on 04.02.14.
@@ -46,9 +48,7 @@ object CRoomDefinition extends Controller {
         Logger.debug(room.toString)
     }
 
-
-
-    Ok(views.html.roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS, rooms))
+    Ok(roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS, rooms))
   }
 
   def submitRoom = Action {
@@ -57,7 +57,7 @@ object CRoomDefinition extends Controller {
       val roomResult = roomDefForm.bindFromRequest
 
       roomResult.fold(
-        errors => BadRequest(views.html.roomdefinition("Räume", errors, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms())),
+        errors => BadRequest(roomdefinition("Räume", errors, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms())),
         room => {
           Logger.info(room.timeCriterias.toString)
 

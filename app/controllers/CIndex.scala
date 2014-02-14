@@ -12,7 +12,7 @@ object CIndex extends Controller {
   def index =
 
       Action {
-        Ok(views.html.index("Home"))
+        Ok(views.html.index.index("Home"))
       }
 
 }

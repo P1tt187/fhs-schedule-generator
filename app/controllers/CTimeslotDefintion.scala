@@ -13,6 +13,8 @@ import models.fhs.pages.timeslot.{MTimeslotDisplay, MTimeslotDefine}
 import models.Transactions
 import org.hibernate.criterion.Restrictions
 import models.persistence.template.{TimeslotTemplate, WeekdayTemplate}
+import views.html.timeslotdefintiion._
+
 
 /**
  * Created by fabian on 23.01.14.
@@ -37,7 +39,7 @@ object CTimeslotDefintion extends Controller {
   def page =
       Action {
 
-        Ok(views.html.timeslotdefinition("Timeslots", List[String](), timeslotForm, WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
+        Ok(timeslotdefinition("Timeslots", List[String](), timeslotForm, WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
         //Ok(views.html.index("test"))
       }
 
@@ -50,14 +52,14 @@ object CTimeslotDefintion extends Controller {
 
       timeslotResult.fold(
         errors => {
-          BadRequest(views.html.timeslotdefinition("Timeslots", List[String](), errors, WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
+          BadRequest(timeslotdefinition("Timeslots", List[String](), errors, WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
         },
         timeslot => {
 
           Logger.debug("weekdays" + timeslot.weekdays)
 
           if (timeslot.weekdays.isEmpty) {
-            BadRequest(views.html.timeslotdefinition("Timeslots", List("weekdays"), timeslotForm.fill(timeslot), WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
+            BadRequest(timeslotdefinition("Timeslots", List("weekdays"), timeslotForm.fill(timeslot), WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
           } else {
 
             timeslot.weekdays.foreach {
