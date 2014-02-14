@@ -10,20 +10,20 @@ import java.util.List;
 @Table(name="TBLGROUP")
 public class Group extends Participant {
 
-    @ManyToOne(optional = true)
-    private Group parent;
+    @ManyToMany
+    private List<Group> parent;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "parent")
     private List<Group> subGroups;
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Course course;
 
-    public Group getParent() {
+    public List<Group> getParent() {
         return parent;
     }
 
-    public void setParent(Group parent) {
+    public void setParent(List<Group> parent) {
         this.parent = parent;
     }
 

@@ -31,6 +31,7 @@ public class RoomEntity extends AbstractEntity {
     private Integer number;
 
     @ManyToOne
+    @OrderColumn(name="name")
     private HouseEntity house;
 
     public HouseEntity getHouse() {

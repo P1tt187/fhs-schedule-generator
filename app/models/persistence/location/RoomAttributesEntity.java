@@ -43,6 +43,11 @@ public class RoomAttributesEntity extends AbstractEntity {
     }
 
     @Override
+    public String toString() {
+        return "RoomAttributesEntity{" + "attribute='" + attribute + '}' + '\'';
+    }
+
+    @Override
     public int hashCode() {
         return attribute != null ? attribute.hashCode() : 0;
     }
