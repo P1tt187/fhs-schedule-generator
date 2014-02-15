@@ -1,12 +1,20 @@
-@(message:String)
+@(message: String)(implicit flash: Flash)
 
-@main(message,CBLAFileUpload.NAV){
+    @main(message, CBLAFileUpload.NAV) {
+        <div class="page-header" >
+            <h1>Planungsdatei importieren</h1>
+        </div>
 
-    @helper.form(action = routes.CBLAFileUpload.uploadFile, 'enctype -> "multipart/form-data") {
-        <input class="btn btn-primary" type="file" name="fileUpload" title="Datei Auswählen">
-        <p>
-            <input class="btn btn-success" type="submit" value="Upload">
-        </p>
+        @helper.form(action = routes.CBLAFileUpload.uploadFile, 'enctype -> "multipart/form-data") {
+            <div class="form-group @if(flash.get("error") != null) {has-error}">
+                @if(flash.get("error") != null) {
+                    <label class="control-label" for="uploadBtn">@flash.get("error")</label>
+                }
+                <input id="uploadBtn" class="btn btn-info " type="file" name="fileUpload" title="Datei Auswählen" accept="application/bla, .bla">
+            </div>
+            <p>
+                <input class="btn btn-success" type="submit" value="Upload">
+            </p>
+        }
+
     }
-
-}

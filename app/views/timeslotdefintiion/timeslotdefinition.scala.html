@@ -7,10 +7,12 @@
         errorIds.contains("weekdays")
     }
 
+
 @main(message, controllers.CTimeslotDefintion.NAV) {
     <div class="page-header">
         <h1>Zeitslot Hinzufügen</h1>
     </div>
+
     <div class="clearfix">
         <div class="row-fluid">
             <div class="col-md-5">
@@ -36,7 +38,7 @@
                         </label>
                         <select class=" @if(errorWeekdaySelect) {has-error}" id="weekdays" name="weekdays[]" multiple title="nichts Ausgewählt">
                         @for(dayname <- weekdays) {
-                            <option class="@if(errorWeekdaySelect) {alert alert-danger}" value="@dayname._1">@dayname._2</option>
+                            <option class="@if(errorWeekdaySelect) {alert alert-danger}" value="@dayname._1" @if(timeslotForm("weekdays").value.getOrElse("").equals(dayname._1)) {selected }>@dayname._2 </option>
                         }
                         </select>
                     </div>
