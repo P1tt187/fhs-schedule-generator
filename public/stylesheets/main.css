@@ -5,10 +5,12 @@ html,
 body {
     height: 100%;
     /* The html and body elements cannot have any padding or margin. */
+     padding-top: 2%;
 }
 
 /* Wrapper for page content to push down footer */
 #wrap {
+
     min-height: 100%;
     height: auto;
     /* Negative indent footer by its height */
@@ -34,7 +36,7 @@ body {
 
 .container {
     width: auto;
-    max-width: 680px;
+    max-width: 90%;
     padding: 0 15px;
 }
 .container .text-muted {
@@ -47,9 +49,7 @@ body {
     height: 130px !important;
 }
 
-#mainContainer {
-    margin-top : 4%;
-}
+
 
 label {
     display: block;

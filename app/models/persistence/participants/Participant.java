@@ -1,7 +1,6 @@
 package models.persistence.participants;
 
 import models.persistence.AbstractEntity;
-import models.persistence.lecture.Lecture;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,9 +17,6 @@ public abstract class Participant extends AbstractEntity {
     @Column(name = "SIZE", nullable = false)
     protected Integer size;
 
-    @ManyToOne
-    protected Lecture lecture;
-
     @ManyToMany(mappedBy = "participants")
     protected List<Student> students;
 
@@ -32,11 +28,4 @@ public abstract class Participant extends AbstractEntity {
         this.size = size;
     }
 
-    public Lecture getLecture() {
-        return lecture;
-    }
-
-    public void setLecture(Lecture lecture) {
-        this.lecture = lecture;
-    }
 }

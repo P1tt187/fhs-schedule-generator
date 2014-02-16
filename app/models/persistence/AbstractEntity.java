@@ -1,5 +1,8 @@
 package models.persistence;
 
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
+
 import javax.persistence.*;
 
 /**
@@ -10,8 +13,12 @@ import javax.persistence.*;
 public abstract class AbstractEntity {
 
 
+    /**
+     * the version
+     */
     @Version
-    protected long serialVersionUID=1L;
+    @Generated(GenerationTime.ALWAYS)
+    private Long serialVersionUID ;
 
     /**
      * database id
@@ -21,6 +28,7 @@ public abstract class AbstractEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
 
+
     public Long getId() {
         return id;
     }
@@ -29,11 +37,14 @@ public abstract class AbstractEntity {
         this.id = id;
     }
 
-    public long getSerialVersionUID() {
+
+    public Long getSerialVersionUID() {
         return serialVersionUID;
     }
 
-    public void setSerialVersionUID(long serialVersionUID) {
+    public void setSerialVersionUID(Long serialVersionUID) {
         this.serialVersionUID = serialVersionUID;
     }
+
+
 }

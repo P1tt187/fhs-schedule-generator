@@ -3,6 +3,8 @@ package models.persistence.lecture;
 import models.persistence.Docent;
 import models.persistence.enumerations.EDuration;
 import models.persistence.participants.Participant;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -18,7 +20,8 @@ public class Lecture extends AbstractLecture {
     @Column(name = "NAME", nullable = false)
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lecture")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Participant.class)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Participant> participants;
 
     @OneToOne(optional = false, targetEntity = Docent.class)
@@ -26,7 +29,7 @@ public class Lecture extends AbstractLecture {
 
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "duration", nullable = false)
+    @Column(name = "DURATION", nullable = false)
     private EDuration duration;
 
     public EDuration getDuration() {

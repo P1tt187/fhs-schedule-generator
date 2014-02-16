@@ -6,9 +6,12 @@
         </div>
 
         @helper.form(action = routes.CBLAFileUpload.uploadFile, 'enctype -> "multipart/form-data") {
-            <div class="form-group @if(flash.get("error") != null) {has-error}">
-                @if(flash.get("error") != null) {
+            <div class="form-group @("has-error".when(flash.get("error"))) @("has-success".when(flash.get("success")))">
+                @if(flash.get("error")) {
                     <label class="control-label" for="uploadBtn">@flash.get("error")</label>
+                }
+                @if(flash.get("success")){
+                    <label class="control-label" for="uploadBtn">@flash.get("success")</label>
                 }
                 <input id="uploadBtn" class="btn btn-info " type="file" name="fileUpload" title="Datei Auswählen" accept="application/bla, .bla">
             </div>

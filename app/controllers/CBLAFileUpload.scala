@@ -40,7 +40,7 @@ object CBLAFileUpload extends Controller {
 
             case Failure(ex) => Akka.system.actorOf(Props[BlaImportActor], name = IMPORT_ACTOR_NAME) ! ImportFile(tmpFile)
           }
-          Redirect(routes.CBLAFileUpload.page).flashing("info" -> "success")
+          Redirect(routes.CBLAFileUpload.page).flashing("success" -> "success")
       }.getOrElse(
           Redirect(routes.CBLAFileUpload.page).flashing("error" -> "Missing File")
 
