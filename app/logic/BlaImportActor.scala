@@ -28,7 +28,7 @@ class BlaImportActor extends Actor {
   def parseFile(file: File) = {
 
     def Scanner = new Scanner(file, "ISO-8859-1")
-    
+
     var scanner = Scanner
 
     while (scanner.hasNextLine) {
@@ -51,11 +51,26 @@ class BlaImportActor extends Actor {
     }
     scanner.close()
 
-    scanner= Scanner
+    scanner = Scanner
 
-    while(scanner.hasNextLine){
+    while (scanner.hasNextLine) {
       val line = scanner.nextLine()
+      if (line.startsWith("klv(")) {
+        val part = line.substring(4).replace("\"", "").split(",")
+        val studiengang = part(0)
+        val name = part(1)
+        val lehrveranstaltungSchluessel = part(2)
+        val semester = part(3)
+        val anzahlVorlesungstunden = part(5)
+        val anzahlUebungsgruppenStunden = part(6)
 
+        Logger.debug("Studiengang: " + studiengang)
+        Logger.debug("Name: " + name)
+        Logger.debug("LehrveranstaltungSchluessel: " + lehrveranstaltungSchluessel)
+        Logger.debug("Semester: " + semester)
+        Logger.debug("AnzahlVorlesung: " + anzahlVorlesungstunden)
+        Logger.debug("anzahlUebungsgruppenStunden: " + anzahlUebungsgruppenStunden)
+      }
     }
 
     Logger.debug(shortcut.toString())

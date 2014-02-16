@@ -19,7 +19,7 @@ object MRoomdefintion {
   /**
    * predefinded constants for the attribute
    */
-  final val ATTRIBUTES: Array[String] = Array[String]("PC-Pool", "Beamer", "Whiteboard", "Blackboard")
+  final val ATTRIBUTES: Array[String] = Array[String]("PC-Pool", "Beamer", "Whiteboard", "Blackboard","Overhead")
 
 
   def findOrCreateHouseEntityByName(name:String):HouseEntity={
