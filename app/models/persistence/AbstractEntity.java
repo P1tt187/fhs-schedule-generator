@@ -17,8 +17,7 @@ public abstract class AbstractEntity {
      * the version
      */
     @Version
-    @Generated(GenerationTime.ALWAYS)
-    private Long serialVersionUID ;
+    private Long serialVersionUID=1L ;
 
     /**
      * database id
