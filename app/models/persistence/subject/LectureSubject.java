@@ -1,24 +1,15 @@
 package models.persistence.subject;
 
-import models.persistence.participants.Course;
-
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import java.util.List;
+import javax.persistence.Table;
 
 /**
- * Created by fabian on 07.02.14.
+ * @author fabian
+ *         on 07.02.14.
  */
 @Entity
-public class LectureSubject extends AbstractSubject{
-    @OneToMany(targetEntity = Course.class)
-    private List<Course> courses;
+@Table(name = "TBLLECTURE_SUBJECT")
+public class LectureSubject extends AbstractSubject {
 
-    public List<Course> getCourses() {
-        return courses;
-    }
 
-    public void setCourses(List<Course> courses) {
-        this.courses = courses;
-    }
 }

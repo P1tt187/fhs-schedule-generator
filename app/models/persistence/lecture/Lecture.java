@@ -7,7 +7,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Created by fabian on 28.01.14.
@@ -16,16 +16,17 @@ import java.util.List;
 @Table(name = "TBLLECTURE")
 public class Lecture extends AbstractLecture {
 
-
+    /** name of the lecture */
     @Column(name = "NAME", nullable = false)
     private String name;
 
+    /** participants can be multiple courses or groups*/
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Participant.class)
     @Fetch(FetchMode.SUBSELECT)
-    private List<Participant> participants;
+    private Set<Participant> participants;
 
-    @OneToOne(optional = false, targetEntity = Docent.class)
-    private Docent docent;
+    @OneToMany(targetEntity = Docent.class)
+    private Set<Docent> docents;
 
 
     @Enumerated(EnumType.STRING)
@@ -48,20 +49,20 @@ public class Lecture extends AbstractLecture {
         this.name = name;
     }
 
-    public List<Participant> getParticipants() {
+    public Set<Participant> getParticipants() {
         return participants;
     }
 
-    public void setParticipants(List<Participant> participants) {
+    public void setParticipants(Set<Participant> participants) {
         this.participants = participants;
     }
 
-    public Docent getDocent() {
-        return docent;
+    public Set<Docent> getDocents() {
+        return docents;
     }
 
-    public void setDocent(Docent docent) {
-        this.docent = docent;
+    public void setDocents(Set<Docent> docent) {
+        this.docents = docent;
     }
 
     @Override
@@ -71,7 +72,7 @@ public class Lecture extends AbstractLecture {
 
         Lecture lecture = (Lecture) o;
 
-        if (docent != null ? !docent.equals(lecture.docent) : lecture.docent != null) return false;
+        if (docents != null ? !docents.equals(lecture.docents) : lecture.docents != null) return false;
         if (duration != lecture.duration) return false;
         if (name != null ? !name.equals(lecture.name) : lecture.name != null) return false;
         if (participants != null ? !participants.equals(lecture.participants) : lecture.participants != null)
@@ -84,7 +85,7 @@ public class Lecture extends AbstractLecture {
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (participants != null ? participants.hashCode() : 0);
-        result = 31 * result + (docent != null ? docent.hashCode() : 0);
+        result = 31 * result + (docents != null ? docents.hashCode() : 0);
         result = 31 * result + (duration != null ? duration.hashCode() : 0);
         return result;
     }

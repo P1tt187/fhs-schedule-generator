@@ -12,9 +12,6 @@ import javax.persistence.*;
 @Table(name = "TBLDOCENT")
 public class Docent extends AbstractEntity {
 
-    @Constraints.Required
-    @Column(name = "FIRSTNAME")
-    private String firstName;
 
     @Constraints.Required
     @Column(name = "LASTNAME")
@@ -28,18 +25,10 @@ public class Docent extends AbstractEntity {
 
         Docent docent = (Docent) o;
 
-        if (firstName != null ? !firstName.equals(docent.firstName) : docent.firstName != null) return false;
+
         if (lastName != null ? !lastName.equals(docent.lastName) : docent.lastName != null) return false;
 
         return true;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
     }
 
     public String getLastName() {
@@ -69,7 +58,6 @@ public class Docent extends AbstractEntity {
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (id != null ? id.hashCode() : 0);
-        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
         return result;
     }
