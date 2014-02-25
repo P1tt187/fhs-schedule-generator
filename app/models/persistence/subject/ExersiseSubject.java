@@ -1,7 +1,5 @@
 package models.persistence.subject;
 
-import play.data.validation.Constraints;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -13,7 +11,7 @@ import javax.persistence.Table;
 @Table(name="TBLEERSISE_SUBJECT")
 public class ExersiseSubject extends AbstractSubject {
 
-    @Constraints.Required
+
     @Column(name = "GROUPTYPE")
     private String groupType;
 

@@ -62,4 +62,12 @@ public class Course extends Participant {
         result = 31 * result + (shortName != null ? shortName.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Course{" +
+                "fullName='" + fullName + '\'' +
+                ", shortName='" + shortName + '\'' +
+                '}';
+    }
 }

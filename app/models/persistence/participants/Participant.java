@@ -13,7 +13,7 @@ import javax.persistence.*;
 public abstract class Participant extends AbstractEntity {
 
 
-    @Column(name = "SIZE", nullable = false)
+    @Column(name = "SIZE", nullable = true)
     protected Integer size;
 
 

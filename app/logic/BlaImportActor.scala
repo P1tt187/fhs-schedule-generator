@@ -4,6 +4,14 @@ import akka.actor.Actor
 import java.io.File
 import java.util.Scanner
 import play.api.Logger
+import models.persistence.subject.LectureSubject
+import models.Transactions
+import models.persistence.participants.{Participant, Group, Course}
+import org.hibernate.criterion.Restrictions
+import java.util
+import scala.collection.JavaConversions._
+import models.persistence.Docent
+import models.persistence.criteria.{AbstractCriteria, CriteriaContainer}
 
 /**
  * @author fabian
@@ -36,6 +44,59 @@ class BlaImportActor extends Actor {
   def parseFile(file: File) = {
 
     def Scanner = new Scanner(file, "ISO-8859-1")
+
+    def findCourse(shortName: String) = {
+      var course = Transactions.hibernateAction {
+        implicit session =>
+          session.createCriteria(classOf[Course]).add(Restrictions.eq("shortName", shortName)).uniqueResult().asInstanceOf[Course]
+      }
+
+      if (course == null) {
+        course = new Course
+        course.setShortName(shortName)
+        course.setFullName(shortcutReverse(shortName.substring(0, shortName.length - 1)))
+        course.setGroups(new util.LinkedList[Group]())
+        course.setSize(0)
+        Transactions {
+          implicit entityManager =>
+            entityManager.persist(course)
+        }
+      }
+
+      course
+    }
+
+    def findDocent(lastname: String): Docent = {
+      var docent: Docent = Transactions.hibernateAction {
+        implicit session =>
+          session.createCriteria(classOf[Docent]).add(Restrictions.eq("lastName", lastname)).uniqueResult().asInstanceOf[Docent]
+      }
+      if (docent == null) {
+        docent = new Docent
+        docent.setLastName(lastname)
+        val criteriaContainer = new CriteriaContainer
+        criteriaContainer.setCriterias(List[AbstractCriteria]())
+        docent.setCriteriaContainer(criteriaContainer)
+        Transactions {
+          implicit entitiymanager =>
+            entitiymanager.persist(docent)
+        }
+      }
+
+      docent
+    }
+
+    def createLecture(metaInfo: SubjectMetaInformation) = {
+
+      val lectureSubject = new LectureSubject
+      lectureSubject.setName(metaInfo.subjektName)
+      val course = findCourse(metaInfo.courseShortName)
+      lectureSubject.setParticipants(Set(course).asInstanceOf[Set[Participant]])
+      lectureSubject.setDocents(Set(findDocent(metaInfo.docent)))
+      lectureSubject.setUnits(metaInfo.lectureCount)
+      lectureSubject
+
+    }
 
     var scanner = Scanner
 
@@ -79,14 +140,8 @@ class BlaImportActor extends Actor {
         val docent = part(4)
         val lectureCount = part(5)
         val exersizeCount = part(6)
-        /*
-                    Logger.debug("Studiengang: " + studiengang)
-                    Logger.debug("Name: " + name)
-                    Logger.debug("LehrveranstaltungSchluessel: " + lehrveranstaltungSchluessel)
-                    Logger.debug("Semester: " + semester)
-                    Logger.debug("AnzahlVorlesung: " + anzahlVorlesungstunden)
-                    Logger.debug("anzahlUebungsgruppenStunden: " + anzahlUebungsgruppenStunden)*/
-        subjectMetaInformation += subjectName + shortcut(course) -> SubjectMetaInformation(shortcut(course) + semester, subjectName, semester.toInt, docent, lectureCount.toInt, exersizeCount.toInt)
+
+        subjectMetaInformation += subjectName + shortcut(course) -> SubjectMetaInformation(shortcut(course) + semester, subjectName, semester.toInt, docent, lectureCount.toFloat / 2f, exersizeCount.toFloat / 2f)
       } else if (line.startsWith("klv_teilnehmer(")) {
         val part = line.substring(line.indexOf("(") + 1, line.lastIndexOf(")")).split(",").map(_.replace("\"", ""))
 
@@ -97,22 +152,25 @@ class BlaImportActor extends Actor {
             connectedParticipants = connectedParticipants.substring(0, connectedParticipants.indexOf("(") - 1).trim
           }
 
-          Logger.debug("subject: " + subjectName + " with: " + shortcutReverse(connectedParticipants.substring(0,connectedParticipants.length-1)))
+          Logger.debug("subject: " + subjectName + " with: " + connectedParticipants)
         } else {
-          subjectMetaInformation(part(1) + shortcut(part(0)))
+          val metaInfo = subjectMetaInformation(part(1) + shortcut(part(0)))
+          if (metaInfo.lectureCount > 0) {
+            Logger.debug(createLecture(metaInfo).toString)
+          }
         }
       }
     }
 
     scanner.close()
 
-     Logger.debug(shortcut.toString())
+    Logger.debug(shortcut.toString())
     /* Logger.debug(subjectNames.mkString("\n"))
      Logger.debug(subjectMetaInformation.mkString("\n"))
      */
   }
 
-  private case class SubjectMetaInformation(courseShortName: String, subjektName: String, semester: Int, docent: String, lectureCount: Int, exersizeCount: Int)
+  private case class SubjectMetaInformation(courseShortName: String, subjektName: String, semester: Int, docent: String, lectureCount: Float, exersizeCount: Float)
 
 }
 

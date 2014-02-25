@@ -17,9 +17,15 @@ import java.util.Set;
 @Table(name = "TBLSUBJECT")
 public abstract class AbstractSubject extends AbstractEntity {
 
+    /**
+     * units of this subject, 0.5 means not weekly
+     */
     @Column(name = "UNITS", nullable = true)
-    private Integer units;
+    private Float units;
 
+    /**
+     * name of this subject
+     */
     @Column(name = "NAME")
     private String name;
 
@@ -38,15 +44,18 @@ public abstract class AbstractSubject extends AbstractEntity {
         this.participants = courses;
     }
 
+    /**
+     * docents for this subject
+     */
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(targetEntity = Docent.class, fetch = FetchType.EAGER)
     private Set<Docent> docents;
 
-    public Integer getUnits() {
+    public Float getUnits() {
         return units;
     }
 
-    public void setUnits(Integer units) {
+    public void setUnits(Float units) {
         this.units = units;
     }
 
@@ -64,5 +73,16 @@ public abstract class AbstractSubject extends AbstractEntity {
 
     public void setDocents(Set<Docent> docents) {
         this.docents = docents;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() +
+                "{" +
+                "units=" + units +
+                ", name='" + name + '\'' +
+                ", participants=" + participants +
+                ", docents=" + docents +
+                '}';
     }
 }

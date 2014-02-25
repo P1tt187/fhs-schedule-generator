@@ -1,12 +1,10 @@
 package models.persistence;
 
-import org.hibernate.annotations.Generated;
-import org.hibernate.annotations.GenerationTime;
-
 import javax.persistence.*;
 
 /**
- * Created by fabian on 03.02.14.
+ * @author fabian
+ *         on 03.02.14.
  */
 @MappedSuperclass
 //@Access(AccessType.PROPERTY)
@@ -17,7 +15,7 @@ public abstract class AbstractEntity {
      * the version
      */
     @Version
-    private Long serialVersionUID=1L ;
+    private Long version = 1L;
 
     /**
      * database id
@@ -37,12 +35,12 @@ public abstract class AbstractEntity {
     }
 
 
-    public Long getSerialVersionUID() {
-        return serialVersionUID;
+    public Long getVersion() {
+        return version;
     }
 
-    public void setSerialVersionUID(Long serialVersionUID) {
-        this.serialVersionUID = serialVersionUID;
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
 
