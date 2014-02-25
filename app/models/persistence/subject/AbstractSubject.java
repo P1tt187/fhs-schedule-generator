@@ -7,6 +7,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -28,6 +29,38 @@ public abstract class AbstractSubject extends AbstractEntity {
      */
     @Column(name = "NAME")
     private String name;
+
+    /**
+     * is this subject used in schedule
+     */
+    @Column(name = "active")
+    private Boolean active;
+
+
+    /**
+     * same subject can have diffrent names in diffrent courses
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @MapKeyColumn(name = "COURSE")
+    @Column(name = "SUBJECTNAME")
+    private Map<String, String> subjectSynonyms;
+
+    public Boolean isActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Map<String, String> getSubjectSynonyms() {
+        return subjectSynonyms;
+    }
+
+    public void setSubjectSynonyms(Map<String, String> subjectSynonyms) {
+        this.subjectSynonyms = subjectSynonyms;
+    }
 
     /**
      * the courses
@@ -79,10 +112,12 @@ public abstract class AbstractSubject extends AbstractEntity {
     public String toString() {
         return this.getClass().getSimpleName() +
                 "{" +
-                "units=" + units +
+                "active=" +
+                ", units=" + units +
                 ", name='" + name + '\'' +
                 ", participants=" + participants +
                 ", docents=" + docents +
+                ", subjectSynonyms=" + subjectSynonyms +
                 '}';
     }
 }

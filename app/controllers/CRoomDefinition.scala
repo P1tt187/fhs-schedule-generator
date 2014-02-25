@@ -65,7 +65,7 @@ object CRoomDefinition extends Controller {
 
           val houseDO = MRoomdefintion.findOrCreateHouseEntityByName(room.house)
 
-          val roomDO = new RoomEntity(room.capacity, room.number, houseDO )
+          val roomDO = new RoomEntity(room.capacity, room.number, houseDO)
           houseDO.getRooms.add(roomDO)
           roomDO.setRoomAttributes(roomAttributes)
 
@@ -87,6 +87,8 @@ object CRoomDefinition extends Controller {
                   roomDO.getCriteriaContainer.getCriterias.add(timeslotCriteria)
               }
           }
+
+          Logger.debug("" + houseDO +" " + roomDO)
           Transactions {
             implicit entitiManager =>
               entitiManager.persist(roomDO)

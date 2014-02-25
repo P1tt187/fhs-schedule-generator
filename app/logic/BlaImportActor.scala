@@ -4,7 +4,7 @@ import akka.actor.Actor
 import java.io.File
 import java.util.Scanner
 import play.api.Logger
-import models.persistence.subject.LectureSubject
+import models.persistence.subject.{AbstractSubject, LectureSubject}
 import models.Transactions
 import models.persistence.participants.{Participant, Group, Course}
 import org.hibernate.criterion.Restrictions
@@ -54,7 +54,7 @@ class BlaImportActor extends Actor {
       if (course == null) {
         course = new Course
         course.setShortName(shortName)
-        course.setFullName(shortcutReverse(shortName.substring(0, shortName.length - 1)))
+        course.setFullName(shortcutReverse(shortName.substring(0, shortName.length-1)))
         course.setGroups(new util.LinkedList[Group]())
         course.setSize(0)
         Transactions {
@@ -91,15 +91,25 @@ class BlaImportActor extends Actor {
       val lectureSubject = new LectureSubject
       lectureSubject.setName(metaInfo.subjektName)
       val course = findCourse(metaInfo.courseShortName)
-      lectureSubject.setParticipants(Set(course).asInstanceOf[Set[Participant]])
+      lectureSubject.setParticipants(Set[Participant](course))
       lectureSubject.setDocents(Set(findDocent(metaInfo.docent)))
       lectureSubject.setUnits(metaInfo.lectureCount)
+      lectureSubject.setActive(true)
+      lectureSubject.setSubjectSynonyms(Map(course.getShortName -> metaInfo.subjektName))
       lectureSubject
 
     }
 
+    def findLectureSubject(name:String) = {
+      Transactions.hibernateAction{
+        implicit session =>
+          session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("name",name)).uniqueResult().asInstanceOf[LectureSubject]
+      }
+    }
+
     var scanner = Scanner
 
+    /** collect shortcuts */
     while (scanner.hasNextLine) {
       val line = scanner.nextLine()
       if (line.startsWith("kinfo(")) {
@@ -129,6 +139,9 @@ class BlaImportActor extends Actor {
 
     scanner = Scanner
 
+    var result=Set[AbstractSubject]()
+
+    /** collect subjects and participants */
     while (scanner.hasNextLine) {
       val line = scanner.nextLine()
       if (line.startsWith("klv(")) {
@@ -147,16 +160,39 @@ class BlaImportActor extends Actor {
 
         val subjectName = part(1)
         if (part(4).startsWith("gemeinsam mit")) {
-          var connectedParticipants = part(4).substring("gemeinsam mit ".length).toUpperCase
-          if (connectedParticipants.contains("(")) {
-            connectedParticipants = connectedParticipants.substring(0, connectedParticipants.indexOf("(") - 1).trim
+
+          val metaInfo = subjectMetaInformation(part(1) + shortcut(part(0)))
+          var lectureSubject:LectureSubject = null
+          if (metaInfo.lectureCount > 0f) {
+             lectureSubject = findLectureSubject(metaInfo.subjektName)
+            if(lectureSubject==null){
+              lectureSubject=createLecture(metaInfo)
+            }
+            lectureSubject.setParticipants(lectureSubject.getParticipants + findCourse(metaInfo.courseShortName))
+            result+=lectureSubject
+
+            var connectedParticipants = part(4).substring("gemeinsam mit ".length).toUpperCase
+            if (connectedParticipants.contains("(")) {
+              val synonym = connectedParticipants.substring(connectedParticipants.indexOf("(")+1,connectedParticipants.indexOf(")")).trim
+              connectedParticipants = connectedParticipants.substring(0, connectedParticipants.indexOf("(") - 1).trim
+              lectureSubject.setSubjectSynonyms(lectureSubject.getSubjectSynonyms + (connectedParticipants -> synonym))
+            }
+            Logger.debug("" + lectureSubject)
+            Logger.debug("subject: " + subjectName + " with: " + connectedParticipants)
+            lectureSubject.setParticipants(lectureSubject.getParticipants + findCourse(connectedParticipants.substring(0,connectedParticipants.length)))
           }
 
-          Logger.debug("subject: " + subjectName + " with: " + connectedParticipants)
+
+
         } else {
           val metaInfo = subjectMetaInformation(part(1) + shortcut(part(0)))
-          if (metaInfo.lectureCount > 0) {
-            Logger.debug(createLecture(metaInfo).toString)
+          if (metaInfo.lectureCount > 0f) {
+            var lectureSubject = findLectureSubject(metaInfo.subjektName)
+            if(lectureSubject==null){
+              lectureSubject=createLecture(metaInfo)
+            }
+            lectureSubject.setParticipants(lectureSubject.getParticipants + findCourse(metaInfo.courseShortName))
+            result+=lectureSubject
           }
         }
       }
@@ -165,6 +201,7 @@ class BlaImportActor extends Actor {
     scanner.close()
 
     Logger.debug(shortcut.toString())
+    Logger.debug(result.mkString("\n"))
     /* Logger.debug(subjectNames.mkString("\n"))
      Logger.debug(subjectMetaInformation.mkString("\n"))
      */

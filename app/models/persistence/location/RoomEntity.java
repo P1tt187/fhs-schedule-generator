@@ -30,8 +30,11 @@ public class RoomEntity extends AbstractEntity {
     @Column(name = "NUMBER", nullable = false)
     private Integer number;
 
+    /**
+     * the room is in a house
+     */
     @ManyToOne
-    @OrderColumn(name="name")
+    @OrderColumn(name = "name")
     private HouseEntity house;
 
     public HouseEntity getHouse() {
@@ -43,8 +46,11 @@ public class RoomEntity extends AbstractEntity {
     }
 
 
+    /**
+     * Attributes of this room
+     */
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = RoomAttributesEntity.class,cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = RoomAttributesEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RoomAttributesEntity> roomAttributes;
 
     public List<RoomAttributesEntity> getRoomAttributes() {
@@ -132,5 +138,15 @@ public class RoomEntity extends AbstractEntity {
         result = 31 * result + (roomAttributes != null ? roomAttributes.hashCode() : 0);
         result = 31 * result + (criteriaContainer != null ? criteriaContainer.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "RoomEntity{" +
+                "capacity=" + capacity +
+                ", number=" + number +
+                ", roomAttributes=" + roomAttributes +
+                ", criteriaContainer=" + criteriaContainer +
+                '}';
     }
 }
