@@ -25,4 +25,5 @@ public abstract class Participant extends AbstractEntity {
         this.size = size;
     }
 
+
 }

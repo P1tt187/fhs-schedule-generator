@@ -2,7 +2,6 @@ package models.persistence.subject;
 
 import models.persistence.AbstractEntity;
 import models.persistence.Docent;
-import models.persistence.participants.Participant;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -14,7 +13,7 @@ import java.util.Set;
  * Created by fabian on 07.02.14.
  */
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "TBLSUBJECT")
 public abstract class AbstractSubject extends AbstractEntity {
 
@@ -33,7 +32,7 @@ public abstract class AbstractSubject extends AbstractEntity {
     /**
      * is this subject used in schedule
      */
-    @Column(name = "active")
+    @Column(name = "ACTIVE")
     private Boolean active;
 
 
@@ -63,25 +62,10 @@ public abstract class AbstractSubject extends AbstractEntity {
     }
 
     /**
-     * the courses
-     */
-    @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = Participant.class, fetch = FetchType.EAGER)
-    private Set<Participant> participants;
-
-    public Set<Participant> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(Set<Participant> courses) {
-        this.participants = courses;
-    }
-
-    /**
      * docents for this subject
      */
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = Docent.class, fetch = FetchType.EAGER)
+    @ManyToMany(targetEntity = Docent.class, fetch = FetchType.EAGER)
     private Set<Docent> docents;
 
     public Float getUnits() {
@@ -112,12 +96,38 @@ public abstract class AbstractSubject extends AbstractEntity {
     public String toString() {
         return this.getClass().getSimpleName() +
                 "{" +
-                "active=" +
+                "active=" + active +
                 ", units=" + units +
                 ", name='" + name + '\'' +
-                ", participants=" + participants +
                 ", docents=" + docents +
                 ", subjectSynonyms=" + subjectSynonyms +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AbstractSubject that = (AbstractSubject) o;
+
+        if (active != null ? !active.equals(that.active) : that.active != null) return false;
+        if (docents != null ? !docents.equals(that.docents) : that.docents != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (subjectSynonyms != null ? !subjectSynonyms.equals(that.subjectSynonyms) : that.subjectSynonyms != null)
+            return false;
+        if (units != null ? !units.equals(that.units) : that.units != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = units != null ? units.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (active != null ? active.hashCode() : 0);
+        result = 31 * result + (subjectSynonyms != null ? subjectSynonyms.hashCode() : 0);
+        result = 31 * result + (docents != null ? docents.hashCode() : 0);
+        return result;
     }
 }

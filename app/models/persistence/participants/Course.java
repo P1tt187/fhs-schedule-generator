@@ -60,6 +60,7 @@ public class Course extends Participant {
     public int hashCode() {
         int result = fullName != null ? fullName.hashCode() : 0;
         result = 31 * result + (shortName != null ? shortName.hashCode() : 0);
+        result = 31 * result + (size != null ? size.hashCode() : 0);
         return result;
     }
 
@@ -68,6 +69,7 @@ public class Course extends Participant {
         return "Course{" +
                 "fullName='" + fullName + '\'' +
                 ", shortName='" + shortName + '\'' +
+                ", size='" + size + '\'' +
                 '}';
     }
 }
