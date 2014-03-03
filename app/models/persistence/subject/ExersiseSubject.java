@@ -18,16 +18,6 @@ public class ExersiseSubject extends AbstractSubject {
     @Column(name = "GROUPTYPE")
     private String groupType;
 
-    @OneToOne(targetEntity = Course.class)
-    private Course course;
-
-    public Course getCourse() {
-        return course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
-    }
 
     public String getGroupType() {
         return groupType;

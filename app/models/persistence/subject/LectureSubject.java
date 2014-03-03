@@ -19,24 +19,7 @@ import java.util.Set;
 public class LectureSubject extends AbstractSubject {
 
 
-    /**
-     * the courses
-     */
-    @Fetch(FetchMode.SUBSELECT)
-    @ManyToMany(targetEntity = Course.class, fetch = FetchType.EAGER)
-    private Set<Course> courses;
 
-    public Set<Course> getCourses() {
-        return courses;
-    }
 
-    public void setCourses(Set<Course> courses) {
-        this.courses = courses;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + "courses=" + courses;
-    }
 
 }

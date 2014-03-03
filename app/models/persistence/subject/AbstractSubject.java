@@ -2,6 +2,8 @@ package models.persistence.subject;
 
 import models.persistence.AbstractEntity;
 import models.persistence.Docent;
+import models.persistence.enumerations.EDuration;
+import models.persistence.participants.Course;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -20,21 +22,26 @@ public abstract class AbstractSubject extends AbstractEntity {
     /**
      * units of this subject, 0.5 means not weekly
      */
-    @Column(name = "UNITS", nullable = true)
+    @Column(name = "UNITS", nullable = false)
     private Float units;
 
     /**
      * name of this subject
      */
-    @Column(name = "NAME")
+    @Column(name = "NAME", nullable = false)
     private String name;
 
     /**
      * is this subject used in schedule
      */
-    @Column(name = "ACTIVE")
+    @Column(name = "ACTIVE", nullable = false)
     private Boolean active;
 
+    /**
+     * which semester is it
+     */
+    @Column(name = "SEMESTER", nullable = false)
+    private String semester;
 
     /**
      * same subject can have diffrent names in diffrent courses
@@ -45,8 +52,32 @@ public abstract class AbstractSubject extends AbstractEntity {
     @Column(name = "SUBJECTNAME")
     private Map<String, String> subjectSynonyms;
 
+
+    /**
+     * the courses
+     */
+    @Fetch(FetchMode.SUBSELECT)
+    @ManyToMany(targetEntity = Course.class, fetch = FetchType.EAGER)
+    private Set<Course> courses;
+
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
+    }
+
     public Boolean isActive() {
         return active;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 
     public void setActive(Boolean active) {
@@ -99,6 +130,8 @@ public abstract class AbstractSubject extends AbstractEntity {
                 "active=" + active +
                 ", units=" + units +
                 ", name='" + name + '\'' +
+                ", semester='" + semester + "\'" +
+                ", courses=" + courses +
                 ", docents=" + docents +
                 ", subjectSynonyms=" + subjectSynonyms +
                 '}';

@@ -4,7 +4,7 @@ import akka.actor.Actor
 import java.io.File
 import java.util.Scanner
 import play.api.Logger
-import models.persistence.subject.LectureSubject
+import models.persistence.subject.{ExersiseSubject, AbstractSubject, LectureSubject}
 import models.Transactions
 import models.persistence.participants.{Group, Course}
 import org.hibernate.criterion.Restrictions
@@ -27,6 +27,7 @@ class BlaImportActor extends Actor {
   private var shortcutReverse = Map[ShortCourseName, CourseOfStudies]()
   private var subjectNames = Map[CourseOfStudies, Set[SubjectName]]()
   private var subjectMetaInformation = Map[SubjectName, SubjectMetaInformation]()
+  private var semester: String = null
 
   override def receive: Actor.Receive = {
 
@@ -102,10 +103,95 @@ class BlaImportActor extends Actor {
 
     }
 
+    def createExersise(metaInfo: SubjectMetaInformation) = {
+
+      val exersizeSubject = new ExersiseSubject
+      exersizeSubject.setName(metaInfo.subjektName)
+      val course = findCourse(metaInfo.courseShortName)
+
+      exersizeSubject.setCourses(Set(course))
+
+      exersizeSubject.setDocents(Set(findDocent(metaInfo.docent)))
+      exersizeSubject.setUnits(metaInfo.exersizeCount)
+      exersizeSubject.setActive(true)
+      exersizeSubject.setSubjectSynonyms(Map(course.getShortName -> metaInfo.subjektName))
+      exersizeSubject
+
+    }
+
+    def createExersizeWith(metaInfo: SubjectMetaInformation, part: Array[String], subjectName: String) = {
+      var exersizeSubject: ExersiseSubject = null
+      exersizeSubject = findExersiseSubject(metaInfo.subjektName)
+      if (exersizeSubject == null) {
+        exersizeSubject = createExersise(metaInfo)
+      }
+      exersizeSubject.setCourses(exersizeSubject.getCourses + findCourse(metaInfo.courseShortName))
+
+      var connectedParticipants = part(4).substring("gemeinsam mit ".length).toUpperCase.trim
+      if (!connectedParticipants.startsWith("BA") && !connectedParticipants.startsWith("MA")) {
+        connectedParticipants = "BA" + connectedParticipants
+      }
+      if (connectedParticipants.contains("(")) {
+        val synonym = connectedParticipants.substring(connectedParticipants.indexOf("(") + 1, connectedParticipants.indexOf(")")).trim
+        connectedParticipants = connectedParticipants.substring(0, connectedParticipants.indexOf("(") - 1).trim
+
+        exersizeSubject.setSubjectSynonyms(exersizeSubject.getSubjectSynonyms + (connectedParticipants -> synonym))
+      }
+      // Logger.debug("" + lectureSubject)
+      Logger.debug("subject: " + subjectName + " with: " + connectedParticipants)
+      exersizeSubject.setCourses(exersizeSubject.getCourses + findCourse(connectedParticipants.substring(0, connectedParticipants.length)))
+      exersizeSubject
+
+    }
+
+    def createLectureWith(metaInfo: SubjectMetaInformation, part: Array[String], subjectName: String) = {
+      var lectureSubject: LectureSubject = null
+      lectureSubject = findLectureSubject(metaInfo.subjektName)
+      if (lectureSubject == null) {
+        lectureSubject = createLecture(metaInfo)
+      }
+      lectureSubject.setCourses(lectureSubject.getCourses + findCourse(metaInfo.courseShortName))
+
+      var connectedParticipants = part(4).substring("gemeinsam mit ".length).toUpperCase.trim
+      if (!connectedParticipants.startsWith("BA") && !connectedParticipants.startsWith("MA")) {
+        connectedParticipants = "BA" + connectedParticipants
+      }
+      if (connectedParticipants.contains("(")) {
+        val synonym = connectedParticipants.substring(connectedParticipants.indexOf("(") + 1, connectedParticipants.indexOf(")")).trim
+        connectedParticipants = connectedParticipants.substring(0, connectedParticipants.indexOf("(") - 1).trim
+
+        lectureSubject.setSubjectSynonyms(lectureSubject.getSubjectSynonyms + (connectedParticipants -> synonym))
+      }
+      // Logger.debug("" + lectureSubject)
+      Logger.debug("subject: " + subjectName + " with: " + connectedParticipants)
+      lectureSubject.setCourses(lectureSubject.getCourses + findCourse(connectedParticipants.substring(0, connectedParticipants.length)))
+      lectureSubject
+
+    }
+
     def findLectureSubject(name: String) = {
       Transactions.hibernateAction {
         implicit session =>
           session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("name", name)).uniqueResult().asInstanceOf[LectureSubject]
+      }
+    }
+
+    def findExersiseSubject(name: String) = {
+      Transactions.hibernateAction {
+        implicit session =>
+          session.createCriteria(classOf[ExersiseSubject]).add(Restrictions.eq("name", name)).uniqueResult().asInstanceOf[ExersiseSubject]
+      }
+    }
+
+    def saveSubject(abstractSubject: AbstractSubject) {
+      abstractSubject.setSemester(semester)
+      Transactions {
+        implicit entityManager =>
+          if (abstractSubject.getId == null) {
+            entityManager.persist(abstractSubject)
+          } else {
+            entityManager.merge(abstractSubject)
+          }
       }
     }
 
@@ -115,7 +201,7 @@ class BlaImportActor extends Actor {
     while (scanner.hasNextLine) {
       val line = scanner.nextLine()
       if (line.startsWith("kinfo(")) {
-        val semester = line.substring(7, line.lastIndexOf('"'))
+        semester = line.substring(7, line.lastIndexOf('"'))
         Logger.debug("semester: " + semester)
       } else if (line.startsWith("kstudiengang_fächer_planen(")) {
         val course = line.substring(line.indexOf("(\"") + 2, line.indexOf("\",["))
@@ -157,43 +243,28 @@ class BlaImportActor extends Actor {
 
           subjectMetaInformation += subjectName + shortcut(course) -> SubjectMetaInformation(shortcut(course) + semester, subjectName, semester.toInt, docent, lectureCount.toFloat / 2f, exersizeCount.toFloat / 2f)
         } else if (line.startsWith("klv_teilnehmer(")) {
+          /** connect participants */
           val part = line.substring(line.indexOf("(") + 1, line.lastIndexOf(")")).split(",").map(_.replace("\"", ""))
 
           val subjectName = part(1)
           if (part(4).startsWith("gemeinsam mit")) {
 
             val metaInfo = subjectMetaInformation(subjectName + shortcut(part(0)))
-            var lectureSubject: LectureSubject = null
+
+            var abstractSubject: AbstractSubject = null
             if (metaInfo.lectureCount > 0f) {
-              lectureSubject = findLectureSubject(metaInfo.subjektName)
-              if (lectureSubject == null) {
-                lectureSubject = createLecture(metaInfo)
-              }
-              lectureSubject.setCourses(lectureSubject.getCourses + findCourse(metaInfo.courseShortName))
-
-              var connectedParticipants = part(4).substring("gemeinsam mit ".length).toUpperCase.trim
-              if (!connectedParticipants.startsWith("BA") && !connectedParticipants.startsWith("MA")) {
-                connectedParticipants = "BA" + connectedParticipants
-              }
-              if (connectedParticipants.contains("(")) {
-                val synonym = connectedParticipants.substring(connectedParticipants.indexOf("(") + 1, connectedParticipants.indexOf(")")).trim
-                connectedParticipants = connectedParticipants.substring(0, connectedParticipants.indexOf("(") - 1).trim
-
-                lectureSubject.setSubjectSynonyms(lectureSubject.getSubjectSynonyms + (connectedParticipants -> synonym))
-              }
-              // Logger.debug("" + lectureSubject)
-              Logger.debug("subject: " + subjectName + " with: " + connectedParticipants)
-              lectureSubject.setCourses(lectureSubject.getCourses + findCourse(connectedParticipants.substring(0, connectedParticipants.length)))
-              Transactions {
-                implicit entityManager =>
-                  if (lectureSubject.getId == null) {
-                    entityManager.persist(lectureSubject)
-                  } else {
-                    entityManager.merge(lectureSubject)
-                  }
-              }
+              abstractSubject = createLectureWith(metaInfo, part, subjectName)
+              saveSubject(abstractSubject)
+            }
+            if (metaInfo.exersizeCount > 0f) {
+              abstractSubject = createExersizeWith(metaInfo, part, subjectName)
+              saveSubject(abstractSubject)
             }
 
+            if (abstractSubject == null) {
+              Logger.warn("abstractSubject=null " + metaInfo)
+
+            }
 
           } else {
             val metaInfo = subjectMetaInformation(part(1) + shortcut(part(0)))
@@ -203,12 +274,29 @@ class BlaImportActor extends Actor {
                 lectureSubject = createLecture(metaInfo)
               }
               lectureSubject.setCourses(lectureSubject.getCourses + findCourse(metaInfo.courseShortName))
+              lectureSubject.setSemester(semester)
               Transactions {
                 implicit entityManager =>
                   if (lectureSubject.getId == null) {
                     entityManager.persist(lectureSubject)
                   } else {
                     entityManager.merge(lectureSubject)
+                  }
+              }
+            }
+            if (metaInfo.exersizeCount > 0f) {
+              var exersizeSubject = findExersiseSubject(metaInfo.subjektName)
+              if (exersizeSubject == null) {
+                exersizeSubject = createExersise(metaInfo)
+              }
+              exersizeSubject.setCourses(exersizeSubject.getCourses + findCourse(metaInfo.courseShortName))
+              exersizeSubject.setSemester(semester)
+              Transactions {
+                implicit entityManager =>
+                  if (exersizeSubject.getId == null) {
+                    entityManager.persist(exersizeSubject)
+                  } else {
+                    entityManager.merge(exersizeSubject)
                   }
               }
             }
@@ -225,7 +313,7 @@ class BlaImportActor extends Actor {
 
     val result = Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[LectureSubject]).list().asInstanceOf[util.List[LectureSubject]]
+        session.createCriteria(classOf[AbstractSubject]).add(Restrictions.eq("semester",semester)).list().asInstanceOf[util.List[AbstractSubject]]
     }
     Logger.debug(result.mkString("\n"))
 
