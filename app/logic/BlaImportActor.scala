@@ -201,14 +201,21 @@ class BlaImportActor extends Actor {
     while (scanner.hasNextLine) {
       val line = scanner.nextLine()
       if (line.startsWith("kinfo(")) {
-        semester = new Semester
-        semester.setName( line.substring(7, line.lastIndexOf('"')))
 
-        Transactions{
-          implicit entityManager =>
-            entityManager.persist(semester)
+
+        semester = Transactions.hibernateAction {
+          implicit session =>
+            session.createCriteria(classOf[Semester]).add(Restrictions.eq("name", line.substring(7, line.lastIndexOf('"')))).uniqueResult().asInstanceOf[Semester]
         }
+        if (semester == null) {
+          semester = new Semester
+          semester.setName(line.substring(7, line.lastIndexOf('"')))
 
+          Transactions {
+            implicit entityManager =>
+              entityManager.persist(semester)
+          }
+        }
         Logger.debug("semester: " + semester)
       } else if (line.startsWith("kstudiengang_fächer_planen(")) {
         val course = line.substring(line.indexOf("(\"") + 2, line.indexOf("\",["))
