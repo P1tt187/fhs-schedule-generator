@@ -1,8 +1,8 @@
 package models.persistence.subject;
 
+import models.Semester;
 import models.persistence.AbstractEntity;
 import models.persistence.Docent;
-import models.persistence.enumerations.EDuration;
 import models.persistence.participants.Course;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by fabian on 07.02.14.
+ * @author fabian
+ *         on 07.02.14.
  */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -40,8 +41,8 @@ public abstract class AbstractSubject extends AbstractEntity {
     /**
      * which semester is it
      */
-    @Column(name = "SEMESTER", nullable = false)
-    private String semester;
+    @ManyToOne(targetEntity = Semester.class, optional = false, cascade = CascadeType.MERGE)
+    private Semester semester;
 
     /**
      * same subject can have diffrent names in diffrent courses
@@ -72,11 +73,11 @@ public abstract class AbstractSubject extends AbstractEntity {
         return active;
     }
 
-    public String getSemester() {
+    public Semester getSemester() {
         return semester;
     }
 
-    public void setSemester(String semester) {
+    public void setSemester(Semester semester) {
         this.semester = semester;
     }
 

@@ -5,7 +5,7 @@ import java.io.File
 import java.util.Scanner
 import play.api.Logger
 import models.persistence.subject.{ExersiseSubject, AbstractSubject, LectureSubject}
-import models.Transactions
+import models.{Semester, Transactions}
 import models.persistence.participants.{Group, Course}
 import org.hibernate.criterion.Restrictions
 import java.util
@@ -27,7 +27,7 @@ class BlaImportActor extends Actor {
   private var shortcutReverse = Map[ShortCourseName, CourseOfStudies]()
   private var subjectNames = Map[CourseOfStudies, Set[SubjectName]]()
   private var subjectMetaInformation = Map[SubjectName, SubjectMetaInformation]()
-  private var semester: String = null
+  private var semester: Semester = null
 
   override def receive: Actor.Receive = {
 
@@ -39,7 +39,7 @@ class BlaImportActor extends Actor {
 
       parseFile(file)
 
-    case unkownCommand => throw new IllegalArgumentException("unknown command" + unkownCommand)
+    case unkownCommand => throw new IllegalArgumentException("unknown command " + unkownCommand)
   }
 
   def parseFile(file: File) = {
@@ -201,7 +201,14 @@ class BlaImportActor extends Actor {
     while (scanner.hasNextLine) {
       val line = scanner.nextLine()
       if (line.startsWith("kinfo(")) {
-        semester = line.substring(7, line.lastIndexOf('"'))
+        semester = new Semester
+        semester.setName( line.substring(7, line.lastIndexOf('"')))
+
+        Transactions{
+          implicit entityManager =>
+            entityManager.persist(semester)
+        }
+
         Logger.debug("semester: " + semester)
       } else if (line.startsWith("kstudiengang_fächer_planen(")) {
         val course = line.substring(line.indexOf("(\"") + 2, line.indexOf("\",["))
@@ -284,6 +291,7 @@ class BlaImportActor extends Actor {
                   }
               }
             }
+
             if (metaInfo.exersizeCount > 0f) {
               var exersizeSubject = findExersiseSubject(metaInfo.subjektName)
               if (exersizeSubject == null) {
@@ -313,7 +321,7 @@ class BlaImportActor extends Actor {
 
     val result = Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[AbstractSubject]).add(Restrictions.eq("semester",semester)).list().asInstanceOf[util.List[AbstractSubject]]
+        session.createCriteria(classOf[AbstractSubject]).add(Restrictions.eq("semester", semester)).list().asInstanceOf[util.List[AbstractSubject]]
     }
     Logger.debug(result.mkString("\n"))
 
