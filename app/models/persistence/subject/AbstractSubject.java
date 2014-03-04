@@ -51,6 +51,7 @@ public abstract class AbstractSubject extends AbstractEntity {
     @Fetch(FetchMode.SUBSELECT)
     @MapKeyColumn(name = "COURSE")
     @Column(name = "SUBJECTNAME")
+    @CollectionTable(name="TBLSYNONYMS")
     private Map<String, String> subjectSynonyms;
 
 
