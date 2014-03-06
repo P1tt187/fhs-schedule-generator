@@ -25,7 +25,7 @@
                     </option>
                 </select>
                 <div id="namefield">
-
+                    
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
         $('#selectLectureType' ).on('change',function(){
 
             $.getJSON('/editSucjects/' + $('#selectSemester' ).val() + "/" + $('#selectLectureType' ).val());
-            $('#namefield' ).removeAll( );
+            $('#namefield' ).empty();
 
         });
     } ) ;
