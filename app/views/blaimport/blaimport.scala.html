@@ -1,23 +1,92 @@
 @(message: String)(implicit flash: Flash)
 
-    @main(message, CBLAFileUpload.NAV) {
-        <div class="page-header" >
-            <h1>Planungsdatei importieren</h1>
+@main(message, CBLAFileUpload.NAV) {
+
+    <script type="text/javascript">
+        var error=undefined;
+    </script>
+
+    <div class="page-header" >
+        <h1>Planungsdatei importieren</h1>
+    </div>
+
+    @helper.form(action = routes.CBLAFileUpload.uploadFile, 'enctype -> "multipart/form-data") {
+        <div class="form-group @("has-error".when(flash.get("error"))) @("has-success".when(flash.get("success")))">
+            @if(flash.get("error")) {
+                <label class="control-label" for="uploadBtn">@flash.get("error")</label>
+                <script type="text/javascript">
+                $ ( window ).on ( 'load', function ( ) {
+                $ ( '#progressBarContainer' ).removeClass ( 'hidden' ) ;
+                } ) ;
+                     error=true;
+                </script>
+            }
+            @if(flash.get("success")) {
+                <label class="control-label" for="uploadBtn">@flash.get("success")</label>
+                <script type="text/javascript">
+                $ ( window ).on ( 'load', function ( ) {
+                $ ( '#progressBarContainer' ).removeClass ( 'hidden' ) ;
+                } ) ;
+                 error=false;
+                </script>
+            }
+            <input id="uploadBtn" class="btn btn-info " type="file" name="fileUpload" title="Datei Auswählen" accept="application/bla, .bla">
+        </div>
+        <p>
+            <input class="btn btn-success" type="submit" value="Upload">
+        </p>
+    }
+
+    <div id="progressBarContainer" class="hidden">
+
+        <div id="progressBar" class="progress progress-striped active">
+            <div class="progress-bar progress-bar-warning " role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width : 100%">
+                <span class="sr-only">100% Complete</span>
+            </div>
         </div>
 
-        @helper.form(action = routes.CBLAFileUpload.uploadFile, 'enctype -> "multipart/form-data") {
-            <div class="form-group @("has-error".when(flash.get("error"))) @("has-success".when(flash.get("success")))">
-                @if(flash.get("error")) {
-                    <label class="control-label" for="uploadBtn">@flash.get("error")</label>
-                }
-                @if(flash.get("success")){
-                    <label class="control-label" for="uploadBtn">@flash.get("success")</label>
-                }
-                <input id="uploadBtn" class="btn btn-info " type="file" name="fileUpload" title="Datei Auswählen" accept="application/bla, .bla">
-            </div>
-            <p>
-                <input class="btn btn-success" type="submit" value="Upload">
-            </p>
+
+    </div>
+
+    <script type="text/javascript">
+
+    var startPolling = function ( ) {
+    var poll = function ( ) {
+
+    $.ajax ( "/blaimportFinished", {
+
+         dataType: "json",
+        success : function ( data ) {
+            if ( data.result == true ) {
+            changeProgressBar ( ) ;
+            } else {
+             setTimeout ( poll, 2000 ) ;
+            }
         }
+    } ) ;
 
     }
+
+    poll ( ) ;
+
+    }
+
+    var changeProgressBar = function ( ) {
+    //$ ( '#progressBar' ).removeClass ( 'active' ) ;
+    $ ( '.progress-bar' ).removeClass ( 'progress-bar-warning' ).addClass ( 'progress-bar-success' ) ;
+
+    }
+
+    $ ( window ).on ( 'load', function ( ) {
+        if(undefined != error) {
+            if ( ! error ) {
+            startPolling ( ) ;
+            } else {
+            $ ( '.progress-bar' ).removeClass ( 'progress-bar-warning' ).addClass ( 'progress-bar-danger' ) ;
+            }
+        }
+    });
+
+    </script>
+
+}

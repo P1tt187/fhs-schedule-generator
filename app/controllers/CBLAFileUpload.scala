@@ -6,10 +6,12 @@ import play.api.libs.concurrent.Akka
 import akka.actor.Props
 import logic.{ImportFile, BlaImportActor}
 import play.api.Play.current
-import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 import play.api.libs.concurrent.Execution.Implicits._
-
+import scala.concurrent.Future
+import akka.pattern.ask
+import akka.util.Timeout
+import scala.concurrent.duration._
 
 /**
  * Created by fabian on 07.02.14.
@@ -18,9 +20,21 @@ object CBLAFileUpload extends Controller {
 
   val NAV = "PLFILEUPLOAD"
 
+  implicit val timeout = Timeout(5 seconds)
+  private var result : Future[Any] = null
+
 
   def page() = Action { implicit request =>
     Ok(blaimport("Import"))
+  }
+
+  def finished = Action{
+
+    val sb = StringBuilder.newBuilder
+    sb.append("{\"result\":")
+    if(result==null){ sb.append(false.toString) } else {sb.append(result.isCompleted.toString)}
+    sb.append("}")
+    Ok( sb.toString()  )
   }
 
   def uploadFile = Action(parse.multipartFormData) {
@@ -36,9 +50,9 @@ object CBLAFileUpload extends Controller {
 
 
           Akka.system.actorSelection("/user/" + IMPORT_ACTOR_NAME).resolveOne(300 millis).onComplete {
-            case Success(actor) => actor ! ImportFile(tmpFile)
+            case Success(actor) => result = actor ? ImportFile(tmpFile)
 
-            case Failure(ex) => Akka.system.actorOf(Props[BlaImportActor], name = IMPORT_ACTOR_NAME) ! ImportFile(tmpFile)
+            case Failure(ex) => result = Akka.system.actorOf(Props[BlaImportActor], name = IMPORT_ACTOR_NAME) ? ImportFile(tmpFile)
           }
           Redirect(routes.CBLAFileUpload.page).flashing("success" -> "success")
       }.getOrElse(

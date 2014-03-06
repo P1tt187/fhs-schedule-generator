@@ -151,7 +151,6 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
 
         }
 
-
         return this.stopMinute.compareTo(that.stopMinute);
     }
 }

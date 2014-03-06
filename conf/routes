@@ -12,7 +12,11 @@ GET         /defineRooms               controllers.CRoomDefinition.page
 POST        /addRoom                   controllers.CRoomDefinition.submitRoom
 
 GET         /blaimport                 controllers.CBLAFileUpload.page
+GET         /blaimportFinished         controllers.CBLAFileUpload.finished
 POST        /blaUpload                 controllers.CBLAFileUpload.uploadFile
+
+GET         /editSubjects              controllers.CEditSubjects.page
+GET         /editSucjects/:semester/:subjectType controllers.CEditSubjects.getNamesField(semester,subjectType)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file              controllers.Assets.at(path="/public", file)

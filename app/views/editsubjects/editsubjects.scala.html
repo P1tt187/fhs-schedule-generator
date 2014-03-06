@@ -1,0 +1,44 @@
+@(message: String, semesters: List[String])
+
+@main(message, CEditSubjects.NAV) {
+
+    <div class="page-header">
+        <h1> Fächer bearbeiten </h1>
+    </div>
+    <div class="clearfix">
+        <div class="row-fluid">
+            <div class="col-md-5">
+                <label class="control-label" for="selectSemester">Semester</label>
+                <select id="selectSemester" title="Semester">
+                @for(semester <- semesters) {
+                    <option value="@semester.replaceAll("/","+")">@semester</option>
+                }
+                </select>
+
+                <label class="control-label" for="selectLectureType">Typ</label>
+                <select id="selectLectureType" title="Vorlesung oder Übung">
+                    <option value="lecture">
+                        Vorlesung
+                    </option>
+                    <option value="exersise">
+                        Übung
+                    </option>
+                </select>
+                <div id="namefield">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+    $ ( window ).on ( 'load', function ( ) {
+        $('#selectLectureType' ).on('change',function(){
+
+            $.getJSON('/editSucjects/' + $('#selectSemester' ).val() + "/" + $('#selectLectureType' ).val());
+            $('#namefield' ).removeAll( );
+
+        });
+    } ) ;
+    </script>
+}
