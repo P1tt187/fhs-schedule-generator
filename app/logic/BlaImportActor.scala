@@ -115,6 +115,7 @@ class BlaImportActor extends Actor {
       exersizeSubject.setUnits(metaInfo.exersizeCount)
       exersizeSubject.setActive(true)
       exersizeSubject.setSubjectSynonyms(Map(course.getShortName -> metaInfo.subjektName))
+      exersizeSubject.setGroupType("")
       exersizeSubject
 
     }

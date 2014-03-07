@@ -1,0 +1,31 @@
+@(lectureType: String, subject: models.persistence.subject.AbstractSubject)
+
+@import models.persistence.subject.ExersiseSubject
+
+<div class="row-fluid">
+    <div class="col-md-5">
+        <label for="nameInput" class="control-label">Name</label>
+        <input class="form-control " id="nameInput" type="text" placeholder="name" value="@subject.getName">
+        <label for="unitInput" class="control-label">Einheiten</label>
+        <input class="form-control" id="unitInput" type="number" placeholder="einheiten" value="@subject.getUnits">
+    </div>
+    <div class="col-md-5">
+        <label class="control-label" for="activeCheckbox">Aktiv</label>
+        <input class=" form-control checkbox" type="checkbox" id="activeCheckbox" @if(subject.isActive){ checked }>
+        @if(lectureType.equals(CEditSubjects.EXERSISE)) {
+            <label class="control-label" for="groupTypeInput">Gruppentyp</label>
+            <input class="form-control" id="groupTypeInput" type="text" placeholder="Gruppentyp" value="@(subject.asInstanceOf[ExersiseSubject].getGroupType)">
+            }
+    </div>
+</div>
+<div class="clearfix"></div>
+<div class="row-fluid">
+    <div class="col-md-5">
+        <label for="selectCourse">Kurse</label>
+        <select class="form-control" multiple id="selectCourse" title="nichts ausgewählt"></select>
+    </div>
+    <div class="col-md-5">
+        <label class="control-label" for="selectDocents">Dozenten</label>
+        <select class="form-control" multiple id="selectDocents" title="nichts ausgewählst"></select>
+    </div>
+</div>
