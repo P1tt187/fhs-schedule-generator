@@ -3,7 +3,9 @@ package models.fhs.pages.editsubjects
 import models.{Semester, Transactions}
 import scala.collection.JavaConversions._
 import models.persistence.subject.{ExersiseSubject, LectureSubject}
-import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
+import org.hibernate.criterion.{Order, CriteriaSpecification, Restrictions}
+import models.persistence.Docent
+import models.persistence.participants.Course
 
 /**
  * @author fabian 
@@ -46,13 +48,26 @@ object MEditSubjects {
     }
   }
 
-  def findSubject[T](clazz:Class[T], id:Long)={
-    Transactions.hibernateAction{
-      implicit session=>
-       clazz.cast(session.createCriteria(clazz).add(Restrictions.idEq(id)).uniqueResult())
+  def findSubject[T](clazz: Class[T], id: Long) = {
+    Transactions.hibernateAction {
+      implicit session =>
+        clazz.cast(session.createCriteria(clazz).add(Restrictions.idEq(id)).uniqueResult())
     }
   }
 
+  def findDocents() = {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[Docent]).addOrder(Order.asc("lastName")).list().asInstanceOf[java.util.List[Docent]].toList
+    }
+  }
+
+  def findCourses() = {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[Course]).addOrder(Order.asc("shortName")).list().asInstanceOf[java.util.List[Course]].toList
+    }
+  }
 
 }
 

@@ -7,6 +7,8 @@ import play.api.Logger
 import java.util.regex.Pattern
 import views.html.editsubjects._
 import models.persistence.subject.{ExersiseSubject, LectureSubject}
+import play.api.cache.Cache
+import play.api.Play.current
 
 /**
  * @author fabian 
@@ -34,11 +36,26 @@ object CEditSubjects extends Controller {
         findSubject(classOf[ExersiseSubject], id)
     }
 
-    if(subject.isInstanceOf[ExersiseSubject]){
-      Logger.debug(subject.asInstanceOf[ExersiseSubject].getGroupType)
+    subject match {
+      case exersiseSubject: ExersiseSubject =>
+        Logger.debug(exersiseSubject.getGroupType)
+      case _ =>
     }
 
-    Ok(Json.stringify(Json.obj("html" -> subjectfields(subjectType, subject).toString())))
+
+    val docents = Cache.getOrElse("docents") {
+      val docent = findDocents()
+      Cache.set("docents", docent)
+      docent
+    }
+
+
+    val courses = Cache.getOrElse("courses") {
+     val course= findCourses()
+      Cache.set("courses",course)
+      course
+    }
+    Ok(Json.stringify(Json.obj("html" -> subjectfields(subjectType, subject, docents, courses).toString())))
   }
 
   def getNamesField(semester: String, subjectType: String) = Action {

@@ -15,6 +15,7 @@ public abstract class AbstractEntity {
      * the version
      */
     @Version
+    @Transient
     private Long version = 1L;
 
     /**

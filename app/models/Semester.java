@@ -14,6 +14,7 @@ import javax.persistence.Table;
 @Table(name = "TBLSEMESTER")
 public class Semester extends AbstractEntity {
 
+    /** the name of this semester */
     @Column(name = "NAME")
     private String name;
 
