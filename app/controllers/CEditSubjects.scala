@@ -9,6 +9,8 @@ import views.html.editsubjects._
 import models.persistence.subject.{ExersiseSubject, LectureSubject}
 import play.api.cache.Cache
 import play.api.Play.current
+import scala.collection.JavaConversions._
+import models.Transactions
 
 /**
  * @author fabian 
@@ -70,24 +72,59 @@ object CEditSubjects extends Controller {
     }
   }
 
+
   def saveData = Action(parse.json) {
     implicit request =>
+      try {
+        val jsVal = request.body
 
-      val jsVal=request.body
+        val subjectId = (jsVal \ "subjectId").as[Long]
 
-      val subjectId = (jsVal \ "subjectId").as[Long]
+        val activeCheckbox = (jsVal \ "activeCheckbox").as[Boolean]
 
-    Logger.debug("" + (jsVal \ "activeCheckbox").as[Boolean])
+        val nameInput = (jsVal \ "nameInput").as[String]
 
-      val subject = (jsVal \ "subjectType").as[String] match {
-        case LECTURE =>
-          findSubject(classOf[LectureSubject], subjectId)
-        case EXERSISE =>
-          findSubject(classOf[ExersiseSubject], subjectId)
+        val unitInput = (jsVal \ "unitInput").as[String].trim.toFloat
+
+        val selectedCourseIds = (jsVal \ "selectCourse").as[JsArray].value.map(_.as[String].toLong).toList
+
+        val selectDocentsIds = (jsVal \ "selectDocents").as[JsArray].value.map(_.as[String].toLong).toList
+
+        val selectedCourse = findCourses(selectedCourseIds).toSet
+
+        val selectedDocents=findDocents(selectDocentsIds).toSet
+
+        //Logger.debug("" + (jsVal \ "selectCourse"))
+
+
+        val subject = (jsVal \ "subjectType").as[String] match {
+          case LECTURE =>
+            findSubject(classOf[LectureSubject], subjectId)
+          case EXERSISE =>
+            val groupTypeInput = (jsVal \ "groupTypeInput").as[String]
+            val exersize = findSubject(classOf[ExersiseSubject], subjectId)
+            exersize.setGroupType(groupTypeInput)
+            exersize
+        }
+
+        subject.setActive(activeCheckbox)
+        subject.setName(nameInput)
+        subject.setUnits(unitInput)
+        subject.setCourses(selectedCourse)
+        subject.setDocents(selectedDocents)
+
+        Transactions{
+          implicit entitymanager =>
+            entitymanager.merge(subject)
+        }
+
+        Ok(Json.stringify(Json.obj("result" -> "succsess")))
       }
-
-
-      Ok("")
+      catch {
+        case e: Exception =>
+          Logger.error("submit error", e)
+          NotAcceptable(Json.stringify(Json.obj("result" -> e.getMessage)))
+      }
   }
 
 }

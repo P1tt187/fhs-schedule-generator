@@ -62,10 +62,30 @@ object MEditSubjects {
     }
   }
 
+  def findDocents(ids: List[Long]) = {
+    ids.map {
+      id =>
+        Transactions.hibernateAction {
+          implicit session =>
+            session.createCriteria(classOf[Docent]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[Docent]
+        }
+    }
+  }
+
   def findCourses() = {
     Transactions.hibernateAction {
       implicit session =>
         session.createCriteria(classOf[Course]).addOrder(Order.asc("shortName")).list().asInstanceOf[java.util.List[Course]].toList
+    }
+  }
+
+  def findCourses(ids:List[Long])={
+    ids.map{
+      id =>
+        Transactions.hibernateAction {
+          implicit session =>
+            session.createCriteria(classOf[Course]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[Course]
+        }
     }
   }
 

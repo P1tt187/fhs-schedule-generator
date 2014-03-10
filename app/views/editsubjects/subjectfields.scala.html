@@ -7,9 +7,9 @@
     <div class="row-fluid">
         <div class="col-md-5">
             <label for="nameInput" class="control-label">Name</label>
-            <input class="form-control " id="nameInput" name="nameInput" type="text" placeholder="name" value="@subject.getName">
+            <input class="form-control " id="nameInput" name="nameInput" type="text" placeholder="name" value="@subject.getName" required>
             <label for="unitInput" class="control-label">Einheiten</label>
-            <input class="form-control" id="unitInput" name="unitInput" type="number" placeholder="einheiten" value="@subject.getUnits">
+           <div id="unitInputDiv"> <input class="form-control" id="unitInput" name="unitInput" type="number" placeholder="einheiten" value="@subject.getUnits" step="0.5" min="0.5" required></div>
         </div>
         <div class="col-md-5">
             <label class="control-label" for="activeCheckbox">Aktiv</label>
@@ -17,7 +17,7 @@
             checked }>
             @if(lectureType.equals(CEditSubjects.EXERSISE)) {
                 <label class="control-label" for="groupTypeInput">Gruppentyp</label>
-                <input class="form-control" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="@(subject.asInstanceOf[ExersiseSubject].getGroupType)">
+                <input class="form-control" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="@(subject.asInstanceOf[ExersiseSubject].getGroupType)" required>
                 }
         </div>
     </div>
@@ -27,19 +27,21 @@
             <label for="selectCourse">Kurse</label>
             <select class="form-control" multiple="multiple" id="selectCourse" name="selectCourse" title="nichts ausgewählt">
             @for(course <- courses) {
-                <option value="@course.getId" @if(subject.getCourses.contains(course)) {
-                    selected }> @course.getShortName </option>
+                <option value="@course.getId" @if(subject.getCourses.contains(course)) { selected }
+                > @course.getShortName </option>
             }
             </select>
         </div>
         <div class="col-md-5">
-            <label class="control-label" for="selectDocents">Dozenten</label>
-            <select class="form-control" multiple="multiple" id="selectDocents" name="selectDocents" title="nichts ausgewählst">
-            @for(docent <- docents) {
-                <option value="@docent.getId" @if(subject.getDocents.contains(docent)) { selected }
-                >@docent.getLastName </option>
-            }
-            </select>
+            <div id="docents">
+                <label class="control-label" for="selectDocents">Dozenten</label>
+                <select class="form-control" multiple="multiple" id="selectDocents" name="selectDocents" title="nichts ausgewählst">
+                @for(docent <- docents) {
+                    <option value="@docent.getId" @if(subject.getDocents.contains(docent)) { selected }
+                    >@docent.getLastName </option>
+                }
+                </select>
+            </div>
         </div>
     </div>
     <div class="clearfix"></div>
@@ -54,50 +56,84 @@
         </div>
     </div>
 </form>
+<div class="clearfix"></div>
+<div class="row-fluid">
+    <div class="col-md-5">
+        <div id="result">
 
-    <div id="error">
-
+        </div>
     </div>
+</div>
 <script type="text/javascript">
 
+    var appendError = function(){
+    $ ( '#result' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
+    }
+
 $ ( '#chancelButton' ).on ( 'click', function ( ) {
-$ ( location ).attr ( 'href', "  @routes.CEditSubjects.page ".trim());
+$ ( location ).attr ( 'href', "   @routes.CEditSubjects.page ".trim());
 } ) ;
+
+
 
 $ ( '#subjectForm' ).on ( "submit", function ( e ) {
 e.preventDefault ( ) ;
 
+$('.has-error' ).removeClass('has-error');
 
-var data =  $ ( '#subjectForm' ).serializeObject();
-    data['subjectType']='@lectureType';
-    data['subjectId']=@subject.getId;
+
+if($('#unitInput' ).val() % 0.5 != 0 || $('#unitInput' ).val() < 0.5 ){
+    $('#unitInputDiv' ).addClass('has-error');
+    appendError();
+    return;
+}
+
+var data = $ ( '#subjectForm' ).serializeObject ( ) ;
+data[ 'subjectType' ] = ' @lectureType '.trim();
+data[ 'subjectId' ] = @subject.getId ;
 
 /** proof if checkbox is checked or not */
-data['activeCheckbox']= data['activeCheckbox']==='on';
+data[ 'activeCheckbox' ] = data[ 'activeCheckbox' ] === 'on' ;
+/** make sure that arrays are arrays*/
+if(! $.isArray(data[ 'selectCourse' ])){
+    data[ 'selectCourse' ]=[data[ 'selectCourse' ]];
+}
+if(data[ 'selectDocents' ]==null){
+   $('#docents' ).addClass('has-error');
+    appendError();
+    return;
+}
+if(! $.isArray(data[ 'selectDocents' ])){
+    data[ 'selectDocents' ]=[data[ 'selectDocents' ]];
+}
 
-var Form = this;
-       $.ajax ( {
-       cache: false,
-       type: "POST",
-       dataType : "json",
-       data : JSON.stringify(data),
-       context : Form,
-       contentType: "application/json; charset=utf-8",
-       url : "@routes.CEditSubjects.saveData",
-        success : function ( callback ) {
-        console.log(JSON.parse(callback));
 
-        $(this).html("Success");
+var Form = this ;
+$.ajax ( {
+    cache : false,
+    type : "POST",
+    dataType : "json",
+    data : JSON.stringify ( data ),
+    context : Form,
+    contentType : "application/json; charset=utf-8",
+    url : " @routes.CEditSubjects.saveData",
+    success : function ( callback ) {
+                console.log ( JSON.stringify ( callback ) ) ;
 
-        },
+                $ ( '#result' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
 
-        error : function ( callback ) {
+            },
+
+    error : function ( callback ) {
                 // error handler
-                console.log ( JSON.parse ( callback) ) ;
-            $('#error' ).empty( ).append(callback.responseText);
+                console.log ( JSON.stringify ( callback ) ) ;
+                $ ( '#result' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
 
-            }
-        } ) ;
+        var response = callback.responseJSON;
+        $('#' + response.result ).addClass('has-error');
+
+                }
+   } ) ;
 
 console.debug ( JSON.stringify ( data ) ) ;
 
