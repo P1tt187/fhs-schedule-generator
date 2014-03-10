@@ -33,8 +33,8 @@ object MEditSubjects {
 
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[java.util.List[LectureSubject]].
-          map(element => MSubjects(element.getId, element.getName)).toList.sortWith(_ < _)
+        session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name")).list().asInstanceOf[java.util.List[LectureSubject]].
+          map(element => MSubjects(element.getId, element.getName)).toList
     }
   }
 
@@ -43,8 +43,8 @@ object MEditSubjects {
 
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[ExersiseSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[java.util.List[ExersiseSubject]].
-          map(element => MSubjects(element.getId, element.getName)).toList.sortWith(_ < _)
+        session.createCriteria(classOf[ExersiseSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name")).list().asInstanceOf[java.util.List[ExersiseSubject]].
+          map(element => MSubjects(element.getId, element.getName)).toList
     }
   }
 
@@ -71,10 +71,6 @@ object MEditSubjects {
 
 }
 
-case class MSubjects(id: Long, name: String) extends Ordered[MSubjects] {
-  override def compare(that: MSubjects): Int = this.name.compareTo(that.name)
-}
+case class MSubjects(id: Long, name: String)
 
-case class MDocent(id: Long, name: String) extends Ordered[MDocent] {
-  override def compare(that: MDocent): Int = this.name.compareTo(that.name)
-}
+

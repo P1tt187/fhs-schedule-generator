@@ -17,7 +17,8 @@ POST        /blaUpload                                  controllers.CBLAFileUplo
 
 GET         /editSubjects                               controllers.CEditSubjects.page
 GET         /editSucjects/:semester/:subjectType        controllers.CEditSubjects.getNamesField(semester,subjectType)
-GET         /subjects/:subjectType/:id       controllers.CEditSubjects.getSubjectFields(subjectType, id )
+GET         /subjects/:subjectType/:id                  controllers.CEditSubjects.getSubjectFields(subjectType, id )
+POST        /editSubject                                controllers.CEditSubjects.saveData
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                               controllers.Assets.at(path="/public", file)

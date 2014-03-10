@@ -173,14 +173,14 @@ class BlaImportActor extends Actor {
     def findLectureSubject(name: String) = {
       Transactions.hibernateAction {
         implicit session =>
-          session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("name", name)).uniqueResult().asInstanceOf[LectureSubject]
+          session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("name", name)).add(Restrictions.eq("semester",semester)).uniqueResult().asInstanceOf[LectureSubject]
       }
     }
 
     def findExersiseSubject(name: String) = {
       Transactions.hibernateAction {
         implicit session =>
-          session.createCriteria(classOf[ExersiseSubject]).add(Restrictions.eq("name", name)).uniqueResult().asInstanceOf[ExersiseSubject]
+          session.createCriteria(classOf[ExersiseSubject]).add(Restrictions.eq("name", name)).add(Restrictions.eq("semester",semester)).uniqueResult().asInstanceOf[ExersiseSubject]
       }
     }
 

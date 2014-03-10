@@ -51,8 +51,8 @@ object CEditSubjects extends Controller {
 
 
     val courses = Cache.getOrElse("courses") {
-     val course= findCourses()
-      Cache.set("courses",course)
+      val course = findCourses()
+      Cache.set("courses", course)
       course
     }
     Ok(Json.stringify(Json.obj("html" -> subjectfields(subjectType, subject, docents, courses).toString())))
@@ -68,6 +68,26 @@ object CEditSubjects extends Controller {
       case EXERSISE =>
         Ok(Json.stringify(Json.obj("html" -> namefield(findExersiseSubjectsForSemester(semesterPattern), EXERSISE).toString())))
     }
+  }
+
+  def saveData = Action(parse.json) {
+    implicit request =>
+
+      val jsVal=request.body
+
+      val subjectId = (jsVal \ "subjectId").as[Long]
+
+    Logger.debug("" + (jsVal \ "activeCheckbox").as[Boolean])
+
+      val subject = (jsVal \ "subjectType").as[String] match {
+        case LECTURE =>
+          findSubject(classOf[LectureSubject], subjectId)
+        case EXERSISE =>
+          findSubject(classOf[ExersiseSubject], subjectId)
+      }
+
+
+      Ok("")
   }
 
 }
