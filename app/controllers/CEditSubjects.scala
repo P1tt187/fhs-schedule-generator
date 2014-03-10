@@ -92,7 +92,7 @@ object CEditSubjects extends Controller {
 
         val selectedCourse = findCourses(selectedCourseIds).toSet
 
-        val selectedDocents=findDocents(selectDocentsIds).toSet
+        val selectedDocents = findDocents(selectDocentsIds).toSet
 
         //Logger.debug("" + (jsVal \ "selectCourse"))
 
@@ -113,7 +113,7 @@ object CEditSubjects extends Controller {
         subject.setCourses(selectedCourse)
         subject.setDocents(selectedDocents)
 
-        Transactions{
+        Transactions {
           implicit entitymanager =>
             entitymanager.merge(subject)
         }

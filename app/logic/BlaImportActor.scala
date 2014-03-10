@@ -290,6 +290,7 @@ class BlaImportActor extends Actor {
               }
               lectureSubject.setCourses(lectureSubject.getCourses + findCourse(metaInfo.courseShortName))
               lectureSubject.setSemester(semester)
+
               Transactions {
                 implicit entityManager =>
                   if (lectureSubject.getId == null) {
