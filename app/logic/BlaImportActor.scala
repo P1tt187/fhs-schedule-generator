@@ -89,6 +89,34 @@ class BlaImportActor extends Actor {
       docent
     }
 
+    def areSemesterValuesConsistent(semesterValues: List[Int]):Boolean = {
+      val winter = semester.getName.startsWith("Winter")
+      val summer = semester.getName.startsWith("Sommer")
+      if(semesterValues.toSet.size >1) {
+
+        /** data is consistent if all are true or false*/
+        val checkResults = semesterValues.map {
+          element =>
+            if (winter) {
+              element % 2 != 0
+            } else
+            if (summer) {
+              element % 2 == 0
+            } else {
+              Logger.warn("this shouldn happen " + semester.getName)
+              false
+            }
+        }
+
+
+        checkResults.toSet.size < 2
+
+      } else {
+        true
+      }
+
+    }
+
     def setActiveValue(subject: AbstractSubject, semesterValue: Int) {
 
       val winter = semester.getName.startsWith("Winter")
@@ -106,6 +134,27 @@ class BlaImportActor extends Actor {
       if (summer) {
         subject.setActive(summerValue)
       }
+    }
+
+    def findConsistentSemester(semesterValues: List[Int]) = {
+      val winter = semester.getName.startsWith("Winter")
+      val summer = semester.getName.startsWith("Sommer")
+
+      val correctSemester =
+        semesterValues.filter {
+          element =>
+            if (winter) {
+              element % 2 != 0
+            } else
+            if (summer) {
+              element % 2 == 0
+            } else {
+
+              false
+            }
+        }
+
+      correctSemester(0)
     }
 
     def findLectureSubject(name: String) = {
@@ -195,12 +244,12 @@ class BlaImportActor extends Actor {
           val exersizeCount = part(6)
 
           subjectMetaInformation.get(subjectName) match {
-            case None => subjectMetaInformation += subjectName -> SubjectMetaInformation(List(shortcut(course) + semester), subjectName, semester.toInt, docent, lectureCount.toFloat / 2f, exersizeCount.toFloat / 2f, Map((shortcut(course) + semester) -> subjectName))
+            case None => subjectMetaInformation += subjectName -> SubjectMetaInformation(List(shortcut(course)), List(shortcut(course) + semester), subjectName, List(semester.toInt), docent, lectureCount.toFloat / 2f, exersizeCount.toFloat / 2f, Map((shortcut(course) + semester) -> subjectName))
 
             case Some(metaInfo) =>
               var theSynonyms = metaInfo.synonyms
               theSynonyms += (shortcut(course) + semester) -> subjectName
-              subjectMetaInformation += subjectName -> metaInfo.copy(synonyms = theSynonyms, courseShortName = metaInfo.courseShortName :+ (shortcut(course) + semester))
+              subjectMetaInformation += subjectName -> metaInfo.copy(synonyms = theSynonyms, courseShortName = metaInfo.courseShortName :+ (shortcut(course) + semester), semesterValue = metaInfo.semesterValue :+ semester.toInt, courseShortCut = metaInfo.courseShortCut :+ shortcut(course))
           }
 
 
@@ -244,35 +293,59 @@ class BlaImportActor extends Actor {
     subjectMetaInformation.foreach {
       case (k, v) =>
         v match {
-          case SubjectMetaInformation(courseShortName, subjektName, semesterValue, docent, lectureCount, exersizeCount, synonyms) =>
-            val courses = courseShortName.map(e => findCourse(e)).toSet
+          case SubjectMetaInformation(courseShortCut, courseShortName, subjectName, semesterValues, docent, lectureCount, exersizeCount, synonyms) =>
+
+
+
+            def initSubject(subject: AbstractSubject, courses: Set[Course], subjectName: String, semesterValues: List[Int], docent: String, unitCount: Float, synonyms: Map[String, String]) {
+              subject.setDocents(Set(findDocent(docent)))
+              subject.setName(subjectName)
+              subject.setSemester(semester)
+              subject.setUnits(unitCount)
+
+              subject.setSubjectSynonyms(synonyms)
+
+              if (areSemesterValuesConsistent(semesterValues)) {
+                setActiveValue(subject, semesterValues(0))
+              } else {
+                subject.setActive(true)
+              }
+
+
+              subject.setCourses(courses)
+              if (subject.isActive) {
+                saveSubject(subject)
+              }
+            }
+
+            val courses = if (areSemesterValuesConsistent(semesterValues)) {
+              courseShortName.map(e => findCourse(e)).toSet
+
+            } else {
+              val correctSemester = findConsistentSemester(semesterValues)
+
+              var correctCourse = Set[Course]()
+
+              for (i <- 0 to courseShortCut.length-1) {
+
+                correctCourse += findCourse(courseShortCut(i) + correctSemester)
+
+              }
+
+              correctCourse
+
+            }
 
             if (exersizeCount > 0f) {
               val exersizeSubject = new ExersiseSubject
-              exersizeSubject.setDocents(Set(findDocent(docent)))
-              exersizeSubject.setName(subjektName)
-              exersizeSubject.setSemester(semester)
-              exersizeSubject.setUnits(exersizeCount)
+
               exersizeSubject.setGroupType("")
-              exersizeSubject.setSubjectSynonyms(synonyms)
-              setActiveValue(exersizeSubject, semesterValue)
-              exersizeSubject.setCourses(courses)
-              if (exersizeSubject.isActive) {
-                saveSubject(exersizeSubject)
-              }
+
+              initSubject(exersizeSubject, courses, subjectName, semesterValues, docent, exersizeCount, synonyms)
             }
             if (lectureCount > 0f) {
               val lectureSubject = new LectureSubject
-              lectureSubject.setDocents(Set(findDocent(docent)))
-              lectureSubject.setName(subjektName)
-              lectureSubject.setSemester(semester)
-              lectureSubject.setUnits(lectureCount)
-              lectureSubject.setSubjectSynonyms(synonyms)
-              setActiveValue(lectureSubject, semesterValue)
-              lectureSubject.setCourses(courses)
-              if (lectureSubject.isActive) {
-                saveSubject(lectureSubject)
-              }
+              initSubject(lectureSubject, courses, subjectName, semesterValues, docent, lectureCount, synonyms)
             }
         }
 
@@ -292,7 +365,7 @@ class BlaImportActor extends Actor {
      */
   }
 
-  private case class SubjectMetaInformation(courseShortName: List[String], subjektName: String, semester: Int, docent: String, lectureCount: Float, exersizeCount: Float, synonyms: Map[String, String])
+  private case class SubjectMetaInformation(courseShortCut: List[String], courseShortName: List[String], subjektName: String, semesterValue: List[Int], docent: String, lectureCount: Float, exersizeCount: Float, synonyms: Map[String, String])
 
 }
 
