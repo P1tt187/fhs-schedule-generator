@@ -27,6 +27,7 @@ class BlaImportActor extends Actor {
   private var shortcutReverse = Map[ShortCourseName, CourseOfStudies]()
   private var subjectNames = Map[CourseOfStudies, Set[SubjectName]]()
   private var subjectMetaInformation = Map[SubjectName, SubjectMetaInformation]()
+
   private var semester: Semester = null
 
   override def receive: Actor.Receive = {
@@ -36,6 +37,7 @@ class BlaImportActor extends Actor {
       shortcutReverse = shortcutReverse.empty
       subjectNames = subjectNames.empty
       subjectMetaInformation = subjectMetaInformation.empty
+
 
       parseFile(file)
 
@@ -87,100 +89,36 @@ class BlaImportActor extends Actor {
       docent
     }
 
-    def createLecture(metaInfo: SubjectMetaInformation) = {
+    def setActiveValue(subject: AbstractSubject, semesterValue: Int) {
 
-      val lectureSubject = new LectureSubject
-      lectureSubject.setName(metaInfo.subjektName)
-      val course = findCourse(metaInfo.courseShortName)
+      val winter = semester.getName.startsWith("Winter")
 
-      lectureSubject.setCourses(Set(course))
+      val winterValue = semesterValue % 2 != 0
 
-      lectureSubject.setDocents(Set(findDocent(metaInfo.docent)))
-      lectureSubject.setUnits(metaInfo.lectureCount)
-      lectureSubject.setActive(true)
-      lectureSubject.setSubjectSynonyms(Map(course.getShortName -> metaInfo.subjektName))
-      lectureSubject
+      val summer = semester.getName.startsWith("Sommer")
 
-    }
+      val summerValue = semesterValue % 2 == 0
 
-    def createExersise(metaInfo: SubjectMetaInformation) = {
-
-      val exersizeSubject = new ExersiseSubject
-      exersizeSubject.setName(metaInfo.subjektName)
-      val course = findCourse(metaInfo.courseShortName)
-
-      exersizeSubject.setCourses(Set(course))
-
-      exersizeSubject.setDocents(Set(findDocent(metaInfo.docent)))
-      exersizeSubject.setUnits(metaInfo.exersizeCount)
-      exersizeSubject.setActive(true)
-      exersizeSubject.setSubjectSynonyms(Map(course.getShortName -> metaInfo.subjektName))
-      exersizeSubject.setGroupType("")
-      exersizeSubject
-
-    }
-
-    def createExersizeWith(metaInfo: SubjectMetaInformation, part: Array[String], subjectName: String) = {
-      var exersizeSubject: ExersiseSubject = null
-      exersizeSubject = findExersiseSubject(metaInfo.subjektName)
-      if (exersizeSubject == null) {
-        exersizeSubject = createExersise(metaInfo)
+      if (winter) {
+        subject.setActive(winterValue)
       }
-      exersizeSubject.setCourses(exersizeSubject.getCourses + findCourse(metaInfo.courseShortName))
 
-      var connectedParticipants = part(4).substring("gemeinsam mit ".length).toUpperCase.trim
-      if (!connectedParticipants.startsWith("BA") && !connectedParticipants.startsWith("MA")) {
-        connectedParticipants = "BA" + connectedParticipants
+      if (summer) {
+        subject.setActive(summerValue)
       }
-      if (connectedParticipants.contains("(")) {
-        val synonym = connectedParticipants.substring(connectedParticipants.indexOf("(") + 1, connectedParticipants.indexOf(")")).trim
-        connectedParticipants = connectedParticipants.substring(0, connectedParticipants.indexOf("(") - 1).trim
-
-        exersizeSubject.setSubjectSynonyms(exersizeSubject.getSubjectSynonyms + (connectedParticipants -> synonym))
-      }
-      // Logger.debug("" + lectureSubject)
-      Logger.debug("subject: " + subjectName + " with: " + connectedParticipants)
-      exersizeSubject.setCourses(exersizeSubject.getCourses + findCourse(connectedParticipants.substring(0, connectedParticipants.length)))
-      exersizeSubject
-
-    }
-
-    def createLectureWith(metaInfo: SubjectMetaInformation, part: Array[String], subjectName: String) = {
-      var lectureSubject: LectureSubject = null
-      lectureSubject = findLectureSubject(metaInfo.subjektName)
-      if (lectureSubject == null) {
-        lectureSubject = createLecture(metaInfo)
-      }
-      lectureSubject.setCourses(lectureSubject.getCourses + findCourse(metaInfo.courseShortName))
-
-      var connectedParticipants = part(4).substring("gemeinsam mit ".length).toUpperCase.trim
-      if (!connectedParticipants.startsWith("BA") && !connectedParticipants.startsWith("MA")) {
-        connectedParticipants = "BA" + connectedParticipants
-      }
-      if (connectedParticipants.contains("(")) {
-        val synonym = connectedParticipants.substring(connectedParticipants.indexOf("(") + 1, connectedParticipants.indexOf(")")).trim
-        connectedParticipants = connectedParticipants.substring(0, connectedParticipants.indexOf("(") - 1).trim
-
-        lectureSubject.setSubjectSynonyms(lectureSubject.getSubjectSynonyms + (connectedParticipants -> synonym))
-      }
-      // Logger.debug("" + lectureSubject)
-      Logger.debug("subject: " + subjectName + " with: " + connectedParticipants)
-      lectureSubject.setCourses(lectureSubject.getCourses + findCourse(connectedParticipants.substring(0, connectedParticipants.length)))
-      lectureSubject
-
     }
 
     def findLectureSubject(name: String) = {
       Transactions.hibernateAction {
         implicit session =>
-          session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("name", name)).add(Restrictions.eq("semester",semester)).uniqueResult().asInstanceOf[LectureSubject]
+          session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("name", name)).add(Restrictions.eq("semester", semester)).uniqueResult().asInstanceOf[LectureSubject]
       }
     }
 
     def findExersiseSubject(name: String) = {
       Transactions.hibernateAction {
         implicit session =>
-          session.createCriteria(classOf[ExersiseSubject]).add(Restrictions.eq("name", name)).add(Restrictions.eq("semester",semester)).uniqueResult().asInstanceOf[ExersiseSubject]
+          session.createCriteria(classOf[ExersiseSubject]).add(Restrictions.eq("name", name)).add(Restrictions.eq("semester", semester)).uniqueResult().asInstanceOf[ExersiseSubject]
       }
     }
 
@@ -256,7 +194,16 @@ class BlaImportActor extends Actor {
           val lectureCount = part(5)
           val exersizeCount = part(6)
 
-          subjectMetaInformation += subjectName + shortcut(course) -> SubjectMetaInformation(shortcut(course) + semester, subjectName, semester.toInt, docent, lectureCount.toFloat / 2f, exersizeCount.toFloat / 2f)
+          subjectMetaInformation.get(subjectName) match {
+            case None => subjectMetaInformation += subjectName -> SubjectMetaInformation(List(shortcut(course) + semester), subjectName, semester.toInt, docent, lectureCount.toFloat / 2f, exersizeCount.toFloat / 2f, Map((shortcut(course) + semester) -> subjectName))
+
+            case Some(metaInfo) =>
+              var theSynonyms = metaInfo.synonyms
+              theSynonyms += (shortcut(course) + semester) -> subjectName
+              subjectMetaInformation += subjectName -> metaInfo.copy(synonyms = theSynonyms, courseShortName = metaInfo.courseShortName :+ (shortcut(course) + semester))
+          }
+
+
         } else if (line.startsWith("klv_teilnehmer(")) {
           /** connect participants */
           val part = line.substring(line.indexOf("(") + 1, line.lastIndexOf(")")).split(",").map(_.replace("\"", ""))
@@ -264,60 +211,26 @@ class BlaImportActor extends Actor {
           val subjectName = part(1)
           if (part(4).startsWith("gemeinsam mit")) {
 
-            val metaInfo = subjectMetaInformation(subjectName + shortcut(part(0)))
+            val metaInfo = subjectMetaInformation(subjectName)
 
-            var abstractSubject: AbstractSubject = null
-            if (metaInfo.lectureCount > 0f) {
-              abstractSubject = createLectureWith(metaInfo, part, subjectName)
-              saveSubject(abstractSubject)
-            }
-            if (metaInfo.exersizeCount > 0f) {
-              abstractSubject = createExersizeWith(metaInfo, part, subjectName)
-              saveSubject(abstractSubject)
+            var connectedParticipants = part(4).substring("gemeinsam mit ".length).toUpperCase.trim
+            if (!connectedParticipants.startsWith("BA") && !connectedParticipants.startsWith("MA")) {
+              connectedParticipants = "BA" + connectedParticipants
             }
 
-            if (abstractSubject == null) {
-              Logger.warn("abstractSubject=null " + metaInfo)
 
+            if (connectedParticipants.contains("(")) {
+              val synonym = connectedParticipants.substring(connectedParticipants.indexOf("(") + 1, connectedParticipants.indexOf(")")).trim
+              connectedParticipants = connectedParticipants.substring(0, connectedParticipants.indexOf("(") - 1).trim
+              subjectMetaInformation += part(1) -> metaInfo.copy(courseShortName = metaInfo.courseShortName :+ connectedParticipants, synonyms = metaInfo.synonyms + (connectedParticipants -> synonym))
+            } else {
+              subjectMetaInformation += part(1) -> metaInfo.copy(courseShortName = metaInfo.courseShortName :+ connectedParticipants)
             }
 
-          } else {
-            val metaInfo = subjectMetaInformation(part(1) + shortcut(part(0)))
-            if (metaInfo.lectureCount > 0f) {
-              var lectureSubject = findLectureSubject(metaInfo.subjektName)
-              if (lectureSubject == null) {
-                lectureSubject = createLecture(metaInfo)
-              }
-              lectureSubject.setCourses(lectureSubject.getCourses + findCourse(metaInfo.courseShortName))
-              lectureSubject.setSemester(semester)
 
-              Transactions {
-                implicit entityManager =>
-                  if (lectureSubject.getId == null) {
-                    entityManager.persist(lectureSubject)
-                  } else {
-                    entityManager.merge(lectureSubject)
-                  }
-              }
-            }
-
-            if (metaInfo.exersizeCount > 0f) {
-              var exersizeSubject = findExersiseSubject(metaInfo.subjektName)
-              if (exersizeSubject == null) {
-                exersizeSubject = createExersise(metaInfo)
-              }
-              exersizeSubject.setCourses(exersizeSubject.getCourses + findCourse(metaInfo.courseShortName))
-              exersizeSubject.setSemester(semester)
-              Transactions {
-                implicit entityManager =>
-                  if (exersizeSubject.getId == null) {
-                    entityManager.persist(exersizeSubject)
-                  } else {
-                    entityManager.merge(exersizeSubject)
-                  }
-              }
-            }
           }
+
+
         }
       }
     }
@@ -327,6 +240,45 @@ class BlaImportActor extends Actor {
     scanner.close()
 
     Logger.debug(shortcut.toString())
+
+    subjectMetaInformation.foreach {
+      case (k, v) =>
+        v match {
+          case SubjectMetaInformation(courseShortName, subjektName, semesterValue, docent, lectureCount, exersizeCount, synonyms) =>
+            val courses = courseShortName.map(e => findCourse(e)).toSet
+
+            if (exersizeCount > 0f) {
+              val exersizeSubject = new ExersiseSubject
+              exersizeSubject.setDocents(Set(findDocent(docent)))
+              exersizeSubject.setName(subjektName)
+              exersizeSubject.setSemester(semester)
+              exersizeSubject.setUnits(exersizeCount)
+              exersizeSubject.setGroupType("")
+              exersizeSubject.setSubjectSynonyms(synonyms)
+              setActiveValue(exersizeSubject, semesterValue)
+              exersizeSubject.setCourses(courses)
+              if (exersizeSubject.isActive) {
+                saveSubject(exersizeSubject)
+              }
+            }
+            if (lectureCount > 0f) {
+              val lectureSubject = new LectureSubject
+              lectureSubject.setDocents(Set(findDocent(docent)))
+              lectureSubject.setName(subjektName)
+              lectureSubject.setSemester(semester)
+              lectureSubject.setUnits(lectureCount)
+              lectureSubject.setSubjectSynonyms(synonyms)
+              setActiveValue(lectureSubject, semesterValue)
+              lectureSubject.setCourses(courses)
+              if (lectureSubject.isActive) {
+                saveSubject(lectureSubject)
+              }
+            }
+        }
+
+    }
+
+    // Logger.debug("" + subjectMetaInformation.mkString("\n"))
 
     val result = Transactions.hibernateAction {
       implicit session =>
@@ -340,7 +292,7 @@ class BlaImportActor extends Actor {
      */
   }
 
-  private case class SubjectMetaInformation(courseShortName: String, subjektName: String, semester: Int, docent: String, lectureCount: Float, exersizeCount: Float)
+  private case class SubjectMetaInformation(courseShortName: List[String], subjektName: String, semester: Int, docent: String, lectureCount: Float, exersizeCount: Float, synonyms: Map[String, String])
 
 }
 
