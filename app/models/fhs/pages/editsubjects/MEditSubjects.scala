@@ -2,7 +2,7 @@ package models.fhs.pages.editsubjects
 
 import models.{Semester, Transactions}
 import scala.collection.JavaConversions._
-import models.persistence.subject.{ExersiseSubject, LectureSubject}
+import models.persistence.subject.{ExerciseSubject, LectureSubject}
 import org.hibernate.criterion.{Order, CriteriaSpecification, Restrictions}
 import models.persistence.Docent
 import models.persistence.participants.Course
@@ -43,7 +43,7 @@ object MEditSubjects {
 
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[ExersiseSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name")).list().asInstanceOf[java.util.List[ExersiseSubject]].
+        session.createCriteria(classOf[ExerciseSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name")).list().asInstanceOf[java.util.List[ExerciseSubject]].
           map(element => MSubjects(element.getId, element.getName)).toList
     }
   }

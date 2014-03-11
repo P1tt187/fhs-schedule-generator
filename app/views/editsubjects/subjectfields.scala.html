@@ -1,6 +1,6 @@
 @(lectureType: String, subject: models.persistence.subject.AbstractSubject, docents: List[models.persistence.Docent], courses: List[models.persistence.participants.Course])
 
-@import models.persistence.subject.ExersiseSubject
+@import models.persistence.subject.ExerciseSubject
 
 <form role="form" id="subjectForm">
 
@@ -15,9 +15,9 @@
             <label class="control-label" for="activeCheckbox">Aktiv</label>
             <input class=" form-control checkbox" type="checkbox" id="activeCheckbox" name="activeCheckbox" @if(subject.isActive) {
             checked }>
-            @if(lectureType.equals(CEditSubjects.EXERSISE)) {
+            @if(lectureType.equals(CEditSubjects.EXERCISE)) {
                 <label class="control-label" for="groupTypeInput">Gruppentyp</label>
-                <input class="form-control" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="@(subject.asInstanceOf[ExersiseSubject].getGroupType)" required>
+                <input class="form-control" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="@(subject.asInstanceOf[ExerciseSubject].getGroupType)" required>
                 }
         </div>
     </div>

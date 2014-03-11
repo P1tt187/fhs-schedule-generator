@@ -1,18 +1,15 @@
 package models.persistence.subject;
 
-import models.persistence.participants.Course;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
  * Created by fabian on 07.02.14.
  */
 @Entity
-@Table(name="TBLEXERSISE_SUBJECT")
-public class ExersiseSubject extends AbstractSubject {
+@Table(name="TBLEXERCISE_SUBJECT")
+public class ExerciseSubject  extends AbstractSubject {
 
 
     @Column(name = "GROUPTYPE")

@@ -4,7 +4,7 @@ import akka.actor.Actor
 import java.io.File
 import java.util.Scanner
 import play.api.Logger
-import models.persistence.subject.{ExersiseSubject, AbstractSubject, LectureSubject}
+import models.persistence.subject.{ExerciseSubject, AbstractSubject, LectureSubject}
 import models.{Semester, Transactions}
 import models.persistence.participants.{Group, Course}
 import org.hibernate.criterion.Restrictions
@@ -89,12 +89,12 @@ class BlaImportActor extends Actor {
       docent
     }
 
-    def areSemesterValuesConsistent(semesterValues: List[Int]):Boolean = {
+    def areSemesterValuesConsistent(semesterValues: List[Int]): Boolean = {
       val winter = semester.getName.startsWith("Winter")
       val summer = semester.getName.startsWith("Sommer")
-      if(semesterValues.toSet.size >1) {
+      if (semesterValues.toSet.size > 1) {
 
-        /** data is consistent if all are true or false*/
+        /** data is consistent if all are true or false */
         val checkResults = semesterValues.map {
           element =>
             if (winter) {
@@ -167,7 +167,7 @@ class BlaImportActor extends Actor {
     def findExersiseSubject(name: String) = {
       Transactions.hibernateAction {
         implicit session =>
-          session.createCriteria(classOf[ExersiseSubject]).add(Restrictions.eq("name", name)).add(Restrictions.eq("semester", semester)).uniqueResult().asInstanceOf[ExersiseSubject]
+          session.createCriteria(classOf[ExerciseSubject]).add(Restrictions.eq("name", name)).add(Restrictions.eq("semester", semester)).uniqueResult().asInstanceOf[ExerciseSubject]
       }
     }
 
@@ -275,11 +275,7 @@ class BlaImportActor extends Actor {
             } else {
               subjectMetaInformation += part(1) -> metaInfo.copy(courseShortName = metaInfo.courseShortName :+ connectedParticipants)
             }
-
-
           }
-
-
         }
       }
     }
@@ -326,7 +322,7 @@ class BlaImportActor extends Actor {
 
               var correctCourse = Set[Course]()
 
-              for (i <- 0 to courseShortCut.length-1) {
+              for (i <- 0 to courseShortCut.length - 1) {
 
                 correctCourse += findCourse(courseShortCut(i) + correctSemester)
 
@@ -337,11 +333,11 @@ class BlaImportActor extends Actor {
             }
 
             if (exersizeCount > 0f) {
-              val exersizeSubject = new ExersiseSubject
+              val exerciseSubject = new ExerciseSubject
 
-              exersizeSubject.setGroupType("")
+              exerciseSubject.setGroupType("PCPOOL")
 
-              initSubject(exersizeSubject, courses, subjectName, semesterValues, docent, exersizeCount, synonyms)
+              initSubject(exerciseSubject, courses, subjectName, semesterValues, docent, exersizeCount, synonyms)
             }
             if (lectureCount > 0f) {
               val lectureSubject = new LectureSubject

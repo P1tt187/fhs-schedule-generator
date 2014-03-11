@@ -6,7 +6,7 @@ import models.fhs.pages.editsubjects.MEditSubjects._
 import play.api.Logger
 import java.util.regex.Pattern
 import views.html.editsubjects._
-import models.persistence.subject.{ExersiseSubject, LectureSubject}
+import models.persistence.subject.{ExerciseSubject, LectureSubject}
 import play.api.cache.Cache
 import play.api.Play.current
 import scala.collection.JavaConversions._
@@ -21,7 +21,7 @@ object CEditSubjects extends Controller {
   val NAV = "EDITSUBJECTS"
 
   val LECTURE = "lecture"
-  val EXERSISE = "exersise"
+  val EXERCISE = "exercise"
 
 
   def page = Action {
@@ -34,12 +34,12 @@ object CEditSubjects extends Controller {
     val subject = subjectType match {
       case LECTURE =>
         findSubject(classOf[LectureSubject], id)
-      case EXERSISE =>
-        findSubject(classOf[ExersiseSubject], id)
+      case EXERCISE =>
+        findSubject(classOf[ExerciseSubject], id)
     }
 
     subject match {
-      case exersiseSubject: ExersiseSubject =>
+      case exersiseSubject: ExerciseSubject =>
         Logger.debug(exersiseSubject.getGroupType)
       case _ =>
     }
@@ -67,8 +67,8 @@ object CEditSubjects extends Controller {
     subjectType match {
       case LECTURE =>
         Ok(Json.stringify(Json.obj("html" -> namefield(findLectureSubjectsForSemester(semesterPattern), LECTURE).toString())))
-      case EXERSISE =>
-        Ok(Json.stringify(Json.obj("html" -> namefield(findExersiseSubjectsForSemester(semesterPattern), EXERSISE).toString())))
+      case EXERCISE =>
+        Ok(Json.stringify(Json.obj("html" -> namefield(findExersiseSubjectsForSemester(semesterPattern), EXERCISE).toString())))
     }
   }
 
@@ -100,11 +100,11 @@ object CEditSubjects extends Controller {
         val subject = (jsVal \ "subjectType").as[String] match {
           case LECTURE =>
             findSubject(classOf[LectureSubject], subjectId)
-          case EXERSISE =>
+          case EXERCISE =>
             val groupTypeInput = (jsVal \ "groupTypeInput").as[String]
-            val exersize = findSubject(classOf[ExersiseSubject], subjectId)
-            exersize.setGroupType(groupTypeInput)
-            exersize
+            val exercise = findSubject(classOf[ExerciseSubject], subjectId)
+            exercise.setGroupType(groupTypeInput)
+            exercise
         }
 
         subject.setActive(activeCheckbox)
