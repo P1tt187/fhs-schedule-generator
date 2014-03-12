@@ -9,14 +9,16 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.min.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-theme.min.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-select.min.css")">
+        <!--link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-select.min.css")"-->
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-multiselect.css")">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
 
 
         <script src="@routes.Assets.at("javascripts/jquery-2.1.0.min.js")" type="text/javascript"></script>
         <!--script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script-->
         <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
-        <script src="@routes.Assets.at("javascripts/bootstrap-select.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/bootstrap-multiselect.js")" type="text/javascript"></script>
+        <!--script src="@routes.Assets.at("javascripts/bootstrap-select.min.js")" type="text/javascript"></script-->
         <script src="@routes.Assets.at("javascripts/bootstrap.file-input.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/jquery.serializeObject.js")" type="text/javascript"></script>
 
@@ -83,13 +85,28 @@
         </footer>
 
         <script type="text/javascript">
-        $ ( window ).on ( 'load', function ( ) {
 
+            var initSelect = function(){
+            $('select' ).multiselect({
+            buttonClass:'btn btn-default ',
+            numberDisplayed: 4,
+            enableFiltering:true,
+            nonSelectedText: 'Nichts Ausgewählt',
+            maxHeight: 200,
+            buttonWidth:false,
+            enableCaseInsensitiveFiltering: true,
+            buttonContainer: '<span class="dropdown " />'
+            });
+            }
+
+        $ ( window ).on ( 'load', function ( ) {
+/*
         $ ( "select" ).attr ( 'data-live-search', true ).selectpicker ( {
         //'selectedText' : 'cat',
         'style' : 'btn-default'
         } ) ;
-
+*/
+        initSelect();
         $('input[type=file]').bootstrapFileInput();
         // $('.selectpicker').selectpicker('hide');
         } ) ;
