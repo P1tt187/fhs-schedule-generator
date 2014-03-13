@@ -25,50 +25,57 @@ object CEditSubjects extends Controller {
 
 
   def page = Action {
-    Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters()))
+    Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(),findCourses()))
   }
 
   def getSubjectFields(subjectType: String, idString: String) = Action {
-    val id = idString.toLong
 
-    val subject = subjectType match {
-      case LECTURE =>
-        findSubject(classOf[LectureSubject], id)
-      case EXERCISE =>
-        findSubject(classOf[ExerciseSubject], id)
+    if (idString.equals("null")) {
+
+      BadRequest("")
+
+    } else {
+      val id = idString.toLong
+
+      val subject = subjectType match {
+        case LECTURE =>
+          findSubject(classOf[LectureSubject], id)
+        case EXERCISE =>
+          findSubject(classOf[ExerciseSubject], id)
+      }
+
+      subject match {
+        case exersiseSubject: ExerciseSubject =>
+          Logger.debug(exersiseSubject.getGroupType)
+        case _ =>
+      }
+
+
+      val docents = Cache.getOrElse("docents") {
+        val docent = findDocents()
+        Cache.set("docents", docent)
+        docent
+      }
+
+
+      val courses = Cache.getOrElse("courses") {
+        val course = findCourses()
+        Cache.set("courses", course)
+        course
+      }
+      Ok(Json.stringify(Json.obj("html" -> subjectfields(subjectType, subject, docents, courses).toString())))
     }
-
-    subject match {
-      case exersiseSubject: ExerciseSubject =>
-        Logger.debug(exersiseSubject.getGroupType)
-      case _ =>
-    }
-
-
-    val docents = Cache.getOrElse("docents") {
-      val docent = findDocents()
-      Cache.set("docents", docent)
-      docent
-    }
-
-
-    val courses = Cache.getOrElse("courses") {
-      val course = findCourses()
-      Cache.set("courses", course)
-      course
-    }
-    Ok(Json.stringify(Json.obj("html" -> subjectfields(subjectType, subject, docents, courses).toString())))
   }
 
-  def getNamesField(semester: String, subjectType: String) = Action {
+  def getNamesField(semester: String, subjectType: String, filterDocentId: Long, filterCourseId: Long) = Action {
     val semesterPattern = semester.replaceAll(Pattern.quote("+"), "/").trim
     Logger.debug("semester: " + semesterPattern + " subjectType: " + subjectType)
     //Logger.debug("" +MEditSubjects.findLectureSubjectsForSemester(semester.replaceAll(Pattern.quote("+"),"/").trim))
     subjectType match {
       case LECTURE =>
-        Ok(Json.stringify(Json.obj("html" -> namefield(findLectureSubjectsForSemester(semesterPattern), LECTURE).toString())))
+        Ok(Json.stringify(Json.obj("html" -> namefield(findLectureSubjectsForSemester(semesterPattern, filterDocentId, filterCourseId), LECTURE).toString())))
       case EXERCISE =>
-        Ok(Json.stringify(Json.obj("html" -> namefield(findExersiseSubjectsForSemester(semesterPattern), EXERCISE).toString())))
+        Ok(Json.stringify(Json.obj("html" -> namefield(findExersiseSubjectsForSemester(semesterPattern, filterDocentId, filterCourseId), EXERCISE).toString())))
     }
   }
 

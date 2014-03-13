@@ -27,23 +27,43 @@ object MEditSubjects {
     }
   }
 
-  def findLectureSubjectsForSemester(semester: String) = {
+  def findLectureSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1) = {
 
     val semesterDO = findSemester(semester)
 
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name")).list().asInstanceOf[java.util.List[LectureSubject]].
+        val criterion = session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name"))
+
+        if (filterDocentId != -1) {
+          criterion.createCriteria("docents").add(Restrictions.idEq(filterDocentId))
+        }
+
+        if (filterCourseId != -1) {
+          criterion.createCriteria("courses").add(Restrictions.idEq(filterCourseId))
+        }
+
+        criterion.list().asInstanceOf[java.util.List[LectureSubject]].
           map(element => MSubjects(element.getId, element.getName)).toList
     }
   }
 
-  def findExersiseSubjectsForSemester(semester: String) = {
+  def findExersiseSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1) = {
     val semesterDO = findSemester(semester)
 
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[ExerciseSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name")).list().asInstanceOf[java.util.List[ExerciseSubject]].
+        val criterion = session.createCriteria(classOf[ExerciseSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name"))
+
+        if (filterDocentId != -1) {
+          criterion.createCriteria("docents").add(Restrictions.idEq(filterDocentId))
+        }
+
+        if (filterCourseId != -1) {
+          criterion.createCriteria("courses").add(Restrictions.idEq(filterCourseId))
+        }
+
+        criterion.list().asInstanceOf[java.util.List[ExerciseSubject]].
           map(element => MSubjects(element.getId, element.getName)).toList
     }
   }
@@ -79,8 +99,8 @@ object MEditSubjects {
     }
   }
 
-  def findCourses(ids:List[Long])={
-    ids.map{
+  def findCourses(ids: List[Long]) = {
+    ids.map {
       id =>
         Transactions.hibernateAction {
           implicit session =>

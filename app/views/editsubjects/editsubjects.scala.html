@@ -1,6 +1,7 @@
-@(message: String, semesters: List[String])
+@(message: String, semesters: List[String], docents:List[models.persistence.Docent], courses:List[models.persistence.participants.Course])
 
-    @main(message, CEditSubjects.NAV) {
+
+@main(message, CEditSubjects.NAV) {
 
         <div class="page-header">
             <h1> Fächer bearbeiten </h1>
@@ -28,7 +29,25 @@
                             </option>
                         </select>
                     </div>
+                    <div class="col-md-5">
+                        <label for="filterDocent" class="control-label">Filtere Dozent</label>
+                        <select class="form-control" id="filterDocent">
+                            <option value="-1">kein filter</option>
+                            @for(d<-docents){
+                                <option value="@d.getId">@d.getLastName</option>
+                            }
 
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="filterCourses" class="control-label">Filter Kurs</label>
+                        <select class="form-control" id="filterCourses">
+                            <option value="-1">kein filter</option>
+                            @for(c<-courses){
+                                <option value="@c.getId">@c.getShortName</option>
+                            }
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -51,16 +70,18 @@
 
         var getNameField = function ( ) {
 
-        $.getJSON ( '/editSucjects/' + $ ( '#selectSemester' ).val ( ) + "/" + $ ( '#selectLectureType' ).val ( ), function ( data ) {
+        $.getJSON ( '/editSucjects/' + $ ( '#selectSemester' ).val ( ) + "/" + $ ( '#selectLectureType' ).val ( ) + '/' +$('#filterDocent' ).val()+ '/' +$('#filterCourses' ).val(), function ( data ) {
 
         $ ( '#nameContainer' ).empty ( ).append ( data.html ) ;
 
         reenableSelectBoxes();
         } ) ;
-        }
+        };
 
         $ ( '#selectLectureType' ).on ( 'change', getNameField ) ;
         $ ( '#selectSemester' ).on ( 'change', getNameField ) ;
+        $ ( '#filterDocent' ).on('change', getNameField)
+        $ ( '#filterCourses' ).on('change', getNameField)
         getNameField ( ) ;
 
         } ) ;

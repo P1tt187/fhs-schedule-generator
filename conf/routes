@@ -16,7 +16,7 @@ GET         /blaimportFinished                          controllers.CBLAFileUplo
 POST        /blaUpload                                  controllers.CBLAFileUpload.uploadFile
 
 GET         /editSubjects                               controllers.CEditSubjects.page
-GET         /editSucjects/:semester/:subjectType        controllers.CEditSubjects.getNamesField(semester,subjectType)
+GET         /editSucjects/:semester/:subjectType/:filterDocentId/:filterCourseId        controllers.CEditSubjects.getNamesField(semester,subjectType,filterDocentId:Long,filterCourseId:Long)
 GET         /subjects/:subjectType/:id                  controllers.CEditSubjects.getSubjectFields(subjectType, id )
 POST        /editSubject                                controllers.CEditSubjects.saveData
 
