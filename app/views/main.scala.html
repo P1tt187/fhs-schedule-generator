@@ -74,7 +74,7 @@
         </div>
 
         <footer id="footer">
-            <div class="container" style="text-align : center">
+            <div class="container ">
                 <p class="text-muted">
                     <a href="http://www.playframework.com">www.playframework.com</a> <br/>
                     <a href="http://getbootstrap.com/">twitter brootstrap</a> <br/>
@@ -88,16 +88,15 @@
 
             var initSelect = function(){
             $('select' ).multiselect({
-            buttonClass:'btn btn-default ',
-            numberDisplayed: 4,
+            buttonClass:'btn btn-default form-group',
+            numberDisplayed: 10,
             enableFiltering:true,
             nonSelectedText: 'Nichts Ausgewählt',
             maxHeight: 200,
-            buttonWidth:false,
             enableCaseInsensitiveFiltering: true,
-            buttonContainer: '<span class="dropdown " />'
+            buttonContainer: '<span class="dropdown" />'
             });
-            }
+           };
 
         $ ( window ).on ( 'load', function ( ) {
 /*

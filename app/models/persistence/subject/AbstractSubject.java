@@ -3,6 +3,7 @@ package models.persistence.subject;
 import models.Semester;
 import models.persistence.AbstractEntity;
 import models.persistence.Docent;
+import models.persistence.criteria.CriteriaContainer;
 import models.persistence.participants.Course;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -51,7 +52,7 @@ public abstract class AbstractSubject extends AbstractEntity {
     @Fetch(FetchMode.SUBSELECT)
     @MapKeyColumn(name = "COURSE")
     @Column(name = "SUBJECTNAME")
-    @CollectionTable(name="TBLSYNONYMS")
+    @CollectionTable(name = "TBLSYNONYMS")
     private Map<String, String> subjectSynonyms;
 
 
@@ -61,6 +62,17 @@ public abstract class AbstractSubject extends AbstractEntity {
     @Fetch(FetchMode.SUBSELECT)
     @ManyToMany(targetEntity = Course.class, fetch = FetchType.EAGER)
     private Set<Course> courses;
+
+    @OneToOne(targetEntity = CriteriaContainer.class, cascade = CascadeType.ALL)
+    private CriteriaContainer criteriaContainer;
+
+    public CriteriaContainer getCriteriaContainer() {
+        return criteriaContainer;
+    }
+
+    public void setCriteriaContainer(CriteriaContainer criteriaContainer) {
+        this.criteriaContainer = criteriaContainer;
+    }
 
     public Set<Course> getCourses() {
         return courses;
@@ -136,6 +148,7 @@ public abstract class AbstractSubject extends AbstractEntity {
                 ", courses=" + courses +
                 ", docents=" + docents +
                 ", subjectSynonyms=" + subjectSynonyms +
+                ", criteriaContainer=" + criteriaContainer +
                 '}';
     }
 
@@ -152,6 +165,8 @@ public abstract class AbstractSubject extends AbstractEntity {
         if (subjectSynonyms != null ? !subjectSynonyms.equals(that.subjectSynonyms) : that.subjectSynonyms != null)
             return false;
         if (units != null ? !units.equals(that.units) : that.units != null) return false;
+        if (criteriaContainer != null ? !criteriaContainer.equals(that.criteriaContainer) : that.criteriaContainer != null)
+            return false;
 
         return true;
     }
@@ -163,6 +178,7 @@ public abstract class AbstractSubject extends AbstractEntity {
         result = 31 * result + (active != null ? active.hashCode() : 0);
         result = 31 * result + (subjectSynonyms != null ? subjectSynonyms.hashCode() : 0);
         result = 31 * result + (docents != null ? docents.hashCode() : 0);
+        result = 31 * result + (criteriaContainer != null ? criteriaContainer.hashCode() : 0);
         return result;
     }
 }

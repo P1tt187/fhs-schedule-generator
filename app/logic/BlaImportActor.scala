@@ -301,6 +301,9 @@ class BlaImportActor extends Actor {
 
               subject.setSubjectSynonyms(synonyms)
 
+              subject.setCriteriaContainer(new CriteriaContainer)
+              subject.getCriteriaContainer.setCriterias(List[AbstractCriteria]())
+
               if (areSemesterValuesConsistent(semesterValues)) {
                 setActiveValue(subject, semesterValues(0))
               } else {

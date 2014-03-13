@@ -17,9 +17,9 @@
             @form(action = routes.CRoomDefinition.submitRoom, 'class -> "span2  form-inline") {
 
                 <fieldset>
-                    @inputText(roomDefForm("number"), '_class -> "form-group span1", '_label -> "Nummer", '_help -> "Raumnummer")
-
                     @inputText(roomDefForm("house"), '_class -> "form-group span1", '_label -> "Haus", '_help -> "Gebäude")
+
+                    @inputText(roomDefForm("number"), '_class -> "form-group span1", '_label -> "Nummer", '_help -> "Raumnummer")
                     <br/>
                     @inputText(roomDefForm("capacity"), '_class -> "form-group span1", '_label -> "Kapazität", '_help -> "Wieviele Personen?")
                     <br/>

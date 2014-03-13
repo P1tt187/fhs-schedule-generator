@@ -27,4 +27,28 @@ public class CriteriaContainer extends AbstractEntity {
     public void setCriterias(List<AbstractCriteria> criterias) {
         this.criterias = criterias;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CriteriaContainer that = (CriteriaContainer) o;
+
+        if (criterias != null ? !criterias.equals(that.criterias) : that.criterias != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return criterias != null ? criterias.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        return "CriteriaContainer{" +
+                "criterias=" + criterias +
+                '}';
+    }
 }

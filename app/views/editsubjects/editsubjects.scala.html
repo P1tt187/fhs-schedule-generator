@@ -28,9 +28,11 @@
                             </option>
                         </select>
                     </div>
+
                 </div>
             </div>
         </div>
+        <div class="clearfix"></div>
         <div class="row-fluid">
             <div id="nameContainer" class="col-md-9">
 
@@ -40,24 +42,10 @@
 
         <script type="text/javascript">
             var reenableSelectBoxes = function( ){
-            /*$ ( "select" ).attr ( 'data-live-search', true ).selectpicker ( {
-            //'selectedText' : 'cat',
-            'style' : 'btn-default'
-            } ) ; */
-/*
-            $('select' ).multiselect({
-            buttonClass:'btn btn-default form-control',
-            numberDisplayed: 4,
-            enableFiltering:true,
-            enableCaseInsensitiveFiltering: true,
-            nonSelectedText: 'Nichts Ausgewählt',
-            maxHeight: 200,
-            buttonContainer: '<span class="dropdown" />'
-            });
-*/
+
             initSelect();
             $ ( 'input[type=file]' ).bootstrapFileInput ( ) ;
-            }
+            };
 
         $ ( window ).on ( 'load', function ( ) {
 
