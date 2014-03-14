@@ -88,13 +88,14 @@
 
             var initSelect = function(){
             $('select' ).multiselect({
-            buttonClass:'btn btn-default form-group',
-            numberDisplayed: 10,
+            buttonClass:'btn btn-default btn-sm',
+            numberDisplayed: 5,
             enableFiltering:true,
             nonSelectedText: 'Nichts Ausgewählt',
             maxHeight: 200,
+            //buttonWidth: 200,
             enableCaseInsensitiveFiltering: true,
-            buttonContainer: '<span class="dropdown" />'
+            buttonContainer: '<div class="dropdown" />'
             });
            };
 

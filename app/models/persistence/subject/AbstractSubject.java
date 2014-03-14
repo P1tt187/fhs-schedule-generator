@@ -63,6 +63,10 @@ public abstract class AbstractSubject extends AbstractEntity {
     @ManyToMany(targetEntity = Course.class, fetch = FetchType.EAGER)
     private Set<Course> courses;
 
+
+    /**
+     * criterias of this subject
+     */
     @OneToOne(targetEntity = CriteriaContainer.class, cascade = CascadeType.ALL)
     private CriteriaContainer criteriaContainer;
 

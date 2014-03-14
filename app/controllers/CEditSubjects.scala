@@ -25,7 +25,7 @@ object CEditSubjects extends Controller {
 
 
   def page = Action {
-    Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(),findCourses()))
+    Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses()))
   }
 
   def getSubjectFields(subjectType: String, idString: String) = Action {
@@ -67,15 +67,15 @@ object CEditSubjects extends Controller {
     }
   }
 
-  def getNamesField(semester: String, subjectType: String, filterDocentId: Long, filterCourseId: Long) = Action {
+  def getNamesField(semester: String, subjectType: String, filterDocentId: Long, filterCourseId: Long, filterActive: String) = Action {
     val semesterPattern = semester.replaceAll(Pattern.quote("+"), "/").trim
     Logger.debug("semester: " + semesterPattern + " subjectType: " + subjectType)
     //Logger.debug("" +MEditSubjects.findLectureSubjectsForSemester(semester.replaceAll(Pattern.quote("+"),"/").trim))
     subjectType match {
       case LECTURE =>
-        Ok(Json.stringify(Json.obj("html" -> namefield(findLectureSubjectsForSemester(semesterPattern, filterDocentId, filterCourseId), LECTURE).toString())))
+        Ok(Json.stringify(Json.obj("html" -> namefield(findLectureSubjectsForSemester(semesterPattern, filterDocentId, filterCourseId, filterActive), LECTURE).toString())))
       case EXERCISE =>
-        Ok(Json.stringify(Json.obj("html" -> namefield(findExersiseSubjectsForSemester(semesterPattern, filterDocentId, filterCourseId), EXERCISE).toString())))
+        Ok(Json.stringify(Json.obj("html" -> namefield(findExersiseSubjectsForSemester(semesterPattern, filterDocentId, filterCourseId, filterActive), EXERCISE).toString())))
     }
   }
 

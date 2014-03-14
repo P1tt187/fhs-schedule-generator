@@ -27,7 +27,7 @@ object MEditSubjects {
     }
   }
 
-  def findLectureSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1) = {
+  def findLectureSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive:String) = {
 
     val semesterDO = findSemester(semester)
 
@@ -43,12 +43,16 @@ object MEditSubjects {
           criterion.createCriteria("courses").add(Restrictions.idEq(filterCourseId))
         }
 
+      if(!filterActive.equals("-1")){
+        criterion.add(Restrictions.eq("active",filterActive.toBoolean))
+      }
+
         criterion.list().asInstanceOf[java.util.List[LectureSubject]].
           map(element => MSubjects(element.getId, element.getName)).toList
     }
   }
 
-  def findExersiseSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1) = {
+  def findExersiseSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive:String) = {
     val semesterDO = findSemester(semester)
 
     Transactions.hibernateAction {
@@ -61,6 +65,10 @@ object MEditSubjects {
 
         if (filterCourseId != -1) {
           criterion.createCriteria("courses").add(Restrictions.idEq(filterCourseId))
+        }
+
+        if(!filterActive.equals("-1")){
+          criterion.add(Restrictions.eq("active",filterActive.toBoolean))
         }
 
         criterion.list().asInstanceOf[java.util.List[ExerciseSubject]].
