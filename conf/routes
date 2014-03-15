@@ -20,5 +20,9 @@ GET         /editSucjects/:semester/:subjectType/:filterDocentId/:filterCourseId
 GET         /subjects/:subjectType/:id                                                                controllers.CEditSubjects.getSubjectFields(subjectType, id )
 POST        /editSubject                                                                              controllers.CEditSubjects.saveData
 
+GET         /editCourses                                                                              controllers.CEditCourses.page
+GET         /editCourses/courseFields/:courseId                                                       controllers.CEditCourses.getCourseFields(courseId:Long)
+POST        /submitCourseData                                                                         controllers.CEditCourses.saveCourseData
+
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                                             controllers.Assets.at(path="/public", file)

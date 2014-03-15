@@ -1,0 +1,91 @@
+@(course: models.persistence.participants.Course)
+
+
+<br/>
+
+<div class="row-fluid">
+    <div class="col-md-12">
+
+        <form class="form-inline" role="form" id="courseFieldForm">
+            <div class="form-group">
+                <label for="courseName" class="control-label">Kursname</label>
+                <input class="form-control" type="text" name="courseName" id="courseName" value="@course.getFullName" required/>
+            </div>
+
+            <div class="form-group">
+                <label for="courseShortName" class="control-label">Kursname</label>
+                <input class="form-control " type="text" name="courseShortName" id="courseShortName" value="@course.getShortName" required/>
+            </div>
+            <div class="form-group" id="courseSizeContainer">
+                <label for="courseSize" class="control-label">Kursgröße</label>
+                <input type="number" class="form-control" name="courseSize" id="courseSize" value="@course.getSize" step="1" min="0" required/>
+            </div>
+
+            <br/>
+            <br/>
+            <div class="form-group">
+                <button class="btn btn-success" type="submit" >Senden</button>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-danger" type="reset" >Abbrechen</button>
+            </div>
+        </form>
+        <div id="courseEditResult"></div>
+    </div>
+</div>
+<div class="clearfix"></div>
+
+<script type="text/javascript">
+initSelect ( ) ;
+
+$ ( '#courseFieldForm' ).on ( 'submit', function ( e ) {
+e.preventDefault ( ) ;
+$ ( '.has-error' ).removeClass ( 'has-error' ) ;
+if ( ! $.isNumeric ( $ ( '#courseSize' ).val ( ) ) ) {
+$ ( '#courseSizeContainer' ).addClass ( 'has-error' ) ;
+return ;
+}
+var formData = $ ( '#courseFieldForm' ).serializeObject ( ) ;
+
+formData[ 'courseId' ] = @course.getId ;
+
+$.ajax ( {
+cache : false,
+type : "POST",
+dataType : "json",
+data : JSON.stringify ( formData ),
+context : this,
+contentType : "application/json; charset=utf-8",
+url : " @routes.CEditCourses.saveCourseData ",
+success : function ( callback ) {
+console.log ( JSON.stringify ( callback ) ) ;
+
+$ ( '#courseEditResult' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
+
+},
+
+error : function ( callback ) {
+// error handler
+console.log ( JSON.stringify ( callback ) ) ;
+$ ( '#courseEditResult' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
+
+var response = callback.responseJSON ;
+$ ( '#' + response.result ).addClass ( 'has-error' ) ;
+
+}
+} ) ;
+
+console.debug ( JSON.stringify ( formData ) ) ;
+} ) ;
+</script>
+
+<div class="page-header">
+    <h1>Gruppen bearbeiten</h1>
+</div>
+
+@if( course.getGroups != null ) {
+    @for( group <- course.getGroups ) {
+    @groupFields(group)
+    }
+
+}

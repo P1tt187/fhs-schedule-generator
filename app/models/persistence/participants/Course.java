@@ -1,5 +1,8 @@
 package models.persistence.participants;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -16,7 +19,8 @@ public class Course extends Participant {
     @Column(name="SHORTNAME", nullable = false)
     private String shortName;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course")
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course" , fetch = FetchType.EAGER)
     private List<Group> groups;
 
     public String getFullName() {

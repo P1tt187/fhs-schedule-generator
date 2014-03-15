@@ -1,0 +1,20 @@
+@(group: models.persistence.participants.Group)
+
+<div class="col-md-9">
+    <form id="groupForm@group.getId" class="form-horizontal" role="form">
+        <div class="form-group">
+            <label class="control-label" for="typ@group.getId">Gruppentyp</label>
+            <input id="type@group.getId" class="form-control" type="text" value="@group.getGroupType">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="size@group.getId">Gruppentyp</label>
+            <input id="size@group.getId" class="form-control" type="number" value="@group.getGroupType">
+        </div>
+    </form>
+</div>
+@if(group.getSubGroups != null) {
+
+
+}
+
+
