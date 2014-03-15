@@ -9,8 +9,8 @@
 
         <div class="row-fluid">
             <div class="col-md-9">
-                <div class="row-fluid">
-                    <div class="col-md-6">
+                <div class="form-inline">
+                    <div class="form-group">
                         <label class="control-label" for="selectSemester">Semester</label>
                         <select class="form-control" id="selectSemester" title="Semester">
                         @for(semester <- semesters) {
@@ -18,7 +18,7 @@
                         }
                         </select>
                     </div>
-                    <div class="col-md-5">
+                    <div class="form-group">
                         <label class="control-label" for="selectLectureType">Typ</label>
                         <select class="form-control" id="selectLectureType" title="Vorlesung oder Übung">
                             <option value="@CEditSubjects.LECTURE">
@@ -30,9 +30,9 @@
                         </select>
                     </div>
                 </div>
-        <div class="clearfix" ></div>
-                <div class="row-fluid">
-                    <div class="col-md-3">
+        <br/>
+               <div class="form-inline">
+                    <div class="form-group">
                         <label for="filterDocent" class="control-label">Filtere Dozent</label>
                         <select class="form-control" id="filterDocent">
                             <option value="-1">kein filter</option>
@@ -41,7 +41,7 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="form-group">
                         <label for="filterCourses" class="control-label">Filter Kurs</label>
                         <select class="form-control" id="filterCourses">
                             <option value="-1">kein filter</option>
@@ -50,7 +50,7 @@
                             }
                         </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="form-group">
                         <label class="control-label" for="filterActive">Filter Aktive</label>
                         <select class="form-control" id="filterActive">
                             <option value="-1">kein filter</option>
@@ -60,10 +60,11 @@
                      </div>
                 </div>
             </div>
+
         </div>
         <div class="clearfix"></div>
         <div class="row-fluid">
-            <div id="nameContainer" class="col-md-9">
+            <div id="nameContainer" class="col-md-5">
 
             </div>
         </div>
