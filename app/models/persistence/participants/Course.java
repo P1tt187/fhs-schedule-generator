@@ -20,7 +20,7 @@ public class Course extends Participant {
     private String shortName;
 
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course" , fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "course" , fetch = FetchType.LAZY)
     private List<Group> groups;
 
     public String getFullName() {

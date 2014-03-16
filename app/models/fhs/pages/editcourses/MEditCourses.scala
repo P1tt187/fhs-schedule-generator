@@ -4,6 +4,8 @@ import models.Transactions
 import models.persistence.participants.{Group, Course}
 import org.hibernate.criterion.{Restrictions, Order}
 import scala.collection.JavaConversions._
+import org.hibernate.FetchMode
+
 
 /**
  * @author fabian 
@@ -21,7 +23,7 @@ object MEditCourses {
   def findCourse(courseId: Long) = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).uniqueResult().asInstanceOf[Course]
+        session.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).setFetchMode("groups",FetchMode.JOIN).uniqueResult().asInstanceOf[Course]
     }
   }
 
