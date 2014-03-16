@@ -57,7 +57,7 @@ dataType : "json",
 data : JSON.stringify ( formData ),
 context : this,
 contentType : "application/json; charset=utf-8",
-url : " @routes.CEditCourses.saveCourseData ",
+url : "@routes.CEditCourses.saveCourseData ",
 success : function ( callback ) {
 console.log ( JSON.stringify ( callback ) ) ;
 
@@ -84,9 +84,74 @@ console.debug ( JSON.stringify ( formData ) ) ;
     <h1>Gruppen bearbeiten</h1>
 </div>
 
+<form id="addGroup" class="form-inline">
+    <div class="form-group">
+        <label for="addGroupTypeName" class="control-label ">Gruppentyp</label>
+        <input id="addGroupTypeName" name="addGroupTypeName" type="text" class="form-control" required placeholder="Gruppentyp"/>
+    </div>
+    <div class="form-group" id="addGroupCountContainer">
+        <label for="addGroupCount" class="control-label">Anzahl</label>
+        <input id="addGroupCount" name="addGroupCount" type="number" class="form-control" required placeholder="Anzahl" min="1"/>
+    </div>
+
+    <div class="form-group" >
+        <label for="submitAddGroup" class="control-label"> <span class="glyphicon"></span> </label>
+        <button id="submitAddGroup" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> </button>
+    </div>
+</form>
+<div class="clearfix"></div>
+<div id="addGroupResult" class="col-md-5"></div>
+<div class="clearfix"></div>
+<script type="text/javascript">
+    $('#addGroup' ).on('submit', function(e){
+        e.preventDefault();
+    $ ( '.has-error' ).removeClass ( 'has-error' ) ;
+
+    if ( ! $.isNumeric ( $ ( '#addGroupCount' ).val ( )) ) {
+    $ ( '#addGroupCountContainer' ).addClass ( 'has-error' ) ;
+    return ;
+    }
+    var formData = $ ( '#addGroup' ).serializeObject ( ) ;
+
+    formData[ 'courseId' ] = @course.getId ;
+    formData['addGroupCount']=Number(formData['addGroupCount']);
+
+    $.ajax ( {
+    cache : false,
+    type : "POST",
+    dataType : "json",
+    data : JSON.stringify ( formData ),
+    context : this,
+    contentType : "application/json; charset=utf-8",
+    url : "@routes.CEditCourses.saveGroupData",
+    success : function ( callback ) {
+    console.log ( JSON.stringify ( callback ) ) ;
+
+    $ ( '#addGroupResult' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
+
+    location.reload(true);
+
+    },
+
+    error : function ( callback ) {
+    // error handler
+    console.log ( JSON.stringify ( callback ) ) ;
+    $ ( '#addGroupResult' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
+
+
+    var response = callback.responseJSON ;
+    $ ( '#' + response.result ).addClass ( 'has-error' ) ;
+
+    }
+    } ) ;
+
+    console.debug ( JSON.stringify ( formData ) ) ;
+    });
+</script>
+
 @if( course.getGroups != null ) {
     @for( group <- course.getGroups ) {
-    @groupFields(group)
+        @groupFields(group)
     }
 
 }

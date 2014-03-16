@@ -5,6 +5,9 @@ import views.html.editcourses._
 import models.fhs.pages.editcourses.MEditCourses._
 import play.api.libs.json._
 import play.api.Logger
+import models.persistence.participants.Group
+import scala.collection.JavaConversions._
+import models.Transactions
 
 /**
  * @author fabian 
@@ -21,7 +24,7 @@ object CEditCourses extends Controller {
 
 
   def getCourseFields(courseId: Long) = Action {
-    Ok(Json.stringify(Json.obj("html" -> courseFields(findCourse(courseId)).toString())))
+    Ok(Json.stringify(Json.obj("htmlresult" -> courseFields(findCourse(courseId)).toString())))
   }
 
   def saveCourseData = Action(parse.json) {
@@ -37,8 +40,132 @@ object CEditCourses extends Controller {
         Ok(Json.stringify(Json.obj("result" -> "success")))
       }
       catch {
-        case e:Exception => Logger.error("error",e)
-        BadRequest(e.getMessage)
+        case e: Exception => Logger.error("error", e)
+          BadRequest(e.getMessage)
       }
+  }
+
+  def saveGroupData = Action(parse.json) {
+    implicit request =>
+      try {
+        val jsVal = request.body
+        val course = findCourse((jsVal \ "courseId").as[Long])
+        val groupType = (jsVal \ "addGroupTypeName").as[String]
+        val groupCount = (jsVal \ "addGroupCount").as[Int]
+
+        for (i <- 1 to groupCount) {
+          val group = new Group
+          group.setGroupType(groupType)
+          group.setParent(null)
+          group.setCourse(course)
+          group.setSize(course.getSize / groupCount)
+          group.setSubGroups(List[Group]())
+
+          if (i == groupCount) {
+            group.setSize(course.getSize / groupCount + course.getSize % groupCount)
+          }
+
+          course.setGroups(course.getGroups :+ group)
+          Logger.debug("saveGroupData " +  group)
+        }
+
+        Transactions {
+          implicit em =>
+            em.merge(course)
+        }
+
+        Ok(Json.stringify(Json.obj("result" -> "success")))
+      }
+      catch {
+        case ex: Exception => Logger.error("saveGroupData", ex)
+          BadRequest(ex.getMessage)
+      }
+  }
+
+  def saveSubGroupData = Action(parse.json) {
+    implicit request =>
+      try {
+        val jsVal = request.body
+        val parent = findGroup((jsVal \ "groupId").as[Long])
+        val groupType = (jsVal \ "addSubGroupTypeName").as[String]
+        val groupCount = (jsVal \ "addSubGroupCount").as[Int]
+
+
+        for (i <- 1 to groupCount) {
+          val group = new Group
+          group.setGroupType(groupType)
+          group.setParent(parent)
+         // group.setCourse(course)
+          group.setSize(parent.getSize / groupCount)
+          group.setSubGroups(List[Group]())
+
+          if (i == groupCount) {
+            group.setSize(parent.getSize / groupCount + parent.getSize % groupCount)
+          }
+
+          parent.setSubGroups(parent.getSubGroups :+ group)
+
+          Logger.debug("saveSubGroupData " + group)
+          Logger.debug("parent " + parent.getSubGroups)
+
+
+          Transactions {
+            implicit em =>
+              em.persist(group)
+              em.merge(parent)
+          }
+        }
+
+
+
+        Ok(Json.stringify(Json.obj("result" -> "success")))
+      }
+      catch {
+        case ex: Exception => Logger.error("saveGroupData", ex)
+          BadRequest(ex.getMessage)
+      }
+  }
+
+  def updateGroup = Action(parse.json) {
+    implicit request =>
+      try {
+        val jsVal = request.body
+
+        val group = findGroup((jsVal \ "groupId").as[Long])
+        val size = (jsVal \ "groupsize").as[Int]
+
+        val groupType = (jsVal \ "grouptype").as[String]
+
+        group.setGroupType(groupType)
+        group.setSize(size)
+
+        Transactions {
+          implicit em =>
+            em.merge(group)
+        }
+
+        Ok(Json.stringify(Json.obj("result" -> "success")))
+      }
+      catch {
+        case ex: Exception => Logger.error("saveGroupData", ex)
+          BadRequest(ex.getMessage)
+      }
+  }
+
+  def deleteGroup(groupId:Long)=Action{
+    try {
+
+      removeGroup(groupId)
+
+      Redirect(routes.CEditCourses.page)
+    }
+    catch {
+      case ex: Exception => Logger.error("saveGroupData", ex)
+        BadRequest(ex.getMessage)
+    }
+  }
+
+  def getGroup(groupId: Long) = Action {
+    Ok(Json.stringify(Json.obj("htmlresult" -> groupFields(findGroup(groupId)).toString())))
   }
 }

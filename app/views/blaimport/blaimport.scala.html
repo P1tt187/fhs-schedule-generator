@@ -13,27 +13,28 @@
     <div class="row-fluid">
         <div class="co-md-9">
                 @helper.form(action = routes.CBLAFileUpload.uploadFile, 'enctype -> "multipart/form-data") {
-                    <div class="form-inline @("has-error".when(flash.get("error"))) @("has-success".when(flash.get("success")))">
-                        @if(flash.get("error")) {
-                            <label class="control-label" for="uploadBtn">@flash.get("error")</label>
-                            <script type="text/javascript">
-                            $ ( window ).on ( 'load', function ( ) {
-                            $ ( '#progressBarContainer' ).removeClass ( 'hidden' ) ;
-                            } ) ;
-                                 error=true;
-                            </script>
-                        }
-                        @if(flash.get("success")) {
-                            <label class="control-label" for="uploadBtn">@flash.get("success")</label>
-                            <script type="text/javascript">
-                            $ ( window ).on ( 'load', function ( ) {
-                            $ ( '#progressBarContainer' ).removeClass ( 'hidden' ) ;
-                            } ) ;
-                             error=false;
-                            </script>
-                        }
+                    <div class="form-horizontal @("has-error".when(flash.get("error"))) @("has-success".when(flash.get("success")))">
+
 
                         <div class="form-group">
+                            @if(flash.get("error")) {
+                                <label class="control-label" for="uploadBtn">@flash.get("error")</label>
+                                <script type="text/javascript">
+                                $ ( window ).on ( 'load', function ( ) {
+                                $ ( '#progressBarContainer' ).removeClass ( 'hidden' ) ;
+                                } ) ;
+                                error=true;
+                                </script>
+                            }
+                            @if(flash.get("success")) {
+                                <label class="control-label" for="uploadBtn">@flash.get("success")</label>
+                                <script type="text/javascript">
+                                $ ( window ).on ( 'load', function ( ) {
+                                $ ( '#progressBarContainer' ).removeClass ( 'hidden' ) ;
+                                } ) ;
+                                error=false;
+                                </script>
+                            }
                             <input id="uploadBtn" class="btn btn-info " type="file" name="fileUpload" title="Datei Auswählen" accept="application/bla, .bla">
                         </div>
                         <div class="form-group">

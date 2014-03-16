@@ -25,12 +25,13 @@
 <script type="text/javascript">
     var getCourseFields = function(){
     $.getJSON("/editCourses/courseFields/" + $('#courseSelect' ).val(), function(data){
-        $('#courseFields' ).empty( ).append(data.html);
+        $('#courseFields' ).empty().
+           append(data.htmlresult);
     });
     };
 
-    $('#courseSelect' ).on('change',getCourseFields
-    );
+    $('#courseSelect' ).on('change',getCourseFields);
+
     getCourseFields();
 </script>
 }

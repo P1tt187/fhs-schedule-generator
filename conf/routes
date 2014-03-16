@@ -22,7 +22,12 @@ POST        /editSubject                                                        
 
 GET         /editCourses                                                                              controllers.CEditCourses.page
 GET         /editCourses/courseFields/:courseId                                                       controllers.CEditCourses.getCourseFields(courseId:Long)
+GET         /getGroupFields/:groupId                                                                  controllers.CEditCourses.getGroup(groupId:Long)
+GET         /deleteGroup/:groupId                                                                     controllers.CEditCourses.deleteGroup(groupId:Long)
 POST        /submitCourseData                                                                         controllers.CEditCourses.saveCourseData
+POST        /submitNewGroup                                                                           controllers.CEditCourses.saveGroupData
+POST        /submitSubGroup                                                                           controllers.CEditCourses.saveSubGroupData
+POST        /updateGroup                                                                              controllers.CEditCourses.updateGroup
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                                             controllers.Assets.at(path="/public", file)

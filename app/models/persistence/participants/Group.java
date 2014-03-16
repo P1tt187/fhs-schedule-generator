@@ -10,24 +10,32 @@ import java.util.List;
  * Created by fabian on 29.01.14.
  */
 @Entity
-@Table(name="TBLGROUP")
+@Table(name = "TBLGROUP")
 public class Group extends Participant {
 
-    /** parent group */
+    /**
+     * parent group
+     */
     @ManyToOne()
     private Group parent;
 
-    /** subgroups of this group*/
+    /**
+     * subgroups of this group
+     */
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "parent")
     private List<Group> subGroups;
 
-    /** parent course */
-    @ManyToOne(cascade = CascadeType.ALL)
+    /**
+     * parent course
+     */
+    @ManyToOne()
     private Course course;
 
-    /** type of this group*/
-    @Column(name="TYPE")
+    /**
+     * type of this group
+     */
+    @Column(name = "TYPE")
     private String groupType;
 
     public Group getParent() {
@@ -36,6 +44,15 @@ public class Group extends Participant {
 
     public void setParent(Group parent) {
         this.parent = parent;
+    }
+
+    /** find main course */
+    public Course getMainCourse() {
+        if (parent != null) {
+            return parent.getMainCourse();
+        } else {
+            return course;
+        }
     }
 
     public List<Group> getSubGroups() {
@@ -60,6 +77,17 @@ public class Group extends Participant {
 
     public void setGroupType(String groupType) {
         this.groupType = groupType;
+    }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "parent=" + (parent != null ? parent.getGroupType() : "null") +
+                ", subGroups=" + subGroups +
+                ", course=" + course +
+                ", groupType='" + groupType + '\'' +
+                ", size=" + getSize() +
+                '}';
     }
 
     @Override

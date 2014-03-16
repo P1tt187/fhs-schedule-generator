@@ -1,20 +1,156 @@
 @(group: models.persistence.participants.Group)
 
-<div class="col-md-9">
-    <form id="groupForm@group.getId" class="form-horizontal" role="form">
+
+<div id="groupContainer@group.getId">
+    <div class="page-header"></div>
+    <form id="groupForm@group.getId" class="form-inline" role="form">
         <div class="form-group">
-            <label class="control-label" for="typ@group.getId">Gruppentyp</label>
-            <input id="type@group.getId" class="form-control" type="text" value="@group.getGroupType">
+            <label class="control-label" for="type@group.getId">Gruppentyp</label>
+            <input name="grouptype" id="type@group.getId" class="form-control" type="text" value="@group.getGroupType" required>
+        </div>
+        <div class="form-group" id="containerSize@group.getId">
+            <label class="control-label" for="size@group.getId">Anzahl</label>
+            <input id="size@group.getId" name="groupsize" class="form-control" type="number" value="@group.getSize" required>
         </div>
         <div class="form-group">
-            <label class="control-label" for="size@group.getId">Gruppentyp</label>
-            <input id="size@group.getId" class="form-control" type="number" value="@group.getGroupType">
+            <label class="control-label" for="edit@group.getId"><span class="glyphicon"></span></label>
+            <button id="edit@group.getId" type="submit" class="btn btn-success"><span class="glyphicon glyphicon glyphicon-ok-sign"></span> </button>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="delete@group.getId"><span class="glyphicon"></span></label>
+            <a href="@routes.CEditCourses.deleteGroup(group.getId)" id="delete@group.getId" type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span></a>
         </div>
     </form>
+    <div class="col-md-5" id="result@group.getId"></div>
+    <div class="clearfix"></div>
+    <script type="text/javascript">
+
+    $ ( '#groupForm@group.getId' ).on ( 'submit', function ( e ) {
+    e.preventDefault ( ) ;
+    $ ( '.has-error' ).removeClass ( 'has-error' ) ;
+    if ( ! $.isNumeric ( $ ( '#courseSize' ).val ( ) ) ) {
+    $ ( '#containerSize@group.getId' ).addClass ( 'has-error' ) ;
+    return ;
+    }
+    var formData = $ ( '#groupForm@group.getId' ).serializeObject ( ) ;
+
+    formData[ 'groupId' ] = @group.getId ;
+    formData['groupsize'] =Number(formData['groupsize']);
+
+    $.ajax ( {
+    cache : false,
+    type : "POST",
+    dataType : "json",
+    data : JSON.stringify ( formData ),
+    context : this,
+    contentType : "application/json; charset=utf-8",
+    url : "@routes.CEditCourses.updateGroup ",
+    success : function ( callback ) {
+    console.log ( JSON.stringify ( callback ) ) ;
+
+    $ ( '#result@group.getId' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
+
+    },
+
+    error : function ( callback ) {
+    // error handler
+    console.log ( JSON.stringify ( callback ) ) ;
+    $ ( '#result@group.getId' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
+
+    var response = callback.responseJSON ;
+    $ ( '#' + response.result ).addClass ( 'has-error' ) ;
+
+    }
+    } ) ;
+
+    console.debug ( JSON.stringify ( formData ) ) ;
+    } ) ;
+
+
+    </script>
+
+    <form id="addSubGroup@group.getId" class="form-inline">
+        <br/>
+        <h4> Untergruppe Erstellen</h4>
+        <div class="form-group">
+            <label for="addSubGroupTypeName@group.getId" class="control-label ">Gruppentyp</label>
+            <input id="addSubGroupTypeName@group.getId" name="addSubGroupTypeName" type="text" class="form-control" required placeholder="Gruppentyp"/>
+        </div>
+        <div class="form-group" id="addSubGroupCountContainer@group.getId">
+            <label for="addSubGroupCount@group.getId" class="control-label">Anzahl</label>
+            <input id="addSubGroupCount@group.getId" name="addSubGroupCount" type="number" class="form-control" required placeholder="Anzahl" min="1"/>
+        </div>
+
+        <div class="form-group" >
+            <label for="submitAddSubGroup@group.getId" class="control-label"> <span class="glyphicon"></span> </label>
+            <button id="submitAddSubGroup@group.getId" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> </button>
+        </div>
+    </form>
+
+    <div class="col-md-5" id="addSubgroupResult@group.getId"></div>
+    <div class="clearfix"></div>
+
+    <script type="text/javascript">
+
+    $('#addSubGroup@group.getId' ).on('submit', function(e){
+    e.preventDefault();
+    $ ( '.has-error' ).removeClass ( 'has-error' ) ;
+
+    if ( ! $.isNumeric ( $ ( '#addSubGroupCount@group.getId' ).val ( )) ) {
+    $ ( '#addSubGroupCountContainer@group.getId' ).addClass ( 'has-error' ) ;
+    return ;
+    }
+    var formData = $ ( '#addSubGroup@group.getId' ).serializeObject ( ) ;
+
+    formData[ 'groupId' ] = @group.getId ;
+    formData['addSubGroupCount']=Number(formData['addSubGroupCount']);
+
+    $.ajax ( {
+    cache : false,
+    type : "POST",
+    dataType : "json",
+    data : JSON.stringify ( formData ),
+    context : this,
+    contentType : "application/json; charset=utf-8",
+    url : "@routes.CEditCourses.saveSubGroupData",
+    success : function ( callback ) {
+    console.log ( JSON.stringify ( callback ) ) ;
+
+    $ ( '#addSubgroupResult@group.getId' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
+
+    location.reload(true);
+
+    },
+
+    error : function ( callback ) {
+    // error handler
+    console.log ( JSON.stringify ( callback ) ) ;
+    $ ( '#addSubgroupResult@group.getId' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
+
+
+    var response = callback.responseJSON ;
+    $ ( '#' + response.result ).addClass ( 'has-error' ) ;
+
+    }
+    } ) ;
+
+    console.debug ( JSON.stringify ( formData ) ) ;
+    });
+
+    </script>
+    <div id="subgroupContainer@group.getId" ></div>
 </div>
+
+<script type="text/javascript">
 @if(group.getSubGroups != null) {
 
-
+    @for(subgroup <- group.getSubGroups){
+        $.getJSON('@routes.CEditCourses.getGroup(subgroup.getId)',
+        function(data){
+        $('#subgroupContainer@group.getId').append(data.htmlresult);
+        $('#subgroupContainer@group.getId').addClass('panel').addClass('panel-info');
+        });
+    }
 }
-
+</script>
 
