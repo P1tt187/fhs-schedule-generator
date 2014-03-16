@@ -91,7 +91,7 @@ object CEditCourses extends Controller {
         val groupCount = (jsVal \ "addSubGroupCount").as[Int]
 
 
-        for (i <- 1 to groupCount) {
+       val result=  (1 to groupCount).map { i =>
           val group = new Group
           group.setGroupType(groupType)
           group.setParent(parent)
@@ -114,11 +114,13 @@ object CEditCourses extends Controller {
               em.persist(group)
               em.merge(parent)
           }
+
+         group
         }
 
 
 
-        Ok(Json.stringify(Json.obj("result" -> "success")))
+        Ok(Json.stringify(Json.obj("htmlresult" -> result.map(g=> groupFields(g).toString()).foldLeft("")(_+_))))
       }
       catch {
         case ex: Exception => Logger.error("saveGroupData", ex)

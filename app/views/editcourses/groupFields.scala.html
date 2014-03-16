@@ -118,8 +118,9 @@
 
     $ ( '#addSubgroupResult@group.getId' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
 
-    location.reload(true);
-
+    //location.reload(true);
+    $('#subgroupContainer@group.getId').append(callback.htmlresult);
+    $('#subgroupContainer@group.getId').addClass('panel').addClass('panel-info');
     },
 
     error : function ( callback ) {
