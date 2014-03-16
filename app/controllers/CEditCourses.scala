@@ -53,7 +53,7 @@ object CEditCourses extends Controller {
         val groupType = (jsVal \ "addGroupTypeName").as[String]
         val groupCount = (jsVal \ "addGroupCount").as[Int]
 
-        for (i <- 1 to groupCount) {
+        val result = (1 to groupCount).map { i =>
           val group = new Group
           group.setGroupType(groupType)
           group.setParent(null)
@@ -66,7 +66,13 @@ object CEditCourses extends Controller {
           }
 
           course.setGroups(course.getGroups :+ group)
-          Logger.debug("saveGroupData " +  group)
+
+          Transactions {
+            implicit em =>
+              em.persist(group)
+          }
+
+          group
         }
 
         Transactions {
@@ -74,7 +80,7 @@ object CEditCourses extends Controller {
             em.merge(course)
         }
 
-        Ok(Json.stringify(Json.obj("result" -> "success")))
+        Ok(Json.stringify(Json.obj("htmlresult" -> result.map(g=> groupFields(g).toString()).foldLeft("")(_+_))))
       }
       catch {
         case ex: Exception => Logger.error("saveGroupData", ex)
@@ -159,7 +165,7 @@ object CEditCourses extends Controller {
 
       removeGroup(groupId)
 
-      Redirect(routes.CEditCourses.page)
+      Ok(Json.stringify(Json.obj("result" -> "success")))
     }
     catch {
       case ex: Exception => Logger.error("saveGroupData", ex)

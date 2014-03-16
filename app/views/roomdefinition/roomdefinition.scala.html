@@ -36,16 +36,16 @@
                 </fieldset>
                 <fieldset>
                     <label for="addTcrit" class="control-label" >Eingeschränkte Verfügbarkeit </label>
-                    <input role="button" type="button" id="addTcrit" class="btn btn-warning btn-sm span1" onclick="addTimeCritInput ( ) ;" value="+"/>
-                    <input role="button" type="button" class="btn btn-danger btn-sm span1" onclick="removeTimeCritInput();" value="-" />
+                    <button role="button" type="button" id="addTcrit" class="btn btn-warning btn-sm span1" onclick="addTimeCritInput ( ) ;" ><span class="glyphicon glyphicon-plus"></span> </button>
+                    <button role="button" type="button" class="btn btn-danger btn-sm span1" onclick="removeTimeCritInput();" value="-" ><span class="glyphicon glyphicon-minus"></span> </button>
                     <div id="timeslotcrit" ></div>
                 </fieldset>
                 <fieldset style="margin-top : 1%">
                     <div class="form-group ">
-                        <span class=" btn-group span4"><input type="submit" class="form-control btn btn-success " value="senden" /> </span>
+                        <span class=" btn-group span4"><button type="submit" class="form-control btn btn-success " > <span class="glyphicon glyphicon-ok-sign"></span> </button> </span>
                         <span class=" btn-group span2">
                             <a href="@routes.CRoomDefinition.page" class=" btn btn-danger form-control " role="button">
-                                Abbrechen
+                                <span class="glyphicon glyphicon-ban-circle"></span>
                             </a>
                         </span>
                     </div>

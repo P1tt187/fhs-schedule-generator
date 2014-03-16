@@ -1,15 +1,16 @@
 @(group: models.persistence.participants.Group)
 
 
-<div id="groupContainer@group.getId">
-    <div class="page-header"></div>
+<div id="groupContainer@group.getId" class="panel-group">
+    <div class="panel-heading">Gruppe</div>
+    <div class="panel-body">
     <form id="groupForm@group.getId" class="form-inline" role="form">
         <div class="form-group">
             <label class="control-label" for="type@group.getId">Gruppentyp</label>
             <input name="grouptype" id="type@group.getId" class="form-control" type="text" value="@group.getGroupType" required>
         </div>
         <div class="form-group" id="containerSize@group.getId">
-            <label class="control-label" for="size@group.getId">Anzahl</label>
+            <label class="control-label" for="size@group.getId">Personen</label>
             <input id="size@group.getId" name="groupsize" class="form-control" type="number" value="@group.getSize" required>
         </div>
         <div class="form-group">
@@ -18,12 +19,24 @@
         </div>
         <div class="form-group">
             <label class="control-label" for="delete@group.getId"><span class="glyphicon"></span></label>
-            <a href="@routes.CEditCourses.deleteGroup(group.getId)" id="delete@group.getId" type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span></a>
+            <button role="button" href="" id="delete@group.getId" type="reset" class="btn btn-danger"><span class="glyphicon glyphicon-minus"></span></button>
         </div>
     </form>
     <div class="col-md-5" id="result@group.getId"></div>
     <div class="clearfix"></div>
     <script type="text/javascript">
+
+        $('#delete@group.getId').on('click',function(e){
+
+             e.preventDefault();
+    $.getJSON('@routes.CEditCourses.deleteGroup(group.getId)')
+    .done(function(){
+      $('#groupContainer@group.getId').remove();
+    } ).fail(function(callback){
+    console.log ( JSON.stringify ( callback ) ) ;
+    $ ( '#result@group.getId' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
+    });
+        });
 
     $ ( '#groupForm@group.getId' ).on ( 'submit', function ( e ) {
     e.preventDefault ( ) ;
@@ -118,7 +131,7 @@
 
     $ ( '#addSubgroupResult@group.getId' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
 
-    //location.reload(true);
+
     $('#subgroupContainer@group.getId').append(callback.htmlresult);
     $('#subgroupContainer@group.getId').addClass('panel').addClass('panel-info');
     },
@@ -140,6 +153,7 @@
 
     </script>
     <div id="subgroupContainer@group.getId" ></div>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -149,7 +163,7 @@
         $.getJSON('@routes.CEditCourses.getGroup(subgroup.getId)',
         function(data){
         $('#subgroupContainer@group.getId').append(data.htmlresult);
-        $('#subgroupContainer@group.getId').addClass('panel').addClass('panel-info');
+        $('#subgroupContainer@group.getId').addClass('panel').addClass('panel-primary');
         });
     }
 }

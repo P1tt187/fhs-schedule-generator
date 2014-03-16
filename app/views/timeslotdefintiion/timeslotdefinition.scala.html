@@ -45,9 +45,9 @@
                     <br/>
 
                     <div class="form-group " style="margin-top : 1%">
-                        <span class=" btn-group span4"><input type="submit" class="form-control btn btn-success " value="senden" /> </span>
+                        <span class=" btn-group span4"><button type="submit" class="form-control btn btn-success " ><span class="glyphicon glyphicon-ok-sign"></span></button> </span>
                         <span class=" btn-group span2"><a href="@routes.CTimeslotDefintion.page" class=" btn btn-danger form-control " role="button">
-                            Abbrechen</a></span>
+                            <span class="glyphicon glyphicon-ban-circle"></span></a></span>
 
                     </div>
                 </fieldset>
@@ -80,7 +80,7 @@
                                     @slot.getStopHour.formatted("%02d") : @slot.getStopMinute.formatted("%02d")
                                 </td>
                                 <td>
-                                    <a class="btn btn-danger btn-sm" href="@routes.CTimeslotDefintion.delete(slot.getId)">Löschen</a>
+                                    <a class="btn btn-danger btn-sm" href="@routes.CTimeslotDefintion.delete(slot.getId)"> <span class="glyphicon glyphicon-remove-sign"></span> </a>
                                 </td>
                             </tr>
                         }
