@@ -1,7 +1,7 @@
 @(group: models.persistence.participants.Group)
 
 
-<div id="groupContainer@group.getId" class="panel-group">
+<div id="groupContainer@group.getId" class="panel panel-primary">
     <div class="panel-heading">Gruppe</div>
     <div class="panel-body">
     <form id="groupForm@group.getId" class="form-inline" role="form">
@@ -133,7 +133,7 @@
 
 
     $('#subgroupContainer@group.getId').append(callback.htmlresult);
-    $('#subgroupContainer@group.getId').addClass('panel').addClass('panel-primary');
+    //$('#subgroupContainer@group.getId').addClass('panel').addClass('panel-primary');
     },
 
     error : function ( callback ) {
@@ -163,7 +163,7 @@
         $.getJSON('@routes.CEditCourses.getGroup(subgroup.getId)',
         function(data){
         $('#subgroupContainer@group.getId').append(data.htmlresult);
-        $('#subgroupContainer@group.getId').addClass('panel').addClass('panel-primary');
+        //$('#subgroupContainer@group.getId').addClass('panel').addClass('panel-primary');
         });
     }
 }
