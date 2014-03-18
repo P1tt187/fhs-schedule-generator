@@ -12,7 +12,7 @@
 
     <div class="row-fluid">
         <div class="co-md-9">
-                @helper.form(action = routes.CBLAFileUpload.uploadFile, 'enctype -> "multipart/form-data") {
+                @helper.form(action = routes.CBLAFileUpload.uploadFile(), 'enctype -> "multipart/form-data") {
                     <div class="form-horizontal @("has-error".when(flash.get("error"))) @("has-success".when(flash.get("success")))">
 
 
