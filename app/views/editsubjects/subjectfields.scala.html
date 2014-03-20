@@ -5,65 +5,65 @@
 <form role="form" id="subjectForm" class="form-inline">
 
     <div class="form-group">
-            <label for="nameInput" class="control-label">Name</label>
-            <input class="form-control " id="nameInput" name="nameInput" type="text" placeholder="name" value="@subject.getName" required>
+        <label for="nameInput" class="control-label">Name</label>
+        <input class="form-control " id="nameInput" name="nameInput" type="text" placeholder="name" value="@subject.getName" required>
     </div>
     <div id="unitInputDiv" class="form-group">
-            <label for="unitInput" class="control-label">Einheiten</label>
-            <input class="form-control" id="unitInput" name="unitInput" type="number" placeholder="einheiten" value="@subject.getUnits" step="0.5" min="0.5" required>
+        <label for="unitInput" class="control-label">Einheiten</label>
+        <input class="form-control" id="unitInput" name="unitInput" type="number" placeholder="einheiten" value="@subject.getUnits" step="0.5" min="0.5" required>
     </div>
 
 
     <div class="form-group">
-                <label class="control-label" for="activeCheckbox">Aktiv</label>
-                <input class="form-control checkbox" type="checkbox" id="activeCheckbox" name="activeCheckbox" @if(subject.isActive) {
-                checked }>
+        <label class="control-label" for="activeCheckbox">Aktiv</label>
+        <input class="form-control checkbox" type="checkbox" id="activeCheckbox" name="activeCheckbox" @if(subject.isActive) {
+        checked }>
     </div>
 
-            @if(lectureType.equals(CEditSubjects.EXERCISE)) {
-                <div class="clearfix"></div>
-                <div class="form-group">
-                    <label class="control-label" for="groupTypeInput">Gruppentyp</label>
-                    <input class="form-control" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="@(subject.asInstanceOf[ExerciseSubject].getGroupType)" required>
-                </div>
-                }
+    @if(lectureType.equals(CEditSubjects.EXERCISE)) {
+        <div class="clearfix"></div>
+        <div class="form-group">
+            <label class="control-label" for="groupTypeInput">Gruppentyp</label>
+            <input class="form-control" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="@(subject.asInstanceOf[ExerciseSubject].getGroupType)" required>
+        </div>
+    }
 
 
     <div class="clearfix"></div>
 
-            <div id="courses" class="form-group">
-                <label class="control-label" for="selectCourse">Kurse</label>
-                <select class="form-control" multiple="multiple" id="selectCourse" name="selectCourse" title="nichts ausgewählt">
-                @for(course <- courses) {
-                    <option value="@course.getId" @if(subject.getCourses.contains(course)) { selected }
-                    > @course.getShortName </option>
-                }
-                </select>
-            </div>
+    <div id="courses" class="form-group">
+        <label class="control-label" for="selectCourse">Kurse</label>
+        <select class="form-control" multiple="multiple" id="selectCourse" name="selectCourse" title="nichts ausgewählt">
+        @for(course <- courses) {
+            <option value="@course.getId" @if(subject.getCourses.contains(course)) { selected }
+            > @course.getShortName </option>
+        }
+        </select>
+    </div>
 
-        <div class="form-group">
-            <div id="docents">
-                <label class="control-label" for="selectDocents">Dozenten</label>
-                <select class="form-control" multiple="multiple" id="selectDocents" name="selectDocents" title="nichts ausgewählst">
-                @for(docent <- docents) {
-                    <option value="@docent.getId" @if(subject.getDocents.contains(docent)) { selected }
-                    >@docent.getLastName </option>
-                }
-                </select>
-            </div>
+    <div class="form-group">
+        <div id="docents">
+            <label class="control-label" for="selectDocents">Dozenten</label>
+            <select class="form-control" multiple="multiple" id="selectDocents" name="selectDocents" title="nichts ausgewählst">
+            @for(docent <- docents) {
+                <option value="@docent.getId" @if(subject.getDocents.contains(docent)) { selected }
+                >@docent.getLastName </option>
+            }
+            </select>
         </div>
+    </div>
 
     <div class="clearfix" ></div>
 
-            <br/>
-            <div class="form-inline">
-                <div class="form-group">
-                    <button id="submitBtn" type="submit" class="btn btn-success" ><span class="glyphicon glyphicon-ok-sign"></span></button>
-                </div>
-                <div class="form-group">
-                    <button id="chancelButton" type="reset" class="btn btn-danger"><span class="glyphicon glyphicon-ban-circle"></span> </button>
-                </div>
-            </div>
+    <br/>
+    <div class="form-inline">
+        <div class="form-group">
+            <button id="submitBtn" type="submit" class="btn btn-success" ><span class="glyphicon glyphicon-ok-sign"></span></button>
+        </div>
+        <div class="form-group">
+            <button id="chancelButton" type="reset" class="btn btn-danger"><span class="glyphicon glyphicon-ban-circle"></span> </button>
+        </div>
+    </div>
 
 </form>
 <div class="clearfix"></div>
@@ -73,12 +73,12 @@
 
 <script type="text/javascript">
 
-    var appendError = function(){
-    $ ( '#result' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
-    }
+var appendError = function ( ) {
+$ ( '#result' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
+}
 
 $ ( '#chancelButton' ).on ( 'click', function ( ) {
-$ ( location ).attr ( 'href', "   @routes.CEditSubjects.page ".trim());
+$ ( location ).attr ( 'href', "    @routes.CEditSubjects.page ".trim());
 } ) ;
 
 
@@ -86,69 +86,69 @@ $ ( location ).attr ( 'href', "   @routes.CEditSubjects.page ".trim());
 $ ( '#subjectForm' ).on ( "submit", function ( e ) {
 e.preventDefault ( ) ;
 
-$('.has-error' ).removeClass('has-error');
+$ ( '.has-error' ).removeClass ( 'has-error' ) ;
 
 
-if($('#unitInput' ).val() % 0.5 != 0 || $('#unitInput' ).val() < 0.5 ){
-    $('#unitInputDiv' ).addClass('has-error');
-    appendError();
-    return;
+if ( $ ( '#unitInput' ).val ( ) % 0.5 != 0 || $ ( '#unitInput' ).val ( ) < 0.5 ) {
+$ ( '#unitInputDiv' ).addClass ( 'has-error' ) ;
+appendError ( ) ;
+return ;
 }
 
 var data = $ ( '#subjectForm' ).serializeObject ( ) ;
-data[ 'subjectType' ] = ' @lectureType '.trim();
+data[ 'subjectType' ] = '  @lectureType '.trim();
 data[ 'subjectId' ] = @subject.getId ;
 
 /** proof if checkbox is checked or not */
 data[ 'activeCheckbox' ] = data[ 'activeCheckbox' ] === 'on' ;
-/** make sure that arrays are arrays*/
+/** make sure that arrays are arrays */
 
-if(data[ 'selectCourse' ]==null){
-$('#courses' ).addClass('has-error');
-appendError();
-return;
+if ( data[ 'selectCourse' ] == null ) {
+$ ( '#courses' ).addClass ( 'has-error' ) ;
+appendError ( ) ;
+return ;
 }
 
-if(! $.isArray(data[ 'selectCourse' ])){
-    data[ 'selectCourse' ]=[data[ 'selectCourse' ]];
+if ( ! $.isArray ( data[ 'selectCourse' ] ) ) {
+data[ 'selectCourse' ] =[ data[ 'selectCourse' ] ] ;
 }
 
-if(data[ 'selectDocents' ]==null){
-   $('#docents' ).addClass('has-error');
-    appendError();
-    return;
+if ( data[ 'selectDocents' ] == null ) {
+$ ( '#docents' ).addClass ( 'has-error' ) ;
+appendError ( ) ;
+return ;
 }
-if(! $.isArray(data[ 'selectDocents' ])){
-    data[ 'selectDocents' ]=[data[ 'selectDocents' ]];
+if ( ! $.isArray ( data[ 'selectDocents' ] ) ) {
+data[ 'selectDocents' ] =[ data[ 'selectDocents' ] ] ;
 }
 
 
 var Form = this ;
 $.ajax ( {
-    cache : false,
-    type : "POST",
-    dataType : "json",
-    data : JSON.stringify ( data ),
-    context : Form,
-    contentType : "application/json; charset=utf-8",
-    url : " @routes.CEditSubjects.saveData",
-    success : function ( callback ) {
-                console.log ( JSON.stringify ( callback ) ) ;
+cache : false,
+type : "POST",
+dataType : "json",
+data : JSON.stringify ( data ),
+context : Form,
+contentType : "application/json; charset=utf-8",
+url : "  @routes.CEditSubjects.saveData ",
+success : function ( callback ) {
+console.log ( JSON.stringify ( callback ) ) ;
 
-                $ ( '#result' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
+$ ( '#result' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
 
-            },
+},
 
-    error : function ( callback ) {
-                // error handler
-                console.log ( JSON.stringify ( callback ) ) ;
-                $ ( '#result' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
+error : function ( callback ) {
+// error handler
+console.log ( JSON.stringify ( callback ) ) ;
+$ ( '#result' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
 
-        var response = callback.responseJSON;
-        $('#' + response.result ).addClass('has-error');
+var response = callback.responseJSON ;
+$ ( '#' + response.result ).addClass ( 'has-error' ) ;
 
-                }
-   } ) ;
+}
+} ) ;
 
 console.debug ( JSON.stringify ( data ) ) ;
 

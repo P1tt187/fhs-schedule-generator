@@ -43,4 +43,14 @@ public abstract class Node extends AbstractEntity {
     public void setChildren(List<Node> children) {
         this.children = children;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer(this.getClass().getSimpleName());
+        sb.append("{");
+        sb.append("parent=").append(parent);
+        sb.append(", children=").append(children);
+        sb.append('}');
+        return sb.toString();
+    }
 }
