@@ -1,7 +1,9 @@
 package models.persistence.lecture;
 
 import models.persistence.Docent;
+import models.persistence.criteria.CriteriaContainer;
 import models.persistence.enumerations.EDuration;
+import models.persistence.location.RoomEntity;
 import models.persistence.participants.Participant;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -16,22 +18,56 @@ import java.util.Set;
 @Table(name = "TBLLECTURE")
 public class Lecture extends AbstractLecture {
 
-    /** name of the lecture */
+    /**
+     * name of the lecture
+     */
     @Column(name = "NAME", nullable = false)
     private String name;
 
-    /** participants can be multiple courses or groups*/
+    /**
+     * participants can be multiple courses or groups
+     */
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Participant.class)
     @Fetch(FetchMode.SUBSELECT)
     private Set<Participant> participants;
 
+    /**
+     * docents for this lecture
+     */
     @OneToMany(targetEntity = Docent.class)
     private Set<Docent> docents;
+    /**
+     * room for this lecture
+     */
+    @ManyToOne(targetEntity = RoomEntity.class)
+    private RoomEntity room;
 
-
+    /**
+     * duration of this lecture
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "DURATION", nullable = false)
     private EDuration duration;
+
+    /** criterias of this lecture */
+    @ManyToOne(targetEntity = CriteriaContainer.class)
+    private CriteriaContainer criteriaContainer;
+
+    public CriteriaContainer getCriteriaContainer() {
+        return criteriaContainer;
+    }
+
+    public void setCriteriaContainer(CriteriaContainer criteriaContainer) {
+        this.criteriaContainer = criteriaContainer;
+    }
+
+    public RoomEntity getRoom() {
+        return room;
+    }
+
+    public void setRoom(RoomEntity room) {
+        this.room = room;
+    }
 
     public EDuration getDuration() {
         return duration;
@@ -88,5 +124,18 @@ public class Lecture extends AbstractLecture {
         result = 31 * result + (docents != null ? docents.hashCode() : 0);
         result = 31 * result + (duration != null ? duration.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Lecture{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", participants=").append(participants);
+        sb.append(", docents=").append(docents);
+        sb.append(", room=").append(room);
+        sb.append(", duration=").append(duration);
+        sb.append(", criteriaContainer=").append(criteriaContainer);
+        sb.append('}');
+        return sb.toString();
     }
 }

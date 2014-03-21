@@ -16,7 +16,7 @@ public class Group extends Participant {
     /**
      * parent group
      */
-    @ManyToOne()
+    @ManyToOne(targetEntity = Group.class)
     private Group parent;
 
     /**
@@ -29,7 +29,7 @@ public class Group extends Participant {
     /**
      * parent course
      */
-    @ManyToOne()
+    @ManyToOne(targetEntity = Course.class)
     private Course course;
 
     /**

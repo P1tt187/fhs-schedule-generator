@@ -2,16 +2,14 @@ package models.persistence;
 
 import models.persistence.scheduletree.Root;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * @author fabian
  *         on 20.03.14.
  */
 @Entity
-@Table(name="TBLSCHEDULE")
+@Table(name = "TBLSCHEDULE")
 public class Schedule extends AbstractEntity {
 
     @OneToOne(targetEntity = Root.class)
@@ -23,6 +21,20 @@ public class Schedule extends AbstractEntity {
 
     public void setRoot(Root root) {
         this.root = root;
+    }
+
+    /**
+     * Semester of this Schedule
+     */
+    @ManyToOne(targetEntity = Semester.class, cascade = CascadeType.MERGE)
+    private Semester semester;
+
+    public Semester getSemester() {
+        return semester;
+    }
+
+    public void setSemester(Semester semester) {
+        this.semester = semester;
     }
 
     @Override

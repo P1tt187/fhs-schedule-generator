@@ -1,8 +1,8 @@
 package models.persistence.subject;
 
-import models.Semester;
 import models.persistence.AbstractEntity;
 import models.persistence.Docent;
+import models.persistence.Semester;
 import models.persistence.criteria.CriteriaContainer;
 import models.persistence.participants.Course;
 import org.hibernate.annotations.Fetch;
@@ -67,7 +67,7 @@ public abstract class AbstractSubject extends AbstractEntity {
     /**
      * criterias of this subject
      */
-    @OneToOne(targetEntity = CriteriaContainer.class, cascade = CascadeType.ALL)
+    @ManyToOne(targetEntity = CriteriaContainer.class, cascade = CascadeType.ALL)
     private CriteriaContainer criteriaContainer;
 
     public CriteriaContainer getCriteriaContainer() {

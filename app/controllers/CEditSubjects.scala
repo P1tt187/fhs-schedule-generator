@@ -75,7 +75,7 @@ object CEditSubjects extends Controller {
       case LECTURE =>
         Ok(Json.stringify(Json.obj("html" -> namefield(findLectureSubjectsForSemester(semesterPattern, filterDocentId, filterCourseId, filterActive), LECTURE).toString())))
       case EXERCISE =>
-        Ok(Json.stringify(Json.obj("html" -> namefield(findExersiseSubjectsForSemester(semesterPattern, filterDocentId, filterCourseId, filterActive), EXERCISE).toString())))
+        Ok(Json.stringify(Json.obj("html" -> namefield(findExerciseSubjectsForSemester(semesterPattern, filterDocentId, filterCourseId, filterActive), EXERCISE).toString())))
     }
   }
 

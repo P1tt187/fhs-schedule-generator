@@ -1,6 +1,8 @@
 package models.persistence.criteria;
 
 import models.persistence.AbstractEntity;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,6 +18,7 @@ public class CriteriaContainer extends AbstractEntity {
     /**
      * criterias
      */
+    @Fetch(FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, targetEntity = AbstractCriteria.class, fetch = FetchType.EAGER)
     private List<AbstractCriteria> criterias;
 

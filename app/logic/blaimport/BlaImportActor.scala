@@ -1,16 +1,16 @@
-package logic
+package logic.blaimport
 
 import akka.actor.Actor
 import java.io.File
 import java.util.Scanner
 import play.api.Logger
 import models.persistence.subject.{ExerciseSubject, AbstractSubject, LectureSubject}
-import models.{Semester, Transactions}
+import models.Transactions
 import models.persistence.participants.{Group, Course}
 import org.hibernate.criterion.Restrictions
 import java.util
 import scala.collection.JavaConversions._
-import models.persistence.Docent
+import models.persistence.{Semester, Docent}
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer}
 
 /**

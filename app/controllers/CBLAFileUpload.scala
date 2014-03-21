@@ -4,7 +4,6 @@ import play.api.mvc._
 import views.html.blaimport._
 import play.api.libs.concurrent.Akka
 import akka.actor.Props
-import logic.{ImportFile, BlaImportActor}
 import play.api.Play.current
 import scala.util.{Failure, Success}
 import play.api.libs.concurrent.Execution.Implicits._
@@ -12,9 +11,11 @@ import scala.concurrent.Future
 import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
+import logic.blaimport.{ImportFile, BlaImportActor}
 
 /**
- * Created by fabian on 07.02.14.
+ * @author fabian
+ *         on 07.02.14.
  */
 object CBLAFileUpload extends Controller {
 

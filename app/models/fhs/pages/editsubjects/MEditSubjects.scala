@@ -1,10 +1,10 @@
 package models.fhs.pages.editsubjects
 
-import models.{Semester, Transactions}
+import models.Transactions
 import scala.collection.JavaConversions._
 import models.persistence.subject.{ExerciseSubject, LectureSubject}
 import org.hibernate.criterion.{Order, CriteriaSpecification, Restrictions}
-import models.persistence.Docent
+import models.persistence.{Semester, Docent}
 import models.persistence.participants.Course
 
 /**
@@ -52,7 +52,7 @@ object MEditSubjects {
     }
   }
 
-  def findExersiseSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive:String) = {
+  def findExerciseSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive:String) = {
     val semesterDO = findSemester(semester)
 
     Transactions.hibernateAction {

@@ -101,7 +101,7 @@ object CEditCourses extends Controller {
           val group = new Group
           group.setGroupType(groupType)
           group.setParent(parent)
-         // group.setCourse(course)
+          group.setCourse(parent.getCourse)
           group.setSize(parent.getSize / groupCount)
           group.setSubGroups(List[Group]())
 

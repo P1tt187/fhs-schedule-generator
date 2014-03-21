@@ -1,5 +1,18 @@
-@(message:String)
+@(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm])(implicit flash: Flash)
 
-@main(message, CGenerate.NAV){
+@import helper._
+@import helper.twitterBootstrap._
+
+@main(message, CGenerate.NAV) {
+
+    @form(action = routes.CGenerate.generatorAction(), 'class -> "form-inline") {
+        @select(formGenerator("id"), semesters.toSeq.map(s => (s.getId.toString, s.getName)), '_label -> "Semester", '_help -> "", '_class -> "form-group")
+
+        <div class="clearfix"></div>
+        <div class="form-group">
+            <button class="btn btn-success form-control" role="button" type="submit">Generieren</button>
+        </div>
+
+    }
 
 }

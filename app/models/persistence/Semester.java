@@ -1,6 +1,4 @@
-package models;
-
-import models.persistence.AbstractEntity;
+package models.persistence;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,6 +15,9 @@ public class Semester extends AbstractEntity {
     /** the name of this semester */
     @Column(name = "NAME")
     private String name;
+
+
+
 
     public String getName() {
         return name;
