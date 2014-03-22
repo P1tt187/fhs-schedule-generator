@@ -49,7 +49,9 @@ public class Lecture extends AbstractLecture {
     @Column(name = "DURATION", nullable = false)
     private EDuration duration;
 
-    /** criterias of this lecture */
+    /**
+     * criterias of this lecture
+     */
     @ManyToOne(targetEntity = CriteriaContainer.class)
     private CriteriaContainer criteriaContainer;
 
@@ -138,4 +140,6 @@ public class Lecture extends AbstractLecture {
         sb.append('}');
         return sb.toString();
     }
+
+
 }

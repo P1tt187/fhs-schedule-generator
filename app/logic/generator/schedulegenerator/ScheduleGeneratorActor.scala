@@ -8,7 +8,7 @@ import akka.pattern.ask
 import logic.generator.lecturegenerator.{LectureAnswer, GenerateLectures, LectureGeneratorActor}
 import scala.concurrent.Await
 import play.api.Logger
-import models.persistence.enumerations.EDuration
+import com.rits.cloning.Cloner
 
 /**
  * @author fabian 
@@ -16,7 +16,9 @@ import models.persistence.enumerations.EDuration
  */
 class ScheduleGeneratorActor extends Actor {
 
-  implicit val timeout = Timeout(60 seconds)
+  val TIMEOUTVAL = 10
+
+  implicit val timeout = Timeout(TIMEOUTVAL seconds)
 
   override def receive = {
 
@@ -25,9 +27,13 @@ class ScheduleGeneratorActor extends Actor {
       val lectureGenerationActor = context.actorOf(Props[LectureGeneratorActor])
 
       val lectureFuture = ask(lectureGenerationActor, GenerateLectures(subjectList)).mapTo[LectureAnswer]
-      val lectures = Await.result(lectureFuture, 60 seconds).lectures
+      val lectures = Await.result(lectureFuture,TIMEOUTVAL seconds).lectures
 
-      Logger.debug(lectures.filter(_.getDuration ==  EDuration.UNWEEKLY) .mkString("\n"))
+      val cloner = new Cloner
+
+      val clone = cloner.deepClone(lectures)
+
+      Logger.debug(clone.mkString("\n"))
       sender() ! ScheduleAnswer(new Schedule)
     case _ =>
   }
