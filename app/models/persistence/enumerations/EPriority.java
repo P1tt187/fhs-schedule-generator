@@ -4,9 +4,21 @@ package models.persistence.enumerations;
  * Created by fabian on 07.02.14.
  */
 public enum EPriority {
-    HIGH,
+    /** enum constant **/
+    HIGH(1),
+    /** enum constant **/
+    NORMAL(0),
+    /** enum constant **/
+    LOW(-1);
 
-    NORMAL,
+    /** the sort index */
+    private Integer sortIndex;
 
-    LOW;
+    public Integer getSortIndex() {
+        return sortIndex;
+    }
+
+    EPriority(Integer sortIndex) {
+        this.sortIndex = sortIndex;
+    }
 }

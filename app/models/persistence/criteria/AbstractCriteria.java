@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "TBLCRITERIA")
-public abstract class AbstractCriteria extends AbstractEntity {
+public abstract class AbstractCriteria extends AbstractEntity implements Comparable<AbstractCriteria>{
 
     /**
      * is the system allowed to use other possibilitys
@@ -41,5 +41,10 @@ public abstract class AbstractCriteria extends AbstractEntity {
 
     public void setPriority(EPriority priority) {
         this.priority = priority;
+    }
+
+    @Override
+    public int compareTo(AbstractCriteria that) {
+        return this.priority.getSortIndex().compareTo(that.priority.getSortIndex());
     }
 }
