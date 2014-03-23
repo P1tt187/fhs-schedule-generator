@@ -17,7 +17,8 @@ import play.api.libs.json._
 
 
 /**
- * Created by fabian on 04.02.14.
+ * @author fabian
+ *         on 04.02.14.
  */
 object CRoomDefinition extends Controller {
 
