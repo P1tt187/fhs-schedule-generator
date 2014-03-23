@@ -14,6 +14,7 @@ import models.persistence.location.{RoomAttributesEntity, RoomEntity}
 import scala.collection.JavaConversions._
 import views.html.roomdefinition._
 import play.api.libs.json._
+import org.hibernate.criterion.Restrictions
 
 
 /**
@@ -28,7 +29,7 @@ object CRoomDefinition extends Controller {
     mapping(
       "capacity" -> number,
       "house" -> nonEmptyText,
-      "number" -> number,
+      "number" -> nonEmptyText,
       "attributes" -> list(nonEmptyText),
       "timeCriterias" -> list(mapping(
         "startHour" -> number(min = 0, max = 23),
@@ -57,6 +58,22 @@ object CRoomDefinition extends Controller {
   def getCriteriaFields(index:Int) = Action{
 
     Ok(Json.stringify(Json.obj("htmlresult" -> timeslotcrit(index).toString())))
+
+  }
+
+  def deleteRoom(id:Long)= Action{
+
+    Transactions.hibernateAction{
+      implicit session =>
+       val room =  session.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
+        room.getHouse.getRooms.remove(room)
+        val house = room.getHouse
+        room.setHouse(null)
+        session.saveOrUpdate(house)
+        session.delete(room)
+    }
+
+    Redirect(routes.CRoomDefinition.page())
 
   }
 

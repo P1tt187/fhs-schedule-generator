@@ -13,9 +13,9 @@ import org.hibernate.FetchMode
  * @author fabian
  *         on 04.02.14.
  */
-case class MRoomdefintion(capacity: Int, house: String, number: Int, attributes: List[String], timeCriterias: List[MTtimeslotCritDefine])
+case class MRoomdefintion(capacity: Int, house: String, number: String, attributes: List[String], timeCriterias: List[MTtimeslotCritDefine])
 
-case class MRoomdisplay(id: Long, capacity: Int, house: String, number: Int, roomAttributes: List[RoomAttributesEntity], timeCriterias: List[MTimeslotDisplay])
+case class MRoomdisplay(id: Long, capacity: Int, house: String, number: String, roomAttributes: List[RoomAttributesEntity], timeCriterias: List[MTimeslotDisplay])
 
 object MRoomdefintion {
   /**
@@ -57,7 +57,7 @@ object MRoomdefintion {
           case tcrit: TimeslotCriteria => MTimeslotDisplay(tcrit.getId, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStartMinute, tcrit.getWeekday.getName, tcrit.getWeekday.getSortIndex, tcrit.getDuration)
         }
         MRoomdisplay(element.getId, element.getCapacity, element.getHouse.getName, element.getNumber, element.getRoomAttributes.toList, timeslotCrit.toList)
-    }
+    }.sortBy(_.house)
   }
 
   def getWeekayTemplate(sortIndex: Int): WeekdayTemplate = {

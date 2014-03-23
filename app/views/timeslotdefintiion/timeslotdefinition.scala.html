@@ -80,7 +80,7 @@
                                     @slot.getStopHour.formatted("%02d") : @slot.getStopMinute.formatted("%02d")
                                 </td>
                                 <td>
-                                    <a class="btn btn-danger btn-sm" href="@routes.CTimeslotDefintion.delete(slot.getId)"> <span class="glyphicon glyphicon-remove-sign"></span> </a>
+                                    <button class="btn btn-danger btn-sm" onclick="$(location).attr('href','@routes.CTimeslotDefintion.delete(slot.getId)');"><span class="glyphicon glyphicon-remove-sign"></span></button>
                                 </td>
                             </tr>
                         }

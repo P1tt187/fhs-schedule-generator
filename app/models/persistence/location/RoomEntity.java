@@ -28,7 +28,7 @@ public class RoomEntity extends AbstractEntity {
      */
 
     @Column(name = "NUMBER", nullable = false)
-    private Integer number;
+    private String number;
 
     /**
      * the room is in a house
@@ -77,11 +77,11 @@ public class RoomEntity extends AbstractEntity {
     }
 
 
-    public Integer getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(Integer number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 
@@ -104,7 +104,7 @@ public class RoomEntity extends AbstractEntity {
     /**
      * parameter constructor
      */
-    public RoomEntity(Integer capacity, Integer number, HouseEntity house) {
+    public RoomEntity(Integer capacity, String number, HouseEntity house) {
         this.capacity = capacity;
         this.number = number;
         this.house = house;
@@ -142,11 +142,13 @@ public class RoomEntity extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "RoomEntity{" +
-                "capacity=" + capacity +
-                ", number=" + number +
-                ", roomAttributes=" + roomAttributes +
-                ", criteriaContainer=" + criteriaContainer +
-                '}';
+        final StringBuffer sb = new StringBuffer("RoomEntity{");
+        sb.append("capacity=").append(capacity);
+        sb.append(", number='").append(number).append('\'');
+        sb.append(", house=").append(house);
+        sb.append(", roomAttributes=").append(roomAttributes);
+        sb.append(", criteriaContainer=").append(criteriaContainer);
+        sb.append('}');
+        return sb.toString();
     }
 }

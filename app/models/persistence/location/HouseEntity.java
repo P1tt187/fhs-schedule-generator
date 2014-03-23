@@ -47,10 +47,10 @@ public class HouseEntity extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "HouseEntity{" +
-                "name='" + name + '\'' +
-                ", rooms=" + rooms +
-                '}';
+        final StringBuffer sb = new StringBuffer("HouseEntity{");
+        sb.append("name='").append(name).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override

@@ -84,11 +84,11 @@
             </select>
         </div>
 
-        <div class="form-group">
-            <label class="control-label" for="@("timeCriterias_" + index + "_duration")">
+        <div class="form-group span6">
+            <label class="control-label" for="@("timeCriterias_" + index + "_duration")" style="display : block">
                 Wochen
             </label>
-            <select id="@("timeCriterias_" + index + "_duration")" name="timeCriterias[@index].duration">
+            <select class="form-control" id="@("timeCriterias_" + index + "_duration")" name="timeCriterias[@index].duration">
                 <option value="@EDuration.WEEKLY">Wöchentlich</option>
                 <option value="@EDuration.EVEN">Gerade Wochen</option>
                 <option value="@EDuration.UNEVEN">Ungerade Wochen</option>

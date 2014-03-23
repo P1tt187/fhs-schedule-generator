@@ -1,6 +1,7 @@
 @(lectureNames: List[models.fhs.pages.editsubjects.MSubjects], lectureType: String)
 
-    <div class="">
+    <div class="form-inline">
+        <div class="form-group">
         <label for="nameField" class="control-label">
         Bezeichnung
         </label>
@@ -9,6 +10,7 @@
                 <option value="@element.id">@element.name</option>
             }
         </select>
+        </div>
     </div>
 
 

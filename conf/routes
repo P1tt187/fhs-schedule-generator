@@ -11,6 +11,7 @@ GET         /deleteTimeslot/:id                                                 
 GET         /defineRooms                                                                              controllers.CRoomDefinition.page
 GET         /roomcritfields/:index                                                                    controllers.CRoomDefinition.getCriteriaFields(index:Int)
 POST        /addRoom                                                                                  controllers.CRoomDefinition.submitRoom
+GET         /removeRoom/:id                                                                           controllers.CRoomDefinition.deleteRoom(id:Long)
 
 GET         /blaimport                                                                                controllers.CBLAFileUpload.page
 GET         /blaimportFinished                                                                        controllers.CBLAFileUpload.finished
