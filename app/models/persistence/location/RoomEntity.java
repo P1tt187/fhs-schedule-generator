@@ -65,7 +65,7 @@ public class RoomEntity extends AbstractEntity {
      * contains all criterias
      */
 
-    @OneToOne(cascade = CascadeType.ALL, targetEntity = CriteriaContainer.class)
+    @ManyToOne(cascade = CascadeType.ALL, targetEntity = CriteriaContainer.class)
     private CriteriaContainer criteriaContainer;
 
     public Integer getCapacity() {

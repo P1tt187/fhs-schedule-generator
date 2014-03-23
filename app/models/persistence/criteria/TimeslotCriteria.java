@@ -1,28 +1,35 @@
 package models.persistence.criteria;
 
+import models.persistence.enumerations.EDuration;
 import models.persistence.template.WeekdayTemplate;
 
 import javax.persistence.*;
 
 /**
- * Created by fabian on 28.01.14.
+ * @author fabian
+ *         on 28.01.14.
  */
 @Entity
 @Table(name = "TBLTIMESLOT_CRITERIA")
 public class TimeslotCriteria extends AbstractCriteria {
 
 
-    public TimeslotCriteria(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute, WeekdayTemplate weekday) {
+    public TimeslotCriteria(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute, WeekdayTemplate weekday, EDuration duration) {
         this.startHour = startHour;
         this.startMinute = startMinute;
         this.stopHour = stopHour;
         this.stopMinute = stopMinute;
         this.weekday = weekday;
+        this.duration = duration;
     }
 
     public TimeslotCriteria() {
 
     }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "DURATION", nullable = false)
+    private EDuration duration;
 
     @Column(name = "STARTHOUR", nullable = false)
     private Integer startHour;
@@ -40,9 +47,17 @@ public class TimeslotCriteria extends AbstractCriteria {
     private Integer stopMinute;
 
 
-    @OneToOne(fetch = FetchType.EAGER, optional = false,targetEntity = WeekdayTemplate.class)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false, targetEntity = WeekdayTemplate.class)
     private WeekdayTemplate weekday;
 
+
+    public EDuration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(EDuration duration) {
+        this.duration = duration;
+    }
 
     public Integer getStartHour() {
         return startHour;
@@ -100,8 +115,22 @@ public class TimeslotCriteria extends AbstractCriteria {
         if (isTolerance() != null ? !isTolerance().equals(that.isTolerance()) : that.isTolerance() != null)
             return false;
         if (weekday != null ? !weekday.equals(that.weekday) : that.weekday != null) return false;
+        if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
 
         return true;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("TimeslotCriteria{");
+        sb.append("duration=").append(duration);
+        sb.append(", startHour=").append(startHour);
+        sb.append(", startMinute=").append(startMinute);
+        sb.append(", stopHour=").append(stopHour);
+        sb.append(", stopMinute=").append(stopMinute);
+        sb.append(", weekday=").append(weekday);
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override
@@ -114,6 +143,7 @@ public class TimeslotCriteria extends AbstractCriteria {
         result = 31 * result + (stopHour != null ? stopHour.hashCode() : 0);
         result = 31 * result + (stopMinute != null ? stopMinute.hashCode() : 0);
         result = 31 * result + (weekday != null ? weekday.hashCode() : 0);
+        result = 37 * result + (duration != null ? duration.hashCode() : 0);
         return result;
     }
 }

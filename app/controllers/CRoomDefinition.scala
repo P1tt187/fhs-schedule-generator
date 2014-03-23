@@ -9,10 +9,11 @@ import models.persistence.criteria.CriteriaContainer
 import java.util
 import models._
 import models.persistence.criteria.{AbstractCriteria, TimeslotCriteria}
-import models.persistence.enumerations.EPriority
+import models.persistence.enumerations.{EDuration, EPriority}
 import models.persistence.location.{RoomAttributesEntity, RoomEntity}
 import scala.collection.JavaConversions._
 import views.html.roomdefinition._
+import play.api.libs.json._
 
 
 /**
@@ -33,7 +34,8 @@ object CRoomDefinition extends Controller {
         "startMinute" -> number(min = 0, max = 59),
         "stopHour" -> number(min = 0, max = 23),
         "stopMinute" -> number(min = 0, max = 59),
-        "weekdays" -> list(number(min = 0, max = 6))
+        "weekdays" -> list(number(min = 0, max = 6)),
+        "duration" -> text
       )(MTtimeslotCritDefine.apply)(MTtimeslotCritDefine.unapply))
 
     )(MRoomdefintion.apply)(MRoomdefintion.unapply)
@@ -51,6 +53,12 @@ object CRoomDefinition extends Controller {
     Ok(roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS, rooms))
   }
 
+  def getCriteriaFields(index:Int) = Action{
+
+    Ok(Json.stringify(Json.obj("htmlresult" -> timeslotcrit(index).toString())))
+
+  }
+
   def submitRoom = Action {
     implicit request =>
 
@@ -66,6 +74,8 @@ object CRoomDefinition extends Controller {
           val houseDO = MRoomdefintion.findOrCreateHouseEntityByName(room.house)
 
           val roomDO = new RoomEntity(room.capacity, room.number, houseDO)
+          Logger.debug("houseDO:" + houseDO)
+
           houseDO.getRooms.add(roomDO)
           roomDO.setRoomAttributes(roomAttributes)
 
@@ -79,7 +89,7 @@ object CRoomDefinition extends Controller {
 
                   val weekday = MRoomdefintion.getWeekayTemplate(sortIndex)
 
-                  val timeslotCriteria = new TimeslotCriteria(crit.startHour, crit.startMinutes, crit.stopHour, crit.stopMinutes, weekday)
+                  val timeslotCriteria = new TimeslotCriteria(crit.startHour, crit.startMinutes, crit.stopHour, crit.stopMinutes, weekday, EDuration.valueOf(crit.duration))
                   timeslotCriteria.setPriority(EPriority.HIGH)
                   timeslotCriteria.setTolerance(false)
 
@@ -88,11 +98,10 @@ object CRoomDefinition extends Controller {
               }
           }
 
-          Logger.debug("" + houseDO +" " + roomDO)
+          Logger.debug("" + houseDO + " " + roomDO)
           Transactions {
             implicit entitiManager =>
               entitiManager.persist(roomDO)
-              entitiManager.merge(houseDO)
           }
 
           Redirect(routes.CRoomDefinition.page)

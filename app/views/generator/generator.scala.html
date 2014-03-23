@@ -5,6 +5,10 @@
 
 @main(message, CGenerate.NAV) {
 
+    <div class="page-header">
+        <h1>Stundenplan Generieren</h1>
+    </div>
+
     @form(action = routes.CGenerate.generatorAction(), 'class -> "form-inline") {
         @select(formGenerator("id"), semesters.toSeq.map(s => (s.getId.toString, s.getName)), '_label -> "Semester", '_help -> "", '_class -> "form-group")
 

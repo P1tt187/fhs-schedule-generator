@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "TBLWEEKDAY_TEMPLATE")
-public class WeekdayTemplate extends AbstractEntity implements Comparable<WeekdayTemplate>{
+public class WeekdayTemplate extends AbstractEntity implements Comparable<WeekdayTemplate> {
 
     @Constraints.Required
     @Column(name = "NAME")
@@ -22,7 +22,7 @@ public class WeekdayTemplate extends AbstractEntity implements Comparable<Weekda
     @Column(name = "SORTINDEX")
     private Integer sortIndex;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent",fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent", fetch = FetchType.EAGER)
     private List<TimeslotTemplate> children;
 
     public String getName() {

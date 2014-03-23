@@ -7,6 +7,7 @@ import models.fhs.pages.timeslot.MTimeslotDisplay
 import scala.collection.JavaConversions._
 import models.persistence.criteria.TimeslotCriteria
 import models.persistence.location.{HouseEntity, RoomAttributesEntity, RoomEntity}
+import org.hibernate.FetchMode
 
 /**
  * Created by fabian on 04.02.14.
@@ -25,7 +26,7 @@ object MRoomdefintion {
   def findOrCreateHouseEntityByName(name:String):HouseEntity={
     Transactions.hibernateAction{
       implicit session =>
-        var result = session.createCriteria(classOf[HouseEntity]).add(Restrictions.eq("name",name)).uniqueResult().asInstanceOf[HouseEntity]
+        var result = session.createCriteria(classOf[HouseEntity]).add(Restrictions.eq("name",name)).setFetchMode("rooms",FetchMode.JOIN).uniqueResult().asInstanceOf[HouseEntity]
         if(result ==null){
          result = new HouseEntity(name)
           result.setRooms(new java.util.LinkedList[RoomEntity]())
@@ -52,11 +53,8 @@ object MRoomdefintion {
     dbResult.toList.map {
       element =>
         val timeslotCrit = element.getCriteriaContainer.getCriterias map {
-          crit =>
-            crit match {
-              case tcrit: TimeslotCriteria => MTimeslotDisplay(tcrit.getId, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStartMinute, tcrit.getWeekday.getName, tcrit.getWeekday.getSortIndex)
+          case tcrit: TimeslotCriteria => MTimeslotDisplay(tcrit.getId, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStartMinute, tcrit.getWeekday.getName, tcrit.getWeekday.getSortIndex)
 
-            }
         }
         MRoomdisplay(element.getId, element.getCapacity, element.getHouse.getName, element.getNumber, element.getRoomAttributes.toList , timeslotCrit.toList)
     }

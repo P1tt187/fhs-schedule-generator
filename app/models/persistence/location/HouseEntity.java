@@ -17,8 +17,7 @@ public class HouseEntity extends AbstractEntity {
     @Column(name = "NAME")
     private String name;
 
-    @Transient
-    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
     private List<RoomEntity> rooms;
 

@@ -1,7 +1,6 @@
 package models.persistence.template;
 
 import models.persistence.AbstractEntity;
-import play.data.validation.Constraints;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,32 +12,36 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "TBLTIMESLOT_TEMPLATE")
-public class TimeslotTemplate extends AbstractEntity implements Comparable<TimeslotTemplate>{
+public class TimeslotTemplate extends AbstractEntity implements Comparable<TimeslotTemplate> {
 
+    /**
+     * the weekday
+     */
     @ManyToOne
     private WeekdayTemplate parent;
 
-    @Constraints.Required
-    @Constraints.Max(value = 23)
-    @Constraints.Min(value = 0)
+    /**
+     * the starthour
+     */
     @Column(name = "STARTHOUR", nullable = false)
     private Integer startHour;
 
-    @Constraints.Max(value = 59)
-    @Constraints.Min(value = 0)
-    @Constraints.Required
+    /**
+     * startminute
+     */
     @Column(name = "STARTMINUTE", nullable = false)
     private Integer startMinute;
 
-    @Constraints.Max(value = 23)
-    @Constraints.Min(value = 0)
-    @Constraints.Required
+    /**
+     * stophour
+     */
     @Column(name = "STOPHOUR", nullable = false)
     private Integer stopHour;
 
-    @Constraints.Max(value = 59)
-    @Constraints.Min(value = 0)
-    @Constraints.Required
+
+    /**
+     * stopminute
+     */
     @Column(name = "STOPMINUTE", nullable = false)
     private Integer stopMinute;
 
@@ -96,13 +99,14 @@ public class TimeslotTemplate extends AbstractEntity implements Comparable<Times
 
     @Override
     public String toString() {
-        return "TimeslotTemplate{" +
-                "parent=" + parent +
-                ", startHour=" + startHour +
-                ", startMinute=" + startMinute +
-                ", stopHour=" + stopHour +
-                ", stopMinute=" + stopMinute +
-                '}';
+        final StringBuffer sb = new StringBuffer("TimeslotTemplate{");
+        sb.append("parent=").append(parent);
+        sb.append(", startHour=").append(startHour);
+        sb.append(", startMinute=").append(startMinute);
+        sb.append(", stopHour=").append(stopHour);
+        sb.append(", stopMinute=").append(stopMinute);
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override
@@ -111,8 +115,8 @@ public class TimeslotTemplate extends AbstractEntity implements Comparable<Times
             return -1;
         }
 
-        WeekdayTemplate thisWeekday = (WeekdayTemplate) parent;
-        WeekdayTemplate thatWeekday = (WeekdayTemplate) that.parent;
+        WeekdayTemplate thisWeekday = parent;
+        WeekdayTemplate thatWeekday = that.parent;
 
         int ret = thisWeekday.compareTo(thatWeekday);
         if (ret != 0) {

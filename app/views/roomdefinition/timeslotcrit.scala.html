@@ -1,4 +1,6 @@
-@(weekdays: Seq[(String, String)])
+@(index: Int)
+
+@import models.persistence.enumerations.EDuration
 
     @hours = @{
         (0 to 23).map {
@@ -22,87 +24,73 @@
     }
 
     @weedayOption = @{
-        weekdays map {
+        CTimeslotDefintion.WEEKDAYS map {
             dayname =>
                 new Html("'<option  value=\"" + dayname._1 + "\">" + dayname._2 + "</option>'+ ")
         }
     }
-    <script type="text/javascript">
-    var i = 0 ;
-
-    function addTimeCritInput ( ) {
-
-    $ ( "#timeslotcrit" ).append (
-    '<div class="panel panel-info container-fluid" id="timeCriterias_' + i + '" > ' +
-    '<div class="row-fluid"> ' +
-    '<h4>Beginn:</h4>' +
-    '<div class="clearfix form-group span2  " id="timeCriterias_' + i + '_startHour_field">' +
-    '<label for="timeCriterias_' + i + '_startHour">Stunde</label>' +
-    '<div class="input">' +
-    '<select id="timeCriterias_0_startHour" name="timeCriterias[' + i + '].startHour" >' +
-        @hours
-    '</select>' +
-    '<span class="help-inline"></span>' +
-    '<span class="help-block"></span>' +
-    '</div>' +
-    '</div>' +
-    '<div class="clearfix form-group span2  " id="timeCriterias_' + i + '_startMinute_field">' +
-    '<label for="timeCriterias_' + i + '_startMinute">Minute</label>' +
-    '<div class="input">' +
-    '<select id="timeCriterias_' + i + '_startMinute" name="timeCriterias[' + i + '].startMinute" >' +
-        @minutes
-    '</select>' +
-    '<span class="help-inline"></span>' +
-    '<span class="help-block"></span>' +
-    '</div>' +
-    '</div>' +
-    '<h4>Ende:</h4>' +
-    '<div class="clearfix form-group span2  " id="timeCriterias_' + i + '_stopHour_field">' +
-    '<label for="timeCriterias_' + i + '_stopHour">Stunde</label>' +
-    '<div class="input">' +
-    '<select id="timeCriterias_' + i + '_stopHour" name="timeCriterias[' + i + '].stopHour" >' +
-        @hours
-    '</select>' +
-    '<span class="help-inline"></span>' +
-    '<span class="help-block"></span>' +
-    '</div>' +
-    '</div>' +
-    '<div class="clearfix form-group span2  " id="timeCriterias_' + i + '_stopMinute_field">' +
-    '<label for="timeCriterias_' + i + '_stopMinute">Minute</label>' +
-    '<div class="input">' +
-    '<select id="timeCriterias_' + i + '_stopMinute" name="timeCriterias[' + i + '].stopMinute" >' +
-        @minutes
-    '</select>' +
-    '<span class="help-inline"></span>' +
-    '<span class="help-block"></span>' +
-    '</div>' +
-    '</div> <br/>' +
-    '<div class="form-group span6 ">' +
-    '<label class="control-label" for="timeCriterias_' + i + '_weekdays" style="display:block">' +
-    'Wochentage:' +
-    '</label>' +
-    '<select id="timeCriterias_' + i + '_weekdays" name="timeCriterias[' + i + '].weekdays[]" multiple title="nichts Ausgewählt"> ' +
-        @weedayOption
-    '</select>' +
-    '</div>' +
-
-    '</div>' +
-    '</div>' +
-    '</div>' ) ;
-    i ++ ;
-
-    initSelect();
 
 
-    }
+<div class="panel panel-info container-fluid" id="timeCriterias_@index">
+    <div class="row-fluid">
+        <h4>Beginn:</h4>
+        <div class="clearfix form-group span2  " id="@("timeCriterias_" + index + "_startHour_field")">
+            <label for="@("timeCriterias_" + index + "_startHour")">Stunde</label>
+            <div class="input">
+                <select id="@("timeCriterias_" + index + "_startHour")" name="timeCriterias[@index].startHour" >
+                @hours
+                </select>
+                <span class="help-inline"></span>
+                <span class="help-block"></span>
+            </div>
+        </div>
+        <div class="clearfix form-group span2  " id="@(" timeCriterias_" + index + "_startMinute_field")">
+            <label for="@("timeCriterias_" + index + "_startMinute")">Minute</label>
+            <div class="input">
+                <select id="@("timeCriterias_" + index + "_startMinute")" name="timeCriterias[@index].startMinute" >
+                @minutes
+                </select>
+                <span class="help-inline"></span>
+                <span class="help-block"></span>
+            </div>
+        </div>
+        <h4>Ende:</h4>
+        <div class="clearfix form-group span2  " id="@("timeCriterias_" + index + "_stopHour_field")">
+            <label for="@("timeCriterias_" + index + "_stopHour")">Stunde</label>
+            <div class="input">
+                <select id="@("timeCriterias_" + index + "_stopHour")" name="timeCriterias[@index].stopHour" >
+                @hours
+                </select>
+                <span class="help-inline"></span>
+                <span class="help-block"></span>
+            </div>
+        </div>
+        <div class="clearfix form-group span2  " id="@("timeCriterias_" + index + "_stopMinute_field")">
+            <label for="@("timeCriterias_" + index + "_stopMinute")"> Minute</label>
+            <div class="input">
+                <select id="@("timeCriterias_" + index + "_stopMinute")" name="timeCriterias[@index].stopMinute" >
+                @minutes
+                </select>
+                <span class="help-inline"></span>
+                <span class="help-block"></span>
+            </div>
+        </div> <br/>
+        <div class="form-group span6 ">
+            <label class="control-label" for="@("timeCriterias_" + index + "_weekdays")" style="display : block">
+                Wochentage:
+            </label>
+            <select class="form-control" id="@("timeCriterias_" + index + "_weekdays")" name="timeCriterias[@index].weekdays[]" multiple title="nichts Ausgewählt">
+            @weedayOption
+            </select>
+        </div>
 
-    function removeTimeCritInput ( ) {
-    if ( i > 0 ) {
-    i -- ;
-    $ ( "#timeCriterias_" + i ).remove ( ) ;
-    }
-
-
-    }
-    </script>
-
+        <div class="form-group">
+            <label class="control-label" for="@("timeCriterias_" + index + "_duration")">
+                Wochen
+            </label>
+            <select id="@("timeCriterias_" + index + "_duration")" name="timeCriterias[@index].duration">
+                <option value="@EDuration.WEEKLY">Wöchentlich</option>
+                <option value="@EDuration.EVEN">Gerade Wochen</option>
+                <option value="@EDuration.UNEVEN">Ungerade Wochen</option>
+            </select>
+        </div>

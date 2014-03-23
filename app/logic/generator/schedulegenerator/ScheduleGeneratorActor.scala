@@ -7,6 +7,7 @@ import scala.concurrent.duration._
 import akka.pattern.ask
 import logic.generator.lecturegenerator.{LectureAnswer, GenerateLectures, LectureGeneratorActor}
 import scala.concurrent.Await
+import com.rits.cloning.Cloner
 
 /**
  * @author fabian 
@@ -14,9 +15,9 @@ import scala.concurrent.Await
  */
 class ScheduleGeneratorActor extends Actor {
 
-  val TIMEOUTVAL = 10
+  val TIMEOUT_VAL = 10
 
-  implicit val timeout = Timeout(TIMEOUTVAL seconds)
+  implicit val timeout = Timeout(TIMEOUT_VAL seconds)
 
   override def receive = {
 
@@ -26,7 +27,10 @@ class ScheduleGeneratorActor extends Actor {
 
       val lectureFuture = ask(lectureGenerationActor, GenerateLectures(subjectList)).mapTo[LectureAnswer]
 
-      val lectures = Await.result(lectureFuture,TIMEOUTVAL seconds).lectures
+      val lectures = Await.result(lectureFuture,TIMEOUT_VAL seconds).lectures
+
+      val cloner = new Cloner()
+      context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures))
 
       sender() ! ScheduleAnswer(new Schedule)
     case _ =>
