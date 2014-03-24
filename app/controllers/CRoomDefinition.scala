@@ -61,6 +61,16 @@ object CRoomDefinition extends Controller {
 
   }
 
+
+  def editRoom(id:Long)=Action{
+
+    val room = MRoomdefintion.findRoomById(id)
+    Logger.debug("edit room - " + room)
+
+    val filledForm = roomDefForm.fill(room)
+    Ok(roomdefinition("Räume", filledForm, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms()))
+  }
+
   def deleteRoom(id:Long)= Action{
 
     Transactions.hibernateAction{

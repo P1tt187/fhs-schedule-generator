@@ -10,6 +10,7 @@ GET         /deleteTimeslot/:id                                                 
 
 GET         /defineRooms                                                                              controllers.CRoomDefinition.page
 GET         /roomcritfields/:index                                                                    controllers.CRoomDefinition.getCriteriaFields(index:Int)
+GET         /editRoom/:id                                                                             controllers.CRoomDefinition.editRoom(id:Long)
 POST        /addRoom                                                                                  controllers.CRoomDefinition.submitRoom
 GET         /removeRoom/:id                                                                           controllers.CRoomDefinition.deleteRoom(id:Long)
 

@@ -1,215 +1,229 @@
 @(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion], weekdays: Seq[(String, String)], existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay])
-    @import models.fhs.pages.roomdefinition._
-    @import models.persistence.enumerations.EDuration
+@import models.fhs.pages.roomdefinition._
+@import models.persistence.enumerations.EDuration
 
-    @import helper._
-    @import helper.twitterBootstrap._
+@import helper._
+@import helper.twitterBootstrap._
 
 
-    @main(title, CRoomDefinition.NAV) {
+@main(title, CRoomDefinition.NAV) {
 
-        <div class="page-header">
-            <h1> Räume </h1>
-        </div>
+    <div class="page-header">
+        <h1> Räume </h1>
+    </div>
 
-        <div class="clearfix">
-            <div class="row-fluid">
-                <div class="col-md-5">
-                    @form(action = routes.CRoomDefinition.submitRoom, 'class -> "span2  form-inline") {
+    <div class="clearfix">
+        <div class="row-fluid">
+            <div class="col-md-5">
+                @form(action = routes.CRoomDefinition.submitRoom, 'class -> "span2  form-inline") {
 
-                        <fieldset>
-                            @inputText(roomDefForm("house"), '_class -> "form-group span1", '_label -> "Haus", '_help -> "Gebäude")
+                    <fieldset>
+                        @inputText(roomDefForm("house"), '_class -> "form-group span1", '_label -> "Haus", '_help -> "Gebäude")
 
-                            @inputText(roomDefForm("number"), '_class -> "form-group span1", '_label -> "Nummer", '_help -> "Raumnummer")
-                            <br/>
-                            @inputText(roomDefForm("capacity"), '_class -> "form-group span1", '_label -> "Kapazität", '_help -> "Wieviele Personen?")
-                            <br/>
+                        @inputText(roomDefForm("number"), '_class -> "form-group span1", '_label -> "Nummer", '_help -> "Raumnummer")
+                        <br/>
+                        @inputText(roomDefForm("capacity"), '_class -> "form-group span1", '_label -> "Kapazität", '_help -> "Wieviele Personen?")
+                        <br/>
 
-                            <label class="control-label" for="attributes" style="display : block ;">
-                                Eigenschaften
-                            </label>
-                            <select id="attributes" name="attributes[]" multiple title="nichts Ausgewählt">
-                            @for(attr <- MRoomdefintion.ATTRIBUTES) {
-                                <option value="@attr">@attr</option>
-                            }
-                            </select>
+                        <label class="control-label" for="attributes" style="display : block ;">
+                            Eigenschaften
+                        </label>
+                        <select id="attributes" name="attributes[]" multiple title="nichts Ausgewählt">
+                        @for(attr <- MRoomdefintion.ATTRIBUTES) {
+                            <option value="@attr" @if(roomDefForm.value.getOrElse(MRoomdefintion(0,"","",List[String](),List[MTtimeslotCritDefine]())).attributes.contains(attr)){selected} >@attr</option>
+                        }
+                        </select>
 
-                        </fieldset>
-                        <fieldset>
-                            <label for="addTcrit" class="control-label" >Eingeschränkte Verfügbarkeit </label>
-                            <button role="button" type="button" id="addTcrit" class="btn btn-warning btn-sm span1" ><span class="glyphicon glyphicon-plus"></span> </button>
-                            <button id="removeCritButton" role="button" type="button" class="btn btn-danger btn-sm span1" ><span class="glyphicon glyphicon-minus"></span> </button>
-                            <div id="timeslotcrit" >
-                                @repeat(roomDefForm("timeCriterias"), min=0){ criteriaFields =>
-                                    <div class="panel panel-info container-fluid" id="@criteriaFields.id">
-                                        <div class="row-fluid">
+                    </fieldset>
+                    <fieldset>
+                        <label for="addTcrit" class="control-label" >Eingeschränkte Verfügbarkeit </label>
+                        <button role="button" type="button" id="addTcrit" class="btn btn-warning btn-sm span1" ><span class="glyphicon glyphicon-plus"></span> </button>
+                        <button id="removeCritButton" role="button" type="button" class="btn btn-danger btn-sm span1" ><span class="glyphicon glyphicon-minus"></span> </button>
+                        <div id="timeslotcrit" >
+                        @repeat(roomDefForm("timeCriterias"), min = 0) { criteriaFields =>
+                            <div class="panel panel-info container-fluid" id="@criteriaFields.id">
+                                <div class="row-fluid">
                                     <h4>Beginn:</h4>
 
                                     @select(criteriaFields("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
                                     @select(criteriaFields("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4", '_label -> "Minute", '_help -> "")
 
-                                <h4>Ende:</h4>
+                                    <h4>Ende:</h4>
 
                                     @select(criteriaFields("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
                                     @select(criteriaFields("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Minute", '_help -> "")
 
 
+                                    @repeat(criteriaFields("weekdays"), min = 0) { weekday =>
+                                        @defining(weekdays.find(p => p._1.equals(weekday.value.get)).get) { day =>
+                                            <div class='form-group span6'>
+                                                <label class="control-label" for="weekdays@criteriaFields.id">
+                                                    Wochentage</label>
+                                                <select class="form-control" id="weekdays@criteriaFields.id" name="@(criteriaFields.id + "_weekdays[]")" multiple title="nichts Ausgewählt">
+                                                @for(dayname <- weekdays) {
+                                                    <option class="" value="@dayname._1" @if(day._1.equals(dayname._1)) {selected }>@dayname._2 </option>
+                                                }
+                                                </select>
+                                            </div>
+                                        }
 
-                                <div class='form-group span6'>
-                                    <label class="control-label" for="weekdays@criteriaFields.id">Wochentage</label>
-                                    <select class="form-control" id="weekdays@criteriaFields.id" name="@(criteriaFields.id + "_weekdays[]")" multiple title="nichts Ausgewählt">
-                                    @for(dayname <- weekdays) {
-                                        <option class="" value="@dayname._1" @if(criteriaFields("weekdays").value.getOrElse("").contains(dayname._1)) {selected }>@dayname._2 </option>
                                     }
-                                </select>
-                                </div>
-
-                                @select(criteriaFields("duration"),Seq((EDuration.WEEKLY.name(),"Wöchentlich"),(EDuration.EVEN.name(),"Gerade Wochen"),(EDuration.UNEVEN.name(),"Ungerade Wochen")),'_class -> "form-group", '_label -> "Wochen")
-
-                                  </div>
-                                  </div>
-                                }
-                            </div>
-                        </fieldset>
-                        <fieldset style="margin-top : 1%">
-                            <div class="form-group ">
-                                <span class=" btn-group span4"><button type="submit" class="form-control btn btn-success " > <span class="glyphicon glyphicon-ok-sign"></span> </button> </span>
-                                <span class=" btn-group span2">
-                                    <a href="@routes.CRoomDefinition.page" class=" btn btn-danger form-control " role="button">
-                                        <span class="glyphicon glyphicon-ban-circle"></span>
-                                    </a>
-                                </span>
-                            </div>
-                        </fieldset>
-                    }
-
-                    <script type="text/javascript">
-                    var i = @roomDefForm("timeCriterias").value.getOrElse(0) ;
 
 
+                                    @select(criteriaFields("duration"), Seq((EDuration.WEEKLY.name(), "Wöchentlich"), (EDuration.EVEN.name(), "Gerade Wochen"), (EDuration.UNEVEN.name(), "Ungerade Wochen")), '_class -> "form-group", '_label -> "Wochen")
 
-                    var addTimeslotCritInput = function ( ) {
-                    $.getJSON ( '/roomcritfields/' + i, function ( data ) {
-                    $ ( '#timeslotcrit' ).append ( data.htmlresult ) ;
-                    initSelect ( ) ;
-                    i ++ ;
-                    } ) ;
-                    } ;
-
-                    var removeTimeCritInput = function ( ) {
-                    if ( i > 0 ) {
-                    i -- ;
-                    $ ( "#timeCriterias_" + i ).remove ( ) ;
-                    }
-
-
-
-                    } ;
-                    $ ( '#removeCritButton' ).on ( 'click', removeTimeCritInput ) ;
-                    $ ( '#addTcrit' ).on ( 'click', addTimeslotCritInput ) ;
-
-
-                    </script>
-
-                </div>
-            </div>
-                <!-- Display existing Rooms -->
-            <div class="row-fluid ">
-                <div class="col-md-7">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover table-condensed" style="text-align : center">
-                            <thead>
-                                <tr class="text-info">
-                                    <th>Haus</th>
-                                    <th>Nummer</th>
-                                    <th>Kapazität</th>
-                                    @for(e <- MRoomdefintion.ATTRIBUTES) {
-                                        <th>@e</th>
-                                    }
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            @for(roomEntity <- existingRooms) {
-                                <tr class="active">
-                                    <td>
-                                    @roomEntity.house
-                                    </td>
-                                    <td>
-                                    @roomEntity.number
-                                    </td>
-                                    <td>
-                                    @roomEntity.capacity
-                                    </td>
-                                    @for(e <- MRoomdefintion.ATTRIBUTES) {
-                                        <td>
-                                            <span class="glyphicon  @if(roomEntity.roomAttributes.filter(_.getAttribute.equalsIgnoreCase(e))) { glyphicon-ok } else { glyphicon-remove } " ></span>
-                                        </td>
-                                    }
-                                    <td>
-                                      <button role="button" class="btn btn-sm btn-danger" onclick="$(location).attr('href','@routes.CRoomDefinition.deleteRoom(roomEntity.id )');"><span class="glyphicon glyphicon-remove-circle"></span></button>
-                                    </td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
-                    </div>
-                    @for(roomEntity <- existingRooms) {
-                        <div class="panel panel-info">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">
-                                    @roomEntity.house @roomEntity.number
-                                </h3>
-                            </div>
-
-                            <div class="panel-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-striped table-hover table-condensed text-center" >
-                                        <thead>
-                                            <tr class="text-info" >
-                                                <th class="text-center">Tag</th>
-                                                <th class="text-center">Von</th>
-                                                <th class="text-center">Bis</th>
-                                                <th class="text-center">Wöchentlich</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @if(roomEntity.timeCriterias.isEmpty) {
-                                                <tr>
-                                                    <td>-</td>
-                                                    <td>immer</td>
-                                                    <td>verfügbar</td>
-                                                    <td>Wöchentlich</td>
-                                                </tr>
-                                            }
-
-                                            @for(tcrit <- roomEntity.timeCriterias) {
-                                                <tr class="active">
-                                                    <td>@tcrit.weekday.substring(0, 2)</td>
-                                                    <td>@tcrit.startHour.formatted("%02d")
-                                                        : @tcrit.startMinutes.formatted("%02d")</td>
-                                                    <td>@tcrit.stopHour.formatted("%02d")
-                                                        : @tcrit.stopMinutes.formatted("%02d")</td>
-                                                    <td>
-                                                    @{
-                                                        tcrit.duration match {
-                                                            case EDuration.WEEKLY => "Wöchentlich"
-                                                            case EDuration.EVEN => "Gerade Wochen"
-                                                            case EDuration.UNEVEN => "Ungerade Wochen"
-                                                            case other => other.name()
-                                                        }
-                                                    }
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
                                 </div>
                             </div>
+                        }
                         </div>
-                    }
-                </div>
+                    </fieldset>
+                    <fieldset style="margin-top : 1%">
+                        <div class="form-group ">
+                            <span class=" btn-group span4"><button type="submit" class="form-control btn btn-success " > <span class="glyphicon glyphicon-ok-sign"></span> </button> </span>
+                            <span class=" btn-group span2">
+                                <a href="@routes.CRoomDefinition.page" class=" btn btn-danger form-control " role="button">
+                                    <span class="glyphicon glyphicon-ban-circle"></span>
+                                </a>
+                            </span>
+                        </div>
+                    </fieldset>
+                }
+
+
+
+                <script type="text/javascript">
+
+
+                var i = @roomDefForm.value.getOrElse(MRoomdefintion(0,"","",List[String](),List[MTtimeslotCritDefine]())).timeCriterias.size ;
+
+
+
+                var addTimeslotCritInput = function ( ) {
+                $.getJSON ( '/roomcritfields/' + i, function ( data ) {
+                $ ( '#timeslotcrit' ).append ( data.htmlresult ) ;
+                initSelect ( ) ;
+                i ++ ;
+                } ) ;
+                } ;
+
+                var removeTimeCritInput = function ( ) {
+                if ( i > 0 ) {
+                i -- ;
+                $ ( "#timeCriterias_" + i ).remove ( ) ;
+                }
+
+
+
+                } ;
+                $ ( '#removeCritButton' ).on ( 'click', removeTimeCritInput ) ;
+                $ ( '#addTcrit' ).on ( 'click', addTimeslotCritInput ) ;
+
+
+                </script>
+
             </div>
         </div>
+            <!-- Display existing Rooms -->
+        <div class="row-fluid ">
+            <div class="col-md-7">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-condensed" style="text-align : center">
+                        <thead>
+                            <tr class="text-info">
+                                <th>Haus</th>
+                                <th>Nummer</th>
+                                <th>Kapazität</th>
+                                @for(e <- MRoomdefintion.ATTRIBUTES) {
+                                    <th>@e</th>
+                                }
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @for(roomEntity <- existingRooms) {
+                            <tr class="active">
+                                <td>
+                                @roomEntity.house
+                                </td>
+                                <td>
+                                @roomEntity.number
+                                </td>
+                                <td>
+                                @roomEntity.capacity
+                                </td>
+                                @for(e <- MRoomdefintion.ATTRIBUTES) {
+                                    <td>
+                                        <span class="glyphicon  @if(roomEntity.roomAttributes.filter(_.getAttribute.equalsIgnoreCase(e))) { glyphicon-ok } else { glyphicon-remove } " ></span>
+                                    </td>
+                                }
+                                <td>
+                                    <button role="button" class="btn btn-sm btn-warning" onclick="$ ( location ).attr ( 'href', ' @routes.CRoomDefinition.editRoom(roomEntity.id) ');"><span class="glyphicon glyphicon-pencil"></span> </button>
+                                </td>
+                                <td>
+                                    <button role="button" class="btn btn-sm btn-danger" onclick="$ ( location ).attr ( 'href', ' @routes.CRoomDefinition.deleteRoom(roomEntity.id) ');"><span class="glyphicon glyphicon-remove-circle"></span></button>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                @for(roomEntity <- existingRooms) {
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                @roomEntity.house @roomEntity.number
+                            </h3>
+                        </div>
 
-    }
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-hover table-condensed text-center" >
+                                    <thead>
+                                        <tr class="text-info" >
+                                            <th class="text-center">Tag</th>
+                                            <th class="text-center">Von</th>
+                                            <th class="text-center">Bis</th>
+                                            <th class="text-center">Wöchentlich</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if(roomEntity.timeCriterias.isEmpty) {
+                                            <tr>
+                                                <td>-</td>
+                                                <td>immer</td>
+                                                <td>verfügbar</td>
+                                                <td>Wöchentlich</td>
+                                            </tr>
+                                        }
+
+                                        @for(tcrit <- roomEntity.timeCriterias) {
+                                            <tr class="active">
+                                                <td>@tcrit.weekday.substring(0, 2)</td>
+                                                <td>@tcrit.startHour.formatted("%02d")
+                                                    : @tcrit.startMinutes.formatted("%02d")</td>
+                                                <td>@tcrit.stopHour.formatted("%02d")
+                                                    : @tcrit.stopMinutes.formatted("%02d")</td>
+                                                <td>
+                                                @{
+                                                    tcrit.duration match {
+                                                        case EDuration.WEEKLY => "Wöchentlich"
+                                                        case EDuration.EVEN => "Gerade Wochen"
+                                                        case EDuration.UNEVEN => "Ungerade Wochen"
+                                                        case other => other.name()
+                                                    }
+                                                }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+}

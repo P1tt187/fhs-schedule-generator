@@ -45,6 +45,18 @@ object MRoomdefintion {
     }
   }
 
+  def findRoomById(id:Long)={
+    Transactions.hibernateAction{
+      implicit session =>
+        val room = session.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
+        val attributes = room.getRoomAttributes.map(_.getAttribute).toList
+        val criterias = room.getCriteriaContainer.getCriterias.map {
+          case tcrit: TimeslotCriteria => MTtimeslotCritDefine(tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute, List(tcrit.getWeekday.getSortIndex), tcrit.getDuration.name)
+        }.toList
+        MRoomdefintion(room.getCapacity,room.getHouse.getName,room.getNumber,attributes,criterias)
+    }
+  }
+
   def findAllRooms(): List[MRoomdisplay] = {
     val dbResult = Transactions.hibernateAction {
       implicit session =>
