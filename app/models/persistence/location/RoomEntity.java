@@ -50,7 +50,7 @@ public class RoomEntity extends AbstractEntity {
      * Attributes of this room
      */
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = RoomAttributesEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(targetEntity = RoomAttributesEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<RoomAttributesEntity> roomAttributes;
 
     public List<RoomAttributesEntity> getRoomAttributes() {

@@ -13,7 +13,7 @@ import org.hibernate.FetchMode
  * @author fabian
  *         on 04.02.14.
  */
-case class MRoomdefintion(capacity: Int, house: String, number: String, attributes: List[String], timeCriterias: List[MTtimeslotCritDefine])
+case class MRoomdefintion(id: Option[Long], capacity: Int, house: String, number: String, attributes: List[String], timeCriterias: List[MTtimeslotCritDefine])
 
 case class MRoomdisplay(id: Long, capacity: Int, house: String, number: String, roomAttributes: List[RoomAttributesEntity], timeCriterias: List[MTimeslotDisplay])
 
@@ -45,15 +45,22 @@ object MRoomdefintion {
     }
   }
 
-  def findRoomById(id:Long)={
-    Transactions.hibernateAction{
+  def findMRoomDefinitionById(id: Long) = {
+    Transactions.hibernateAction {
       implicit session =>
         val room = session.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
         val attributes = room.getRoomAttributes.map(_.getAttribute).toList
         val criterias = room.getCriteriaContainer.getCriterias.map {
           case tcrit: TimeslotCriteria => MTtimeslotCritDefine(tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute, List(tcrit.getWeekday.getSortIndex), tcrit.getDuration.name)
         }.toList
-        MRoomdefintion(room.getCapacity,room.getHouse.getName,room.getNumber,attributes,criterias)
+        MRoomdefintion(Some(id), room.getCapacity, room.getHouse.getName, room.getNumber, attributes, criterias)
+    }
+  }
+
+  def findRoomById(id:Long) = {
+    Transactions.hibernateAction{
+      implicit session =>
+        session.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
     }
   }
 
@@ -85,6 +92,20 @@ object MRoomdefintion {
       day
     } else {
       dbResult
+    }
+  }
+
+  def findOrCreateRoomAttribute(name: String) = {
+    Transactions.hibernateAction {
+      implicit session =>
+        val roomAttr = session.createCriteria(classOf[RoomAttributesEntity]).add(Restrictions.eq("attribute", name)).uniqueResult().asInstanceOf[RoomAttributesEntity]
+        if (roomAttr == null) {
+          val ra = new RoomAttributesEntity()
+          ra.setAttribute(name)
+          ra
+        } else {
+          roomAttr
+        }
     }
   }
 
