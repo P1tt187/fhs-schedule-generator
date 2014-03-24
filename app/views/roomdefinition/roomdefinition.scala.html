@@ -39,7 +39,37 @@
                             <label for="addTcrit" class="control-label" >Eingeschränkte Verfügbarkeit </label>
                             <button role="button" type="button" id="addTcrit" class="btn btn-warning btn-sm span1" ><span class="glyphicon glyphicon-plus"></span> </button>
                             <button id="removeCritButton" role="button" type="button" class="btn btn-danger btn-sm span1" ><span class="glyphicon glyphicon-minus"></span> </button>
-                            <div id="timeslotcrit" ></div>
+                            <div id="timeslotcrit" >
+                                @repeat(roomDefForm("timeCriterias"), min=0){ criteriaFields =>
+                                    <div class="panel panel-info container-fluid" id="@criteriaFields.id">
+                                        <div class="row-fluid">
+                                    <h4>Beginn:</h4>
+
+                                    @select(criteriaFields("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
+                                    @select(criteriaFields("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4", '_label -> "Minute", '_help -> "")
+
+                                <h4>Ende:</h4>
+
+                                    @select(criteriaFields("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
+                                    @select(criteriaFields("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Minute", '_help -> "")
+
+
+
+                                <div class='form-group span6'>
+                                    <label class="control-label" for="weekdays@criteriaFields.id">Wochentage</label>
+                                    <select class="form-control" id="weekdays@criteriaFields.id" name="@(criteriaFields.id + "_weekdays[]")" multiple title="nichts Ausgewählt">
+                                    @for(dayname <- weekdays) {
+                                        <option class="" value="@dayname._1" @if(criteriaFields("weekdays").value.getOrElse("").contains(dayname._1)) {selected }>@dayname._2 </option>
+                                    }
+                                </select>
+                                </div>
+
+                                @select(criteriaFields("duration"),Seq((EDuration.WEEKLY.name(),"Wöchentlich"),(EDuration.EVEN.name(),"Gerade Wochen"),(EDuration.UNEVEN.name(),"Ungerade Wochen")),'_class -> "form-group", '_label -> "Wochen")
+
+                                  </div>
+                                  </div>
+                                }
+                            </div>
                         </fieldset>
                         <fieldset style="margin-top : 1%">
                             <div class="form-group ">
@@ -54,7 +84,7 @@
                     }
 
                     <script type="text/javascript">
-                    var i = 0 ;
+                    var i = @roomDefForm("timeCriterias").value.getOrElse(0) ;
 
 
 

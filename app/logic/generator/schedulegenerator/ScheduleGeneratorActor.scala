@@ -17,6 +17,8 @@ import play.api.Logger
  */
 class ScheduleGeneratorActor extends Actor {
 
+  private val cloner = new Cloner()
+
   val TIMEOUT_VAL = 10
 
   implicit val timeout = Timeout(TIMEOUT_VAL seconds)
@@ -33,7 +35,8 @@ class ScheduleGeneratorActor extends Actor {
 
       Logger.debug("lectures: \n" + lectures.mkString("\n"))
 
-      val cloner = new Cloner()
+      cloner.setCloningEnabled(true)
+
       context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures))
 
       sender() ! ScheduleAnswer(new Schedule)
