@@ -8,6 +8,8 @@ import akka.pattern.ask
 import logic.generator.lecturegenerator.{LectureAnswer, GenerateLectures, LectureGeneratorActor}
 import scala.concurrent.Await
 import com.rits.cloning.Cloner
+import play.api.Logger
+
 
 /**
  * @author fabian 
@@ -28,6 +30,8 @@ class ScheduleGeneratorActor extends Actor {
       val lectureFuture = ask(lectureGenerationActor, GenerateLectures(subjectList)).mapTo[LectureAnswer]
 
       val lectures = Await.result(lectureFuture,TIMEOUT_VAL seconds).lectures
+
+      Logger.debug("lectures: \n" + lectures.mkString("\n"))
 
       val cloner = new Cloner()
       context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures))
