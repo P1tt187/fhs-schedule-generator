@@ -10,11 +10,12 @@ import java.util
 import models._
 import models.persistence.criteria.{AbstractCriteria, TimeslotCriteria}
 import models.persistence.enumerations.{EDuration, EPriority}
-import models.persistence.location.{RoomAttributesEntity, RoomEntity}
+import models.persistence.location.RoomEntity
 import scala.collection.JavaConversions._
 import views.html.roomdefinition._
 import play.api.libs.json._
 import org.hibernate.criterion.Restrictions
+
 
 
 /**
@@ -27,6 +28,7 @@ object CRoomDefinition extends Controller {
 
   val roomDefForm: Form[MRoomdefintion] = Form(
     mapping(
+      "id" -> optional(longNumber),
       "capacity" -> number,
       "house" -> nonEmptyText,
       "number" -> nonEmptyText,
@@ -55,27 +57,27 @@ object CRoomDefinition extends Controller {
     Ok(roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS, rooms))
   }
 
-  def getCriteriaFields(index:Int) = Action{
+  def getCriteriaFields(index: Int) = Action {
 
     Ok(Json.stringify(Json.obj("htmlresult" -> timeslotcrit(index).toString())))
 
   }
 
 
-  def editRoom(id:Long)=Action{
+  def editRoom(id: Long) = Action {
 
-    val room = MRoomdefintion.findRoomById(id)
+    val room = MRoomdefintion.findMRoomDefinitionById(id)
     Logger.debug("edit room - " + room)
 
     val filledForm = roomDefForm.fill(room)
     Ok(roomdefinition("Räume", filledForm, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms()))
   }
 
-  def deleteRoom(id:Long)= Action{
+  def deleteRoom(id: Long) = Action {
 
-    Transactions.hibernateAction{
+    Transactions.hibernateAction {
       implicit session =>
-       val room =  session.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
+        val room = session.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
         room.getHouse.getRooms.remove(room)
         val house = room.getHouse
         room.setHouse(null)
@@ -97,11 +99,30 @@ object CRoomDefinition extends Controller {
         room => {
           Logger.info(room.timeCriterias.toString)
 
-          val roomAttributes = room.attributes map (new RoomAttributesEntity(_))
+
+
+          val roomAttributes = room.attributes map MRoomdefintion.findOrCreateRoomAttribute
 
           val houseDO = MRoomdefintion.findOrCreateHouseEntityByName(room.house)
 
-          val roomDO = new RoomEntity(room.capacity, room.number, houseDO)
+          val roomDO = room.id match {
+            case None => new RoomEntity(room.capacity, room.number, houseDO)
+            case Some(id) => val roomEntity = MRoomdefintion.findRoomById(id)
+
+              val criteriaContainer = roomEntity.getCriteriaContainer
+              roomEntity.setCriteriaContainer(null)
+
+              Transactions {
+                implicit em =>
+                  em.merge(roomEntity)
+                  if (criteriaContainer != null) {
+                    em.remove(em.merge(criteriaContainer))
+                  }
+
+              }
+
+              roomEntity
+          }
           Logger.debug("houseDO:" + houseDO)
 
           houseDO.getRooms.add(roomDO)
@@ -129,7 +150,12 @@ object CRoomDefinition extends Controller {
           Logger.debug("" + houseDO + " " + roomDO)
           Transactions {
             implicit entitiManager =>
-              entitiManager.persist(roomDO)
+
+              if (roomDO.getId == null) {
+                entitiManager.persist(roomDO)
+              } else {
+                entitiManager.merge(roomDO)
+              }
           }
 
           Redirect(routes.CRoomDefinition.page)

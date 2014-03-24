@@ -18,22 +18,26 @@
                 @form(action = routes.CRoomDefinition.submitRoom, 'class -> "span2  form-inline") {
 
                     <fieldset>
-                        @inputText(roomDefForm("house"), '_class -> "form-group span1", '_label -> "Haus", '_help -> "Gebäude")
 
-                        @inputText(roomDefForm("number"), '_class -> "form-group span1", '_label -> "Nummer", '_help -> "Raumnummer")
+                        @inputText(roomDefForm("id"),'_class -> "hidden")
+
+                        @inputText(roomDefForm("house"), '_class -> "form-group ", '_label -> "Haus", '_help -> "Gebäude")
+
+                        @inputText(roomDefForm("number"), '_class -> "form-group ", '_label -> "Nummer", '_help -> "Raumnummer")
                         <br/>
-                        @inputText(roomDefForm("capacity"), '_class -> "form-group span1", '_label -> "Kapazität", '_help -> "Wieviele Personen?")
+                        @inputText(roomDefForm("capacity"), '_class -> "form-group ", '_label -> "Kapazität", '_help -> "Wieviele Personen?")
                         <br/>
 
-                        <label class="control-label" for="attributes" style="display : block ;">
-                            Eigenschaften
-                        </label>
-                        <select id="attributes" name="attributes[]" multiple title="nichts Ausgewählt">
-                        @for(attr <- MRoomdefintion.ATTRIBUTES) {
-                            <option value="@attr" @if(roomDefForm.value.getOrElse(MRoomdefintion(0,"","",List[String](),List[MTtimeslotCritDefine]())).attributes.contains(attr)){selected} >@attr</option>
-                        }
-                        </select>
-
+                        <div class="form-group">
+                            <label class="control-label" for="attributes" style="display : block ;">
+                                Eigenschaften
+                            </label>
+                            <select class="form-control" id="attributes" name="attributes[]" multiple title="nichts Ausgewählt">
+                            @for(attr <- MRoomdefintion.ATTRIBUTES) {
+                                <option value="@attr" @if(roomDefForm.value.getOrElse(MRoomdefintion(None,0,"","",List[String](),List[MTtimeslotCritDefine]())).attributes.contains(attr)){selected} >@attr</option>
+                            }
+                            </select>
+                        </div>
                     </fieldset>
                     <fieldset>
                         <label for="addTcrit" class="control-label" >Eingeschränkte Verfügbarkeit </label>
@@ -45,15 +49,15 @@
                                 <div class="row-fluid">
                                     <h4>Beginn:</h4>
 
-                                    @select(criteriaFields("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
-                                    @select(criteriaFields("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4", '_label -> "Minute", '_help -> "")
+                                    @select(criteriaFields("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
+                                    @select(criteriaFields("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
 
                                     <h4>Ende:</h4>
 
-                                    @select(criteriaFields("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
-                                    @select(criteriaFields("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Minute", '_help -> "")
+                                    @select(criteriaFields("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
+                                    @select(criteriaFields("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group", '_label -> "Minute", '_help -> "")
 
-
+                                    <br/>
                                     @repeat(criteriaFields("weekdays"), min = 0) { weekday =>
                                         @defining(weekdays.find(p => p._1.equals(weekday.value.get)).get) { day =>
                                             <div class='form-group span6'>
@@ -94,7 +98,7 @@
                 <script type="text/javascript">
 
 
-                var i = @roomDefForm.value.getOrElse(MRoomdefintion(0,"","",List[String](),List[MTtimeslotCritDefine]())).timeCriterias.size ;
+                var i = @roomDefForm.value.getOrElse(MRoomdefintion(None,0,"","",List[String](),List[MTtimeslotCritDefine]())).timeCriterias.size ;
 
 
 
