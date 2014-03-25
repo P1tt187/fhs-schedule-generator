@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import models.persistence.template.WeekdayTemplate
 import scala.collection.JavaConversions._
 import models.persistence.criteria.TimeslotCriteria
-import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
 
 /**
  * @author fabian 
@@ -71,17 +71,21 @@ object CExporter extends Controller {
 
           val jsonContainer = mapper.readValue(tmpFile, classOf[JsonContainer])
 
-
-
-          Transactions {
-            implicit em =>
-              val weekdayTemplates = jsonContainer.getHouses.flatMap(_.getRooms.flatMap(_.getCriteriaContainer.getCriterias.map {
+          Transactions.hibernateAction {
+            implicit session =>
+              val houseTemplates = jsonContainer.getHouses.flatMap(_.getRooms.flatMap(_.getCriteriaContainer.getCriterias.map {
                 case tcrit: TimeslotCriteria => tcrit.getWeekday
-              })).toSet
+              }))
 
-              weekdayTemplates.foreach(em.persist(_))
+              (houseTemplates ++ jsonContainer.getWeekdayTemplates).map {
+                wt =>
+                  val dbresult = session.createCriteria(classOf[WeekdayTemplate]).add(Restrictions.eq("sortIndex", wt.getSortIndex)).uniqueResult()
+                  if (dbresult == null) {
+                    session.save(wt)
+                  }
+              }
 
-              jsonContainer.getWeekdayTemplates.diff(weekdayTemplates.toSeq).map(em.persist(_))
+
           }
 
           Transactions {
@@ -92,26 +96,26 @@ object CExporter extends Controller {
           Transactions {
             implicit em =>
 
-             // val semesters = jsonContainer.getSubjects.map(_.getSemester).toSet
-            val courses = jsonContainer.getSubjects.flatMap(_.getCourses).toSet
-            courses.foreach{
-              course =>
-                val groups =course.getGroups.toSet
-                course.setGroups( groups.toList )
-              em.persist(course)}
+            // val semesters = jsonContainer.getSubjects.map(_.getSemester).toSet
+              val courses = jsonContainer.getSubjects.flatMap(_.getCourses).toSet
+              courses.foreach {
+                course =>
+                  val groups = course.getGroups.toSet
+                  course.setGroups(groups.toList)
+                  em.persist(course)
+              }
 
-             // semesters.foreach(em.persist(_))
+            // semesters.foreach(em.persist(_))
           }
 
           Transactions {
             implicit em =>
 
               val docents = jsonContainer.getSubjects.flatMap(_.getDocents).toSet
-            docents.foreach(em.persist(_))
+              docents.foreach(em.persist(_))
 
-            jsonContainer.getSubjects.foreach(em.persist(_))
+              jsonContainer.getSubjects.foreach(em.persist(_))
           }
-
 
 
       }

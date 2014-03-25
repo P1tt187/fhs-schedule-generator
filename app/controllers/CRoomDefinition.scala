@@ -87,15 +87,13 @@ object CRoomDefinition extends Controller {
   def submitRoom = Action {
     implicit request =>
 
+      //Logger.debug("submitRoom - " + request.body)
       val roomResult = roomDefForm.bindFromRequest
 
       roomResult.fold(
         errors => BadRequest(roomdefinition("Räume", errors, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms())),
         room => {
           Logger.info("submit room - " + room.timeCriterias.toString)
-
-
-
           val roomAttributes = room.attributes map MRoomdefintion.findOrCreateRoomAttribute
 
           val houseDO = MRoomdefintion.findOrCreateHouseEntityByName(room.house)

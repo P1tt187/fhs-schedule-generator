@@ -1,4 +1,5 @@
 @(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion], weekdays: Seq[(String, String)], existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay])
+
 @import models.fhs.pages.roomdefinition._
 @import models.persistence.enumerations.EDuration
 
@@ -60,7 +61,7 @@
                                             <div class='form-group span6'>
                                                 <label class="control-label" for="weekdays@criteriaFields.id">
                                                     Wochentage</label>
-                                                <select class="form-control" id="weekdays@criteriaFields.id" name="@(criteriaFields.id + "_weekdays[]")" multiple title="nichts Ausgewählt">
+                                                <select class="form-control" id="weekdays@criteriaFields.id" name="@(criteriaFields.name + ".weekdays[]")" multiple title="nichts Ausgewählt">
                                                 @for(dayname <- weekdays) {
                                                     <option class="" value="@dayname._1" @if(day._1.equals(dayname._1)) {selected }>@dayname._2 </option>
                                                 }
