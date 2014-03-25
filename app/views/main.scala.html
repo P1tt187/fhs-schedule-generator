@@ -46,8 +46,8 @@
                 </div>
             </nav>
             <div class="container-fluid" id="mainContainer">
-                <div class="row-fluid span1 hidden-sm hidden-xs">
-                    <div class="column col-md-2 ">
+                <div class="row-fluid">
+                    <div class="column col-xs-2 hidden-sm hidden-xs">
                         <nav class="collapse navbar-left navbar-collapse pull-left" role="navigation">
                             <ul class="nav navbar-pills nav-stacked" >
                                 <li class="@if(nav == controllers.CIndex.NAV) {active}"><a href="@routes.CIndex.index">
@@ -64,10 +64,7 @@
                             </ul>
                         </nav>
                     </div>
-                </div>
-
-                <div class="row-fluid span12 ">
-                    <div class="column col-md-9 ">
+                    <div class="column col-md-10 ">
                         <article class=" " role="main"> @content </article>
                     </div>
                 </div>
