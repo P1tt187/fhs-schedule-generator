@@ -55,3 +55,7 @@ body {
 label {
     display: block;
 }
+
+ul.nav li.dropdown:hover > ul.dropdown-submenu {
+    display: block;
+}

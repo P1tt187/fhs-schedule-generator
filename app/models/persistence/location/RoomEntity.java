@@ -54,7 +54,7 @@ public class RoomEntity extends AbstractEntity {
      * Attributes of this room
      */
     @Fetch(FetchMode.SUBSELECT)
-    @ManyToMany(targetEntity = RoomAttributesEntity.class, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.EAGER)
+    @ManyToMany(targetEntity = RoomAttributesEntity.class, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.MERGE}, fetch = FetchType.EAGER)
     @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@roomAttributesId")
     private List<RoomAttributesEntity> roomAttributes;
 
