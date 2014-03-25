@@ -1,5 +1,7 @@
 package models.persistence.criteria;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import models.persistence.AbstractEntity;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -20,6 +22,7 @@ public class CriteriaContainer extends AbstractEntity {
      */
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, targetEntity = AbstractCriteria.class, fetch = FetchType.EAGER)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class)
     private List<AbstractCriteria> criterias;
 
 

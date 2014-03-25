@@ -1,14 +1,14 @@
 package models.persistence.location;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import models.persistence.AbstractEntity;
 import models.persistence.criteria.CriteriaContainer;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -54,9 +54,9 @@ public class RoomEntity extends AbstractEntity {
      * Attributes of this room
      */
     @Fetch(FetchMode.SUBSELECT)
-    @ManyToMany(targetEntity = RoomAttributesEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonIgnore
-    private List<RoomAttributesEntity> roomAttributes = new LinkedList<>();
+    @ManyToMany(targetEntity = RoomAttributesEntity.class, cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.DETACH}, fetch = FetchType.EAGER)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@roomAttributesId")
+    private List<RoomAttributesEntity> roomAttributes;
 
     public List<RoomAttributesEntity> getRoomAttributes() {
         return roomAttributes;

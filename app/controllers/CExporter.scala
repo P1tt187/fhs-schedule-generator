@@ -4,7 +4,7 @@ import play.api.mvc._
 import views.html.exporter._
 import play.api.libs.json._
 import models.Transactions
-import models.persistence.location.HouseEntity
+import models.persistence.location.{RoomAttributesEntity, HouseEntity}
 import org.hibernate.FetchMode
 import models.fhs.pages.JavaList
 import models.persistence.subject.AbstractSubject
@@ -84,13 +84,19 @@ object CExporter extends Controller {
                     session.save(wt)
                   }
               }
-
-
           }
 
-          Transactions {
-            implicit em =>
-              jsonContainer.getHouses.foreach(em.persist(_))
+          Transactions.hibernateAction {
+            implicit session =>
+              jsonContainer.getHouses.foreach(_.getRooms.foreach(_.getRoomAttributes.foreach{
+                attr =>
+                  val dbResult = session.createCriteria(classOf[RoomAttributesEntity]).add(Restrictions.eq("attribute",attr.getAttribute)).uniqueResult()
+                  if(dbResult==null){
+                    session.save(attr)
+                  }
+              }  ))
+
+              jsonContainer.getHouses.foreach(session.save(_))
           }
 
           Transactions {

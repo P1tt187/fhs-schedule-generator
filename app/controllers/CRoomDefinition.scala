@@ -144,11 +144,11 @@ object CRoomDefinition extends Controller {
           Transactions {
             implicit entitiManager =>
 
-              if (roomDO.getId == null) {
+            /*  if (roomDO.getId == null) {
                 entitiManager.persist(roomDO)
-              } else {
+              } else {*/
                 entitiManager.merge(roomDO)
-              }
+              //}
           }
 
           Redirect(routes.CRoomDefinition.page)
