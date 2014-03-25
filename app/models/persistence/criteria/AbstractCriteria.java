@@ -1,6 +1,7 @@
 package models.persistence.criteria;
 
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import models.persistence.AbstractEntity;
 import models.persistence.enumerations.EPriority;
 
@@ -12,7 +13,8 @@ import javax.persistence.*;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "TBLCRITERIA")
-public abstract class AbstractCriteria extends AbstractEntity implements Comparable<AbstractCriteria>{
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+public abstract class AbstractCriteria extends AbstractEntity implements Comparable<AbstractCriteria> {
 
     /**
      * is the system allowed to use other possibilitys

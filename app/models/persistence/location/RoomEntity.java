@@ -1,11 +1,14 @@
 package models.persistence.location;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import models.persistence.AbstractEntity;
 import models.persistence.criteria.CriteriaContainer;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -35,6 +38,7 @@ public class RoomEntity extends AbstractEntity {
      */
     @ManyToOne
     @OrderColumn(name = "name")
+    @JsonBackReference("rooms")
     private HouseEntity house;
 
     public HouseEntity getHouse() {
@@ -51,7 +55,8 @@ public class RoomEntity extends AbstractEntity {
      */
     @Fetch(FetchMode.SUBSELECT)
     @ManyToMany(targetEntity = RoomAttributesEntity.class, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<RoomAttributesEntity> roomAttributes;
+    @JsonIgnore
+    private List<RoomAttributesEntity> roomAttributes = new LinkedList<>();
 
     public List<RoomAttributesEntity> getRoomAttributes() {
         return roomAttributes;

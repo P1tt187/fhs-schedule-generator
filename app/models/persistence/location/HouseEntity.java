@@ -1,5 +1,6 @@
 package models.persistence.location;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.persistence.AbstractEntity;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -17,6 +18,7 @@ public class HouseEntity extends AbstractEntity {
     @Column(name = "NAME")
     private String name;
 
+    @JsonManagedReference("rooms")
     @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)
     @Fetch(FetchMode.SUBSELECT)
     private List<RoomEntity> rooms;

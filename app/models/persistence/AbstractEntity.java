@@ -1,5 +1,7 @@
 package models.persistence;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 /**
@@ -16,6 +18,7 @@ public abstract class AbstractEntity {
      */
     @Version
     @Transient
+    @JsonIgnore
     private Long version = 1L;
 
     /**
@@ -24,7 +27,8 @@ public abstract class AbstractEntity {
     @Id
     @Column(name = "ID", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
-    protected Long id;
+    @JsonIgnore
+    private Long id;
 
 
     public Long getId() {

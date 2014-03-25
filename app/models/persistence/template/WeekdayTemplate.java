@@ -1,5 +1,6 @@
 package models.persistence.template;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import models.persistence.AbstractEntity;
 import play.data.validation.Constraints;
 
@@ -22,6 +23,7 @@ public class WeekdayTemplate extends AbstractEntity implements Comparable<Weekda
     @Column(name = "SORTINDEX")
     private Integer sortIndex;
 
+    @JsonManagedReference("timeslotTemplate")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent", fetch = FetchType.EAGER)
     private List<TimeslotTemplate> children;
 

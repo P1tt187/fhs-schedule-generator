@@ -49,11 +49,6 @@ object CRoomDefinition extends Controller {
 
     val rooms = MRoomdefintion.findAllRooms()
 
-    rooms map {
-      room =>
-        Logger.debug(room.toString)
-    }
-
     Ok(roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS, rooms))
   }
 
@@ -97,7 +92,7 @@ object CRoomDefinition extends Controller {
       roomResult.fold(
         errors => BadRequest(roomdefinition("Räume", errors, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms())),
         room => {
-          Logger.info(room.timeCriterias.toString)
+          Logger.info("submit room - " + room.timeCriterias.toString)
 
 
 

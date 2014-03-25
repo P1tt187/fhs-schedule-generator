@@ -1,5 +1,6 @@
 package models.persistence.template;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import models.persistence.AbstractEntity;
 
 import javax.persistence.Column;
@@ -18,6 +19,7 @@ public class TimeslotTemplate extends AbstractEntity implements Comparable<Times
      * the weekday
      */
     @ManyToOne
+    @JsonBackReference("timeslotTemplate")
     private WeekdayTemplate parent;
 
     /**

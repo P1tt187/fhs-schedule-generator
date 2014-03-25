@@ -1,5 +1,8 @@
 package models.persistence.subject;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import models.persistence.AbstractEntity;
 import models.persistence.Docent;
 import models.persistence.Semester;
@@ -19,6 +22,7 @@ import java.util.Set;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "TBLSUBJECT")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public abstract class AbstractSubject extends AbstractEntity {
 
     /**
@@ -42,7 +46,8 @@ public abstract class AbstractSubject extends AbstractEntity {
     /**
      * which semester is it
      */
-    @ManyToOne(targetEntity = Semester.class, optional = false, cascade = CascadeType.MERGE)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class)
+    @ManyToOne(targetEntity = Semester.class, optional = false, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private Semester semester;
 
     /**
@@ -61,12 +66,14 @@ public abstract class AbstractSubject extends AbstractEntity {
      */
     @Fetch(FetchMode.SUBSELECT)
     @ManyToMany(targetEntity = Course.class, fetch = FetchType.EAGER)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class)
     private Set<Course> courses;
 
 
     /**
      * criterias of this subject
      */
+    @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class)
     @ManyToOne(targetEntity = CriteriaContainer.class, cascade = CascadeType.ALL)
     private CriteriaContainer criteriaContainer;
 
@@ -115,6 +122,7 @@ public abstract class AbstractSubject extends AbstractEntity {
      */
     @Fetch(FetchMode.SUBSELECT)
     @ManyToMany(targetEntity = Docent.class, fetch = FetchType.EAGER)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class)
     private Set<Docent> docents;
 
     public Float getUnits() {

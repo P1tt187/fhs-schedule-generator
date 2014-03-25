@@ -1,5 +1,7 @@
 package models.persistence.participants;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -16,11 +18,12 @@ public class Course extends Participant {
     @Column(name = "FULLNAME", nullable = false)
     private String fullName;
 
-    @Column(name="SHORTNAME", nullable = false)
+    @Column(name = "SHORTNAME", nullable = false)
     private String shortName;
 
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, targetEntity = Group.class, fetch = FetchType.LAZY)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@course_group")
     private List<Group> groups;
 
     public String getFullName() {

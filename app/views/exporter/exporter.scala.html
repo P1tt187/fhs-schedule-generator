@@ -1,0 +1,19 @@
+@(message:String)
+
+@main(message,CExporter.NAV){
+<div class="page-header">
+    <h1>Daten Exportieren</h1>
+</div>
+
+    <a class="btn btn-primary" href="@routes.CExporter.export">Download</a>
+    <br />
+    <br />
+    @helper.form(action = routes.CExporter.uploadFile, 'enctype -> "multipart/form-data") {
+        <div class="form-group">
+            <input id="uploadBtn" class="btn btn-info " type="file" name="fileUpload" title="Datei Auswählen" accept="application/json, .json">
+        </div>
+        <div class="form-group">
+            <input class="btn btn-success" type="submit" value="Upload">
+        </div>
+    }
+}

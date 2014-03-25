@@ -1,5 +1,9 @@
 package models.persistence.participants;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -16,6 +20,7 @@ public class Group extends Participant {
     /**
      * parent group
      */
+    @JsonBackReference("subgroup")
     @ManyToOne(targetEntity = Group.class)
     private Group parent;
 
@@ -24,11 +29,13 @@ public class Group extends Participant {
      */
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "parent")
+    @JsonManagedReference("subgroup")
     private List<Group> subGroups;
 
     /**
      * parent course
      */
+    @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@group-course")
     @ManyToOne(targetEntity = Course.class)
     private Course course;
 
@@ -44,15 +51,6 @@ public class Group extends Participant {
 
     public void setParent(Group parent) {
         this.parent = parent;
-    }
-
-    /** find main course */
-    public Course getMainCourse() {
-        if (parent != null) {
-            return parent.getMainCourse();
-        } else {
-            return course;
-        }
     }
 
     public List<Group> getSubGroups() {
@@ -99,7 +97,7 @@ public class Group extends Participant {
 
         if (course != null ? !course.equals(group.course) : group.course != null) return false;
         if (groupType != null ? !groupType.equals(group.groupType) : group.groupType != null) return false;
-        if (parent != null ? !parent.equals(group.parent) : group.parent != null) return false;
+        //if (parent != null ? !parent.equals(group.parent) : group.parent != null) return false;
         if (subGroups != null ? !subGroups.equals(group.subGroups) : group.subGroups != null) return false;
 
         return true;
@@ -107,8 +105,7 @@ public class Group extends Participant {
 
     @Override
     public int hashCode() {
-        int result = parent != null ? parent.hashCode() : 0;
-        result = 31 * result + (subGroups != null ? subGroups.hashCode() : 0);
+        int result = 31 * (subGroups != null ? subGroups.hashCode() : 0);
         result = 31 * result + (course != null ? course.hashCode() : 0);
         result = 31 * result + (groupType != null ? groupType.hashCode() : 0);
         return result;

@@ -40,9 +40,6 @@
                         </div>
                     </fieldset>
                     <fieldset>
-                        <label for="addTcrit" class="control-label" >Eingeschränkte Verfügbarkeit </label>
-                        <button role="button" type="button" id="addTcrit" class="btn btn-warning btn-sm span1" ><span class="glyphicon glyphicon-plus"></span> </button>
-                        <button id="removeCritButton" role="button" type="button" class="btn btn-danger btn-sm span1" ><span class="glyphicon glyphicon-minus"></span> </button>
                         <div id="timeslotcrit" >
                         @repeat(roomDefForm("timeCriterias"), min = 0) { criteriaFields =>
                             <div class="panel panel-info container-fluid" id="@criteriaFields.id">
@@ -78,8 +75,12 @@
 
                                 </div>
                             </div>
+
                         }
                         </div>
+                        <label for="addTcrit" class="control-label" >Eingeschränkte Verfügbarkeit </label>
+                        <button role="button" type="button" id="addTcrit" class="btn btn-warning btn-sm span1" ><span class="glyphicon glyphicon-plus"></span> </button>
+                        <button id="removeCritButton" role="button" type="button" class="btn btn-danger btn-sm span1" ><span class="glyphicon glyphicon-minus"></span> </button>
                     </fieldset>
                     <fieldset style="margin-top : 1%">
                         <div class="form-group ">

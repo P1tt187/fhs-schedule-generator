@@ -1,5 +1,7 @@
 package models.persistence.criteria;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import models.persistence.enumerations.EDuration;
 import models.persistence.template.WeekdayTemplate;
 
@@ -46,7 +48,7 @@ public class TimeslotCriteria extends AbstractCriteria {
     @Column(name = "STOPMINUTE", nullable = false)
     private Integer stopMinute;
 
-
+    @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class)
     @ManyToOne(fetch = FetchType.EAGER, optional = false, targetEntity = WeekdayTemplate.class)
     private WeekdayTemplate weekday;
 
@@ -107,7 +109,7 @@ public class TimeslotCriteria extends AbstractCriteria {
 
         TimeslotCriteria that = (TimeslotCriteria) o;
 
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
         if (startHour != null ? !startHour.equals(that.startHour) : that.startHour != null) return false;
         if (startMinute != null ? !startMinute.equals(that.startMinute) : that.startMinute != null) return false;
         if (stopHour != null ? !stopHour.equals(that.stopHour) : that.stopHour != null) return false;
@@ -136,7 +138,7 @@ public class TimeslotCriteria extends AbstractCriteria {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (getId() != null ? getId().hashCode() : 0);
         result = 31 * result + (isTolerance() != null ? isTolerance().hashCode() : 0);
         result = 31 * result + (startHour != null ? startHour.hashCode() : 0);
         result = 31 * result + (startMinute != null ? startMinute.hashCode() : 0);
