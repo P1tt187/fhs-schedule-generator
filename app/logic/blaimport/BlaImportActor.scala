@@ -175,11 +175,7 @@ class BlaImportActor extends Actor {
       abstractSubject.setSemester(semester)
       Transactions {
         implicit entityManager =>
-          if (abstractSubject.getId == null) {
-            entityManager.persist(abstractSubject)
-          } else {
             entityManager.merge(abstractSubject)
-          }
       }
     }
 
