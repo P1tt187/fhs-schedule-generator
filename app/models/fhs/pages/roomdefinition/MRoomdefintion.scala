@@ -52,7 +52,7 @@ object MRoomdefintion {
         val attributes = room.getRoomAttributes.map(_.getAttribute).toList
         val criterias = room.getCriteriaContainer.getCriterias.map {
           case tcrit: TimeslotCriteria => MTtimeslotCritDefine(tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute, List(tcrit.getWeekday.getSortIndex), tcrit.getDuration.name)
-        }.toList
+        }.toList.sortBy(_.weekdays.sum)
         MRoomdefintion(Some(id), room.getCapacity, room.getHouse.getName, room.getNumber, attributes, criterias)
     }
   }
@@ -75,11 +75,11 @@ object MRoomdefintion {
         val timeslotCrit = element.getCriteriaContainer.getCriterias map {
           case tcrit: TimeslotCriteria => MTimeslotDisplay(tcrit.getId, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStartMinute, tcrit.getWeekday.getName, tcrit.getWeekday.getSortIndex, tcrit.getDuration)
         }
-        MRoomdisplay(element.getId, element.getCapacity, element.getHouse.getName, element.getNumber, element.getRoomAttributes.toList, timeslotCrit.toList)
+        MRoomdisplay(element.getId, element.getCapacity, element.getHouse.getName, element.getNumber, element.getRoomAttributes.toList, timeslotCrit.toList.sortBy(_.weekdayIndex))
     }.sortBy(_.house)
   }
 
-  def getWeekayTemplate(sortIndex: Int): WeekdayTemplate = {
+  def getWeekdayTemplate(sortIndex: Int): WeekdayTemplate = {
     val dbResult = MRoomdefintion.findWeekdayBySortIndex(sortIndex)
 
     if (dbResult == null) {

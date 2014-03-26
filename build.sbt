@@ -13,6 +13,6 @@ libraryDependencies ++= Seq(
   "uk.com.robust-it" % "cloning" % "1.9.0"
 )
 
-scalacOptions ++= Seq("-feature", "-language:postfixOps")
+scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitConversions")
 
 play.Project.playScalaSettings

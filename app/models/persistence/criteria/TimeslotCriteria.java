@@ -50,6 +50,7 @@ public class TimeslotCriteria extends AbstractCriteria {
 
     @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class)
     @ManyToOne(fetch = FetchType.EAGER, optional = false, targetEntity = WeekdayTemplate.class)
+    @OrderBy("sortIndex")
     private WeekdayTemplate weekday;
 
 

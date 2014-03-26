@@ -22,6 +22,7 @@ public class CriteriaContainer extends AbstractEntity {
      */
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, targetEntity = AbstractCriteria.class, fetch = FetchType.EAGER)
+    @OrderBy("priority, tolerance")
     @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class)
     private List<AbstractCriteria> criterias;
 

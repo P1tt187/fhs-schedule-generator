@@ -160,6 +160,7 @@
                     } ) ;
 
                     </script>
+                    <br />
                     <div id="subgroupContainer@group.getId" ></div>
                 </div>
             </div>
@@ -172,7 +173,6 @@
                 $.getJSON ( '  @routes.CEditCourses.getGroup(subgroup.getId) ',
                 function ( data ) {
                 $ ( '#subgroupContainer@group.getId ').append(data.htmlresult);
-                //$('#subgroupContainer  @group.getId ').addClass(' panel ').addClass(' panel - primary ');
                 } ) ;
             }
         }

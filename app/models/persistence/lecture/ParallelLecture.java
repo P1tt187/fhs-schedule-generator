@@ -1,17 +1,23 @@
 package models.persistence.lecture;
 
+import models.persistence.Docent;
+import models.persistence.location.RoomEntity;
+import models.persistence.participants.Participant;
+
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by fabian on 28.01.14.
  */
 @Entity
-@Table(name="TBLPARALLELLECTURE")
-public class ParallelLecture extends AbstractLecture{
+@Table(name = "TBLPARALLELLECTURE")
+public class ParallelLecture extends AbstractLecture {
 
-   // @JoinColumn(name = "fk_lecture")
-    @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER,targetEntity = Lecture.class)
+    // @JoinColumn(name = "fk_lecture")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Lecture.class)
     private List<Lecture> lectures;
 
     public List<Lecture> getLectures() {
@@ -20,6 +26,33 @@ public class ParallelLecture extends AbstractLecture{
 
     public void setLectures(List<Lecture> lectures) {
         this.lectures = lectures;
+    }
+
+    @Override
+    public Set<Docent> getDocents() {
+        return new HashSet<Docent>() {{
+            for (Lecture l : lectures) {
+                addAll(l.getDocents());
+            }
+        }};
+    }
+
+    @Override
+    public Set<Participant> getParticipants() {
+        return new HashSet<Participant>() {{
+            for (Lecture l : lectures) {
+                addAll(l.getParticipants());
+            }
+        }};
+    }
+
+    @Override
+    public Set<RoomEntity> getRooms() {
+        return new HashSet<RoomEntity>() {{
+            for (Lecture l : lectures) {
+                add(l.getRoom());
+            }
+        }};
     }
 
     @Override

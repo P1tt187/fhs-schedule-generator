@@ -129,7 +129,7 @@ object CRoomDefinition extends Controller {
               crit.weekdays foreach {
                 sortIndex =>
 
-                  val weekday = MRoomdefintion.getWeekayTemplate(sortIndex)
+                  val weekday = MRoomdefintion.getWeekdayTemplate(sortIndex)
 
                   val timeslotCriteria = new TimeslotCriteria(crit.startHour, crit.startMinutes, crit.stopHour, crit.stopMinutes, weekday, EDuration.valueOf(crit.duration))
                   timeslotCriteria.setPriority(EPriority.HIGH)

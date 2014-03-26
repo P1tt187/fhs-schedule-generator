@@ -9,6 +9,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -101,6 +102,11 @@ public class Lecture extends AbstractLecture {
 
     public void setDocents(Set<Docent> docent) {
         this.docents = docent;
+    }
+
+    @Override
+    public Set<RoomEntity> getRooms() {
+        return new HashSet<RoomEntity>(){{ add(room); }} ;
     }
 
     @Override
