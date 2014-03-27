@@ -21,11 +21,13 @@ public class Weekday extends Node implements Comparable<Weekday> {
     @Column(name = "SORTINDEX")
     private Integer sortIndex;
 
-    /** constructor for fields */
+    /**
+     * constructor for fields
+     */
     public Weekday(String name, int sortIndex) {
         this.name = name;
         this.sortIndex = sortIndex;
-        this.children = new LinkedList<>();
+        this.setChildren(new LinkedList<Node>());
     }
 
     /**
@@ -37,9 +39,11 @@ public class Weekday extends Node implements Comparable<Weekday> {
 
     @Override
     public String toString() {
-        return "Weekday{" +
-                "name='" + name + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("Weekday{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", sortIndex=").append(sortIndex);
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override
@@ -47,7 +51,6 @@ public class Weekday extends Node implements Comparable<Weekday> {
         if (that == null) throw new IllegalArgumentException("that must not be null");
         return sortIndex.compareTo(that.sortIndex);
     }
-
 
 
     public String getName() {

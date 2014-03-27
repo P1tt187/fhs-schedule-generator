@@ -1,6 +1,8 @@
 package models.persistence.scheduletree;
 
 import models.persistence.AbstractEntity;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.List;
@@ -25,8 +27,9 @@ public abstract class Node extends AbstractEntity {
     /**
      * each node has a list of children
      */
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
-    protected List<Node> children;
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent", fetch = FetchType.EAGER)
+    private List<Node> children;
 
     public Node getParent() {
         return parent;
@@ -48,7 +51,6 @@ public abstract class Node extends AbstractEntity {
     public String toString() {
         final StringBuffer sb = new StringBuffer(this.getClass().getSimpleName());
         sb.append("{");
-        sb.append("parent=").append(parent);
         sb.append(", children=").append(children);
         sb.append('}');
         return sb.toString();

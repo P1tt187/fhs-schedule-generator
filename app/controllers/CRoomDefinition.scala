@@ -113,7 +113,9 @@ object CRoomDefinition extends Controller {
                   }
 
               }
-
+              roomEntity.setCapacity(room.capacity)
+              roomEntity.setNumber(room.number)
+              roomEntity.setHouse(houseDO)
               roomEntity
           }
           Logger.debug("houseDO:" + houseDO)

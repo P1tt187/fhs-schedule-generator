@@ -88,6 +88,7 @@ public class WeekdayTemplate extends AbstractEntity implements Comparable<Weekda
         final StringBuffer sb = new StringBuffer("WeekdayTemplate{");
         sb.append("name='").append(name).append('\'');
         sb.append(", sortIndex=").append(sortIndex);
+        sb.append(", children=").append(children);
         sb.append('}');
         return sb.toString();
     }

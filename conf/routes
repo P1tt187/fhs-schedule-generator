@@ -36,7 +36,7 @@ GET         /generator                                                          
 POST        /generatorAction                                                                          controllers.CGenerate.generatorAction
 
 GET         /exportData                                                                               controllers.CExporter.page
-GET         /export.json                                                                              controllers.CExporter.export
+GET         /data.json                                                                                controllers.CExporter.export
 POST        /uploadJson                                                                               controllers.CExporter.uploadFile
 
 # Map static resources from the /public folder to the /assets URL path

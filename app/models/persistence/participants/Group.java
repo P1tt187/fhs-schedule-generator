@@ -61,6 +61,7 @@ public class Group extends Participant {
         this.subGroups = subGroups;
     }
 
+    @Override
     public Course getCourse() {
         return course;
     }

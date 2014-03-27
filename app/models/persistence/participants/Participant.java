@@ -1,5 +1,6 @@
 package models.persistence.participants;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import models.persistence.AbstractEntity;
 
@@ -27,5 +28,7 @@ public abstract class Participant extends AbstractEntity {
         this.size = size;
     }
 
+    @JsonIgnore
+    public abstract Course getCourse();
 
 }

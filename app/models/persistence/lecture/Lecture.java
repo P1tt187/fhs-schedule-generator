@@ -10,6 +10,7 @@ import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -55,6 +56,24 @@ public class Lecture extends AbstractLecture {
      */
     @ManyToOne(targetEntity = CriteriaContainer.class)
     private CriteriaContainer criteriaContainer;
+
+    /**
+     * same subject can have diffrent names in diffrent courses
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @MapKeyColumn(name = "COURSE")
+    @Column(name = "LECTURENAME")
+    @CollectionTable(name = "TBLLECTURE_SYNONYMS")
+    private Map<String, String> lectureSynonyms;
+
+    public Map<String, String> getLectureSynonyms() {
+        return lectureSynonyms;
+    }
+
+    public void setLectureSynonyms(Map<String, String> lectureSynonyms) {
+        this.lectureSynonyms = lectureSynonyms;
+    }
 
     public CriteriaContainer getCriteriaContainer() {
         return criteriaContainer;

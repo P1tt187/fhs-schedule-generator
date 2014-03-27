@@ -102,7 +102,6 @@ public class TimeslotTemplate extends AbstractEntity implements Comparable<Times
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("TimeslotTemplate{");
-        sb.append("parent=").append(parent);
         sb.append(", startHour=").append(startHour);
         sb.append(", startMinute=").append(startMinute);
         sb.append(", stopHour=").append(stopHour);

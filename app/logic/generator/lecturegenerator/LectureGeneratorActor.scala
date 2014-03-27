@@ -12,6 +12,7 @@ import models.Transactions
 import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
 import models.fhs.pages.JavaList
 import exceptions.NoGroupFoundException
+import scala.util.Random
 
 /**
  * @author fabian 
@@ -41,6 +42,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(lectureSubject.getName)
                 lecture.setCriteriaContainer(subject.getCriteriaContainer)
+                lecture.setLectureSynonyms(lectureSubject.getSubjectSynonyms)
                 lecture
               }
               for (i <- 1 to lectureSubject.getUnits.toInt) {
@@ -78,6 +80,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setCriteriaContainer(exerciseSubject.getCriteriaContainer)
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(exerciseSubject.getName)
+                lecture.setLectureSynonyms(exerciseSubject.getSubjectSynonyms)
                 lecture
               }
               if (multipleCourseGroups.size > 1) {
@@ -143,7 +146,7 @@ class LectureGeneratorActor extends Actor {
 
 
 
-      sender ! LectureAnswer(lectures)
+      sender ! LectureAnswer(Random.shuffle(lectures))
     case _ =>
   }
 

@@ -1,14 +1,14 @@
 package logic.generator.schedulegenerator
 
 import akka.actor.{Props, Actor}
-import models.persistence.Schedule
 import akka.util.Timeout
 import scala.concurrent.duration._
 import akka.pattern.ask
 import logic.generator.lecturegenerator.{LectureAnswer, GenerateLectures, LectureGeneratorActor}
 import scala.concurrent.Await
-import com.rits.cloning.Cloner
+import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
 import play.api.Logger
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
 /**
@@ -17,7 +17,7 @@ import play.api.Logger
  */
 class ScheduleGeneratorActor extends Actor {
 
-  private val cloner = new Cloner()
+  private val cloner = new Cloner(new ObjenesisInstantiationStrategy)
 
   val TIMEOUT_VAL = 10
 
@@ -37,9 +37,16 @@ class ScheduleGeneratorActor extends Actor {
 
       cloner.setCloningEnabled(true)
 
-      context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures))
+      val scheduleFuture = context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures))
 
-      sender() ! ScheduleAnswer(new Schedule)
+
+      scheduleFuture.onSuccess {
+        case ScheduleAnswer(schedule) => sender() ! ScheduleAnswer(schedule)
+        case _=>
+
+      }
+
+
     case _ =>
   }
 

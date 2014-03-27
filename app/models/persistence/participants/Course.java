@@ -51,6 +51,11 @@ public class Course extends Participant {
     }
 
     @Override
+    public Course getCourse() {
+        return this;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Course)) return false;
