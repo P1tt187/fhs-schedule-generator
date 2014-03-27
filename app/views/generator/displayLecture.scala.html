@@ -1,0 +1,16 @@
+@(lecture: models.persistence.lecture.Lecture)
+<div class="panel-heading"> @lecture.getName </div>
+<div class="panel-body">
+    <div>
+    @for(participant <- lecture.getParticipants) {
+        @participant.getName
+    }
+    </div>
+    <div>
+    @for(docent <- lecture.getDocents) {
+        @docent.getLastName
+    }
+    </div>
+    <div> @lecture.getRoom.getHouse.getName @lecture.getRoom.getNumber </div>
+    <div> @lecture.getDuration </div>
+</div>

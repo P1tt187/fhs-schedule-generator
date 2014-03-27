@@ -1,0 +1,38 @@
+@(timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.Timeslot])
+@import models.persistence.scheduletree.Weekday
+
+<div class="">
+    <table class="table table-bordered">
+        <thead>
+            <th class="text-info">Uhrzeit</th>
+            @for(day <- CTimeslotDefintion.WEEKDAYS) {
+                <th class="text-info text-center"> @day._2</th>
+            }
+        </thead>
+        <tbody>
+        @for(range <- timeRanges) {
+            <tr>
+                <td >
+                @range.toString
+                </td>
+                @for(day <- CTimeslotDefintion.WEEKDAYS) {
+                    <td>
+                    @for(slot <- timeslots.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex == day._1.toInt)) {
+                        @for(lecture <- slot.getLectures) {
+                            <small >
+                                <div class="col-xs-11">
+                                    <div class="panel panel-info" >
+                                    @displayAbstractLecture(lecture)
+                                    </div>
+                                </div>
+                            </small>
+
+                        }
+                    }
+                    </td>
+                }
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

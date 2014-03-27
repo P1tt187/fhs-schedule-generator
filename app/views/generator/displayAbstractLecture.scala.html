@@ -1,0 +1,10 @@
+@(abstractLecture: models.persistence.lecture.AbstractLecture)
+@import models.persistence.lecture.Lecture
+@import models.persistence.lecture.ParallelLecture
+
+@{
+    abstractLecture match {
+        case parallelLecture: ParallelLecture => displayParallelLecture(parallelLecture)
+        case lecture: Lecture => displayLecture(lecture)
+    }
+}

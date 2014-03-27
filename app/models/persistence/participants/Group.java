@@ -45,6 +45,11 @@ public class Group extends Participant {
     @Column(name = "TYPE")
     private String groupType;
 
+    @Override
+    public String getName() {
+        return course.getShortName() + " " + groupType;
+    }
+
     public Group getParent() {
         return parent;
     }

@@ -34,6 +34,8 @@ POST        /updateGroup                                                        
 
 GET         /generator                                                                                controllers.CGenerate.page()
 POST        /generatorAction                                                                          controllers.CGenerate.generatorAction
+GET         /generatorFinished                                                                        controllers.CGenerate.finished
+GET         /generatorGetSchedule                                                                     controllers.CGenerate.sendSchedule
 
 GET         /exportData                                                                               controllers.CExporter.page
 GET         /data.json                                                                                controllers.CExporter.export

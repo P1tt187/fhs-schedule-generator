@@ -1,0 +1,7 @@
+@(parallelLecutre:models.persistence.lecture.ParallelLecture)
+
+@for(lecture<- parallelLecutre.getLectures){
+    <div class="panel-warning">
+        @displayLecture(lecture)
+    </div>
+}

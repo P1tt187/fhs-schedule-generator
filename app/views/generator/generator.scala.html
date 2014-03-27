@@ -1,22 +1,78 @@
 @(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm])(implicit flash: Flash)
 
-@import helper._
-@import helper.twitterBootstrap._
+    @import helper._
+    @import helper.twitterBootstrap._
 
-@main(message, CGenerate.NAV) {
+    @main(message, CGenerate.NAV) {
 
-    <div class="page-header">
-        <h1>Stundenplan Generieren</h1>
-    </div>
-
-    @form(action = routes.CGenerate.generatorAction(), 'class -> "form-inline") {
-        @select(formGenerator("id"), semesters.toSeq.map(s => (s.getId.toString, s.getName)), '_label -> "Semester", '_help -> "", '_class -> "form-group")
-
-        <div class="clearfix"></div>
-        <div class="form-group">
-            <button class="btn btn-success form-control" role="button" type="submit">Generieren</button>
+        <div class="page-header">
+            <h1>Stundenplan Generieren</h1>
         </div>
+        <div class="row-fluid">
+            <div class="col-md-5">
+            @form(action = routes.CGenerate.generatorAction(), 'class -> "form-inline") {
+                @select(formGenerator("id"), semesters.toSeq.map(s => (s.getId.toString, s.getName)), '_label -> "Semester", '_help -> "", '_class -> "form-group")
+
+                <div class="clearfix"></div>
+                <div class="form-group">
+                    <button class="btn btn-success form-control" role="button" type="submit">Generieren</button>
+                </div>
+
+            }
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <br />
+        @if(flash.get("startpolling").getOrElse("false").toBoolean) {
+            <div class="row-fluid">
+                <div id="progressBarContainer" class="col-md-5">
+                    <div id="progressBar" class="progress progress-striped active">
+                        <div class="progress-bar progress-bar-warning " role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width : 100%">
+                            <span class="sr-only">100% Complete</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clearfix"> <br/> </div>
+            <div class="row-fluid">
+                <div class="col-md-10" id="scheduleTableContainer">
+
+                </div>
+            </div>
+
+            <script type="text/javascript">
+
+                var showSchedule = function(){
+                $.getJSON("@routes.CGenerate.sendSchedule" , function(data){
+                $('#scheduleTableContainer' ).append(data.htmlresult);
+            });
+                }
+
+            var changeProgressBar = function ( ) {
+            $ ( '.progress-bar' ).removeClass ( 'progress-bar-warning' ).addClass ( 'progress-bar-success' ) ;
+            } ;
+
+            var poll = function ( ) {
+
+            $.ajax ( "@routes.CGenerate.finished", {
+
+            dataType: "json",
+            success : function ( data ) {
+            if ( data.result == true ) {
+            changeProgressBar ( ) ;
+            showSchedule();
+            } else {
+            setTimeout ( poll, 2000 ) ;
+            }
+            }
+            } ) ;
+
+            };
+
+                poll();
+            </script>
+
+        }
 
     }
-
-}

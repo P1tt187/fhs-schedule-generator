@@ -51,6 +51,11 @@ public class Course extends Participant {
     }
 
     @Override
+    public String getName() {
+        return shortName;
+    }
+
+    @Override
     public Course getCourse() {
         return this;
     }

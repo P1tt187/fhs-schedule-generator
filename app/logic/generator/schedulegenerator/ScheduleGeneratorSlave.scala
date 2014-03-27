@@ -68,7 +68,6 @@ class ScheduleGeneratorSlave extends Actor {
 
       schedule.setRoot(root)
       Logger.debug("placed: " + placed + ", not placed: " + notPlaced + ", no room: " + noRoom)
-      Logger.debug("Schedule: " + schedule)
 
       sender() ! ScheduleAnswer(schedule)
 
