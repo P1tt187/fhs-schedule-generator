@@ -110,8 +110,8 @@ class ScheduleGeneratorSlave extends Actor {
         } else {
           existingParticipant match {
             case _: Course => false
-            case group: Group => // containsInParentGroup(group, participants) || containsInSubGroups(group, participants)
-              false
+            case group: Group =>  containsInParentGroup(group, participants) || containsInSubGroups(group, participants)
+
           }
         }
     }.forall(result => result)
