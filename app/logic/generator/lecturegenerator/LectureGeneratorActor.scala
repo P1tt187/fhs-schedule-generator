@@ -20,11 +20,14 @@ import scala.util.Random
  */
 class LectureGeneratorActor extends Actor {
 
+  private var addedLectures = 0
+  private var addedExercises = 0
+
   override def receive = {
 
     case GenerateLectures(subjects) =>
 
-      val lectures = subjects.flatMap {
+      val lectures = subjects.par.flatMap {
         subject =>
 
           val result = mutable.Buffer[Lecture]()
@@ -48,16 +51,18 @@ class LectureGeneratorActor extends Actor {
               for (i <- 1 to lectureSubject.getUnits.toInt) {
                 val lecture: Lecture = initLectureLecture
                 result += lecture
+                addedLectures += 1
               }
               if (isUnWeekly(lectureSubject)) {
                 val lecture = initLectureLecture
                 lecture.setDuration(EDuration.UNWEEKLY)
                 result += lecture
+                addedLectures += 1
               }
 
             case exerciseSubject: ExerciseSubject =>
 
-              val multipleCourseGroups = exerciseSubject.getCourses.par.map {
+              val multipleCourseGroups = exerciseSubject.getCourses.map {
                 course =>
                   Transactions.hibernateAction {
                     implicit session =>
@@ -67,8 +72,9 @@ class LectureGeneratorActor extends Actor {
                   }
               }.toList
 
-              if (multipleCourseGroups.isEmpty) {
-                val e = new NoGroupFoundException("No group found for type: " + exerciseSubject.getGroupType)
+
+              if (!multipleCourseGroups.map(_.isEmpty).forall(result => !result)) {
+                val e = new NoGroupFoundException("No group found for type: " + exerciseSubject.getGroupType + " " + exerciseSubject.getCourses.map(_.getShortName))
                 Logger.error("error", e)
                 throw e
               }
@@ -106,11 +112,13 @@ class LectureGeneratorActor extends Actor {
                     for (i <- 1 to exerciseSubject.getUnits.toInt) {
                       val lecture: Lecture = initExerciseLecture(groups)
                       result += lecture
+                      addedExercises += 1
                     }
                     if (isUnWeekly(exerciseSubject)) {
                       val lecture: Lecture = initExerciseLecture(groups)
                       lecture.setDuration(EDuration.UNWEEKLY)
                       result += lecture
+                      addedExercises += 1
                     }
                   }
                 }
@@ -142,9 +150,9 @@ class LectureGeneratorActor extends Actor {
               List()
           }
           result
-      }
+      }.toList
 
-
+      Logger.debug("lecture: " + addedExercises + " exercises: " + addedExercises)
 
       sender ! LectureAnswer(Random.shuffle(lectures))
     case _ =>

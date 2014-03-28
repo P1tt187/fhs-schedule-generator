@@ -31,6 +31,8 @@ class ScheduleGeneratorSlave extends Actor {
 
     case SlaveGenerate(lectures) =>
 
+      Logger.debug("number of lectures: " + lectures.size)
+
       val rooms = Transactions.hibernateAction {
         implicit session =>
           session.createCriteria(classOf[RoomEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[RoomEntity]].toList
