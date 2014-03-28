@@ -17,7 +17,7 @@ public abstract class Participant extends AbstractEntity {
 
 
     @Column(name = "SIZE", nullable = true)
-    protected Integer size;
+    private Integer size;
 
 
     public Integer getSize() {

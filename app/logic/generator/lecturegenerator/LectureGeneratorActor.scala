@@ -46,18 +46,18 @@ class LectureGeneratorActor extends Actor {
                 lecture.setName(lectureSubject.getName)
                 lecture.setCriteriaContainer(subject.getCriteriaContainer)
                 lecture.setLectureSynonyms(lectureSubject.getSubjectSynonyms)
+                addedLectures += 1
                 lecture
               }
               for (i <- 1 to lectureSubject.getUnits.toInt) {
                 val lecture: Lecture = initLectureLecture
                 result += lecture
-                addedLectures += 1
+
               }
               if (isUnWeekly(lectureSubject)) {
                 val lecture = initLectureLecture
                 lecture.setDuration(EDuration.UNWEEKLY)
                 result += lecture
-                addedLectures += 1
               }
 
             case exerciseSubject: ExerciseSubject =>
@@ -87,6 +87,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(exerciseSubject.getName)
                 lecture.setLectureSynonyms(exerciseSubject.getSubjectSynonyms)
+                addedExercises += 1
                 lecture
               }
               if (multipleCourseGroups.size > 1) {
@@ -112,13 +113,11 @@ class LectureGeneratorActor extends Actor {
                     for (i <- 1 to exerciseSubject.getUnits.toInt) {
                       val lecture: Lecture = initExerciseLecture(groups)
                       result += lecture
-                      addedExercises += 1
                     }
                     if (isUnWeekly(exerciseSubject)) {
                       val lecture: Lecture = initExerciseLecture(groups)
                       lecture.setDuration(EDuration.UNWEEKLY)
                       result += lecture
-                      addedExercises += 1
                     }
                   }
                 }
@@ -152,7 +151,7 @@ class LectureGeneratorActor extends Actor {
           result
       }.toList
 
-      Logger.debug("lecture: " + addedExercises + " exercises: " + addedExercises)
+      Logger.debug("lecture: " + addedLectures + " exercises: " + addedExercises)
 
       sender ! LectureAnswer(Random.shuffle(lectures))
     case _ =>

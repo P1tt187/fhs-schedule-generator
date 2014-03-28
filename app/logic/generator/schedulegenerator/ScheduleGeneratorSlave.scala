@@ -101,13 +101,13 @@ class ScheduleGeneratorSlave extends Actor {
     }
     timeslot.getLectures.flatMap(_.getParticipants).map {
       existingParticipant =>
+       // Logger.debug("participant " + existingParticipant.getName + " participants " + participants.map(_.getName) + " " + participants.contains(existingParticipant) + " " + participants.contains(existingParticipant.getCourse))
         if (participants.contains(existingParticipant) || participants.contains(existingParticipant.getCourse)) {
-          true
+         return true
         } else {
           existingParticipant match {
-            case _: Course => false
+            case _: Course => return false
             case group: Group =>  containsInParentGroup(group, participants) || containsInSubGroups(group, participants)
-
           }
         }
     }.forall(result => result)
@@ -140,7 +140,17 @@ class ScheduleGeneratorSlave extends Actor {
     if(timeslot.getLectures.isEmpty){
       return false
     }
-    timeslot.getLectures.flatMap(_.getDocents).map(docents.contains).forall(result => result)
+    val existingDocents = timeslot.getLectures.flatMap(_.getDocents)
+    var ret:Boolean = false
+    existingDocents.par.foreach{
+      existingDocent =>
+        if(docents.contains(existingDocent)){
+          ret=true
+        }
+    }
+
+    Logger.debug("existing docents " + existingDocents + " docents " + docents + " ret " +  ret)
+    ret
   }
 
   private implicit def weekdayTemplateList2WeekdayList(wl: List[WeekdayTemplate]): List[Weekday] = {

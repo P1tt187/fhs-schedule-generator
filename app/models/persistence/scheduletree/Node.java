@@ -51,7 +51,7 @@ public abstract class Node extends AbstractEntity {
     public String toString() {
         final StringBuffer sb = new StringBuffer(this.getClass().getSimpleName());
         sb.append("{");
-        sb.append(", children=").append(children);
+        sb.append("children=").append(children);
         sb.append('}');
         return sb.toString();
     }

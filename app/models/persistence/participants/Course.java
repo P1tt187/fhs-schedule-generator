@@ -63,11 +63,12 @@ public class Course extends Participant {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Course)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         Course course = (Course) o;
 
         if (fullName != null ? !fullName.equals(course.fullName) : course.fullName != null) return false;
+        if (groups != null ? !groups.equals(course.groups) : course.groups != null) return false;
         if (shortName != null ? !shortName.equals(course.shortName) : course.shortName != null) return false;
 
         return true;
@@ -77,16 +78,16 @@ public class Course extends Participant {
     public int hashCode() {
         int result = fullName != null ? fullName.hashCode() : 0;
         result = 31 * result + (shortName != null ? shortName.hashCode() : 0);
-        result = 31 * result + (size != null ? size.hashCode() : 0);
+        result = 31 * result + (groups != null ? groups.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "Course{" +
-                "fullName='" + fullName + '\'' +
-                ", shortName='" + shortName + '\'' +
-                ", size='" + size + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("Course{");
+        sb.append("fullName='").append(fullName).append('\'');
+        sb.append(", shortName='").append(shortName).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }
