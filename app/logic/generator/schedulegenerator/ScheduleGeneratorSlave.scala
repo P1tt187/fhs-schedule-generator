@@ -13,6 +13,7 @@ import models.persistence.participants.{Course, Group, Participant}
 import models.persistence.lecture.{Lecture, AbstractLecture}
 import play.api.Logger
 import scala.util.Random
+import scala.annotation.tailrec
 
 
 /**
@@ -73,7 +74,7 @@ class ScheduleGeneratorSlave extends Actor {
   }
 
 
-
+@tailrec
   private def initTimeslotAndRoom(lecture: Lecture, possibleTimeslots: List[Timeslot], rooms: List[RoomEntity]) {
     //TODO filter with room criterias
     possibleTimeslots.headOption match {
@@ -113,6 +114,7 @@ class ScheduleGeneratorSlave extends Actor {
     }.forall(result => result)
   }
 
+  @tailrec
   private def containsInParentGroup(group: Group, participants: Set[Participant]): Boolean = {
     if (group == null) {
       return false
@@ -149,7 +151,7 @@ class ScheduleGeneratorSlave extends Actor {
         }
     }
 
-    Logger.debug("existing docents " + existingDocents + " docents " + docents + " ret " +  ret)
+    //Logger.debug("existing docents " + existingDocents + " docents " + docents + " ret " +  ret)
     ret
   }
 
