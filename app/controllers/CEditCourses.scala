@@ -52,6 +52,7 @@ object CEditCourses extends Controller {
         val course = findCourse((jsVal \ "courseId").as[Long])
         val groupType = (jsVal \ "addGroupTypeName").as[String]
         val groupCount = (jsVal \ "addGroupCount").as[Int]
+        val numberOfExistingGroups = getGroupCount(groupType,course)
 
         val result = (1 to groupCount).map { i =>
           val group = new Group
@@ -60,6 +61,7 @@ object CEditCourses extends Controller {
           group.setCourse(course)
           group.setSize(course.getSize / groupCount)
           group.setSubGroups(List[Group]())
+          group.setGroupIndex(numberOfExistingGroups + i)
 
           if (i == groupCount) {
             group.setSize(course.getSize / groupCount + course.getSize % groupCount)
@@ -95,7 +97,7 @@ object CEditCourses extends Controller {
         val parent = findGroup((jsVal \ "groupId").as[Long])
         val groupType = (jsVal \ "addSubGroupTypeName").as[String]
         val groupCount = (jsVal \ "addSubGroupCount").as[Int]
-
+        val numberOfExistingGroups = getGroupCount(groupType,parent.getCourse)
 
        val result=  (1 to groupCount).map { i =>
           val group = new Group
@@ -104,6 +106,9 @@ object CEditCourses extends Controller {
           group.setCourse(parent.getCourse)
           group.setSize(parent.getSize / groupCount)
           group.setSubGroups(List[Group]())
+          group.setGroupIndex(i)
+
+         group.setGroupIndex(numberOfExistingGroups + i)
 
           if (i == groupCount) {
             group.setSize(parent.getSize / groupCount + parent.getSize % groupCount)

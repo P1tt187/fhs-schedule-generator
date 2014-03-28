@@ -1,4 +1,7 @@
 @(lecture: models.persistence.lecture.Lecture)
+
+@import models.persistence.enumerations.EDuration
+
 <div class="panel-heading"> @lecture.getName </div>
 <div class="panel-body">
     <div>
@@ -12,5 +15,12 @@
     }
     </div>
     <div> @lecture.getRoom.getHouse.getName @lecture.getRoom.getNumber </div>
-    <div> @lecture.getDuration </div>
+    <div> @{lecture.getDuration match {
+        case EDuration.EVEN => "g"
+        case EDuration.UNEVEN => "u"
+        case EDuration.WEEKLY => "w"
+        case other => other.name()
+    }
+
+    } </div>
 </div>

@@ -59,7 +59,7 @@ object MGenerator {
 }
 
 case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int) extends Ordered[Timeslot] {
-  override def toString = "" + startHour.formatted("%02d") + ":" + startMinute.formatted("%02d") + " - " + stopHour.formatted("%02d") + " : " + stopMinute.formatted("%02d")
+  override def toString = "" + startHour.formatted("%02d") + ":" + startMinute.formatted("%02d") + "-" + stopHour.formatted("%02d") + ":" + stopMinute.formatted("%02d")
 
   override def compare(that: Timeslot): Int = {
     if (startHour.compareTo(that.getStartHour) != 0) {

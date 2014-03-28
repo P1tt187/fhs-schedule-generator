@@ -41,8 +41,6 @@ class ScheduleGeneratorSlave extends Actor {
           session.createCriteria(classOf[WeekdayTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[WeekdayTemplate]].toList.sortBy(_.getSortIndex)
       }
 
-      //Logger debug weekdays.map("" + _.getChildren).foldLeft("")(_+_)
-
       val root = new Root
 
       root.setChildren(weekdays)
@@ -55,13 +53,10 @@ class ScheduleGeneratorSlave extends Actor {
               weekday.getChildren.toList.asInstanceOf[List[Timeslot]].filter {
                 //TODO filter with timecriterias
                 timeslot =>
-                  //Logger.debug("timeslot contains docent " + timeslotContainsDocents(timeslot, lecture.getDocents.toSet))
-
                   !timeslotContainsDocents(timeslot, lecture.getDocents.toSet) && !timeslotContainsParticipants(timeslot, lecture.getParticipants.toSet)
               }
           }
-         // Logger.debug("" + possibleTimeslots)
-          initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), rooms)
+          initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), rooms.filter(_.getCapacity >= lecture.getParticipants.map(_.getSize.toInt).sum))
       }
 
       val schedule = new Schedule
@@ -83,7 +78,7 @@ class ScheduleGeneratorSlave extends Actor {
       case None => Logger.warn("cannot place " + lecture + " no timeslots available")
         notPlaced += 1
       case Some(timeslot) =>
-        val possibleRooms = rooms.diff(timeslot.getLectures.flatMap(_.getRooms)).filter(_.getCapacity >= lecture.getParticipants.map(_.getSize.toInt).sum)
+        val possibleRooms = rooms.diff(timeslot.getLectures.flatMap(_.getRooms))
         if (possibleRooms.isEmpty) {
           Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture)
           noRoom+=1

@@ -45,9 +45,23 @@ public class Group extends Participant {
     @Column(name = "TYPE")
     private String groupType;
 
+    /**
+     * index of this group
+     */
+    @Column(name = "GROUPINDEX")
+    private Integer groupIndex;
+
+    public Integer getGroupIndex() {
+        return groupIndex;
+    }
+
+    public void setGroupIndex(Integer groupIndex) {
+        this.groupIndex = groupIndex;
+    }
+
     @Override
     public String getName() {
-        return course.getShortName() + " " + groupType;
+        return course.getShortName() + " " + groupIndex;
     }
 
     public Group getParent() {
@@ -85,13 +99,14 @@ public class Group extends Participant {
 
     @Override
     public String toString() {
-        return "Group{" +
-                "parent=" + (parent != null ? parent.getGroupType() : "null") +
-                ", subGroups=" + subGroups +
-                ", course=" + course +
-                ", groupType='" + groupType + '\'' +
-                ", size=" + getSize() +
-                '}';
+        final StringBuffer sb = new StringBuffer("Group{");
+        sb.append("parent=").append(parent != null ? parent.getGroupType() : null);
+        sb.append(", subGroups=").append(subGroups);
+        sb.append(", course=").append(course);
+        sb.append(", groupType='").append(groupType).append('\'');
+        sb.append(", groupIndex=").append(groupIndex);
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override
@@ -103,7 +118,7 @@ public class Group extends Participant {
 
         if (course != null ? !course.equals(group.course) : group.course != null) return false;
         if (groupType != null ? !groupType.equals(group.groupType) : group.groupType != null) return false;
-        //if (parent != null ? !parent.equals(group.parent) : group.parent != null) return false;
+        if (groupIndex != null ? !groupIndex.equals(group.groupIndex) : group.groupIndex != null) return false;
         if (subGroups != null ? !subGroups.equals(group.subGroups) : group.subGroups != null) return false;
 
         return true;
@@ -111,9 +126,10 @@ public class Group extends Participant {
 
     @Override
     public int hashCode() {
-        int result = 31 * (subGroups != null ? subGroups.hashCode() : 0);
+        int result = subGroups != null ? subGroups.hashCode() : 0;
         result = 31 * result + (course != null ? course.hashCode() : 0);
         result = 31 * result + (groupType != null ? groupType.hashCode() : 0);
+        result = 31 * result + (groupIndex != null ? groupIndex.hashCode() : 0);
         return result;
     }
 }

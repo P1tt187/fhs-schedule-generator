@@ -2,7 +2,7 @@ package models.fhs.pages.editcourses
 
 import models.Transactions
 import models.persistence.participants.{Group, Course}
-import org.hibernate.criterion.{Restrictions, Order}
+import org.hibernate.criterion.{Projections, Restrictions, Order}
 import scala.collection.JavaConversions._
 import org.hibernate.FetchMode
 
@@ -23,7 +23,7 @@ object MEditCourses {
   def findCourse(courseId: Long) = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).setFetchMode("groups",FetchMode.JOIN).uniqueResult().asInstanceOf[Course]
+        session.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).setFetchMode("groups", FetchMode.JOIN).uniqueResult().asInstanceOf[Course]
     }
   }
 
@@ -63,6 +63,16 @@ object MEditCourses {
         if (course != null) {
           session.saveOrUpdate(course)
         }
+    }
+  }
+
+  def getGroupCount(groupType:String, course:Course) = {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[Group]).
+          add(Restrictions.eq("course", course)).
+          add(Restrictions.eq("groupType", groupType)).
+          setProjection(Projections.rowCount()).uniqueResult().asInstanceOf[Long].toInt
     }
   }
 
