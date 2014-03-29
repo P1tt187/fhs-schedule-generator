@@ -9,11 +9,13 @@ import models.fhs.pages.JavaList
 import scala.collection.JavaConversions._
 import models.persistence.template.{TimeslotTemplate, WeekdayTemplate}
 import models.persistence.{Schedule, Docent}
-import models.persistence.participants.{Course, Group, Participant}
+import models.persistence.participants.{Group, Participant}
 import models.persistence.lecture.{Lecture, AbstractLecture}
 import play.api.Logger
 import scala.util.Random
 import scala.annotation.tailrec
+import scala.collection.mutable
+import models.persistence.enumerations.EDuration
 
 
 /**
@@ -26,7 +28,7 @@ class ScheduleGeneratorSlave extends Actor {
 
   private var notPlaced = 0
 
-  private var noRoom =0
+  private var noRoom = 0
 
   override def receive = {
 
@@ -50,15 +52,13 @@ class ScheduleGeneratorSlave extends Actor {
 
       lectures.foreach {
         lecture =>
-        //TODO filter weekdays
-          val possibleTimeslots = root.getChildren.flatMap {
-            weekday =>
-              weekday.getChildren.toList.asInstanceOf[List[Timeslot]].filter {
-                //TODO filter with timecriterias
-                timeslot =>
-                  !timeslotContainsDocents(timeslot, lecture.getDocents.toSet) && !timeslotContainsParticipants(timeslot, lecture.getParticipants.toSet)
-              }
+
+          if(lecture.getDuration == EDuration.WEEKLY){
+
           }
+
+        //TODO filter weekdays
+          val possibleTimeslots = findPossibleTimeslots(root, lecture)
           initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), rooms.filter(_.getCapacity >= lecture.getParticipants.map(_.getSize.toInt).sum))
       }
 
@@ -74,7 +74,18 @@ class ScheduleGeneratorSlave extends Actor {
   }
 
 
-@tailrec
+  private def findPossibleTimeslots(root: Root, lecture: AbstractLecture)= {
+     root.getChildren.flatMap {
+      weekday =>
+        weekday.getChildren.toList.asInstanceOf[List[Timeslot]].filter {
+          //TODO filter with timecriterias
+          timeslot =>
+            !timeslotContainsDocents(timeslot, lecture.getDocents.toSet) && !timeslotContainsParticipants(timeslot, lecture.getParticipants.toSet)
+        }
+    }
+  }
+
+  @tailrec
   private def initTimeslotAndRoom(lecture: Lecture, possibleTimeslots: List[Timeslot], rooms: List[RoomEntity]) {
     //TODO filter with room criterias
     possibleTimeslots.headOption match {
@@ -84,7 +95,7 @@ class ScheduleGeneratorSlave extends Actor {
         val possibleRooms = rooms.diff(timeslot.getLectures.flatMap(_.getRooms))
         if (possibleRooms.isEmpty) {
           Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture)
-          noRoom+=1
+          noRoom += 1
           initTimeslotAndRoom(lecture, possibleTimeslots.tail, rooms)
         } else {
           lecture.setRoom(possibleRooms.head)
@@ -97,62 +108,77 @@ class ScheduleGeneratorSlave extends Actor {
   }
 
   private def timeslotContainsParticipants(timeslot: Timeslot, participants: Set[Participant]): Boolean = {
-    if(timeslot.getLectures.isEmpty){
+    if (timeslot.getLectures.isEmpty) {
       return false
     }
-    timeslot.getLectures.flatMap(_.getParticipants).map {
-      existingParticipant =>
-       // Logger.debug("participant " + existingParticipant.getName + " participants " + participants.map(_.getName) + " " + participants.contains(existingParticipant) + " " + participants.contains(existingParticipant.getCourse))
-        if (participants.contains(existingParticipant) || participants.contains(existingParticipant.getCourse)) {
-         return true
-        } else {
-          existingParticipant match {
-            case _: Course => return false
-            case group: Group =>  containsInParentGroup(group, participants) || containsInSubGroups(group, participants)
+
+    @tailrec
+    def checkRecursive(existingParticipant: mutable.Buffer[Participant], lectureParticipant: Set[Participant]): Boolean = {
+      if (lectureParticipant.isEmpty) {
+        return false
+      }
+      if (existingParticipant.contains(lectureParticipant.head) || existingParticipant.contains(lectureParticipant.head.getCourse)) {
+        return true
+      }
+      lectureParticipant.head match {
+        case group: Group =>
+          val existingGroups = existingParticipant.filter(_.isInstanceOf[Group])
+
+          if (containsInParentGroup(group, existingGroups) || containsInSubGroups(group, existingGroups)) {
+            return true
           }
-        }
-    }.forall(result => result)
+        case _ =>
+      }
+
+      checkRecursive(existingParticipant, lectureParticipant.tail)
+    }
+
+    checkRecursive(timeslot.getLectures.flatMap(_.getParticipants), participants)
   }
 
   @tailrec
-  private def containsInParentGroup(group: Group, participants: Set[Participant]): Boolean = {
+  private def containsInParentGroup(group: Group, participants: mutable.Buffer[Participant]): Boolean = {
     if (group == null) {
       return false
     }
 
-    if (participants.forall(!group.equals(_))) {
-      containsInParentGroup(group.getParent, participants)
-    } else {
-      true
+    if (participants.contains(group)) {
+      return true
     }
+    containsInParentGroup(group.getParent, participants)
   }
 
-  private def containsInSubGroups(group: Group, participants: Set[Participant]): Boolean = {
+  private def containsInSubGroups(group: Group, participants: mutable.Buffer[Participant]): Boolean = {
     if (group.getSubGroups == null || group.getSubGroups.isEmpty) {
       return false
     }
-    if (participants.forall(!group.equals(_))) {
-      group.getSubGroups.forall(containsInSubGroups(_, participants))
-    } else {
-      true
+    if(participants.contains(group)){
+      return true
     }
+
+    group.getSubGroups.filter(subgroup => containsInSubGroups(subgroup,participants)).isEmpty
   }
 
   private def timeslotContainsDocents(timeslot: Timeslot, docents: Set[Docent]): Boolean = {
-    if(timeslot.getLectures.isEmpty){
+    if (timeslot.getLectures.isEmpty) {
       return false
     }
-    val existingDocents = timeslot.getLectures.flatMap(_.getDocents)
-    var ret:Boolean = false
-    existingDocents.par.foreach{
-      existingDocent =>
-        if(docents.contains(existingDocent)){
-          ret=true
-        }
+
+    @tailrec
+    def checkRecursive(docents: Set[Docent], existingDocents: mutable.Buffer[Docent]): Boolean = {
+      if (existingDocents.isEmpty) {
+        return false
+      }
+      if (docents.contains(existingDocents.head)) {
+        return true
+      }
+      checkRecursive(docents, existingDocents.tail)
     }
 
-    //Logger.debug("existing docents " + existingDocents + " docents " + docents + " ret " +  ret)
-    ret
+    val existingDocents = timeslot.getLectures.flatMap(_.getDocents)
+
+    checkRecursive(docents, existingDocents)
+
   }
 
   private implicit def weekdayTemplateList2WeekdayList(wl: List[WeekdayTemplate]): List[Weekday] = {
