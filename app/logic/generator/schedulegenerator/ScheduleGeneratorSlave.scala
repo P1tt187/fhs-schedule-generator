@@ -9,8 +9,8 @@ import models.fhs.pages.JavaList
 import scala.collection.JavaConversions._
 import models.persistence.template.{TimeslotTemplate, WeekdayTemplate}
 import models.persistence.{Schedule, Docent}
-import models.persistence.participants.{Group, Participant}
-import models.persistence.lecture.{Lecture, AbstractLecture}
+import models.persistence.participants.{Course, Group, Participant}
+import models.persistence.lecture.{ParallelLecture, Lecture, AbstractLecture}
 import play.api.Logger
 import scala.util.Random
 import scala.annotation.tailrec
@@ -53,13 +53,52 @@ class ScheduleGeneratorSlave extends Actor {
       lectures.foreach {
         lecture =>
 
-          if(lecture.getDuration == EDuration.WEEKLY){
+          if (lecture.getDuration == EDuration.UNWEEKLY) {
+            val parallelLectures = root.getChildren.flatMap(_.getChildren.flatMap {
+              case slot: Timeslot => slot.getLectures.filter {
+                theLecture =>
+                  theLecture.isInstanceOf[ParallelLecture] && lecture.getParticipants.containsAll(theLecture.getParticipants)
+              }
+                .asInstanceOf[mutable.Buffer[ParallelLecture]]
+            })
 
+           // Logger.debug("parallel lectures: " + parallelLectures.flatMap(_.getLectures.map(_.getName)))
+
+            def createParralelLecture() {
+              val parallelLecture = new ParallelLecture
+              parallelLecture.setLectures(List(lecture))
+              lecture.setDuration(EDuration.EVEN)
+              val possibleTimeslots = findPossibleTimeslots(root, parallelLecture)
+              initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), rooms.filter(_.getCapacity >= lecture.getParticipants.map(_.getSize.toInt).sum)) match {
+                case Some(timeslot) =>
+                  timeslot.setLectures(timeslot.getLectures :+ parallelLecture)
+                case None =>
+              }
+            }
+            if (parallelLectures.isEmpty) {
+              createParralelLecture()
+            } else {
+              val existingParallelLectures = parallelLectures.filter(_.getLectures.size() == 1)
+              if (existingParallelLectures.isEmpty) {
+                createParralelLecture()
+              } else {
+                val existingLecture = existingParallelLectures.head
+                lecture.setDuration(EDuration.UNEVEN)
+                lecture.setRoom(existingLecture.getLectures.head.getRoom)
+                existingLecture.setLectures(existingLecture.getLectures :+ lecture)
+                placed+=1
+              }
+            }
+
+          } else {
+
+            //TODO filter weekdays
+            val possibleTimeslots = findPossibleTimeslots(root, lecture)
+            initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), rooms.filter(_.getCapacity >= lecture.getParticipants.map(_.getSize.toInt).sum)) match {
+              case Some(timeslot) => timeslot.setLectures(timeslot.getLectures :+ lecture)
+              case None =>
+            }
           }
-
-        //TODO filter weekdays
-          val possibleTimeslots = findPossibleTimeslots(root, lecture)
-          initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), rooms.filter(_.getCapacity >= lecture.getParticipants.map(_.getSize.toInt).sum))
       }
 
       val schedule = new Schedule
@@ -74,8 +113,8 @@ class ScheduleGeneratorSlave extends Actor {
   }
 
 
-  private def findPossibleTimeslots(root: Root, lecture: AbstractLecture)= {
-     root.getChildren.flatMap {
+  private def findPossibleTimeslots(root: Root, lecture: AbstractLecture) = {
+    root.getChildren.flatMap {
       weekday =>
         weekday.getChildren.toList.asInstanceOf[List[Timeslot]].filter {
           //TODO filter with timecriterias
@@ -86,21 +125,22 @@ class ScheduleGeneratorSlave extends Actor {
   }
 
   @tailrec
-  private def initTimeslotAndRoom(lecture: Lecture, possibleTimeslots: List[Timeslot], rooms: List[RoomEntity]) {
+  private def initTimeslotAndRoom(lecture: Lecture, possibleTimeslots: List[Timeslot], rooms: List[RoomEntity]): Option[Timeslot] = {
     //TODO filter with room criterias
     possibleTimeslots.headOption match {
       case None => Logger.warn("cannot place " + lecture + " no timeslots available")
         notPlaced += 1
+        None
       case Some(timeslot) =>
-        val possibleRooms = rooms.diff(timeslot.getLectures.flatMap(_.getRooms))
+        val possibleRooms = rooms.diff(timeslot.getLectures.flatMap(_.getRooms)).sortBy(_.getCapacity)
         if (possibleRooms.isEmpty) {
           Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture)
           noRoom += 1
           initTimeslotAndRoom(lecture, possibleTimeslots.tail, rooms)
         } else {
           lecture.setRoom(possibleRooms.head)
-          timeslot.setLectures(timeslot.getLectures :+ lecture)
           placed += 1
+          Some(timeslot)
         }
 
 
@@ -127,7 +167,9 @@ class ScheduleGeneratorSlave extends Actor {
           if (containsInParentGroup(group, existingGroups) || containsInSubGroups(group, existingGroups)) {
             return true
           }
-        case _ =>
+        case course: Course => if (!existingParticipant.filter(_.getCourse.equals(course)).isEmpty) {
+          return true
+        }
       }
 
       checkRecursive(existingParticipant, lectureParticipant.tail)
@@ -152,11 +194,11 @@ class ScheduleGeneratorSlave extends Actor {
     if (group.getSubGroups == null || group.getSubGroups.isEmpty) {
       return false
     }
-    if(participants.contains(group)){
+    if (participants.contains(group)) {
       return true
     }
 
-    group.getSubGroups.filter(subgroup => containsInSubGroups(subgroup,participants)).isEmpty
+    !group.getSubGroups.filter(subgroup => containsInSubGroups(subgroup, participants)).isEmpty
   }
 
   private def timeslotContainsDocents(timeslot: Timeslot, docents: Set[Docent]): Boolean = {

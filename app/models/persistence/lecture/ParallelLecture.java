@@ -73,4 +73,12 @@ public class ParallelLecture extends AbstractLecture {
         result = 31 * result + (lectures != null ? lectures.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ParallelLecture{");
+        sb.append("lectures=").append(lectures);
+        sb.append('}');
+        return sb.toString();
+    }
 }

@@ -68,7 +68,6 @@ public class Course extends Participant {
         Course course = (Course) o;
 
         if (fullName != null ? !fullName.equals(course.fullName) : course.fullName != null) return false;
-        if (groups != null ? !groups.equals(course.groups) : course.groups != null) return false;
         if (shortName != null ? !shortName.equals(course.shortName) : course.shortName != null) return false;
 
         return true;
@@ -78,7 +77,6 @@ public class Course extends Participant {
     public int hashCode() {
         int result = fullName != null ? fullName.hashCode() : 0;
         result = 31 * result + (shortName != null ? shortName.hashCode() : 0);
-        result = 31 * result + (groups != null ? groups.hashCode() : 0);
         return result;
     }
 
