@@ -2,7 +2,7 @@
 
 @import models.persistence.enumerations.EDuration
 
-<div class="panel-heading "> @lecture.getName </div>
+
 <div class="panel-body @{
     lecture.getDuration match {
         case EDuration.EVEN => "bg-danger"
@@ -11,6 +11,7 @@
         case other => other.name()
     }
 }">
+    <div > <strong>  @lecture.getName </strong></div>
     <div>
     @for(participant <- lecture.getParticipants) {
         @participant.getName

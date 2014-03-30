@@ -90,59 +90,24 @@ class LectureGeneratorActor extends Actor {
                 addedExercises += 1
                 lecture
               }
-              if (multipleCourseGroups.size > 1) {
 
-                def checkIfGroupSizeMatch: Boolean = {
-                  multipleCourseGroups.map(_.size).toSet.size == 1
-                }
-
-
-                if (!checkIfGroupSizeMatch) {
-
-                  multipleCourseGroups.foreach {
-                    groups =>
-                      groups.foreach {
-                        group =>
-                          initSingleGroup(group)
-                      }
-                  }
-
-                } else {
-                  for (groupIndex <- 0 to multipleCourseGroups(0).size - 1) {
-                    val groups = multipleCourseGroups.map(_(groupIndex))
-                    for (i <- 1 to exerciseSubject.getUnits.toInt) {
-                      val lecture: Lecture = initExerciseLecture(groups)
-                      result += lecture
-                    }
-                    if (isUnWeekly(exerciseSubject)) {
-                      val lecture: Lecture = initExerciseLecture(groups)
-                      lecture.setDuration(EDuration.UNWEEKLY)
-                      result += lecture
-                    }
-                  }
-                }
-              }
-              def initSingleGroup(group: Group): Any = {
+              for (groupIndex <- 0 to multipleCourseGroups(0).size - 1) {
+                val groups = multipleCourseGroups.map(_.lift(groupIndex)).map {
+                  case Some(group) => group
+                  case None => null
+                }.filter(_ != null)
+                //Logger.debug("groups - " + multipleCourseGroups.map(_.lift(groupIndex)))
                 for (i <- 1 to exerciseSubject.getUnits.toInt) {
-                  val lecture = initExerciseLecture(List(group))
+                  val lecture: Lecture = initExerciseLecture(groups)
                   result += lecture
                 }
-
                 if (isUnWeekly(exerciseSubject)) {
-                  val lecture = initExerciseLecture(List(group))
+                  val lecture: Lecture = initExerciseLecture(groups)
                   lecture.setDuration(EDuration.UNWEEKLY)
                   result += lecture
                 }
               }
-              if (multipleCourseGroups.size == 1) {
 
-                multipleCourseGroups(0).foreach {
-                  group =>
-                    initSingleGroup(group)
-
-                }
-
-              }
 
             case anyOther =>
               Logger.warn("No rule for class " + anyOther.getClass.getName)
