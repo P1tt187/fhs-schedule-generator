@@ -91,7 +91,7 @@ class LectureGeneratorActor extends Actor {
                 lecture
               }
 
-              for (groupIndex <- 0 to multipleCourseGroups(0).size - 1) {
+              for (groupIndex <- 0 to multipleCourseGroups.map(_.size).max - 1) {
                 val groups = multipleCourseGroups.map(_.lift(groupIndex)).map {
                   case Some(group) => group
                   case None => null
@@ -107,7 +107,6 @@ class LectureGeneratorActor extends Actor {
                   result += lecture
                 }
               }
-
 
             case anyOther =>
               Logger.warn("No rule for class " + anyOther.getClass.getName)
