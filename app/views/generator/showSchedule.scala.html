@@ -1,33 +1,36 @@
-@(timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.Timeslot])
+@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.Timeslot])
 
 @import models.fhs.pages.generator.TimeRange
 @import models.persistence.scheduletree.Weekday
 
+<div class="page-header">
+    <h1>@title</h1>
+</div>
 
 <div class="table-responsive">
     <table class="table table-bordered">
         <thead>
-            <th class="text-info">Uhrzeit</th>
+            <th class="text-info text-center" >Uhrzeit</th>
             @for(day <- CTimeslotDefintion.WEEKDAYS) {
-                <th class="text-info text-center"> @day._2</th>
+                <th class="text-info text-center" > @day._2</th>
             }
         </thead>
         <tbody>
         @for(range <- timeRanges.sorted(TimeRange)) {
             <tr>
-                <td class="text-center" style=" vertical-align: middle;width: 8%;" >
+                <td class="text-center" style=" vertical-align : middle ; width : 8% ;" >
                 @range.toString
                 </td>
                 @for(day <- CTimeslotDefintion.WEEKDAYS) {
                     <td>
-                    @for(slot <- timeslots.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex == day._1.toInt)) {
+                       @* @timeslots.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex == day._1.toInt).map(_.getLectures) *@
+                    @for(slot <- timeslots.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt)) {
                         @for(lecture <- slot.getLectures) {
-                            <small >
-                                <div class="panel panel-info" >
-                                @displayAbstractLecture(lecture)
-                                </div>
-                            </small>
+                            <div class="panel panel-info smallText" >
+                            @displayAbstractLecture(lecture)
+                            </div>
                         }
+
                     }
                     </td>
                 }

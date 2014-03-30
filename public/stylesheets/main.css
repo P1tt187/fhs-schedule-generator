@@ -59,3 +59,7 @@ label {
 ul.nav li.dropdown:hover > ul.dropdown-submenu {
     display: block;
 }
+
+.smallText {
+    font-size: 11px;
+}

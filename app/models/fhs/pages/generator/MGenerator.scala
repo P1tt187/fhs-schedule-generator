@@ -3,12 +3,13 @@ package models.fhs.pages.generator
 import models.Transactions
 import org.hibernate.criterion.{Restrictions, CriteriaSpecification, Order}
 import scala.collection.JavaConversions._
-import models.persistence.Semester
+import models.persistence.{Schedule, Semester}
 import models.persistence.subject.AbstractSubject
 import models.fhs.pages.JavaList
 import models.persistence.template.TimeslotTemplate
 import scala.annotation.tailrec
-import models.persistence.scheduletree.Timeslot
+import models.persistence.scheduletree.{Weekday, Timeslot}
+import models.persistence.participants.Course
 
 
 /**
@@ -16,6 +17,19 @@ import models.persistence.scheduletree.Timeslot
  *         on 20.03.14.
  */
 object MGenerator {
+
+  def filterScheduleWithCourses(schedule:Schedule)={
+    val courses = Transactions.hibernateAction{
+      implicit session=>
+        session.createCriteria(classOf[Course]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[Course]]
+    }
+
+    courses.map(course=> (course.getShortName,collectTimeslotsFromSchedule( schedule.filter(course))))
+  }
+
+  def collectTimeslotsFromSchedule(schedule:Schedule)={
+    schedule.getRoot.getChildren.asInstanceOf[JavaList[Weekday]].flatMap(_.getChildren.asInstanceOf[JavaList[Timeslot]]).toList.sorted
+  }
 
   def findActiveSubjectsBySemesterId(id: Long) = {
     Transactions.hibernateAction {

@@ -20,7 +20,7 @@ import akka.pattern.ask
 import models.persistence.Schedule
 import play.api.Logger
 import models.fhs.pages.JavaList
-import models.persistence.scheduletree.{Timeslot, Weekday}
+import models.persistence.scheduletree.Timeslot
 import scala.collection.JavaConversions._
 import models.Transactions
 import models.persistence.template.TimeslotTemplate
@@ -62,14 +62,25 @@ object CGenerate extends Controller {
     Ok(sb.toString())
   }
 
+
+
+
+
   def sendSchedule = Action{
-    val timeslots = if(schedule==null) {List[Timeslot]()} else {schedule.getRoot.getChildren.asInstanceOf[JavaList[Weekday]].flatMap(_.getChildren.asInstanceOf[JavaList[Timeslot]]).toList.sorted}
+    val timeslotsAll = if(schedule==null) {List[Timeslot]()} else {collectTimeslotsFromSchedule(schedule)}
     val timeslotTemplates = Transactions.hibernateAction{
       implicit session =>
         session.createCriteria(classOf[TimeslotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeslotTemplate]].toList.sorted
     }
 
-    Ok(Json.stringify(Json.obj("htmlresult"-> showSchedule(findTimeRanges(timeslotTemplates,List[TimeRange]()) ,timeslots).toString())))
+    val timeRanges = findTimeRanges(timeslotTemplates,List[TimeRange]())
+
+     val filteredPages = filterScheduleWithCourses(schedule).sortBy(_._1).map{
+       case (title,timeslots)=>
+         showSchedule(title, timeRanges ,timeslots).toString()
+     }.foldLeft("")(_ + _)
+
+    Ok(Json.stringify(Json.obj("htmlresult"-> (showSchedule("Alle Kurse",timeRanges ,timeslotsAll).toString() + filteredPages))))
   }
 
   def generatorAction = Action {
