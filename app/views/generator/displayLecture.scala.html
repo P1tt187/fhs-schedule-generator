@@ -5,7 +5,7 @@
 
 <div class="panel-body @{
     lecture.getDuration match {
-        case EDuration.EVEN => "bg-danger"
+        case EDuration.EVEN => "bg-warning"
         case EDuration.UNEVEN => "bg-primary"
         case EDuration.WEEKLY => "bg-info"
         case other => other.name()
