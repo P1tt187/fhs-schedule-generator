@@ -119,7 +119,8 @@ public class Group extends Participant {
         if (course != null ? !course.equals(group.course) : group.course != null) return false;
         if (groupType != null ? !groupType.equals(group.groupType) : group.groupType != null) return false;
         if (groupIndex != null ? !groupIndex.equals(group.groupIndex) : group.groupIndex != null) return false;
-        if (subGroups != null ? !subGroups.equals(group.subGroups) : group.subGroups != null) return false;
+        if (subGroups != null ? !(subGroups.containsAll(group.subGroups) && subGroups.size() == group.subGroups.size()) : group.subGroups != null)
+            return false;
 
         return true;
     }
@@ -130,6 +131,12 @@ public class Group extends Participant {
         result = 31 * result + (course != null ? course.hashCode() : 0);
         result = 31 * result + (groupType != null ? groupType.hashCode() : 0);
         result = 31 * result + (groupIndex != null ? groupIndex.hashCode() : 0);
+
+        if (subGroups != null) {
+            for (Group subGroup : subGroups) {
+                result = 31 * result + subGroup.hashCode();
+            }
+        }
         return result;
     }
 }

@@ -58,7 +58,27 @@ object MGenerator {
 
 }
 
-case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int) extends Ordered[Timeslot] {
+object TimeRange extends Ordering[TimeRange] {
+  override def compare(range:TimeRange, that : TimeRange):Int ={
+    if (range.startHour.compareTo(that.startHour) != 0) {
+      return range.startHour.compareTo(that.startHour)
+    }
+    if (range.startMinute.compareTo(that.startMinute) != 0) {
+      return range.startMinute.compareTo(that.startMinute)
+    }
+    if (range.stopHour.compareTo(that.stopHour) != 0) {
+      return range.stopHour.compareTo(that.stopHour)
+    }
+
+    range.stopMinute.compareTo(that.stopMinute)
+  }
+
+}
+
+case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)    extends  Ordered[Timeslot] {
+
+
+
   override def toString = "" + startHour.formatted("%02d") + ":" + startMinute.formatted("%02d") + "-" + stopHour.formatted("%02d") + ":" + stopMinute.formatted("%02d")
 
   override def compare(that: Timeslot): Int = {
@@ -74,6 +94,8 @@ case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute
 
     stopMinute.compareTo(that.getStopMinute)
   }
+
+
 }
 
 case class GeneratorForm(id: Long)

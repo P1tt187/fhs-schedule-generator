@@ -57,12 +57,20 @@ class ScheduleGeneratorSlave extends Actor {
             val parallelLectures = root.getChildren.flatMap(_.getChildren.flatMap {
               case slot: Timeslot => slot.getLectures.filter {
                 theLecture =>
-                  theLecture.isInstanceOf[ParallelLecture] && lecture.getParticipants.containsAll(theLecture.getParticipants)
+
+                  val theLectureCourses = theLecture.getParticipants.map(_.getCourse)
+                  val lectureCourses = lecture.getParticipants.map(_.getCourse)
+
+                  val theLectureContainsCourses = theLectureCourses.containsAll(lectureCourses) && (theLectureCourses.size == lectureCourses.size)
+
+                  val theLectureContainsDocents = theLecture.getDocents.containsAll(lecture.getDocents) && (theLecture.getDocents.size() == lecture.getDocents.size())
+
+                  theLecture.isInstanceOf[ParallelLecture] && theLectureContainsCourses && theLectureContainsDocents
               }
                 .asInstanceOf[mutable.Buffer[ParallelLecture]]
             })
 
-           // Logger.debug("parallel lectures: " + parallelLectures.flatMap(_.getLectures.map(_.getName)))
+            // Logger.debug("parallel lectures: " + parallelLectures.flatMap(_.getLectures.map(_.getName)))
 
             def createParralelLecture() {
               val parallelLecture = new ParallelLecture
@@ -86,7 +94,7 @@ class ScheduleGeneratorSlave extends Actor {
                 lecture.setDuration(EDuration.UNEVEN)
                 lecture.setRoom(existingLecture.getLectures.head.getRoom)
                 existingLecture.setLectures(existingLecture.getLectures :+ lecture)
-                placed+=1
+                placed += 1
               }
             }
 
@@ -191,11 +199,11 @@ class ScheduleGeneratorSlave extends Actor {
   }
 
   private def containsInSubGroups(group: Group, participants: mutable.Buffer[Participant]): Boolean = {
-    if (group.getSubGroups == null || group.getSubGroups.isEmpty) {
-      return false
-    }
     if (participants.contains(group)) {
       return true
+    }
+    if (group.getSubGroups == null || group.getSubGroups.isEmpty) {
+      return false
     }
 
     !group.getSubGroups.filter(subgroup => containsInSubGroups(subgroup, participants)).isEmpty

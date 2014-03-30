@@ -1,5 +1,8 @@
 @(timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.Timeslot])
+
+@import models.fhs.pages.generator.TimeRange
 @import models.persistence.scheduletree.Weekday
+
 
 <div class="table-responsive">
     <table class="table table-bordered">
@@ -10,7 +13,7 @@
             }
         </thead>
         <tbody>
-        @for(range <- timeRanges) {
+        @for(range <- timeRanges.sorted(TimeRange)) {
             <tr>
                 <td >
                 @range.toString
@@ -20,13 +23,10 @@
                     @for(slot <- timeslots.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex == day._1.toInt)) {
                         @for(lecture <- slot.getLectures) {
                             <small >
-                                <div class="col-lg-11">
-                                    <div class="panel panel-info" >
-                                    @displayAbstractLecture(lecture)
-                                    </div>
+                                <div class="panel panel-info" >
+                                @displayAbstractLecture(lecture)
                                 </div>
                             </small>
-
                         }
                     }
                     </td>

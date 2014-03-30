@@ -59,7 +59,7 @@
                                     @repeat(criteriaFields("weekdays"), min = 0) { weekday =>
                                         @defining(weekdays.find(p => p._1.equals(weekday.value.get)).get) { day =>
                                             <div class='form-group span6'>
-                                                <label class="control-label" for="weekdays@criteriaFields.id">
+                                                <label class="control-label" for="weekdays@criteriaFields.id" style="display: block">
                                                     Wochentage</label>
                                                 <select class="form-control" id="weekdays@criteriaFields.id" name="@(criteriaFields.name + ".weekdays[]")" multiple title="nichts Ausgewählt">
                                                 @for(dayname <- weekdays) {
