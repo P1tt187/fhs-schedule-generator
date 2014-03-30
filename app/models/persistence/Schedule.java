@@ -56,8 +56,10 @@ public class Schedule extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Schedule{" +
-                "root=" + root +
-                '}';
+        final StringBuffer sb = new StringBuffer("Schedule{");
+        sb.append("root=").append(root);
+        sb.append(", semester=").append(semester);
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -82,9 +82,10 @@ object CGenerate extends Controller {
         },
         result => {
 
-          scheduleFuture = ask(Akka.system.actorOf(Props[ScheduleGeneratorActor]), GenerateSchedule(findActiveSubjectsBySemesterId(result.id)))
+          scheduleFuture = ask(Akka.system.actorOf(Props[ScheduleGeneratorActor]), GenerateSchedule(findActiveSubjectsBySemesterId(result.id),findSemesterById(result.id)))
           scheduleFuture.onSuccess {
             case ScheduleAnswer(schedule) => this.schedule = schedule
+
             Logger.debug("" + this.schedule)
           }
 

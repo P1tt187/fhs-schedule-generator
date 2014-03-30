@@ -23,7 +23,7 @@ class ScheduleGeneratorActor extends Actor {
 
   override def receive = {
 
-    case GenerateSchedule(subjectList) =>
+    case GenerateSchedule(subjectList, semester) =>
 
       val lectureGenerationActor = context.actorOf(Props[LectureGeneratorActor])
 
@@ -39,6 +39,7 @@ class ScheduleGeneratorActor extends Actor {
 
 
       val schedule  = Await.result(context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures)), TIMEOUT_VAL seconds).asInstanceOf[ScheduleAnswer].schedule
+      schedule.setSemester(semester)
 
       sender() ! ScheduleAnswer(schedule)
 

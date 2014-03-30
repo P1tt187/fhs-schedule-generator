@@ -55,4 +55,28 @@ public abstract class Node extends AbstractEntity {
         sb.append('}');
         return sb.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Node node = (Node) o;
+
+        if (children != null ? !(children.containsAll(node.children) && children.size() == node.children.size()) : node.children != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int ret = 0;
+        if (children != null) {
+            for (Node n : children) {
+                ret = 37 * ret + n.hashCode();
+            }
+        }
+        return ret;
+    }
 }

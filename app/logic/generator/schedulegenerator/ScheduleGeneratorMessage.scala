@@ -1,6 +1,6 @@
 package logic.generator.schedulegenerator
 
-import models.persistence.Schedule
+import models.persistence.{Semester, Schedule}
 import models.persistence.subject.AbstractSubject
 import models.persistence.lecture.Lecture
 
@@ -10,7 +10,7 @@ import models.persistence.lecture.Lecture
  */
 sealed trait ScheduleGeneratorMessage
 
-case class GenerateSchedule(subjects: List[AbstractSubject]) extends ScheduleGeneratorMessage
+case class GenerateSchedule(subjects: List[AbstractSubject], semester : Semester) extends ScheduleGeneratorMessage
 
 case class SlaveGenerate(lectures: List[Lecture]) extends ScheduleGeneratorMessage
 

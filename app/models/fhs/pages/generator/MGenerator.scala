@@ -23,9 +23,15 @@ object MGenerator {
         val criterion = session.createCriteria(classOf[AbstractSubject]).add(Restrictions.eq("active", true)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
         criterion.createCriteria("semester").add(Restrictions.idEq(id))
         // criterion.createCriteria("courses").setFetchMode("groups",FetchMode.JOIN)
-
         criterion.list().asInstanceOf[JavaList[AbstractSubject]].toList
 
+    }
+  }
+
+  def findSemesterById(id: Long) = {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[Semester]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[Semester]
     }
   }
 
@@ -59,7 +65,7 @@ object MGenerator {
 }
 
 object TimeRange extends Ordering[TimeRange] {
-  override def compare(range:TimeRange, that : TimeRange):Int ={
+  override def compare(range: TimeRange, that: TimeRange): Int = {
     if (range.startHour.compareTo(that.startHour) != 0) {
       return range.startHour.compareTo(that.startHour)
     }
@@ -75,8 +81,7 @@ object TimeRange extends Ordering[TimeRange] {
 
 }
 
-case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)    extends  Ordered[Timeslot] {
-
+case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int) extends Ordered[Timeslot] {
 
 
   override def toString = "" + startHour.formatted("%02d") + ":" + startMinute.formatted("%02d") + "-" + stopHour.formatted("%02d") + ":" + stopMinute.formatted("%02d")

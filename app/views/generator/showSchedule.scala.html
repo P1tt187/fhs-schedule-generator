@@ -15,7 +15,7 @@
         <tbody>
         @for(range <- timeRanges.sorted(TimeRange)) {
             <tr>
-                <td >
+                <td class="text-center" style=" vertical-align: middle;width: 8%;" >
                 @range.toString
                 </td>
                 @for(day <- CTimeslotDefintion.WEEKDAYS) {
