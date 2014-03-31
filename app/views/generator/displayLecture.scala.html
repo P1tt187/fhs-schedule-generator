@@ -1,5 +1,7 @@
 @(lecture: models.persistence.lecture.Lecture)
 
+@import models.persistence.enumerations.ELectureKind
+
 @import models.persistence.enumerations.EDuration
 
 
@@ -12,6 +14,14 @@
     }
 }">
     <div > <strong>  @lecture.getName </strong></div>
+    <div class="pull-right">
+        <span class="glyphicon @{
+            lecture.getKind match {
+                case ELectureKind.EXERCISE => "glyphicon-pencil"
+                case ELectureKind.LECTURE => "glyphicon-comment"
+            }
+        } " ></span> </div>
+
     <div>
     @for(participant <- lecture.getParticipants.toList.sortBy(_.getName)) {
         @participant.getName
@@ -23,12 +33,13 @@
     }
     </div>
     <div> @lecture.getRoom.getHouse.getName @lecture.getRoom.getNumber </div>
-    <div> @{lecture.getDuration match {
-        case EDuration.EVEN => "g"
-        case EDuration.UNEVEN => "u"
-        case EDuration.WEEKLY => "w"
-        case other => other.name()
-    }
+    <div> @{
+        lecture.getDuration match {
+            case EDuration.EVEN => "g"
+            case EDuration.UNEVEN => "u"
+            case EDuration.WEEKLY => "w"
+            case other => other.name()
+        }
 
     } </div>
 </div>

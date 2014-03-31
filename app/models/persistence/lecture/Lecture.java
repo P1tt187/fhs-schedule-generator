@@ -3,6 +3,7 @@ package models.persistence.lecture;
 import models.persistence.Docent;
 import models.persistence.criteria.CriteriaContainer;
 import models.persistence.enumerations.EDuration;
+import models.persistence.enumerations.ELectureKind;
 import models.persistence.location.RoomEntity;
 import models.persistence.participants.Participant;
 import org.hibernate.annotations.Fetch;
@@ -66,6 +67,19 @@ public class Lecture extends AbstractLecture {
     @Column(name = "LECTURENAME")
     @CollectionTable(name = "TBLLECTURE_SYNONYMS")
     private Map<String, String> lectureSynonyms;
+
+    /** kind of this lecture */
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "KIND")
+    private ELectureKind kind;
+
+    public ELectureKind getKind() {
+        return kind;
+    }
+
+    public void setKind(ELectureKind kind) {
+        this.kind = kind;
+    }
 
     public Map<String, String> getLectureSynonyms() {
         return lectureSynonyms;
@@ -150,6 +164,7 @@ public class Lecture extends AbstractLecture {
         result = 31 * result + (participants != null ? participants.hashCode() : 0);
         result = 31 * result + (docents != null ? docents.hashCode() : 0);
         result = 31 * result + (duration != null ? duration.hashCode() : 0);
+        result = 31 * result + (kind != null ? kind.hashCode() : 0);
         return result;
     }
 
@@ -157,6 +172,7 @@ public class Lecture extends AbstractLecture {
     public String toString() {
         final StringBuffer sb = new StringBuffer("Lecture{");
         sb.append("name='").append(name).append('\'');
+        sb.append(", kind=").append(kind);
         sb.append(", participants=").append(participants);
         sb.append(", docents=").append(docents);
         sb.append(", room=").append(room);

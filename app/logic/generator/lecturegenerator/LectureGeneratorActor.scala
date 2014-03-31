@@ -6,7 +6,7 @@ import scala.collection.mutable
 import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
 import models.persistence.participants.{Group, Participant}
 import scala.collection.JavaConversions._
-import models.persistence.enumerations.EDuration
+import models.persistence.enumerations.{ELectureKind, EDuration}
 import play.api.Logger
 import models.Transactions
 import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
@@ -46,6 +46,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setName(lectureSubject.getName)
                 lecture.setCriteriaContainer(subject.getCriteriaContainer)
                 lecture.setLectureSynonyms(lectureSubject.getSubjectSynonyms)
+                lecture.setKind(ELectureKind.LECTURE)
                 addedLectures += 1
                 lecture
               }
@@ -87,6 +88,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(exerciseSubject.getName)
                 lecture.setLectureSynonyms(exerciseSubject.getSubjectSynonyms)
+                lecture.setKind(ELectureKind.EXERCISE)
                 addedExercises += 1
                 lecture
               }
