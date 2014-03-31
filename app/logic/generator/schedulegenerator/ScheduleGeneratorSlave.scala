@@ -61,11 +61,21 @@ class ScheduleGeneratorSlave extends Actor {
                   val theLectureCourses = theLecture.getParticipants.map(_.getCourse)
                   val lectureCourses = lecture.getParticipants.map(_.getCourse)
 
+                  val participantsClassMacht = theLecture.getParticipants.forall( lecture.getParticipants.head.getClass.isInstance(_))
+
                   val theLectureContainsCourses = theLectureCourses.containsAll(lectureCourses) && (theLectureCourses.size == lectureCourses.size)
 
                   val theLectureContainsDocents = theLecture.getDocents.containsAll(lecture.getDocents) && (theLecture.getDocents.size() == lecture.getDocents.size())
 
-                  theLecture.isInstanceOf[ParallelLecture] && theLectureContainsCourses && theLectureContainsDocents
+                val theLectureContainsParticipant = lecture.getParticipants.head match {
+                  case _:Group => timeslotContainsParticipants(slot, lecture.getParticipants.toSet)
+                  case _ => false
+                }
+
+
+
+
+                  theLecture.isInstanceOf[ParallelLecture] && theLectureContainsCourses && theLectureContainsDocents && participantsClassMacht && !theLectureContainsParticipant
               }
                 .asInstanceOf[mutable.Buffer[ParallelLecture]]
             })
