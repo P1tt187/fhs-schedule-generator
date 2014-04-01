@@ -10,3 +10,4 @@ sealed trait  ImportMessage
 
 case class ImportFile(file:File) extends ImportMessage
 
+case object ImportFinished extends ImportMessage

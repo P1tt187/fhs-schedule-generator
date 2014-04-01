@@ -40,6 +40,7 @@ class BlaImportActor extends Actor {
 
 
       parseFile(file)
+      sender() ! ImportFinished
 
     case unkownCommand => throw new IllegalArgumentException("unknown command " + unkownCommand)
   }

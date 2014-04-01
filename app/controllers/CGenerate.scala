@@ -25,6 +25,7 @@ import scala.collection.JavaConversions._
 import models.Transactions
 import models.persistence.template.TimeslotTemplate
 import org.hibernate.criterion.CriteriaSpecification
+import java.util.Calendar
 
 /**
  * @author fabian 
@@ -35,6 +36,12 @@ object CGenerate extends Controller {
   private var scheduleFuture: Future[Any] = null
 
   private var schedule: Schedule = null
+
+  private var startTime: Calendar = null
+
+  private var finishTime: Calendar = null
+
+  private var actorFinished = false
 
   val form: Form[GeneratorForm] = Form(
     mapping("id" -> longNumber)(GeneratorForm.apply)(GeneratorForm.unapply)
@@ -53,34 +60,31 @@ object CGenerate extends Controller {
   def finished = Action {
     val sb = StringBuilder.newBuilder
     sb.append("{\"result\":")
-    if (scheduleFuture == null) {
-      sb.append(false.toString)
-    } else {
-      sb.append(scheduleFuture.isCompleted.toString)
-    }
+    sb.append(actorFinished)
     sb.append("}")
     Ok(sb.toString())
   }
 
 
-
-
-
-  def sendSchedule = Action{
-    val timeslotsAll = if(schedule==null) {List[Timeslot]()} else {collectTimeslotsFromSchedule(schedule)}
-    val timeslotTemplates = Transactions.hibernateAction{
+  def sendSchedule = Action {
+    val timeslotsAll = if (schedule == null) {
+      List[Timeslot]()
+    } else {
+      collectTimeslotsFromSchedule(schedule)
+    }
+    val timeslotTemplates = Transactions.hibernateAction {
       implicit session =>
         session.createCriteria(classOf[TimeslotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeslotTemplate]].toList.sorted
     }
 
-    val timeRanges = findTimeRanges(timeslotTemplates,List[TimeRange]())
+    val timeRanges = findTimeRanges(timeslotTemplates, List[TimeRange]())
 
-     val filteredPages = filterScheduleWithCourses(schedule).sortBy(_._1).map{
-       case (title,timeslots)=>
-         showSchedule(title, timeRanges ,timeslots).toString()
-     }.foldLeft("")(_ + _)
+    val filteredPages = filterScheduleWithCourses(schedule).sortBy(_._1).map {
+      case (title, timeslots) =>
+        showSchedule(title, timeRanges, timeslots).toString()
+    }.foldLeft("")(_ + _)
 
-    Ok(Json.stringify(Json.obj("htmlresult"-> (showSchedule("Alle Kurse",timeRanges ,timeslotsAll).toString() + filteredPages))))
+    Ok(Json.stringify(Json.obj("htmlresult" -> (showSchedule("Alle Kurse", timeRanges, timeslotsAll).toString() + filteredPages))))
   }
 
   def generatorAction = Action {
@@ -92,12 +96,14 @@ object CGenerate extends Controller {
           BadRequest(generator("Generator", findSemesters(), errors))
         },
         result => {
-
-          scheduleFuture = ask(Akka.system.actorOf(Props[ScheduleGeneratorActor]), GenerateSchedule(findActiveSubjectsBySemesterId(result.id),findSemesterById(result.id)))
+          actorFinished = false
+          startTime = Calendar.getInstance()
+          scheduleFuture = ask(Akka.system.actorOf(Props[ScheduleGeneratorActor]), GenerateSchedule(findActiveSubjectsBySemesterId(result.id), findSemesterById(result.id)))
           scheduleFuture.onSuccess {
-            case ScheduleAnswer(schedule) => this.schedule = schedule
-
-            Logger.debug("" + this.schedule)
+            case ScheduleAnswer(theSchedule) => this.schedule = theSchedule
+              actorFinished = true
+              finishTime = Calendar.getInstance()
+              Logger.debug("created in " + (finishTime.getTimeInMillis - startTime.getTimeInMillis) + "ms")
           }
 
           //Logger.debug(findActiveSubjectsBySemesterId(result.id).mkString("\n") )

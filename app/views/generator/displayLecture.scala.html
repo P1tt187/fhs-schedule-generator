@@ -10,17 +10,19 @@
         case EDuration.EVEN => "bg-warning"
         case EDuration.UNEVEN => "bg-primary"
         case EDuration.WEEKLY => "bg-info"
-        case other => other.name()
+        case other => "bg-danger"
     }
 }">
     <div > <strong>  @lecture.getName </strong></div>
     <div class="pull-right">
         <span class="glyphicon @{
             lecture.getKind match {
-                case ELectureKind.EXERCISE => "glyphicon-pencil"
-                case ELectureKind.LECTURE => "glyphicon-comment"
+                case ELectureKind.EXERCISE => "glyphicon-hdd"
+                case ELectureKind.LECTURE => "glyphicon-book"
             }
-        } " ></span> </div>
+        } " >
+        </span>
+    </div>
 
     <div>
     @for(participant <- lecture.getParticipants.toList.sortBy(_.getName)) {
