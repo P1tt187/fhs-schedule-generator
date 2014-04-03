@@ -53,20 +53,19 @@ object CBLAFileUpload extends Controller {
           tmpFile.deleteOnExit()
           file.ref.moveTo(tmpFile, replace = true)
 
+          def finishAction(){
+            result.onSuccess {
+              case ImportFinished =>
+                actorFinished = true
+                Logger.debug("import finished")
+            }
+          }
 
           Akka.system.actorSelection("/user/" + IMPORT_ACTOR_NAME).resolveOne(300 millis).onComplete {
             case Success(actor) => result = actor ? ImportFile(tmpFile)
-              result.onSuccess {
-                case ImportFinished =>
-                  actorFinished = true
-                  Logger.debug("import finished")
-              }
+              finishAction()
             case Failure(ex) => result = Akka.system.actorOf(Props[BlaImportActor], name = IMPORT_ACTOR_NAME) ? ImportFile(tmpFile)
-              result.onSuccess {
-                case ImportFinished =>
-                  actorFinished = true
-                  Logger.debug("import finished")
-              }
+              finishAction()
           }
 
           Redirect(routes.CBLAFileUpload.page).flashing("success" -> "success")

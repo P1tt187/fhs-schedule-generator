@@ -8,7 +8,7 @@
 </div>
 
 <div class="table-responsive">
-    <table class="table table-bordered">
+    <table class="table table-bordered table-striped">
         <thead>
             <th class="text-info text-center" >Uhrzeit</th>
             @for(day <- CTimeslotDefintion.WEEKDAYS) {
@@ -22,16 +22,20 @@
                 @range.toString
                 </td>
                 @for(day <- CTimeslotDefintion.WEEKDAYS) {
-                    <td>
-                       @* @timeslots.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex == day._1.toInt).map(_.getLectures) *@
+                    <td >
+
+                    <div style="max-height: 350px;  overflow:auto; display:compact">
                     @for(slot <- timeslots.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt)) {
                         @for(lecture <- slot.getLectures) {
-                            <div class="panel panel-info smallText" >
-                            @displayAbstractLecture(lecture)
-                            </div>
+
+                                <div class="panel panel-info smallText" >
+                                    @displayAbstractLecture(lecture)
+                                </div>
+
                         }
 
                     }
+                    </div>
                     </td>
                 }
             </tr>

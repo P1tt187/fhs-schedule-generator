@@ -61,7 +61,7 @@ class ScheduleGeneratorSlave extends Actor {
                   val theLectureCourses = theLecture.getParticipants.map(_.getCourse)
                   val lectureCourses = lecture.getParticipants.map(_.getCourse)
 
-                  val participantsClassMacht = theLecture.getParticipants.forall( lecture.getParticipants.head.getClass.isInstance(_))
+                  val participantsClassMatch = theLecture.getParticipants.forall( lecture.getParticipants.head.getClass.isInstance(_))
 
                   val theLectureContainsCourses = theLectureCourses.containsAll(lectureCourses) && (theLectureCourses.size == lectureCourses.size)
 
@@ -75,14 +75,14 @@ class ScheduleGeneratorSlave extends Actor {
 
 
 
-                  theLecture.isInstanceOf[ParallelLecture] && theLectureContainsCourses && theLectureContainsDocents && participantsClassMacht && !theLectureContainsParticipant
+                  theLecture.isInstanceOf[ParallelLecture] && theLectureContainsCourses && theLectureContainsDocents && participantsClassMatch && !theLectureContainsParticipant
               }
                 .asInstanceOf[mutable.Buffer[ParallelLecture]]
             })
 
             // Logger.debug("parallel lectures: " + parallelLectures.flatMap(_.getLectures.map(_.getName)))
 
-            def createParralelLecture() {
+            def createParallelLecture() {
               val parallelLecture = new ParallelLecture
               parallelLecture.setLectures(List(lecture))
               lecture.setDuration(EDuration.EVEN)
@@ -94,11 +94,11 @@ class ScheduleGeneratorSlave extends Actor {
               }
             }
             if (parallelLectures.isEmpty) {
-              createParralelLecture()
+              createParallelLecture()
             } else {
               val existingParallelLectures = parallelLectures.filter(_.getLectures.size() == 1)
               if (existingParallelLectures.isEmpty) {
-                createParralelLecture()
+                createParallelLecture()
               } else {
                 val existingLecture = existingParallelLectures.head
                 lecture.setDuration(EDuration.UNEVEN)

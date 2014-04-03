@@ -6,11 +6,11 @@ package models.persistence.enumerations;
  */
 public enum ELectureKind {
     /**
-     * Enum konstant
+     * Enum constant
      */
     LECTURE,
     /**
-     * Enum konstant
+     * Enum constant
      */
-    EXERCISE;
+    EXERCISE
 }

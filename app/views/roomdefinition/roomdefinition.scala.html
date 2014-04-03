@@ -148,7 +148,7 @@
                         </thead>
                         <tbody>
                         @for(roomEntity <- existingRooms) {
-                            <tr class="active">
+                            <tr >
                                 <td>
                                 @roomEntity.house
                                 </td>
@@ -207,7 +207,7 @@
                                         }
 
                                         @for(tcrit <- roomEntity.timeCriterias.sortBy(_.weekdayIndex)) {
-                                            <tr class="active">
+                                            <tr >
                                                 <td>@tcrit.weekday.substring(0, 2)</td>
                                                 <td>@tcrit.startHour.formatted("%02d")
                                                     : @tcrit.startMinutes.formatted("%02d")</td>
