@@ -29,13 +29,13 @@
         @participant.getName
     }
     </div>
-    <div>
+    <div class="pull-right">
     @for(docent <- lecture.getDocents) {
         @docent.getLastName
     }
     </div>
     <div> @lecture.getRoom.getHouse.getName @lecture.getRoom.getNumber </div>
-    <div> @{
+    @*<div> @{
         lecture.getDuration match {
             case EDuration.EVEN => "g"
             case EDuration.UNEVEN => "u"
@@ -43,5 +43,5 @@
             case other => other.name()
         }
 
-    } </div>
+    } </div> *@
 </div>

@@ -13,15 +13,24 @@
         <input class="form-control" id="unitInput" name="unitInput" type="number" placeholder="einheiten" value="@subject.getUnits" step="0.5" min="0.5" required>
     </div>
 
-
+    <div class="clearfix"></div>
     <div class="form-group">
-        <label class="control-label" for="activeCheckbox">Aktiv</label>
-        <input class="form-control checkbox" type="checkbox" id="activeCheckbox" name="activeCheckbox" @if(subject.isActive) {
-        checked }>
+        <label class="control-label" >Für den Plan Berücksichtigen</label>
+        <div class="radio radio-inline">
+            <label>
+                <input class="form-control" type="radio" value="true" name="activeCheckbox" @if(subject.isActive) { checked }> Beachten
+            </label>
+        </div>
+        <div class="radio radio-inline">
+            <label>
+                <input class="form-control" type="radio" value="false" name="activeCheckbox" @if(!subject.isActive) { checked }> Ignorieren
+            </label>
+        </div>
+
     </div>
 
     @if(lectureType.equals(CEditSubjects.EXERCISE)) {
-        <div class="clearfix"></div>
+
         <div class="form-group">
             <label class="control-label" for="groupTypeInput">Gruppentyp</label>
             <input class="form-control" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="@(subject.asInstanceOf[ExerciseSubject].getGroupType)" required>
@@ -33,7 +42,7 @@
 
     <div id="courses" class="form-group">
         <label class="control-label" for="selectCourse">Kurse</label>
-        <select class="form-control" multiple="multiple" id="selectCourse" name="selectCourse" title="nichts ausgewählt">
+        <select class="form-control" multiple="multiple" id="selectCourse" name="selectCourse" title="nichts ausgewählt" required>
         @for(course <- courses) {
             <option value="@course.getId" @if(subject.getCourses.contains(course)) { selected }
             > @course.getShortName </option>
@@ -44,7 +53,7 @@
     <div class="form-group">
         <div id="docents">
             <label class="control-label" for="selectDocents">Dozenten</label>
-            <select class="form-control" multiple="multiple" id="selectDocents" name="selectDocents" title="nichts ausgewählst">
+            <select class="form-control" multiple="multiple" id="selectDocents" name="selectDocents" title="nichts ausgewählst" required>
             @for(docent <- docents) {
                 <option value="@docent.getId" @if(subject.getDocents.contains(docent)) { selected }
                 >@docent.getLastName </option>
@@ -100,7 +109,10 @@ data[ 'subjectType' ] = '  @lectureType '.trim();
 data[ 'subjectId' ] = @subject.getId ;
 
 /** proof if checkbox is checked or not */
-data[ 'activeCheckbox' ] = data[ 'activeCheckbox' ] === 'on' ;
+    console.debug(data.activeCheckbox);
+
+
+data[ 'activeCheckbox' ] = $.parseJSON(data[ 'activeCheckbox' ]);
 /** make sure that arrays are arrays */
 
 if ( data[ 'selectCourse' ] == null ) {

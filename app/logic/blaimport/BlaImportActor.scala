@@ -58,6 +58,7 @@ class BlaImportActor extends Actor {
       if (course == null) {
         course = new Course
         course.setShortName(shortName)
+        Logger.debug("shortname - " + shortName + " " + shortName.substring(0, shortName.length - 1))
         course.setFullName(shortcutReverse(shortName.substring(0, shortName.length - 1)))
         course.setGroups(new util.LinkedList[Group]())
         course.setSize(0)
@@ -263,6 +264,9 @@ class BlaImportActor extends Actor {
             if (!connectedParticipants.startsWith("BA") && !connectedParticipants.startsWith("MA")) {
               connectedParticipants = "BA" + connectedParticipants
             }
+            if(!connectedParticipants.matches("^[a-zA-Z]+\\d$")){
+              connectedParticipants+=metaInfo.semesterValue.head
+            }
 
 
             if (connectedParticipants.contains("(")) {
@@ -315,6 +319,7 @@ class BlaImportActor extends Actor {
             }
 
             val courses = if (areSemesterValuesConsistent(semesterValues)) {
+            //  Logger.debug("subjectname - " + subjectName)
               courseShortName.map(e => findCourse(e)).toSet
 
             } else {
