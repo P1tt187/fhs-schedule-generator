@@ -8,38 +8,26 @@
         <label for="nameInput" class="control-label">Name</label>
         <input class="form-control " id="nameInput" name="nameInput" type="text" placeholder="name" value="@subject.getName" required>
     </div>
+
     <div id="unitInputDiv" class="form-group">
         <label for="unitInput" class="control-label">Einheiten</label>
         <input class="form-control" id="unitInput" name="unitInput" type="number" placeholder="einheiten" value="@subject.getUnits" step="0.5" min="0.5" required>
     </div>
 
     <div class="clearfix"></div>
-    <div class="form-group">
-        <label class="control-label" >Für den Plan Berücksichtigen</label>
-        <div class="radio radio-inline">
-            <label>
-                <input class="form-control" type="radio" value="true" name="activeCheckbox" @if(subject.isActive) { checked }> Beachten
-            </label>
-        </div>
-        <div class="radio radio-inline">
-            <label>
-                <input class="form-control" type="radio" value="false" name="activeCheckbox" @if(!subject.isActive) { checked }> Ignorieren
-            </label>
-        </div>
-
+    <div class="form-group" id="expectedParticipantsContainer">
+        <label class="control-label" for="expectedParticipantsInput">Erwartete Teilnehmerzahl <br/> (optional) </label>
+        <input id="expectedParticipantsInput" name="expectedParticipants" class="form-control" type="number" min="0" placeholder="Anzahl" value="@if(subject.getExpectedParticipants!=null){@subject.getExpectedParticipants}">
     </div>
-
     @if(lectureType.equals(CEditSubjects.EXERCISE)) {
-
         <div class="form-group">
-            <label class="control-label" for="groupTypeInput">Gruppentyp</label>
+            <label class="control-label" for="groupTypeInput"><br/>Gruppentyp</label>
             <input class="form-control" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="@(subject.asInstanceOf[ExerciseSubject].getGroupType)" required>
         </div>
     }
 
-
     <div class="clearfix"></div>
-
+    <br/>
     <div id="courses" class="form-group">
         <label class="control-label" for="selectCourse">Kurse</label>
         <select class="form-control" multiple="multiple" id="selectCourse" name="selectCourse" title="nichts ausgewählt" required>
@@ -60,6 +48,23 @@
             }
             </select>
         </div>
+    </div>
+
+    <div class="clearfix"></div>
+    <br/>
+    <div class="form-group">
+        <label class="control-label" >Für den Plan Berücksichtigen</label>
+        <div class="radio radio-inline">
+            <label>
+                <input class="form-control" type="radio" value="true" name="activeCheckbox" @if(subject.isActive) { checked }> Beachten
+            </label>
+        </div>
+        <div class="radio radio-inline">
+            <label>
+                <input class="form-control" type="radio" value="false" name="activeCheckbox" @if(!subject.isActive) { checked }> Ignorieren
+            </label>
+        </div>
+
     </div>
 
     <div class="clearfix" ></div>
@@ -109,10 +114,7 @@ data[ 'subjectType' ] = '  @lectureType '.trim();
 data[ 'subjectId' ] = @subject.getId ;
 
 /** proof if checkbox is checked or not */
-    console.debug(data.activeCheckbox);
-
-
-data[ 'activeCheckbox' ] = $.parseJSON(data[ 'activeCheckbox' ]);
+    data[ 'activeCheckbox' ] = $.parseJSON(data[ 'activeCheckbox' ]);
 /** make sure that arrays are arrays */
 
 if ( data[ 'selectCourse' ] == null ) {
@@ -120,6 +122,18 @@ $ ( '#courses' ).addClass ( 'has-error' ) ;
 appendError ( ) ;
 return ;
 }
+
+if($('#expectedParticipantsInput' ).val( )=="" ){
+  data['expectedParticipants']=-1;
+}
+
+if(! $.isNumeric(data['expectedParticipants'])){
+    $('#expectedParticipantsContainer' ).addClass('has-error');
+    appendError();
+    return;
+}
+
+data['expectedParticipants']=Number(data['expectedParticipants']);
 
 if ( ! $.isArray ( data[ 'selectCourse' ] ) ) {
 data[ 'selectCourse' ] =[ data[ 'selectCourse' ] ] ;

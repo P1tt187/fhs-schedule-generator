@@ -93,6 +93,8 @@ object CEditSubjects extends Controller {
 
         val unitInput = (jsVal \ "unitInput").as[String].trim.toFloat
 
+        val expectedParticipants = (jsVal \ "expectedParticipants").as[Int]
+
         val selectedCourseIds = (jsVal \ "selectCourse").as[JsArray].value.map(_.as[String].toLong).toList
 
         val selectDocentsIds = (jsVal \ "selectDocents").as[JsArray].value.map(_.as[String].toLong).toList
@@ -119,6 +121,12 @@ object CEditSubjects extends Controller {
         subject.setUnits(unitInput)
         subject.setCourses(selectedCourse)
         subject.setDocents(selectedDocents)
+
+        if (expectedParticipants != -1) {
+          subject.setExpectedParticipants(expectedParticipants)
+        } else {
+          subject.setExpectedParticipants(null)
+        }
 
         Transactions {
           implicit entitymanager =>

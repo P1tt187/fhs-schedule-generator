@@ -30,6 +30,8 @@ class ScheduleGeneratorSlave extends Actor {
 
   private var noRoom = 0
 
+  private def filterRooms(rooms: List[RoomEntity], lecture: Lecture) = rooms.par.filter(_.getCapacity >= lecture.calculateNumberOfParticipants()).toList
+
   override def receive = {
 
     case SlaveGenerate(lectures) =>
@@ -53,6 +55,8 @@ class ScheduleGeneratorSlave extends Actor {
       lectures.foreach {
         lecture =>
 
+          //Logger.debug("lecture " + lecture.getName + " " + lecture.calculateNumberOfParticipants() + " " + lecture.getParticipants.map(_.getSize.toInt).sum)
+
           if (lecture.getDuration == EDuration.UNWEEKLY) {
             val parallelLectures = root.getChildren.flatMap(_.getChildren.flatMap {
               case slot: Timeslot => slot.getLectures.filter {
@@ -61,19 +65,16 @@ class ScheduleGeneratorSlave extends Actor {
                   val theLectureCourses = theLecture.getParticipants.map(_.getCourse)
                   val lectureCourses = lecture.getParticipants.map(_.getCourse)
 
-                  val participantsClassMatch = theLecture.getParticipants.forall( lecture.getParticipants.head.getClass.isInstance(_))
+                  val participantsClassMatch = theLecture.getParticipants.forall(lecture.getParticipants.head.getClass.isInstance(_))
 
                   val theLectureContainsCourses = theLectureCourses.containsAll(lectureCourses) && (theLectureCourses.size == lectureCourses.size)
 
                   val theLectureContainsDocents = theLecture.getDocents.containsAll(lecture.getDocents) && (theLecture.getDocents.size() == lecture.getDocents.size())
 
-                val theLectureContainsParticipant = lecture.getParticipants.head match {
-                  case _:Group => timeslotContainsParticipants(slot, lecture.getParticipants.toSet)
-                  case _ => false
-                }
-
-
-
+                  val theLectureContainsParticipant = lecture.getParticipants.head match {
+                    case _: Group => timeslotContainsParticipants(slot, lecture.getParticipants.toSet)
+                    case _ => false
+                  }
 
                   theLecture.isInstanceOf[ParallelLecture] && theLectureContainsCourses && theLectureContainsDocents && participantsClassMatch && !theLectureContainsParticipant
               }
@@ -87,7 +88,7 @@ class ScheduleGeneratorSlave extends Actor {
               parallelLecture.setLectures(List(lecture))
               lecture.setDuration(EDuration.EVEN)
               val possibleTimeslots = findPossibleTimeslots(root, parallelLecture)
-              initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), rooms.filter(_.getCapacity >= lecture.getParticipants.map(_.getSize.toInt).sum)) match {
+              initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), filterRooms(rooms, lecture)) match {
                 case Some(timeslot) =>
                   timeslot.setLectures(timeslot.getLectures :+ parallelLecture)
                 case None =>
@@ -112,7 +113,7 @@ class ScheduleGeneratorSlave extends Actor {
 
             //TODO filter weekdays
             val possibleTimeslots = findPossibleTimeslots(root, lecture)
-            initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), rooms.filter(_.getCapacity >= lecture.getParticipants.map(_.getSize.toInt).sum)) match {
+            initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), filterRooms(rooms, lecture)) match {
               case Some(timeslot) => timeslot.setLectures(timeslot.getLectures :+ lecture)
               case None =>
             }

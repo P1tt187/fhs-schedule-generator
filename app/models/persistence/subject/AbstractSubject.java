@@ -77,6 +77,20 @@ public abstract class AbstractSubject extends AbstractEntity {
     @ManyToOne(targetEntity = CriteriaContainer.class, cascade = CascadeType.ALL)
     private CriteriaContainer criteriaContainer;
 
+    /**
+     * number of exprected participants
+     */
+    @Column(name = "EXPECTED_PARTICIPANTS")
+    private Integer expectedParticipants;
+
+    public Integer getExpectedParticipants() {
+        return expectedParticipants;
+    }
+
+    public void setExpectedParticipants(Integer expectedParticipants) {
+        this.expectedParticipants = expectedParticipants;
+    }
+
     public CriteriaContainer getCriteriaContainer() {
         return criteriaContainer;
     }
@@ -151,17 +165,19 @@ public abstract class AbstractSubject extends AbstractEntity {
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() +
-                "{" +
-                "active=" + active +
-                ", units=" + units +
-                ", name='" + name + '\'' +
-                ", semester='" + semester + "\'" +
-                ", courses=" + courses +
-                ", docents=" + docents +
-                ", subjectSynonyms=" + subjectSynonyms +
-                ", criteriaContainer=" + criteriaContainer +
-                '}';
+        final StringBuffer sb = new StringBuffer(this.getClass().getSimpleName());
+        sb.append("{units=").append(units);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", expectedParticipants=").append(expectedParticipants);
+        sb.append(", active=").append(active);
+        sb.append(", semester=").append(semester);
+        sb.append(", subjectSynonyms=").append(subjectSynonyms);
+        sb.append(", courses=").append(courses);
+        sb.append(", criteriaContainer=").append(criteriaContainer);
+        sb.append(", expectedParticipants=").append(expectedParticipants);
+        sb.append(", docents=").append(docents);
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override
@@ -172,13 +188,17 @@ public abstract class AbstractSubject extends AbstractEntity {
         AbstractSubject that = (AbstractSubject) o;
 
         if (active != null ? !active.equals(that.active) : that.active != null) return false;
+        if (courses != null ? !courses.equals(that.courses) : that.courses != null) return false;
+        if (criteriaContainer != null ? !criteriaContainer.equals(that.criteriaContainer) : that.criteriaContainer != null)
+            return false;
         if (docents != null ? !docents.equals(that.docents) : that.docents != null) return false;
+        if (expectedParticipants != null ? !expectedParticipants.equals(that.expectedParticipants) : that.expectedParticipants != null)
+            return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (semester != null ? !semester.equals(that.semester) : that.semester != null) return false;
         if (subjectSynonyms != null ? !subjectSynonyms.equals(that.subjectSynonyms) : that.subjectSynonyms != null)
             return false;
         if (units != null ? !units.equals(that.units) : that.units != null) return false;
-        if (criteriaContainer != null ? !criteriaContainer.equals(that.criteriaContainer) : that.criteriaContainer != null)
-            return false;
 
         return true;
     }
@@ -188,9 +208,12 @@ public abstract class AbstractSubject extends AbstractEntity {
         int result = units != null ? units.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (active != null ? active.hashCode() : 0);
+        result = 31 * result + (semester != null ? semester.hashCode() : 0);
         result = 31 * result + (subjectSynonyms != null ? subjectSynonyms.hashCode() : 0);
-        result = 31 * result + (docents != null ? docents.hashCode() : 0);
+        result = 31 * result + (courses != null ? courses.hashCode() : 0);
         result = 31 * result + (criteriaContainer != null ? criteriaContainer.hashCode() : 0);
+        result = 31 * result + (expectedParticipants != null ? expectedParticipants.hashCode() : 0);
+        result = 31 * result + (docents != null ? docents.hashCode() : 0);
         return result;
     }
 }

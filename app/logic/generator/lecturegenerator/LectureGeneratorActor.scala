@@ -47,6 +47,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setCriteriaContainer(subject.getCriteriaContainer)
                 lecture.setLectureSynonyms(lectureSubject.getSubjectSynonyms)
                 lecture.setKind(ELectureKind.LECTURE)
+                lecture.setExpectedParticipants(lectureSubject.getExpectedParticipants)
                 addedLectures += 1
                 lecture
               }
@@ -89,6 +90,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setName(exerciseSubject.getName)
                 lecture.setLectureSynonyms(exerciseSubject.getSubjectSynonyms)
                 lecture.setKind(ELectureKind.EXERCISE)
+                lecture.setExpectedParticipants(exerciseSubject.getExpectedParticipants)
                 addedExercises += 1
                 lecture
               }
