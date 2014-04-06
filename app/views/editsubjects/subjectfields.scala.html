@@ -1,5 +1,8 @@
 @(lectureType: String, subject: models.persistence.subject.AbstractSubject, docents: List[models.persistence.Docent], courses: List[models.persistence.participants.Course])
 
+@import models.persistence.criteria.RoomCriteria
+@import models.fhs.pages.roomdefinition.MRoomdefintion
+
 @import models.persistence.subject.ExerciseSubject
 
 <form role="form" id="subjectForm" class="form-inline">
@@ -49,7 +52,18 @@
             </select>
         </div>
     </div>
-
+    <div class="clearfix"></div>
+    <br/>
+    <div class="form-group">
+        <label class="control-label">Raumeigenschaften (Optional)</label>
+        @for(attr<-MRoomdefintion.ATTRIBUTES){
+        <div class="checkbox">
+            <label>                                                                                       @* check if room attr is set *@
+                <input type="checkbox" name="roomAttributes" class="form-control" value="@attr" @if(!subject.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).filter(roomCrit => roomCrit.asInstanceOf[RoomCriteria].getRoomAttributes.count(_.getAttribute.equals(attr))>0).isEmpty){checked} /> @attr
+            </label>
+        </div>
+        }
+    </div>
     <div class="clearfix"></div>
     <br/>
     <div class="form-group">
@@ -117,6 +131,26 @@ data[ 'subjectId' ] = @subject.getId ;
     data[ 'activeCheckbox' ] = $.parseJSON(data[ 'activeCheckbox' ]);
 /** make sure that arrays are arrays */
 
+if ( ! $.isArray ( data[ 'selectCourse' ] ) ) {
+data[ 'selectCourse' ] =[ data[ 'selectCourse' ] ] ;
+}
+
+if(data['roomAttributes']==null){
+    data['roomAttributes']=[];
+}
+if(! $.isArray(data['roomAttributes'])){
+    data['roomAttributes']=[data['roomAttributes']];
+}
+
+if ( data[ 'selectDocents' ] == null ) {
+$ ( '#docents' ).addClass ( 'has-error' ) ;
+appendError ( ) ;
+return ;
+}
+if ( ! $.isArray ( data[ 'selectDocents' ] ) ) {
+data[ 'selectDocents' ] =[ data[ 'selectDocents' ] ] ;
+}
+
 if ( data[ 'selectCourse' ] == null ) {
 $ ( '#courses' ).addClass ( 'has-error' ) ;
 appendError ( ) ;
@@ -136,18 +170,6 @@ if(! $.isNumeric(data['expectedParticipants'])){
 
 data['expectedParticipants']=Number(data['expectedParticipants']);
 
-if ( ! $.isArray ( data[ 'selectCourse' ] ) ) {
-data[ 'selectCourse' ] =[ data[ 'selectCourse' ] ] ;
-}
-
-if ( data[ 'selectDocents' ] == null ) {
-$ ( '#docents' ).addClass ( 'has-error' ) ;
-appendError ( ) ;
-return ;
-}
-if ( ! $.isArray ( data[ 'selectDocents' ] ) ) {
-data[ 'selectDocents' ] =[ data[ 'selectDocents' ] ] ;
-}
 
 
 var Form = this ;

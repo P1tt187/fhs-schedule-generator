@@ -8,7 +8,7 @@ import scala.collection.JavaConversions._
 import models.persistence.criteria.TimeslotCriteria
 import models.persistence.location.{HouseEntity, RoomAttributesEntity, RoomEntity}
 import org.hibernate.FetchMode
-
+import play.api.Play.current
 /**
  * @author fabian
  *         on 04.02.14.
@@ -21,7 +21,8 @@ object MRoomdefintion {
   /**
    * predefinded constants for the attribute
    */
-  final val ATTRIBUTES: Array[String] = Array[String]("PC-Pool", "Beamer", "Whiteboard", "Blackboard", "Overhead")
+  //final val ATTRIBUTES: Array[String] = Array[String]("Seminar-Room", "PC-Pool", "Beamer", "Whiteboard", "Blackboard", "Overhead")
+  lazy val ATTRIBUTES=current.configuration.getString("roomattributes").getOrElse("").split(",")
 
 
   def findOrCreateHouseEntityByName(name: String): HouseEntity = {
@@ -57,8 +58,8 @@ object MRoomdefintion {
     }
   }
 
-  def findRoomById(id:Long) = {
-    Transactions.hibernateAction{
+  def findRoomById(id: Long) = {
+    Transactions.hibernateAction {
       implicit session =>
         session.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
     }
