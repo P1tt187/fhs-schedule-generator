@@ -1,7 +1,7 @@
 package models.fhs.pages.generator
 
 import models.Transactions
-import org.hibernate.criterion.{Restrictions, CriteriaSpecification, Order}
+import org.hibernate.criterion._
 import scala.collection.JavaConversions._
 import models.persistence.{Schedule, Semester}
 import models.persistence.subject.AbstractSubject
@@ -10,6 +10,7 @@ import models.persistence.template.TimeslotTemplate
 import scala.annotation.tailrec
 import models.persistence.scheduletree.{Weekday, Timeslot}
 import models.persistence.participants.Course
+import scala.Some
 
 
 /**
@@ -18,16 +19,16 @@ import models.persistence.participants.Course
  */
 object MGenerator {
 
-  def filterScheduleWithCourses(schedule:Schedule)={
-    val courses = Transactions.hibernateAction{
-      implicit session=>
+  def filterScheduleWithCourses(schedule: Schedule) = {
+    val courses = Transactions.hibernateAction {
+      implicit session =>
         session.createCriteria(classOf[Course]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[Course]]
     }
 
-    courses.map(course=> (course.getShortName,collectTimeslotsFromSchedule( schedule.filter(course))))
+    courses.map(course => (course.getShortName, collectTimeslotsFromSchedule(schedule.filter(course))))
   }
 
-  def collectTimeslotsFromSchedule(schedule:Schedule)={
+  def collectTimeslotsFromSchedule(schedule: Schedule) = {
     schedule.getRoot.getChildren.asInstanceOf[JavaList[Weekday]].flatMap(_.getChildren.asInstanceOf[JavaList[Timeslot]]).toList.sorted
   }
 
@@ -36,8 +37,9 @@ object MGenerator {
       implicit session =>
         val criterion = session.createCriteria(classOf[AbstractSubject]).add(Restrictions.eq("active", true)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
         criterion.createCriteria("semester").add(Restrictions.idEq(id))
-        // criterion.createCriteria("courses").setFetchMode("groups",FetchMode.JOIN)
+
         criterion.list().asInstanceOf[JavaList[AbstractSubject]].toList
+
 
     }
   }

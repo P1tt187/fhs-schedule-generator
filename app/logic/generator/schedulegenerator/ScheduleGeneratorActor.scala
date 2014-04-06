@@ -17,7 +17,7 @@ class ScheduleGeneratorActor extends Actor {
 
   private val cloner = new Cloner(new ObjenesisInstantiationStrategy)
 
-  val TIMEOUT_VAL = 10
+  val TIMEOUT_VAL = 30
 
   implicit val timeout = Timeout(TIMEOUT_VAL seconds)
 

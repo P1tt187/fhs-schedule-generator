@@ -13,6 +13,7 @@ import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
 import models.fhs.pages.JavaList
 import exceptions.NoGroupFoundException
 import scala.util.Random
+import org.hibernate.FetchMode
 
 /**
  * @author fabian 
@@ -70,6 +71,7 @@ class LectureGeneratorActor extends Actor {
                     implicit session =>
                       session.createCriteria(classOf[Group]).add(Restrictions.eq("course", course))
                         .add(Restrictions.eq("groupType", exerciseSubject.getGroupType))
+                        .setFetchMode("course.groups",FetchMode.JOIN)
                         .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[Group]].toList
                   }
               }.toList
