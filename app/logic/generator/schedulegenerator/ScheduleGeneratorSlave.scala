@@ -62,8 +62,12 @@ class ScheduleGeneratorSlave extends Actor {
 
     root.setChildren(weekdays)
 
+    val allTimeslots = root.getChildren.flatMap(_.getChildren).toList.asInstanceOf[List[Timeslot]]
+
     lectures.foreach {
       lecture =>
+
+        //TODO filter WEEKDAYS
 
         if (lecture.getDuration == EDuration.UNWEEKLY) {
           val parallelLectures = root.getChildren.flatMap(_.getChildren.flatMap {
@@ -96,7 +100,7 @@ class ScheduleGeneratorSlave extends Actor {
             val parallelLecture = new ParallelLecture
             parallelLecture.setLectures(List(lecture))
             lecture.setDuration(EDuration.EVEN)
-            val possibleTimeslots = findPossibleTimeslots(root, parallelLecture)
+            val possibleTimeslots = findPossibleTimeslots(allTimeslots, parallelLecture)
             initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), filterRooms(rooms, lecture)) match {
               case Some(timeslot) =>
                 timeslot.setLectures(timeslot.getLectures :+ parallelLecture)
@@ -121,7 +125,7 @@ class ScheduleGeneratorSlave extends Actor {
         } else {
 
           //TODO filter weekdays
-          val possibleTimeslots = findPossibleTimeslots(root, lecture)
+          val possibleTimeslots = findPossibleTimeslots(allTimeslots, lecture)
           initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), filterRooms(rooms, lecture)) match {
             case Some(timeslot) => timeslot.setLectures(timeslot.getLectures :+ lecture)
             case None =>
@@ -138,14 +142,11 @@ class ScheduleGeneratorSlave extends Actor {
   }
 
 
-  private def findPossibleTimeslots(root: Root, lecture: AbstractLecture) = {
-    root.getChildren.flatMap {
-      weekday =>
-        weekday.getChildren.toList.asInstanceOf[List[Timeslot]].filter {
-          //TODO filter with timecriterias
-          timeslot =>
-            !timeslotContainsDocents(timeslot, lecture.getDocents.toSet) && !timeslotContainsParticipants(timeslot, lecture.getParticipants.toSet)
-        }
+  private def findPossibleTimeslots(timeslots: List[Timeslot], lecture: AbstractLecture) = {
+    timeslots.filter {
+      //TODO filter with timecriterias
+      timeslot =>
+        !timeslotContainsDocents(timeslot, lecture.getDocents.toSet) && !timeslotContainsParticipants(timeslot, lecture.getParticipants.toSet)
     }
   }
 
@@ -240,7 +241,7 @@ class ScheduleGeneratorSlave extends Actor {
   }
 
   private def containsInSubGroups(group: Group, participants: mutable.Buffer[Participant]): Boolean = {
-    if (participants.contains(group) || participantsContainsOtherGroupType(group,participants)) {
+    if (participants.contains(group) || participantsContainsOtherGroupType(group, participants)) {
       return true
     }
 

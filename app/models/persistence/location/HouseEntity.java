@@ -58,17 +58,20 @@ public class HouseEntity extends AbstractEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof HouseEntity)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         HouseEntity that = (HouseEntity) o;
 
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (rooms != null ? !(rooms.containsAll(that.rooms) && rooms.size() == that.rooms.size()) : that.rooms != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (rooms != null ? rooms.hashCode() : 0);
+        return result;
     }
 }

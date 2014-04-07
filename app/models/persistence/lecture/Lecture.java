@@ -1,5 +1,6 @@
 package models.persistence.lecture;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import models.persistence.Docent;
 import models.persistence.criteria.CriteriaContainer;
 import models.persistence.enumerations.EDuration;
@@ -92,6 +93,25 @@ public class Lecture extends AbstractLecture {
             return expectedParticipants;
         }
         return participants.stream().mapToInt(Participant::getSize).sum();
+    }
+
+    /**
+     * calculate cost of this lecture
+     * the more costs a lecture have it will be more important to place it first
+     */
+    @JsonIgnore
+    public Integer getCosts() {
+        Integer ret = 0;
+
+        if (criteriaContainer != null) {
+            ret += criteriaContainer.getCost();
+        }
+
+        if (docents != null) {
+            ret += docents.parallelStream().mapToInt(d -> d.getCriteriaContainer().getCost()).sum();
+        }
+
+        return ret;
     }
 
     public Integer getExpectedParticipants() {

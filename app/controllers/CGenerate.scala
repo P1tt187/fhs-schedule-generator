@@ -54,7 +54,13 @@ object CGenerate extends Controller {
   def page() = Action {
     implicit request =>
 
-      Ok(generator("Generator", findSemesters(), form))
+      val chooseSemesterForm = request.flash.get("lastchoosen") match {
+        case Some(idString)=>
+          form.fill(GeneratorForm(idString.toInt))
+        case None => form
+      }
+
+      Ok(generator("Generator", findSemesters(), chooseSemesterForm))
   }
 
   def finished = Action {
@@ -108,7 +114,7 @@ object CGenerate extends Controller {
 
           //Logger.debug(findActiveSubjectsBySemesterId(result.id).mkString("\n") )
 
-          Redirect(routes.CGenerate.page()).flashing("startpolling" -> "true")
+          Redirect(routes.CGenerate.page()).flashing("startpolling" -> "true","lastchoosen"-> result.id.toString)
         }
 
       )

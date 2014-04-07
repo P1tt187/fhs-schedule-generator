@@ -1,6 +1,8 @@
 package models.persistence.criteria;
 
+import models.persistence.location.HouseEntity;
 import models.persistence.location.RoomAttributesEntity;
+import models.persistence.location.RoomEntity;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -8,34 +10,30 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * Created by fabian on 04.02.14.
+ * @author fabian
+ *         on 04.02.14.
  */
 @Entity
 @Table(name = "TBLROOMCRITERIA")
 public class RoomCriteria extends AbstractCriteria {
-    /**
-     * how many people can be in the room
-     */
-
-    @Column(name = "CAPACITY", nullable = false)
-    private Integer capacity;
 
     /**
-     * in wich house is the room
+     * a house can be a criteria
      */
-    @Column(name = "HOUSE")
-    private String house;
+    @ManyToOne(targetEntity = HouseEntity.class)
+    private HouseEntity house;
 
     /**
-     * number of room in house
+     * a room can be a criteria
      */
+    @ManyToOne(targetEntity = RoomEntity.class)
+    private RoomEntity room;
 
-    @Column(name = "NUMBER", nullable = false)
-    private Integer number;
-
-
+    /**
+     * a specific attributes can be a criteria
+     */
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = RoomAttributesEntity.class,cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = RoomAttributesEntity.class, cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     private List<RoomAttributesEntity> roomAttributes;
 
     public List<RoomAttributesEntity> getRoomAttributes() {
@@ -46,29 +44,53 @@ public class RoomCriteria extends AbstractCriteria {
         this.roomAttributes = roomAttributes;
     }
 
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
-    }
-
-    public String getHouse() {
+    public HouseEntity getHouse() {
         return house;
     }
 
-    public void setHouse(String house) {
+    public void setHouse(HouseEntity house) {
         this.house = house;
     }
 
-    public Integer getNumber() {
-        return number;
+    public RoomEntity getRoom() {
+        return room;
     }
 
-    public void setNumber(Integer number) {
-        this.number = number;
+    public void setRoom(RoomEntity room) {
+        this.room = room;
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RoomCriteria that = (RoomCriteria) o;
+
+        if (house != null ? !house.equals(that.house) : that.house != null) return false;
+        if (room != null ? !room.equals(that.room) : that.room != null) return false;
+        if (roomAttributes != null ? !(roomAttributes.containsAll(that.roomAttributes) && roomAttributes.size() == that.roomAttributes.size()) : that.roomAttributes != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = house != null ? house.hashCode() : 0;
+        result = 31 * result + (room != null ? room.hashCode() : 0);
+        result = 31 * result + (roomAttributes != null ? roomAttributes.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("RoomCriteria{");
+        sb.append("house=").append(house);
+        sb.append(", room=").append(room);
+        sb.append(", roomAttributes=").append(roomAttributes);
+        sb.append('}');
+        return sb.toString();
+    }
 }

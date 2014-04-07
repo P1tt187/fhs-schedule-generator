@@ -6,6 +6,7 @@ import models.persistence.subject.{ExerciseSubject, LectureSubject}
 import org.hibernate.criterion.{Order, CriteriaSpecification, Restrictions}
 import models.persistence.{Semester, Docent}
 import models.persistence.participants.Course
+import models.persistence.location.{HouseEntity, RoomAttributesEntity}
 
 /**
  * @author fabian 
@@ -27,7 +28,7 @@ object MEditSubjects {
     }
   }
 
-  def findLectureSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive:String) = {
+  def findLectureSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive: String) = {
 
     val semesterDO = findSemester(semester)
 
@@ -43,16 +44,16 @@ object MEditSubjects {
           criterion.createCriteria("courses").add(Restrictions.idEq(filterCourseId))
         }
 
-      if(!filterActive.equals("-1")){
-        criterion.add(Restrictions.eq("active",filterActive.toBoolean))
-      }
+        if (!filterActive.equals("-1")) {
+          criterion.add(Restrictions.eq("active", filterActive.toBoolean))
+        }
 
         criterion.list().asInstanceOf[java.util.List[LectureSubject]].
           map(element => MSubjects(element.getId, element.getName)).toList
     }
   }
 
-  def findExerciseSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive:String) = {
+  def findExerciseSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive: String) = {
     val semesterDO = findSemester(semester)
 
     Transactions.hibernateAction {
@@ -67,8 +68,8 @@ object MEditSubjects {
           criterion.createCriteria("courses").add(Restrictions.idEq(filterCourseId))
         }
 
-        if(!filterActive.equals("-1")){
-          criterion.add(Restrictions.eq("active",filterActive.toBoolean))
+        if (!filterActive.equals("-1")) {
+          criterion.add(Restrictions.eq("active", filterActive.toBoolean))
         }
 
         criterion.list().asInstanceOf[java.util.List[ExerciseSubject]].
@@ -107,12 +108,47 @@ object MEditSubjects {
     }
   }
 
+  def findRoomAttributes(attributes: List[String]) = {
+    attributes.map(findRoomAttribute)
+  }
+
+  def findRoomAttribute(attrName: String) = {
+    Transactions.hibernateAction {
+      implicit session =>
+        val result = session.createCriteria(classOf[RoomAttributesEntity]).add(Restrictions.eq("attribute", attrName)).uniqueResult()
+
+        result match {
+          case roomAttr: RoomAttributesEntity => roomAttr
+          case null => val roomAttr = new RoomAttributesEntity()
+            roomAttr.setAttribute(attrName)
+            roomAttr
+        }
+    }
+  }
+
   def findCourses(ids: List[Long]) = {
     ids.map {
       id =>
         Transactions.hibernateAction {
           implicit session =>
             session.createCriteria(classOf[Course]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[Course]
+        }
+    }
+  }
+
+  def findHouses() = {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[HouseEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().toList.asInstanceOf[List[HouseEntity]]
+    }
+  }
+
+  def findSelectedHouses(ids: List[Long]) = {
+    ids.map {
+      id =>
+        Transactions.hibernateAction {
+          implicit session =>
+            session.createCriteria(classOf[HouseEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[HouseEntity]
         }
     }
   }

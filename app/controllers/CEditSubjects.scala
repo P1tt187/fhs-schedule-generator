@@ -11,6 +11,8 @@ import play.api.cache.Cache
 import play.api.Play.current
 import scala.collection.JavaConversions._
 import models.Transactions
+import models.persistence.criteria.RoomCriteria
+import models.persistence.enumerations.EPriority
 
 /**
  * @author fabian 
@@ -63,7 +65,7 @@ object CEditSubjects extends Controller {
         Cache.set("courses", course)
         course
       }
-      Ok(Json.stringify(Json.obj("html" -> subjectfields(subjectType, subject, docents, courses).toString())))
+      Ok(Json.stringify(Json.obj("html" -> subjectfields(subjectType, subject, docents, courses, findHouses()).toString().trim())))
     }
   }
 
@@ -99,9 +101,13 @@ object CEditSubjects extends Controller {
 
         val selectDocentsIds = (jsVal \ "selectDocents").as[JsArray].value.map(_.as[String].toLong).toList
 
+        val roomAttributesInput = (jsVal \ "roomAttributes").as[JsArray].value.map(_.as[String]).toList
+
         val selectedCourse = findCourses(selectedCourseIds).toSet
 
         val selectedDocents = findDocents(selectDocentsIds).toSet
+
+        val roomAttributes = findRoomAttributes(roomAttributesInput)
 
         //Logger.debug("" + (jsVal \ "selectCourse"))
 
@@ -116,6 +122,7 @@ object CEditSubjects extends Controller {
             exercise
         }
 
+
         subject.setActive(activeCheckbox)
         subject.setName(nameInput)
         subject.setUnits(unitInput)
@@ -128,9 +135,26 @@ object CEditSubjects extends Controller {
           subject.setExpectedParticipants(null)
         }
 
+        val criteriaContainer = subject.getCriteriaContainer
+        val otherCriterias = criteriaContainer.getCriterias.filterNot(_.isInstanceOf[RoomCriteria])
+        val existingRoomCriterias = criteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria])
+
+        val roomCriteria = new RoomCriteria
+        roomCriteria.setRoomAttributes(roomAttributes)
+        roomCriteria.setPriority(EPriority.HIGH)
+        roomCriteria.setTolerance(false)
+        criteriaContainer.setCriterias(otherCriterias :+ roomCriteria)
+
+
         Transactions {
           implicit entitymanager =>
             entitymanager.merge(subject)
+            existingRoomCriterias.foreach {
+              rc =>
+                val attachedRc = entitymanager.merge(rc)
+                entitymanager.remove(attachedRc)
+            }
+
         }
 
         Ok(Json.stringify(Json.obj("result" -> "succsess")))

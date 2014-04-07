@@ -29,6 +29,7 @@ public class Group extends Participant {
      */
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "parent")
+    @OrderBy("groupType, groupIndex ASC")
     @JsonManagedReference("subgroup")
     private List<Group> subGroups;
 

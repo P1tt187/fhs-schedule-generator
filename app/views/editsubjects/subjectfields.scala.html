@@ -1,9 +1,11 @@
-@(lectureType: String, subject: models.persistence.subject.AbstractSubject, docents: List[models.persistence.Docent], courses: List[models.persistence.participants.Course])
+
+@(lectureType: String, subject: models.persistence.subject.AbstractSubject, docents: List[models.persistence.Docent], courses: List[models.persistence.participants.Course], houses:List[models.persistence.location.HouseEntity])
 
 @import models.persistence.criteria.RoomCriteria
 @import models.fhs.pages.roomdefinition.MRoomdefintion
 
 @import models.persistence.subject.ExerciseSubject
+@import models.persistence.criteria.TimeslotCriteria
 
 <form role="form" id="subjectForm" class="form-inline">
 
@@ -53,19 +55,37 @@
         </div>
     </div>
     <div class="clearfix"></div>
-    <br/>
-    <div class="form-group">
-        <label class="control-label">Raumeigenschaften (Optional)</label>
-        @for(attr<-MRoomdefintion.ATTRIBUTES){
-        <div class="checkbox">
-            <label>                                                                                       @* check if room attr is set *@
-                <input type="checkbox" name="roomAttributes" class="form-control" value="@attr" @if(!subject.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).filter(roomCrit => roomCrit.asInstanceOf[RoomCriteria].getRoomAttributes.count(_.getAttribute.equals(attr))>0).isEmpty){checked} /> @attr
-            </label>
+    <fieldset class=" panel panel-info">
+        <legend > Einschränkungen (Optional) </legend>
+        <div class="form-group">
+            <label class="control-label">Raumeigenschaften</label>
+            @for(attr<-MRoomdefintion.ATTRIBUTES){
+            <div class="checkbox">
+                <label>                                                                                       @* check if room attr is set *@
+                    <input type="checkbox" name="roomAttributes" class="form-control" value="@attr" @if(!subject.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).filter(roomCrit => roomCrit.asInstanceOf[RoomCriteria].getRoomAttributes.count(_.getAttribute.equals(attr))>0).isEmpty){checked} /> @attr
+                </label>
+            </div>
+            }
         </div>
-        }
-    </div>
+        <div class="clearfix"></div>
+        <div class="form-group">
+            <label class="control-label" for="houseCriteria">Lehveranstaltung muss in Gebäude sein</label>
+            <select class="form-control" id="houseCriteria" name="houseCriteria" multiple title="keine Einschränkung">
+                @for(h<-houses){
+                    <option value="@h.getId" @if(
+                         subject.getCriteriaContainer.getCriterias.count {
+                            case _: TimeslotCriteria => false
+                            case rc: RoomCriteria =>
+                                if(rc.getHouse != null) {
+                                    rc.getHouse.equals(h)
+                                } else false
+                        } > 0
+                    ){selected}>@h.getName</option>
+                }
+            </select>
+        </div>
+    </fieldset>
     <div class="clearfix"></div>
-    <br/>
     <div class="form-group">
         <label class="control-label" >Für den Plan Berücksichtigen</label>
         <div class="radio radio-inline">

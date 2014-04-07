@@ -20,17 +20,17 @@
                 <fieldset>
                     <h4>Beginn:</h4>
 
-                    @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
-                    @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4", '_label -> "Minute", '_help -> "")
+                    @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
+                    @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
 
                     <h4>Ende:</h4>
 
-                    @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Stunde", '_help -> "")
-                    @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group span4 ", '_label -> "Minute", '_help -> "")
+                    @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group  ", '_label -> "Stunde", '_help -> "")
+                    @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group  ", '_label -> "Minute", '_help -> "")
 
                     <h4>Wochentage:</h4>
 
-                    <div class='form-group span6 @if(errorWeekdaySelect) {alert alert-danger}'>
+                    <div class='form-group @if(errorWeekdaySelect) {alert alert-danger}'>
                         <label class="control-label" for="weekdays" style="display : block ;">
                         @if(errorWeekdaySelect) {
                             Mindestens ein Wochentag <strong>muss</strong> ausgewählt sein!

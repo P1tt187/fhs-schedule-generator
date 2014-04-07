@@ -38,7 +38,7 @@ class ScheduleGeneratorActor extends Actor {
       //val scheduleFuture = context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures))
 
 
-      val schedule  = Await.result(context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures)), TIMEOUT_VAL seconds).asInstanceOf[ScheduleAnswer].schedule
+      val schedule  = Await.result(context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures.sortBy(_.getCosts) )), TIMEOUT_VAL seconds).asInstanceOf[ScheduleAnswer].schedule
       schedule.setSemester(semester)
 
       sender() ! ScheduleAnswer(schedule)

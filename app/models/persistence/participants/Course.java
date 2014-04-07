@@ -23,6 +23,7 @@ public class Course extends Participant {
 
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, targetEntity = Group.class, fetch = FetchType.LAZY)
+    @OrderBy("groupIndex")
     @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@course_group")
     private List<Group> groups;
 
