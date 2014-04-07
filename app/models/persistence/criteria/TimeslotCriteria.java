@@ -117,7 +117,7 @@ public class TimeslotCriteria extends AbstractCriteria {
         if (stopMinute != null ? !stopMinute.equals(that.stopMinute) : that.stopMinute != null) return false;
         if (isTolerance() != null ? !isTolerance().equals(that.isTolerance()) : that.isTolerance() != null)
             return false;
-        if (weekday != null ? !weekday.equals(that.weekday) : that.weekday != null) return false;
+        if (weekday != null ? !weekday.getSortIndex().equals(that.weekday.getSortIndex()) : that.weekday != null) return false;
         if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
 
         return true;

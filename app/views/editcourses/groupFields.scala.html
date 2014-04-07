@@ -169,8 +169,8 @@
         <script type="text/javascript">
         @if(group.getSubGroups != null) {
 
-            @for(subgroup <- group.getSubGroups) {
-                $.getJSON ( '  @routes.CEditCourses.getGroup(subgroup.getId) ',
+            @for(subgroup <- group.getSubGroups.toList.sorted) {
+                $.getJSON ( '  @routes.CEditCourses.getGroup(subgroup.getId) '.trim(),
                 function ( data ) {
                 $ ( '#subgroupContainer@group.getId ').append(data.htmlresult);
                 } ) ;

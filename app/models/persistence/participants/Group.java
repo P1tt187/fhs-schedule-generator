@@ -11,11 +11,14 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * Created by fabian on 29.01.14.
+ * <p> Groups are Participants for Exercise </p>
+ *
+ * @author fabian
+ *         on 29.01.14.
  */
 @Entity
 @Table(name = "TBLGROUP")
-public class Group extends Participant {
+public class Group extends Participant implements Comparable<Group> {
 
     /**
      * parent group
@@ -139,5 +142,10 @@ public class Group extends Participant {
             }
         }
         return result;
+    }
+
+    @Override
+    public int compareTo(Group that) {
+       return 2 * groupType.compareTo(that.groupType) + groupIndex.compareTo(that.groupIndex);
     }
 }

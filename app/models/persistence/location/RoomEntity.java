@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "TBLROOM")
-public class RoomEntity extends AbstractEntity {
+public class RoomEntity extends AbstractEntity implements Comparable<RoomEntity> {
 
     /**
      * how many people can be in the room
@@ -129,7 +129,7 @@ public class RoomEntity extends AbstractEntity {
             return false;
         if (house != null ? !house.equals(that.house) : that.house != null) return false;
         if (number != null ? !number.equals(that.number) : that.number != null) return false;
-        if (roomAttributes != null ? !roomAttributes.equals(that.roomAttributes) : that.roomAttributes != null)
+        if (roomAttributes != null ? !(roomAttributes.containsAll(that.roomAttributes) && this.roomAttributes.size() == that.roomAttributes.size() ) : that.roomAttributes != null)
             return false;
 
         return true;
@@ -140,7 +140,7 @@ public class RoomEntity extends AbstractEntity {
         int result = capacity != null ? capacity.hashCode() : 0;
         result = 31 * result + (number != null ? number.hashCode() : 0);
         result = 31 * result + (house != null ? house.hashCode() : 0);
-        result = 31 * result + (roomAttributes != null ? roomAttributes.hashCode() : 0);
+        result = 31 * result + (roomAttributes != null ? roomAttributes.stream().mapToInt(RoomAttributesEntity::hashCode).sum() : 0);
         result = 31 * result + (criteriaContainer != null ? criteriaContainer.hashCode() : 0);
         return result;
     }
@@ -155,5 +155,23 @@ public class RoomEntity extends AbstractEntity {
         sb.append(", criteriaContainer=").append(criteriaContainer);
         sb.append('}');
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(RoomEntity that) {
+
+        int ret = 0;
+        ret += this.house.getName().compareTo(that.house.getName());
+        if (ret != 0) {
+            return ret;
+        }
+        ret += this.number.compareTo(that.number);
+        if (ret != 0) {
+            return ret;
+        }
+
+        ret += this.capacity.compareTo(that.capacity);
+
+        return ret;
     }
 }

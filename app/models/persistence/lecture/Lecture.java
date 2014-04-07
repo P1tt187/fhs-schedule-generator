@@ -111,6 +111,10 @@ public class Lecture extends AbstractLecture {
             ret += docents.parallelStream().mapToInt(d -> d.getCriteriaContainer().getCost()).sum();
         }
 
+        if (participants != null) {
+            ret += participants.size();
+        }
+
         return ret;
     }
 

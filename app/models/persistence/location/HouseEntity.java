@@ -63,7 +63,7 @@ public class HouseEntity extends AbstractEntity {
         HouseEntity that = (HouseEntity) o;
 
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (rooms != null ? !(rooms.containsAll(that.rooms) && rooms.size() == that.rooms.size()) : that.rooms != null) return false;
+        //if (rooms != null ? !(rooms.containsAll(that.rooms) && rooms.size() == that.rooms.size()) : that.rooms != null) return false;
 
         return true;
     }
@@ -71,7 +71,7 @@ public class HouseEntity extends AbstractEntity {
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (rooms != null ? rooms.hashCode() : 0);
+        //result = 31 * result + (rooms != null ? rooms.hashCode() : 0);
         return result;
     }
 }

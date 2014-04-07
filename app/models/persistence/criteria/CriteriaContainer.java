@@ -64,7 +64,7 @@ public class CriteriaContainer extends AbstractEntity {
 
         CriteriaContainer that = (CriteriaContainer) o;
 
-        if (criterias != null ? !criterias.equals(that.criterias) : that.criterias != null) return false;
+        if (criterias != null ? !(criterias.containsAll(that.criterias) && criterias.size() == that.criterias.size()) : that.criterias != null) return false;
 
         return true;
     }

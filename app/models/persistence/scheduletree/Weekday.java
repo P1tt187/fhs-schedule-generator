@@ -68,4 +68,24 @@ public class Weekday extends Node implements Comparable<Weekday> {
     public void setSortIndex(Integer sortIndex) {
         this.sortIndex = sortIndex;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Weekday weekday = (Weekday) o;
+
+        if (sortIndex != null ? !sortIndex.equals(weekday.sortIndex) : weekday.sortIndex != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (sortIndex != null ? sortIndex.hashCode() : 0);
+        return result;
+    }
 }

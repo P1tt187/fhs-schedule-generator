@@ -1,5 +1,5 @@
 
-@(lectureType: String, subject: models.persistence.subject.AbstractSubject, docents: List[models.persistence.Docent], courses: List[models.persistence.participants.Course], houses:List[models.persistence.location.HouseEntity])
+@(lectureType: String, subject: models.persistence.subject.AbstractSubject, docents: List[models.persistence.Docent], courses: List[models.persistence.participants.Course], houses:List[models.persistence.location.HouseEntity], rooms:List[models.persistence.location.RoomEntity])
 
 @import models.persistence.criteria.RoomCriteria
 @import models.fhs.pages.roomdefinition.MRoomdefintion
@@ -55,36 +55,54 @@
         </div>
     </div>
     <div class="clearfix"></div>
-    <fieldset class=" panel panel-info">
-        <legend > Einschränkungen (Optional) </legend>
-        <div class="form-group">
-            <label class="control-label">Raumeigenschaften</label>
-            @for(attr<-MRoomdefintion.ATTRIBUTES){
-            <div class="checkbox">
-                <label>                                                                                       @* check if room attr is set *@
-                    <input type="checkbox" name="roomAttributes" class="form-control" value="@attr" @if(!subject.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).filter(roomCrit => roomCrit.asInstanceOf[RoomCriteria].getRoomAttributes.count(_.getAttribute.equals(attr))>0).isEmpty){checked} /> @attr
-                </label>
-            </div>
-            }
-        </div>
-        <div class="clearfix"></div>
-        <div class="form-group">
-            <label class="control-label" for="houseCriteria">Lehveranstaltung muss in Gebäude sein</label>
-            <select class="form-control" id="houseCriteria" name="houseCriteria" multiple title="keine Einschränkung">
-                @for(h<-houses){
-                    <option value="@h.getId" @if(
-                         subject.getCriteriaContainer.getCriterias.count {
-                            case _: TimeslotCriteria => false
-                            case rc: RoomCriteria =>
-                                if(rc.getHouse != null) {
-                                    rc.getHouse.equals(h)
-                                } else false
-                        } > 0
-                    ){selected}>@h.getName</option>
+    <div class="panel panel-info">
+        <fieldset >
+            <legend > Einschränkungen (Optional) </legend>
+            <div class="form-group">
+                <label class="control-label">Raumeigenschaften</label>
+                @for(attr<-MRoomdefintion.ATTRIBUTES){
+                <div class="checkbox">
+                    <label>                                                                                       @* check if room attr is set *@
+                        <input type="checkbox" name="roomAttributes" class="form-control" value="@attr" @if(!subject.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).filter(roomCrit => roomCrit.asInstanceOf[RoomCriteria].getRoomAttributes.count(_.getAttribute.equals(attr))>0).isEmpty){checked} /> @attr
+                    </label>
+                </div>
                 }
-            </select>
-        </div>
-    </fieldset>
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group">
+                <label class="control-label" for="houseCriteria">Gebäude</label>
+                <select class="form-control" id="houseCriteria" name="houseCriteria" multiple title="keine Einschränkung">
+                    @for(h<-houses){
+                        <option value="@h.getId" @if(
+                             subject.getCriteriaContainer.getCriterias.count {
+                                case _: TimeslotCriteria => false
+                                case rc: RoomCriteria =>
+                                    if(rc.getHouse != null) {
+                                        rc.getHouse.equals(h)
+                                    } else false
+                            } > 0
+                        ){selected}>@h.getName</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="roomCriteria" class="control-label">Räume</label>
+                <select class="form-control" id="roomCriteria" name="roomCriteria" multiple title="keine Einschränkung" data-selected-text-format="count>4">
+                    @for(r<-rooms){
+                     <option value="@r.getId" @if(
+                            subject.getCriteriaContainer.getCriterias.count {
+                                case _: TimeslotCriteria => false
+                                case rc: RoomCriteria =>
+                                    if(rc.getRoom != null) {
+                                        rc.getRoom.equals(r)
+                                    } else false
+                            } > 0
+                        ){selected}>@r.getHouse.getName @r.getNumber</option>
+                    }
+                </select>
+            </div>
+        </fieldset>
+    </div>
     <div class="clearfix"></div>
     <div class="form-group">
         <label class="control-label" >Für den Plan Berücksichtigen</label>
@@ -153,6 +171,20 @@ data[ 'subjectId' ] = @subject.getId ;
 
 if ( ! $.isArray ( data[ 'selectCourse' ] ) ) {
 data[ 'selectCourse' ] =[ data[ 'selectCourse' ] ] ;
+}
+
+if(data['houseCriteria']==null){
+    data['houseCriteria']=[];
+}
+if(! $.isArray(data['houseCriteria'])){
+    data['houseCriteria']=[data.houseCriteria];
+}
+
+if(data['roomCriteria']==null){
+data['roomCriteria']=[];
+}
+if(! $.isArray(data['roomCriteria'])){
+data['roomCriteria']=[data.roomCriteria];
 }
 
 if(data['roomAttributes']==null){

@@ -6,7 +6,7 @@ import models.persistence.subject.{ExerciseSubject, LectureSubject}
 import org.hibernate.criterion.{Order, CriteriaSpecification, Restrictions}
 import models.persistence.{Semester, Docent}
 import models.persistence.participants.Course
-import models.persistence.location.{HouseEntity, RoomAttributesEntity}
+import models.persistence.location.{RoomEntity, HouseEntity, RoomAttributesEntity}
 
 /**
  * @author fabian 
@@ -139,16 +139,35 @@ object MEditSubjects {
   def findHouses() = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[HouseEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().toList.asInstanceOf[List[HouseEntity]]
+        session.createCriteria(classOf[HouseEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().toList.asInstanceOf[List[HouseEntity]].sortBy(_.getName)
     }
   }
 
   def findSelectedHouses(ids: List[Long]) = {
-    ids.map {
-      id =>
-        Transactions.hibernateAction {
-          implicit session =>
+
+    Transactions.hibernateAction {
+      implicit session =>
+        ids.map {
+          id =>
+
             session.createCriteria(classOf[HouseEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[HouseEntity]
+        }
+    }
+  }
+
+  def findRooms() = {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[RoomEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().toList.asInstanceOf[List[RoomEntity]].sorted
+    }
+  }
+
+  def findSelectedRooms(ids: List[Long]) = {
+    Transactions.hibernateAction {
+      implicit session =>
+        ids.map {
+          id =>
+            session.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
         }
     }
   }

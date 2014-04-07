@@ -6,13 +6,17 @@ import models.fhs.pages.editsubjects.MEditSubjects._
 import play.api.Logger
 import java.util.regex.Pattern
 import views.html.editsubjects._
-import models.persistence.subject.{ExerciseSubject, LectureSubject}
+import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
 import play.api.cache.Cache
 import play.api.Play.current
 import scala.collection.JavaConversions._
 import models.Transactions
-import models.persistence.criteria.RoomCriteria
+import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCriteria}
 import models.persistence.enumerations.EPriority
+import models.persistence.participants.Course
+import models.persistence.Docent
+import models.persistence.location.{RoomEntity, RoomAttributesEntity, HouseEntity}
+import scala.collection.mutable
 
 /**
  * @author fabian 
@@ -65,7 +69,20 @@ object CEditSubjects extends Controller {
         Cache.set("courses", course)
         course
       }
-      Ok(Json.stringify(Json.obj("html" -> subjectfields(subjectType, subject, docents, courses, findHouses()).toString().trim())))
+
+      val houses = Cache.getOrElse("houses") {
+        val house = findHouses()
+        Cache.set("houses", house)
+        house
+      }
+
+      val rooms =  Cache.getOrElse("rooms") {
+        val room = findRooms()
+        Cache.set("rooms", room)
+        room
+      }
+
+      Ok(Json.stringify(Json.obj("html" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim())))
     }
   }
 
@@ -103,11 +120,19 @@ object CEditSubjects extends Controller {
 
         val roomAttributesInput = (jsVal \ "roomAttributes").as[JsArray].value.map(_.as[String]).toList
 
+        val houseCriteriaIds = (jsVal \ "houseCriteria").as[JsArray].value.map(_.as[String].toLong).toList
+
+        val roomCriteriaIds = (jsVal \ "roomCriteria").as[JsArray].value.map(_.as[String].toLong).toList
+
         val selectedCourse = findCourses(selectedCourseIds).toSet
 
         val selectedDocents = findDocents(selectDocentsIds).toSet
 
         val roomAttributes = findRoomAttributes(roomAttributesInput)
+
+        val selectedHouses = findSelectedHouses(houseCriteriaIds)
+
+        val selectedRooms= findSelectedRooms(roomCriteriaIds)
 
         //Logger.debug("" + (jsVal \ "selectCourse"))
 
@@ -123,33 +148,22 @@ object CEditSubjects extends Controller {
         }
 
 
-        subject.setActive(activeCheckbox)
-        subject.setName(nameInput)
-        subject.setUnits(unitInput)
-        subject.setCourses(selectedCourse)
-        subject.setDocents(selectedDocents)
-
-        if (expectedParticipants != -1) {
-          subject.setExpectedParticipants(expectedParticipants)
-        } else {
-          subject.setExpectedParticipants(null)
-        }
+        initCourseValues(subject, activeCheckbox, nameInput, unitInput, selectedCourse, selectedDocents, expectedParticipants)
 
         val criteriaContainer = subject.getCriteriaContainer
-        val otherCriterias = criteriaContainer.getCriterias.filterNot(_.isInstanceOf[RoomCriteria])
-        val existingRoomCriterias = criteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria])
+        val otherCriteria = criteriaContainer.getCriterias.filterNot(_.isInstanceOf[RoomCriteria])
+        val existingRoomCriteria = criteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria])
 
-        val roomCriteria = new RoomCriteria
-        roomCriteria.setRoomAttributes(roomAttributes)
-        roomCriteria.setPriority(EPriority.HIGH)
-        roomCriteria.setTolerance(false)
-        criteriaContainer.setCriterias(otherCriterias :+ roomCriteria)
+        setRoomAttributesForCriteria(roomAttributes, criteriaContainer, otherCriteria)
 
+        setHouseCriterias(selectedHouses, criteriaContainer)
+
+        setRoomCriterias(selectedRooms, criteriaContainer)
 
         Transactions {
           implicit entitymanager =>
             entitymanager.merge(subject)
-            existingRoomCriterias.foreach {
+            existingRoomCriteria.foreach {
               rc =>
                 val attachedRc = entitymanager.merge(rc)
                 entitymanager.remove(attachedRc)
@@ -166,4 +180,52 @@ object CEditSubjects extends Controller {
       }
   }
 
+
+  private def setRoomCriterias(selectedRooms: List[RoomEntity], criteriaContainer: CriteriaContainer) {
+    val roomCriterias = selectedRooms.map {
+      room =>
+        val rCrit = new RoomCriteria
+        rCrit.setTolerance(false)
+        rCrit.setRoom(room)
+        rCrit.setPriority(EPriority.HIGH)
+        rCrit
+    }
+
+    criteriaContainer.setCriterias(criteriaContainer.getCriterias.toList ++ roomCriterias)
+  }
+
+  private def setHouseCriterias(selectedHouses: List[HouseEntity], criteriaContainer: CriteriaContainer) {
+    val houseCriterias = selectedHouses.map {
+      house =>
+        val rCrit = new RoomCriteria
+        rCrit.setHouse(house)
+        rCrit.setTolerance(false)
+        rCrit.setPriority(EPriority.HIGH)
+        rCrit
+    }
+
+    criteriaContainer.setCriterias(criteriaContainer.getCriterias.toList ++ houseCriterias)
+  }
+
+  private def setRoomAttributesForCriteria(roomAttributes: List[RoomAttributesEntity], criteriaContainer: CriteriaContainer, otherCriterias: mutable.Buffer[AbstractCriteria]) {
+    val roomCriteria = new RoomCriteria
+    roomCriteria.setRoomAttributes(roomAttributes)
+    roomCriteria.setPriority(EPriority.HIGH)
+    roomCriteria.setTolerance(false)
+    criteriaContainer.setCriterias(otherCriterias :+ roomCriteria)
+  }
+
+  private def initCourseValues(subject: AbstractSubject, activeCheckbox: Boolean, nameInput: String, unitInput: Float, selectedCourse: Set[Course], selectedDocents: Set[Docent], expectedParticipants: Int) {
+    subject.setActive(activeCheckbox)
+    subject.setName(nameInput)
+    subject.setUnits(unitInput)
+    subject.setCourses(selectedCourse)
+    subject.setDocents(selectedDocents)
+
+    if (expectedParticipants != -1) {
+      subject.setExpectedParticipants(expectedParticipants)
+    } else {
+      subject.setExpectedParticipants(null)
+    }
+  }
 }
