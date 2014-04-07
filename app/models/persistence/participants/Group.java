@@ -20,7 +20,7 @@ public class Group extends Participant {
     /**
      * parent group
      */
-    @JsonBackReference("subgroup")
+    @JsonBackReference("subgroups")
     @ManyToOne(targetEntity = Group.class)
     private Group parent;
 
@@ -30,7 +30,7 @@ public class Group extends Participant {
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "parent")
     @OrderBy("groupType, groupIndex ASC")
-    @JsonManagedReference("subgroup")
+    @JsonManagedReference("subgroups")
     private List<Group> subGroups;
 
     /**
