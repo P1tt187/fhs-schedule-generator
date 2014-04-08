@@ -12,10 +12,10 @@ import models.persistence.{Schedule, Docent}
 import models.persistence.participants.{Course, Group, Participant}
 import models.persistence.lecture.{ParallelLecture, Lecture, AbstractLecture}
 import play.api.Logger
-import scala.util.Random
 import scala.annotation.tailrec
 import scala.collection.mutable
 import models.persistence.enumerations.EDuration
+import models.persistence.criteria.{TimeslotCriteria, RoomCriteria, AbstractCriteria}
 
 
 /**
@@ -67,7 +67,31 @@ class ScheduleGeneratorSlave extends Actor {
     lectures.foreach {
       lecture =>
 
-        //TODO filter WEEKDAYS
+
+
+        val criterias = (lecture.getDocents.flatMap(_.getCriteriaContainer.getCriterias) ++ lecture.getCriteriaContainer.getCriterias).toSet
+
+
+        val (availableRooms, availableTimeslots) = filterAvailableRoomsAndTimeslots(criterias, rooms, allTimeslots) match {
+          case (roomResult, timeslotResult) =>
+
+            val roomReturn = if (!roomResult.isEmpty) {
+              roomResult
+            } else {
+              rooms
+            }
+            val timeslotReturn = if (!timeslotResult.isEmpty) {
+              timeslotResult
+            } else {
+              allTimeslots
+            }
+
+            (roomReturn, timeslotReturn)
+
+        }
+
+
+
 
         if (lecture.getDuration == EDuration.UNWEEKLY) {
           val parallelLectures = root.getChildren.flatMap(_.getChildren.flatMap {
@@ -100,8 +124,8 @@ class ScheduleGeneratorSlave extends Actor {
             val parallelLecture = new ParallelLecture
             parallelLecture.setLectures(List(lecture))
             lecture.setDuration(EDuration.EVEN)
-            val possibleTimeslots = findPossibleTimeslots(allTimeslots, parallelLecture)
-            initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), filterRooms(rooms, lecture)) match {
+            val possibleTimeslots = findPossibleTimeslots(availableTimeslots.toList, parallelLecture)
+            initTimeslotAndRoom(lecture, possibleTimeslots.toList, availableRooms.toList) match {
               case Some(timeslot) =>
                 timeslot.setLectures(timeslot.getLectures :+ parallelLecture)
               case None =>
@@ -124,9 +148,9 @@ class ScheduleGeneratorSlave extends Actor {
 
         } else {
 
-          //TODO filter weekdays
-          val possibleTimeslots = findPossibleTimeslots(allTimeslots, lecture)
-          initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), filterRooms(rooms, lecture)) match {
+
+          val possibleTimeslots = findPossibleTimeslots(availableTimeslots.toList, lecture)
+          initTimeslotAndRoom(lecture, possibleTimeslots.toList, availableRooms.toList) match {
             case Some(timeslot) => timeslot.setLectures(timeslot.getLectures :+ lecture)
             case None =>
           }
@@ -141,6 +165,45 @@ class ScheduleGeneratorSlave extends Actor {
     sender() ! ScheduleAnswer(schedule)
   }
 
+  @tailrec
+  private def filterAvailableRoomsAndTimeslots(criterias: Set[AbstractCriteria], allRooms: List[RoomEntity], allTimeslots: List[Timeslot], availableRoomsAndSlots: Tuple2[Set[RoomEntity], Set[Timeslot]] = (Set[RoomEntity](), Set[Timeslot]())): Tuple2[Set[RoomEntity], Set[Timeslot]] = {
+    if (criterias.isEmpty) {
+      return availableRoomsAndSlots
+    }
+    val (possibleRooms, possibleSlots) = availableRoomsAndSlots
+
+    var rooms: List[RoomEntity] = null
+
+    criterias.head match {
+      case rCrit: RoomCriteria =>
+
+        var additionalCriteria = Set[AbstractCriteria]()
+
+        if (rCrit.getHouse != null) {
+          rooms = allRooms.filter(_.getHouse.equals(rCrit.getHouse))
+        }
+        if (rCrit.getRoomAttributes != null) {
+          rooms = allRooms.filter(_.getRoomAttributes.containsAll(rCrit.getRoomAttributes))
+        }
+        if (rCrit.getRoom != null) {
+          rooms = allRooms.filter(_.equals(rCrit.getRoom))
+        }
+        rooms.foreach {
+          room =>
+            additionalCriteria ++= room.getCriteriaContainer.getCriterias
+        }
+
+        return filterAvailableRoomsAndTimeslots(additionalCriteria ++ criterias.tail, allRooms, allTimeslots, ((rooms ++ possibleRooms).toSet, possibleSlots))
+
+      case timeslotCrit: TimeslotCriteria =>
+        val filteredSlots = allTimeslots.filter(_.isTimeslotCriteria(timeslotCrit))
+
+        return filterAvailableRoomsAndTimeslots(criterias.tail, allRooms, allTimeslots, (possibleRooms, possibleSlots ++ filteredSlots))
+    }
+
+
+  }
+
 
   private def findPossibleTimeslots(timeslots: List[Timeslot], lecture: AbstractLecture) = {
     timeslots.filter {
@@ -152,7 +215,6 @@ class ScheduleGeneratorSlave extends Actor {
 
   @tailrec
   private def initTimeslotAndRoom(lecture: Lecture, possibleTimeslots: List[Timeslot], rooms: List[RoomEntity]): Option[Timeslot] = {
-    //TODO filter with room criterias
     possibleTimeslots.headOption match {
       case None => Logger.warn("cannot place " + lecture + " no timeslots available")
         notPlaced += 1
@@ -164,9 +226,31 @@ class ScheduleGeneratorSlave extends Actor {
           noRoom += 1
           initTimeslotAndRoom(lecture, possibleTimeslots.tail, rooms)
         } else {
-          lecture.setRoom(possibleRooms.head)
-          placed += 1
-          Some(timeslot)
+
+          val filteredRooms = filterRooms(possibleRooms.filter {
+            room =>
+              val criteria = room.getCriteriaContainer.getCriterias.map {
+                case t: TimeslotCriteria => t
+              }
+
+              if (criteria.isEmpty) {
+                true
+              } else {
+                criteria.count(c => timeslot.isTimeslotCriteria(c)) > 0
+              }
+
+          }, lecture).sortBy(_.getCapacity)
+
+          if (filteredRooms.isEmpty) {
+            Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture.getName)
+            noRoom += 1
+            initTimeslotAndRoom(lecture, possibleTimeslots.tail, rooms)
+          } else {
+
+            lecture.setRoom(filteredRooms.head)
+            placed += 1
+            Some(timeslot)
+          }
         }
 
 

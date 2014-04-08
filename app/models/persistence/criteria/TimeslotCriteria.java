@@ -110,7 +110,6 @@ public class TimeslotCriteria extends AbstractCriteria {
 
         TimeslotCriteria that = (TimeslotCriteria) o;
 
-        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
         if (startHour != null ? !startHour.equals(that.startHour) : that.startHour != null) return false;
         if (startMinute != null ? !startMinute.equals(that.startMinute) : that.startMinute != null) return false;
         if (stopHour != null ? !stopHour.equals(that.stopHour) : that.stopHour != null) return false;
@@ -139,7 +138,6 @@ public class TimeslotCriteria extends AbstractCriteria {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (getId() != null ? getId().hashCode() : 0);
         result = 31 * result + (isTolerance() != null ? isTolerance().hashCode() : 0);
         result = 31 * result + (startHour != null ? startHour.hashCode() : 0);
         result = 31 * result + (startMinute != null ? startMinute.hashCode() : 0);

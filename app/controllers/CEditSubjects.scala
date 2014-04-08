@@ -76,7 +76,7 @@ object CEditSubjects extends Controller {
         house
       }
 
-      val rooms =  Cache.getOrElse("rooms") {
+      val rooms = Cache.getOrElse("rooms") {
         val room = findRooms()
         Cache.set("rooms", room)
         room
@@ -132,7 +132,7 @@ object CEditSubjects extends Controller {
 
         val selectedHouses = findSelectedHouses(houseCriteriaIds)
 
-        val selectedRooms= findSelectedRooms(roomCriteriaIds)
+        val selectedRooms = findSelectedRooms(roomCriteriaIds)
 
         //Logger.debug("" + (jsVal \ "selectCourse"))
 
@@ -154,7 +154,9 @@ object CEditSubjects extends Controller {
         val otherCriteria = criteriaContainer.getCriterias.filterNot(_.isInstanceOf[RoomCriteria])
         val existingRoomCriteria = criteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria])
 
-        setRoomAttributesForCriteria(roomAttributes, criteriaContainer, otherCriteria)
+        if (!roomAttributes.isEmpty) {
+          setRoomAttributesForCriteria(roomAttributes, criteriaContainer, otherCriteria)
+        }
 
         setHouseCriterias(selectedHouses, criteriaContainer)
 

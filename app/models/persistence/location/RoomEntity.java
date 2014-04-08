@@ -125,8 +125,7 @@ public class RoomEntity extends AbstractEntity implements Comparable<RoomEntity>
         RoomEntity that = (RoomEntity) o;
 
         if (capacity != null ? !capacity.equals(that.capacity) : that.capacity != null) return false;
-        if (criteriaContainer != null ? !criteriaContainer.equals(that.criteriaContainer) : that.criteriaContainer != null)
-            return false;
+
         if (house != null ? !house.equals(that.house) : that.house != null) return false;
         if (number != null ? !number.equals(that.number) : that.number != null) return false;
         if (roomAttributes != null ? !(roomAttributes.containsAll(that.roomAttributes) && this.roomAttributes.size() == that.roomAttributes.size() ) : that.roomAttributes != null)

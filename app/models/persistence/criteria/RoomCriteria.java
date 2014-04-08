@@ -33,7 +33,7 @@ public class RoomCriteria extends AbstractCriteria {
      * a specific attributes can be a criteria
      */
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = RoomAttributesEntity.class, cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
+    @ManyToMany(targetEntity = RoomAttributesEntity.class, cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.EAGER)
     private List<RoomAttributesEntity> roomAttributes;
 
     public List<RoomAttributesEntity> getRoomAttributes() {

@@ -1,9 +1,12 @@
 package models.persistence.scheduletree;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import models.persistence.criteria.TimeslotCriteria;
 import models.persistence.lecture.AbstractLecture;
 
 import javax.persistence.*;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -99,6 +102,37 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
         if (stopMinute != null ? !stopMinute.equals(timeslot.stopMinute) : timeslot.stopMinute != null) return false;
 
         return true;
+    }
+
+    @JsonIgnore
+    public Boolean isTimeslotCriteria(TimeslotCriteria timeslotCriteria) {
+
+        int otherStartHour = timeslotCriteria.getStartHour();
+        int otherStartMinute = timeslotCriteria.getStartMinute();
+        int otherStopHour = timeslotCriteria.getStopHour();
+        int otherStopMinute = timeslotCriteria.getStopMinute();
+        int thisWeekday = ((Weekday) parent).getSortIndex();
+        int otherWeekday = timeslotCriteria.getWeekday().getSortIndex();
+
+        Calendar thisStartDate = Calendar.getInstance();
+        Calendar thisStopDate = Calendar.getInstance();
+        Calendar thatStartDate = Calendar.getInstance();
+        Calendar thatStopDate = Calendar.getInstance();
+
+        initCalendarFields(thisStartDate, startHour, startMinute, thisWeekday);
+        initCalendarFields(thisStopDate, stopHour, stopMinute, thisWeekday);
+        initCalendarFields(thatStartDate, otherStartHour, otherStartMinute, otherWeekday);
+        initCalendarFields(thatStopDate, otherStopHour, otherStopMinute, otherWeekday);
+
+        return thisStartDate.compareTo(thatStartDate) >= 0 && thisStopDate.compareTo(thatStopDate) <= 0;
+    }
+
+    private void initCalendarFields(Calendar calendar, int hour, int minute, int weekdayIndex) {
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.DAY_OF_WEEK, weekdayIndex + 1);
     }
 
     @Override
