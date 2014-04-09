@@ -7,6 +7,7 @@ import org.hibernate.criterion.{Order, CriteriaSpecification, Restrictions}
 import models.persistence.{Semester, Docent}
 import models.persistence.participants.Course
 import models.persistence.location.{RoomEntity, HouseEntity, RoomAttributesEntity}
+import org.hibernate.FetchMode
 
 /**
  * @author fabian 
@@ -36,8 +37,9 @@ object MEditSubjects {
       implicit session =>
         val criterion = session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name"))
 
+        criterion.setFetchMode("criteriaContainer",FetchMode.SELECT)
         if (filterDocentId != -1) {
-          criterion.createCriteria("docents").add(Restrictions.idEq(filterDocentId))
+          criterion.createCriteria("docents").setFetchMode("criteriaContainer",FetchMode.SELECT).add(Restrictions.idEq(filterDocentId))
         }
 
         if (filterCourseId != -1) {
@@ -139,7 +141,7 @@ object MEditSubjects {
   def findHouses() = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[HouseEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().toList.asInstanceOf[List[HouseEntity]].sortBy(_.getName)
+        session.createCriteria(classOf[HouseEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).setFetchMode("rooms", FetchMode.SELECT).list().toList.asInstanceOf[List[HouseEntity]].sortBy(_.getName)
     }
   }
 
@@ -158,7 +160,7 @@ object MEditSubjects {
   def findRooms() = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[RoomEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().toList.asInstanceOf[List[RoomEntity]].sorted
+        session.createCriteria(classOf[RoomEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).setFetchMode("house.rooms", FetchMode.SELECT).setFetchMode("roomAttributes",FetchMode.SELECT).list().toList.asInstanceOf[List[RoomEntity]].sorted
     }
   }
 
