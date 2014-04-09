@@ -17,9 +17,11 @@ import scala.collection.mutable
 import models.persistence.enumerations.EDuration
 import models.persistence.criteria.{TimeslotCriteria, RoomCriteria, AbstractCriteria}
 import org.hibernate.FetchMode
-
+import akka.pattern.ask
 import scala.concurrent.duration._
 import akka.util.Timeout
+import scala.util.Random
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * @author fabian 
@@ -150,11 +152,16 @@ class ScheduleGeneratorSlave extends Actor {
 
 
           val possibleTimeslots = findPossibleTimeslots(availableTimeslots.toList, lecture)
-          initTimeslotAndRoom(lecture, possibleTimeslots.toList, availableRooms.toList) match {
+          initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), availableRooms.toList) match {
             case Some(timeslot) => timeslot.setLectures(timeslot.getLectures :+ lecture)
             case None =>
-              /*
-              lecture.increaseCostField()
+/*
+              lectures.foreach{element =>
+              if(element.getName.equals(lecture.getName)){
+                element.increaseCostField()
+              }
+              }
+
 
                val future =  ask(self,SlaveGenerate(lectures.sortBy(- _.getCosts)))
 
@@ -162,7 +169,7 @@ class ScheduleGeneratorSlave extends Actor {
                   case answer:ScheduleAnswer => sender()!answer
                }
               return
-              */
+*/
           }
         }
     }
@@ -217,7 +224,6 @@ class ScheduleGeneratorSlave extends Actor {
 
   private def findPossibleTimeslots(timeslots: List[Timeslot], lecture: AbstractLecture) = {
     timeslots.filter {
-      //TODO filter with timecriterias
       timeslot =>
         !timeslotContainsDocents(timeslot, lecture.getDocents.toSet) && !timeslotContainsParticipants(timeslot, lecture.getParticipants.toSet)
     }
@@ -226,7 +232,7 @@ class ScheduleGeneratorSlave extends Actor {
   @tailrec
   private def initTimeslotAndRoom(lecture: Lecture, possibleTimeslots: List[Timeslot], rooms: List[RoomEntity]): Option[Timeslot] = {
     possibleTimeslots.headOption match {
-      case None => Logger.warn("cannot place " + lecture.getName + " "+lecture.getKind + " no timeslots available")
+      case None => Logger.warn("cannot place " + lecture.getName + " "+lecture.getKind + " " + lecture.getParticipants.map(_.getName) +" no timeslots available")
         notPlaced += 1
         None
       case Some(timeslot) =>
