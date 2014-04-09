@@ -49,6 +49,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setLectureSynonyms(lectureSubject.getSubjectSynonyms)
                 lecture.setKind(ELectureKind.LECTURE)
                 lecture.setExpectedParticipants(lectureSubject.getExpectedParticipants)
+                lecture.setCostField(lectureSubject.getUnits.toInt)
                 addedLectures += 1
                 lecture
               }
@@ -93,6 +94,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setLectureSynonyms(exerciseSubject.getSubjectSynonyms)
                 lecture.setKind(ELectureKind.EXERCISE)
                 lecture.setExpectedParticipants(exerciseSubject.getExpectedParticipants)
+                lecture.setCostField(exerciseSubject.getUnits.toInt)
                 addedExercises += 1
                 lecture
               }

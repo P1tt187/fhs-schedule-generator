@@ -87,6 +87,10 @@ public class Lecture extends AbstractLecture {
     @JsonIgnore
     private Integer costField = 0;
 
+    public void setCostField(Integer costField) {
+        this.costField = costField;
+    }
+
     public void increaseCostField() {
         if (costField == 0 || costField == 1) {
             costField++;
