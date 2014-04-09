@@ -83,6 +83,16 @@ public class Lecture extends AbstractLecture {
     @Column(name = "EXPECTED_PARTICIPANTS")
     private Integer expectedParticipants;
 
+    @Transient
+    @JsonIgnore
+    private Integer costField = 0;
+
+    public void increaseCostField() {
+        if (costField == 0 || costField == 1) {
+            costField++;
+        }
+        costField *= costField;
+    }
 
     /**
      * if expected participants is set it will return it
@@ -114,6 +124,9 @@ public class Lecture extends AbstractLecture {
         if (participants != null) {
             ret += participants.size();
         }
+
+        ret += calculateNumberOfParticipants();
+        ret += costField;
 
         return ret;
     }

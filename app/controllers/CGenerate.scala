@@ -103,8 +103,10 @@ object CGenerate extends Controller {
         },
         result => {
           actorFinished = false
+          val subjects = findActiveSubjectsBySemesterId(result.id)
+          val semester = findSemesterById(result.id)
           startTime = Calendar.getInstance()
-          scheduleFuture = ask(Akka.system.actorOf(Props[ScheduleGeneratorActor]), GenerateSchedule(findActiveSubjectsBySemesterId(result.id), findSemesterById(result.id)))
+          scheduleFuture = ask(Akka.system.actorOf(Props[ScheduleGeneratorActor]), GenerateSchedule( subjects , semester))
           scheduleFuture.onSuccess {
             case ScheduleAnswer(theSchedule) => this.schedule = theSchedule
               actorFinished = true

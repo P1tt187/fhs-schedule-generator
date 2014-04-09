@@ -51,8 +51,8 @@ object CEditSubjects extends Controller {
       }
 
       subject match {
-        case exersiseSubject: ExerciseSubject =>
-          Logger.debug(exersiseSubject.getGroupType)
+        case exerciseSubject: ExerciseSubject =>
+          Logger.debug(exerciseSubject.getGroupType)
         case _ =>
       }
 

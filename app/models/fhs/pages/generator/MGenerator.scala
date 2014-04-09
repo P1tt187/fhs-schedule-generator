@@ -11,6 +11,7 @@ import scala.annotation.tailrec
 import models.persistence.scheduletree.{Weekday, Timeslot}
 import models.persistence.participants.Course
 import scala.Some
+import org.hibernate.FetchMode
 
 
 /**
@@ -37,6 +38,7 @@ object MGenerator {
       implicit session =>
         val criterion = session.createCriteria(classOf[AbstractSubject]).add(Restrictions.eq("active", true)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
         criterion.createCriteria("semester").add(Restrictions.idEq(id))
+        criterion.setFetchMode("criteriaContainer.house.rooms",FetchMode.JOIN)
 
         criterion.list().asInstanceOf[JavaList[AbstractSubject]].toList
 

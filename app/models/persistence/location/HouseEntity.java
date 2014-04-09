@@ -19,7 +19,7 @@ public class HouseEntity extends AbstractEntity {
     private String name;
 
     @JsonManagedReference("rooms")
-    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "house", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
     private List<RoomEntity> rooms;
 

@@ -16,7 +16,10 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import models.persistence.enumerations.EDuration
 import models.persistence.criteria.{TimeslotCriteria, RoomCriteria, AbstractCriteria}
+import org.hibernate.FetchMode
 
+import scala.concurrent.duration._
+import akka.util.Timeout
 
 /**
  * @author fabian 
@@ -29,6 +32,10 @@ class ScheduleGeneratorSlave extends Actor {
   private var notPlaced = 0
 
   private var noRoom = 0
+
+  val TIMEOUT_VAL = 30
+
+  implicit val timeout = Timeout(TIMEOUT_VAL seconds)
 
   private def filterRooms(rooms: List[RoomEntity], lecture: Lecture) = rooms.par.filter(_.getCapacity >= lecture.calculateNumberOfParticipants()).toList
 
@@ -45,17 +52,17 @@ class ScheduleGeneratorSlave extends Actor {
     case _ =>
   }
 
-  private def placeLectures(lectures: List[Lecture]) = {
+  private def placeLectures(lectures: List[Lecture])  {
     Logger.debug("number of lectures: " + lectures.size)
 
     val rooms = Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[RoomEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[RoomEntity]].toList
+        session.createCriteria(classOf[RoomEntity]).setCacheable(true).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).setFetchMode("house.rooms",FetchMode.JOIN).list().asInstanceOf[JavaList[RoomEntity]].toList
     }
 
     val weekdays: List[Weekday] = Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[WeekdayTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[WeekdayTemplate]].toList.sortBy(_.getSortIndex)
+        session.createCriteria(classOf[WeekdayTemplate]).setCacheable(true).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[WeekdayTemplate]].toList.sortBy(_.getSortIndex)
     }
 
     val root = new Root
@@ -66,32 +73,25 @@ class ScheduleGeneratorSlave extends Actor {
 
     lectures.foreach {
       lecture =>
-
-
-
         val criterias = (lecture.getDocents.flatMap(_.getCriteriaContainer.getCriterias) ++ lecture.getCriteriaContainer.getCriterias).toSet
-
 
         val (availableRooms, availableTimeslots) = filterAvailableRoomsAndTimeslots(criterias, rooms, allTimeslots) match {
           case (roomResult, timeslotResult) =>
 
             val roomReturn = if (!roomResult.isEmpty) {
-              roomResult
+              roomResult.toList.sortBy(_.getCapacity)
             } else {
-              rooms
+              rooms.toList.sortBy(_.getCapacity)
             }
             val timeslotReturn = if (!timeslotResult.isEmpty) {
-              timeslotResult
+              timeslotResult.toList.sorted
             } else {
-              allTimeslots
+              allTimeslots.sorted
             }
 
             (roomReturn, timeslotReturn)
 
         }
-
-
-
 
         if (lecture.getDuration == EDuration.UNWEEKLY) {
           val parallelLectures = root.getChildren.flatMap(_.getChildren.flatMap {
@@ -124,8 +124,8 @@ class ScheduleGeneratorSlave extends Actor {
             val parallelLecture = new ParallelLecture
             parallelLecture.setLectures(List(lecture))
             lecture.setDuration(EDuration.EVEN)
-            val possibleTimeslots = findPossibleTimeslots(availableTimeslots.toList, parallelLecture)
-            initTimeslotAndRoom(lecture, possibleTimeslots.toList, availableRooms.toList) match {
+            val possibleTimeslots = findPossibleTimeslots(availableTimeslots, parallelLecture)
+            initTimeslotAndRoom(lecture, possibleTimeslots.toList, availableRooms) match {
               case Some(timeslot) =>
                 timeslot.setLectures(timeslot.getLectures :+ parallelLecture)
               case None =>
@@ -153,6 +153,16 @@ class ScheduleGeneratorSlave extends Actor {
           initTimeslotAndRoom(lecture, possibleTimeslots.toList, availableRooms.toList) match {
             case Some(timeslot) => timeslot.setLectures(timeslot.getLectures :+ lecture)
             case None =>
+              /*
+              lecture.increaseCostField()
+
+               val future =  ask(self,SlaveGenerate(lectures.sortBy(- _.getCosts)))
+
+               future.onSuccess {
+                  case answer:ScheduleAnswer => sender()!answer
+               }
+              return
+              */
           }
         }
     }
@@ -182,7 +192,7 @@ class ScheduleGeneratorSlave extends Actor {
         if (rCrit.getHouse != null) {
           rooms = allRooms.filter(_.getHouse.equals(rCrit.getHouse))
         }
-        if (rCrit.getRoomAttributes != null) {
+        if (rCrit.getRoomAttributes != null && !rCrit.getRoomAttributes.isEmpty) {
           rooms = allRooms.filter(_.getRoomAttributes.containsAll(rCrit.getRoomAttributes))
         }
         if (rCrit.getRoom != null) {
@@ -216,13 +226,13 @@ class ScheduleGeneratorSlave extends Actor {
   @tailrec
   private def initTimeslotAndRoom(lecture: Lecture, possibleTimeslots: List[Timeslot], rooms: List[RoomEntity]): Option[Timeslot] = {
     possibleTimeslots.headOption match {
-      case None => Logger.warn("cannot place " + lecture + " no timeslots available")
+      case None => Logger.warn("cannot place " + lecture.getName + " "+lecture.getKind + " no timeslots available")
         notPlaced += 1
         None
       case Some(timeslot) =>
         val possibleRooms = rooms.diff(timeslot.getLectures.flatMap(_.getRooms)).sortBy(_.getCapacity)
         if (possibleRooms.isEmpty) {
-          Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture)
+         // Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture)
           noRoom += 1
           initTimeslotAndRoom(lecture, possibleTimeslots.tail, rooms)
         } else {
@@ -242,7 +252,7 @@ class ScheduleGeneratorSlave extends Actor {
           }, lecture).sortBy(_.getCapacity)
 
           if (filteredRooms.isEmpty) {
-            Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture.getName)
+           // Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture.getName)
             noRoom += 1
             initTimeslotAndRoom(lecture, possibleTimeslots.tail, rooms)
           } else {
