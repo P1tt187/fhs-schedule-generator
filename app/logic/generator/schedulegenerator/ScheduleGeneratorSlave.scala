@@ -1,6 +1,6 @@
 package logic.generator.schedulegenerator
 
-import akka.actor.Actor
+import akka.actor.{Props, Actor}
 import models.persistence.scheduletree.{Timeslot, Weekday, Root}
 import models.Transactions
 import models.persistence.location.RoomEntity
@@ -17,11 +17,12 @@ import scala.collection.mutable
 import models.persistence.enumerations.EDuration
 import models.persistence.criteria.{TimeslotCriteria, RoomCriteria, AbstractCriteria}
 import org.hibernate.FetchMode
-import akka.pattern.ask
 import scala.concurrent.duration._
 import akka.util.Timeout
 import scala.util.Random
+import akka.pattern.ask
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Await
 
 /**
  * @author fabian 
@@ -54,12 +55,12 @@ class ScheduleGeneratorSlave extends Actor {
     case _ =>
   }
 
-  private def placeLectures(lectures: List[Lecture])  {
+  private def placeLectures(lectures: List[Lecture]) {
     Logger.debug("number of lectures: " + lectures.size)
 
     val rooms = Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[RoomEntity]).setCacheable(true).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).setFetchMode("house.rooms",FetchMode.JOIN).list().asInstanceOf[JavaList[RoomEntity]].toList
+        session.createCriteria(classOf[RoomEntity]).setCacheable(true).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).setFetchMode("house.rooms", FetchMode.JOIN).list().asInstanceOf[JavaList[RoomEntity]].toList
     }
 
     val weekdays: List[Weekday] = Transactions.hibernateAction {
@@ -75,25 +76,29 @@ class ScheduleGeneratorSlave extends Actor {
 
     lectures.foreach {
       lecture =>
-        val criterias = (lecture.getDocents.flatMap(_.getCriteriaContainer.getCriterias) ++ lecture.getCriteriaContainer.getCriterias).toSet
+      /*
+      val criterias = (lecture.getDocents.flatMap(_.getCriteriaContainer.getCriterias) ++ lecture.getCriteriaContainer.getCriterias).toSet
 
-        val (availableRooms, availableTimeslots) = filterAvailableRoomsAndTimeslots(criterias, rooms, allTimeslots) match {
-          case (roomResult, timeslotResult) =>
+      val (availableRooms, availableTimeslots) = filterAvailableRoomsAndTimeslots(criterias, rooms, allTimeslots) match {
+        case (roomResult, timeslotResult) =>
 
-            val roomReturn = if (!roomResult.isEmpty) {
-              roomResult.toList.sortBy(_.getCapacity)
-            } else {
-              rooms.toList.sortBy(_.getCapacity)
-            }
-            val timeslotReturn = if (!timeslotResult.isEmpty) {
-              timeslotResult.toList.sorted
-            } else {
-              allTimeslots.sorted
-            }
+          val roomReturn = if (!roomResult.isEmpty) {
+            roomResult.toList.sortBy(_.getCapacity)
+          } else {
+            rooms.toList.sortBy(_.getCapacity)
+          }
+          val timeslotReturn = if (!timeslotResult.isEmpty) {
+            timeslotResult.toList.sorted
+          } else {
+            allTimeslots.sorted
+          }
 
-            (roomReturn, timeslotReturn)
+          (roomReturn, timeslotReturn)
 
-        }
+      }
+*/
+  //      val (availableRooms, availableTimeslots) = filterAvailableRoomsAndTimeslotsForLecture(lecture, rooms, allTimeslots)
+        val (availableRooms, availableTimeslots) = (filterRooms(lecture,rooms),allTimeslots)
 
         if (lecture.getDuration == EDuration.UNWEEKLY) {
           val parallelLectures = root.getChildren.flatMap(_.getChildren.flatMap {
@@ -152,23 +157,26 @@ class ScheduleGeneratorSlave extends Actor {
 
 
           val possibleTimeslots = findPossibleTimeslots(availableTimeslots.toList, lecture)
-          initTimeslotAndRoom(lecture, Random.shuffle(possibleTimeslots.toList), availableRooms.toList) match {
+          initTimeslotAndRoom(lecture, possibleTimeslots.toList, availableRooms.toList) match {
             case Some(timeslot) => timeslot.setLectures(timeslot.getLectures :+ lecture)
             case None =>
+
+                         /* lectures.foreach{element =>
+                          if(element.getName.equals(lecture.getName)){
+                            element.increaseCostField()
+                          }
+                          }*/
+
+              lecture.increaseCostField();
+
+
 /*
-              lectures.foreach{element =>
-              if(element.getName.equals(lecture.getName)){
-                element.increaseCostField()
+
+              Await.result(context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(lectures.sortBy(- _.getCosts)), 30 seconds ) match {
+                case answer:ScheduleAnswer => sender()!answer
               }
-              }
 
-
-               val future =  ask(self,SlaveGenerate(lectures.sortBy(- _.getCosts)))
-
-               future.onSuccess {
-                  case answer:ScheduleAnswer => sender()!answer
-               }
-              return
+                          return
 */
           }
         }
@@ -182,42 +190,98 @@ class ScheduleGeneratorSlave extends Actor {
     sender() ! ScheduleAnswer(schedule)
   }
 
-  @tailrec
-  private def filterAvailableRoomsAndTimeslots(criterias: Set[AbstractCriteria], allRooms: List[RoomEntity], allTimeslots: List[Timeslot], availableRoomsAndSlots: Tuple2[Set[RoomEntity], Set[Timeslot]] = (Set[RoomEntity](), Set[Timeslot]())): Tuple2[Set[RoomEntity], Set[Timeslot]] = {
-    if (criterias.isEmpty) {
-      return availableRoomsAndSlots
-    }
-    val (possibleRooms, possibleSlots) = availableRoomsAndSlots
+  private def filterRooms(lecture: Lecture, allRooms: List[RoomEntity]): List[RoomEntity]={
 
-    var rooms: List[RoomEntity] = null
+    @tailrec
+    def filterRecursive(criterias: Set[RoomCriteria], roomBuffer:Set[RoomEntity]=Set[RoomEntity]()):Set[RoomEntity]={
 
-    criterias.head match {
-      case rCrit: RoomCriteria =>
+      if(criterias.isEmpty){
+        return roomBuffer
+      }
 
-        var additionalCriteria = Set[AbstractCriteria]()
+      val rCrit = criterias.head
 
-        if (rCrit.getHouse != null) {
-          rooms = allRooms.filter(_.getHouse.equals(rCrit.getHouse))
-        }
-        if (rCrit.getRoomAttributes != null && !rCrit.getRoomAttributes.isEmpty) {
-          rooms = allRooms.filter(_.getRoomAttributes.containsAll(rCrit.getRoomAttributes))
-        }
-        if (rCrit.getRoom != null) {
-          rooms = allRooms.filter(_.equals(rCrit.getRoom))
-        }
-        rooms.foreach {
-          room =>
-            additionalCriteria ++= room.getCriteriaContainer.getCriterias
-        }
+      var rooms: List[RoomEntity] = null
 
-        return filterAvailableRoomsAndTimeslots(additionalCriteria ++ criterias.tail, allRooms, allTimeslots, ((rooms ++ possibleRooms).toSet, possibleSlots))
+      if (rCrit.getHouse != null) {
+        rooms = allRooms.filter(_.getHouse.equals(rCrit.getHouse))
+      }
+      if (rCrit.getRoomAttributes != null && !rCrit.getRoomAttributes.isEmpty) {
+        rooms = allRooms.filter(_.getRoomAttributes.containsAll(rCrit.getRoomAttributes))
+      }
+      if (rCrit.getRoom != null) {
+        rooms = allRooms.filter(_.equals(rCrit.getRoom))
+      }
 
-      case timeslotCrit: TimeslotCriteria =>
-        val filteredSlots = allTimeslots.filter(_.isTimeslotCriteria(timeslotCrit))
-
-        return filterAvailableRoomsAndTimeslots(criterias.tail, allRooms, allTimeslots, (possibleRooms, possibleSlots ++ filteredSlots))
+      filterRecursive(criterias.tail,roomBuffer ++ rooms)
     }
 
+    val roomCriterias = (lecture.getCriteriaContainer.getCriterias ++ lecture.getDocents.flatMap(_.getCriteriaContainer.getCriterias)) .filter(_.isInstanceOf[RoomCriteria]).map{case rcrit:RoomCriteria => rcrit}
+    if(roomCriterias.isEmpty){
+      return allRooms
+    }
+
+    filterRecursive(roomCriterias.toSet).toList
+  }
+
+  def filterAvailableRoomsAndTimeslotsForLecture(lecture: Lecture, allRooms: List[RoomEntity], allTimeslots: List[Timeslot]) = {
+
+    @tailrec
+    def filterAvailableRoomsAndTimeslots(criterias: Set[AbstractCriteria], allRooms: List[RoomEntity], allTimeslots: List[Timeslot], availableRoomsAndSlots: (Set[RoomEntity], Set[Timeslot]) = (Set[RoomEntity](), Set[Timeslot]())): (Set[RoomEntity], Set[Timeslot]) = {
+      if (criterias.isEmpty) {
+        return availableRoomsAndSlots
+      }
+      val (possibleRooms, possibleSlots) = availableRoomsAndSlots
+
+      var rooms: List[RoomEntity] = null
+
+      criterias.head match {
+        case rCrit: RoomCriteria =>
+
+          var additionalCriteria = Set[AbstractCriteria]()
+
+          if (rCrit.getHouse != null) {
+            rooms = allRooms.filter(_.getHouse.equals(rCrit.getHouse))
+          }
+          if (rCrit.getRoomAttributes != null && !rCrit.getRoomAttributes.isEmpty) {
+            rooms = allRooms.filter(_.getRoomAttributes.containsAll(rCrit.getRoomAttributes))
+          }
+          if (rCrit.getRoom != null) {
+            rooms = allRooms.filter(_.equals(rCrit.getRoom))
+          }
+          var timeslots = Set[Timeslot]()
+
+          rooms.foreach {
+            room =>
+              if(room.getCriteriaContainer.getCriterias.isEmpty){
+                timeslots++=allTimeslots
+              }
+              additionalCriteria ++= room.getCriteriaContainer.getCriterias
+          }
+
+
+          return filterAvailableRoomsAndTimeslots(additionalCriteria ++ criterias.tail, allRooms, allTimeslots, ( possibleRooms ++ rooms, possibleSlots ++ timeslots))
+
+        case timeslotCrit: TimeslotCriteria =>
+          val filteredSlots = allTimeslots.filter(_.isTimeslotCriteria(timeslotCrit))
+
+          return filterAvailableRoomsAndTimeslots(criterias.tail, allRooms, allTimeslots, (possibleRooms, possibleSlots ++ filteredSlots))
+      }
+
+
+    }
+
+    val (rooms, slots) = filterAvailableRoomsAndTimeslots(lecture.getCriteriaContainer.getCriterias.toSet, allRooms, allTimeslots)
+
+    val docentCriterias = lecture.getDocents.flatMap(_.getCriteriaContainer.getCriterias).toSet
+
+    val (resultRoom, resultSlot) =
+      if (!docentCriterias.isEmpty) {
+        filterAvailableRoomsAndTimeslots(docentCriterias, rooms.toList, slots.toList)
+      } else {
+        (rooms, slots)
+      }
+    (resultRoom.toList, resultSlot.toList)
 
   }
 
@@ -231,14 +295,14 @@ class ScheduleGeneratorSlave extends Actor {
 
   @tailrec
   private def initTimeslotAndRoom(lecture: Lecture, possibleTimeslots: List[Timeslot], rooms: List[RoomEntity]): Option[Timeslot] = {
-    possibleTimeslots.headOption match {
-      case None => Logger.warn("cannot place " + lecture.getName + " "+lecture.getKind + " " + lecture.getParticipants.map(_.getName) +" no timeslots available")
+    Random.shuffle(possibleTimeslots).headOption match {
+      case None => Logger.warn("cannot place " + lecture.getName + " " + lecture.getKind + " " + lecture.getParticipants.map(_.getName) + " no timeslots available")
         notPlaced += 1
         None
       case Some(timeslot) =>
         val possibleRooms = rooms.diff(timeslot.getLectures.flatMap(_.getRooms)).sortBy(_.getCapacity)
         if (possibleRooms.isEmpty) {
-         // Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture)
+          // Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture)
           noRoom += 1
           initTimeslotAndRoom(lecture, possibleTimeslots.tail, rooms)
         } else {
@@ -258,7 +322,7 @@ class ScheduleGeneratorSlave extends Actor {
           }, lecture).sortBy(_.getCapacity)
 
           if (filteredRooms.isEmpty) {
-           // Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture.getName)
+            // Logger.debug("no room in timeslot " + timeslot + " for lecture " + lecture.getName)
             noRoom += 1
             initTimeslotAndRoom(lecture, possibleTimeslots.tail, rooms)
           } else {

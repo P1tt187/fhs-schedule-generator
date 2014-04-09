@@ -206,7 +206,7 @@
                                             </tr>
                                         }
 
-                                        @for(tcrit <- roomEntity.timeCriterias.sortBy(_.weekdayIndex)) {
+                                        @for(tcrit <- roomEntity.timeCriterias.sorted) {
                                             <tr >
                                                 <td>@tcrit.weekday.substring(0, 2)</td>
                                                 <td>@tcrit.startHour.formatted("%02d")
