@@ -1,12 +1,13 @@
 package logic.generator.schedulegenerator
 
-import akka.actor.{Props, Actor}
+import akka.actor.{PoisonPill, Props, Actor}
 import akka.util.Timeout
 import scala.concurrent.duration._
 import akka.pattern.ask
 import logic.generator.lecturegenerator.{LectureAnswer, GenerateLectures, LectureGeneratorActor}
 import scala.concurrent.Await
 import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
 /**
@@ -17,7 +18,9 @@ class ScheduleGeneratorActor extends Actor {
 
   private val cloner = new Cloner(new ObjenesisInstantiationStrategy)
 
-  val TIMEOUT_VAL = 30
+  private var stopPlacing = false
+
+  val TIMEOUT_VAL = 60
 
   implicit val timeout = Timeout(TIMEOUT_VAL seconds)
 
@@ -29,7 +32,7 @@ class ScheduleGeneratorActor extends Actor {
 
       val lectureFuture = ask(lectureGenerationActor, GenerateLectures(subjectList)).mapTo[LectureAnswer]
 
-      val lectures = Await.result(lectureFuture,TIMEOUT_VAL seconds).lectures
+      val lectures = Await.result(lectureFuture, TIMEOUT_VAL seconds).lectures
 
       //Logger.debug("lectures: \n" + lectures.mkString("\n"))
 
@@ -38,19 +41,29 @@ class ScheduleGeneratorActor extends Actor {
       //val scheduleFuture = context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures))
 
 
-      val schedule  = Await.result(context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures.sortBy(- _.getCosts) )), TIMEOUT_VAL seconds).asInstanceOf[ScheduleAnswer].schedule
-      schedule.setSemester(semester)
+      val theSender = sender()
 
-      sender() ! ScheduleAnswer(schedule)
+      def generate() {
+        val scheduleFuture = context.actorOf(Props[ScheduleGeneratorSlave]) ? SlaveGenerate(lectures.sortBy(-_.getCosts))
 
-      /*scheduleFuture.onSuccess {
-        case ScheduleAnswer(schedule) => sender() ! ScheduleAnswer(schedule)
-        case _=>
+        scheduleFuture.onSuccess {
+          case  ScheduleAnswer(answer) => theSender ! ScheduleAnswer(answer)
 
-      }*/
+          case PlacingFailure =>
+            if (!stopPlacing) {
+              generate()
+            }
+          case _ =>
 
+        }
+      }
 
+      generate()
+
+    case PoisonPill =>
+      stopPlacing = true
     case _ =>
   }
+
 
 }

@@ -13,7 +13,7 @@ import scala.concurrent.Future
 import logic.generator.schedulegenerator.{GenerateSchedule, ScheduleGeneratorActor, ScheduleAnswer}
 
 import play.api.libs.concurrent.Akka
-import akka.actor.Props
+import akka.actor.{PoisonPill, Props}
 import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits._
 import akka.pattern.ask
@@ -47,7 +47,7 @@ object CGenerate extends Controller {
     mapping("id" -> longNumber)(GeneratorForm.apply)(GeneratorForm.unapply)
   )
 
-  implicit val timeout = Timeout(5 seconds)
+  implicit val timeout = Timeout(30 seconds)
 
   val NAV = "GENERATOR"
 
@@ -55,7 +55,7 @@ object CGenerate extends Controller {
     implicit request =>
 
       val chooseSemesterForm = request.flash.get("lastchoosen") match {
-        case Some(idString)=>
+        case Some(idString) =>
           form.fill(GeneratorForm(idString.toInt))
         case None => form
       }
@@ -106,7 +106,8 @@ object CGenerate extends Controller {
           val subjects = findActiveSubjectsBySemesterId(result.id)
           val semester = findSemesterById(result.id)
           startTime = Calendar.getInstance()
-          scheduleFuture = ask(Akka.system.actorOf(Props[ScheduleGeneratorActor]), GenerateSchedule( subjects , semester))
+          val generatorActor = Akka.system.actorOf(Props[ScheduleGeneratorActor])
+          scheduleFuture = ask(generatorActor, GenerateSchedule(subjects, semester))
           scheduleFuture.onSuccess {
             case ScheduleAnswer(theSchedule) => this.schedule = theSchedule
               actorFinished = true
@@ -114,9 +115,15 @@ object CGenerate extends Controller {
               Logger.debug("created in " + (finishTime.getTimeInMillis - startTime.getTimeInMillis) + "ms")
           }
 
+          scheduleFuture.onFailure {
+            case e: Exception =>
+              generatorActor ! PoisonPill
+
+          }
+
           //Logger.debug(findActiveSubjectsBySemesterId(result.id).mkString("\n") )
 
-          Redirect(routes.CGenerate.page()).flashing("startpolling" -> "true","lastchoosen"-> result.id.toString)
+          Redirect(routes.CGenerate.page()).flashing("startpolling" -> "true", "lastchoosen" -> result.id.toString)
         }
 
       )

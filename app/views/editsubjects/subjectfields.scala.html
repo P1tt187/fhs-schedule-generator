@@ -7,6 +7,8 @@
 @import models.persistence.subject.ExerciseSubject
 @import models.persistence.criteria.TimeslotCriteria
 
+
+
 <form role="form" id="subjectForm" class="form-inline">
 
     <div class="form-group">
@@ -138,6 +140,28 @@
 
 
 <script type="text/javascript">
+
+var coursesSizes= {};
+    @for(c<- courses) {
+        coursesSizes['@c.getId'] = @c.getSize;
+    }
+
+var changePlaceholder = function () {
+
+    var selectedCourses = $('#selectCourse' ).val();
+    var sum = 0;
+    for(var i = 0;i<selectedCourses.length;i++){
+    console.debug(coursesSizes[ selectedCourses[i]]);
+        sum+=coursesSizes[ selectedCourses[i]];
+    }
+
+
+    $('#expectedParticipantsInput' ).attr('placeholder', sum);
+}
+
+$('#selectCourse' ).on('change',changePlaceholder);
+
+changePlaceholder();
 
 var appendError = function ( ) {
 $ ( '#result' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
