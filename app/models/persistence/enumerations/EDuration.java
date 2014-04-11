@@ -1,14 +1,37 @@
 package models.persistence.enumerations;
 
 /**
- * Created by fabian on 07.02.14.
+ * @author fabian on 07.02.14.
  */
 public enum EDuration {
-    WEEKLY,
+    /**
+     * enum constant
+     */
+    WEEKLY(0),
 
-    UNWEEKLY,
+    /**
+     * enum constant
+     */
+    UNWEEKLY(12),
 
-    EVEN,
+    /**
+     * enum constant
+     */
+    EVEN(0),
 
-    UNEVEN;
+    /**
+     * enum constant
+     */
+    UNEVEN(0);
+
+    /** sortindex */
+    private int sortIndex;
+
+    public int getSortIndex() {
+        return sortIndex;
+    }
+
+    EDuration(int sortIndex) {
+        this.sortIndex = sortIndex;
+    }
 }

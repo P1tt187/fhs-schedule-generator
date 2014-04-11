@@ -1,4 +1,4 @@
-@(index: Int)
+@(sortIndex: Int)
 
 @import models.persistence.enumerations.EDuration
 
@@ -31,23 +31,31 @@
     }
 
 
-<div class="panel panel-info container-fluid" id="timeCriterias_@index">
+<div class="panel panel-info container-fluid" id="timeCriterias_@sortIndex">
     <div class="row-fluid">
+        <div class="pull-right">
+            <button id="remove_timeCriterias_@sortIndex" role="button" type="button" class="btn btn-danger"> <span class="glyphicon glyphicon-minus"></span> </button>
+        </div>
+        <script>
+            $('#remove_timeCriterias_@sortIndex').on('click', function(){
+            $('#timeCriterias_@sortIndex' ).remove();
+        });
+        </script>
         <h4>Beginn:</h4>
-        <div class="clearfix form-group span2  " id="@("timeCriterias_" + index + "_startHour_field")">
-            <label for="@("timeCriterias_" + index + "_startHour")">Stunde</label>
+        <div class="clearfix form-group span2  " id="@("timeCriterias_" + sortIndex + "_startHour_field")">
+            <label for="@("timeCriterias_" + sortIndex + "_startHour")">Stunde</label>
             <div class="input">
-                <select id="@("timeCriterias_" + index + "_startHour")" name="timeCriterias[@index].startHour" >
+                <select id="@("timeCriterias_" + sortIndex + "_startHour")" name="timeCriterias[@sortIndex].startHour" >
                 @hours
                 </select>
                 <span class="help-inline"></span>
                 <span class="help-block"></span>
             </div>
         </div>
-        <div class="clearfix form-group span2  " id="@(" timeCriterias_" + index + "_startMinute_field")">
-            <label for="@("timeCriterias_" + index + "_startMinute")">Minute</label>
+        <div class="clearfix form-group span2  " id="@(" timeCriterias_" + sortIndex + "_startMinute_field")">
+            <label for="@("timeCriterias_" + sortIndex + "_startMinute")">Minute</label>
             <div class="input">
-                <select id="@("timeCriterias_" + index + "_startMinute")" name="timeCriterias[@index].startMinute" >
+                <select id="@("timeCriterias_" + sortIndex + "_startMinute")" name="timeCriterias[@sortIndex].startMinute" >
                 @minutes
                 </select>
                 <span class="help-inline"></span>
@@ -55,20 +63,20 @@
             </div>
         </div>
         <h4>Ende:</h4>
-        <div class="clearfix form-group span2  " id="@("timeCriterias_" + index + "_stopHour_field")">
-            <label for="@("timeCriterias_" + index + "_stopHour")">Stunde</label>
+        <div class="clearfix form-group span2  " id="@("timeCriterias_" + sortIndex + "_stopHour_field")">
+            <label for="@("timeCriterias_" + sortIndex + "_stopHour")">Stunde</label>
             <div class="input">
-                <select id="@("timeCriterias_" + index + "_stopHour")" name="timeCriterias[@index].stopHour" >
+                <select id="@("timeCriterias_" + sortIndex + "_stopHour")" name="timeCriterias[@sortIndex].stopHour" >
                 @hours
                 </select>
                 <span class="help-inline"></span>
                 <span class="help-block"></span>
             </div>
         </div>
-        <div class="clearfix form-group span2  " id="@("timeCriterias_" + index + "_stopMinute_field")">
-            <label for="@("timeCriterias_" + index + "_stopMinute")"> Minute</label>
+        <div class="clearfix form-group span2  " id="@("timeCriterias_" + sortIndex + "_stopMinute_field")">
+            <label for="@("timeCriterias_" + sortIndex + "_stopMinute")"> Minute</label>
             <div class="input">
-                <select id="@("timeCriterias_" + index + "_stopMinute")" name="timeCriterias[@index].stopMinute" >
+                <select id="@("timeCriterias_" + sortIndex + "_stopMinute")" name="timeCriterias[@sortIndex].stopMinute" >
                 @minutes
                 </select>
                 <span class="help-inline"></span>
@@ -76,19 +84,19 @@
             </div>
         </div> <br/>
         <div class="form-group span6 ">
-            <label class="control-label" for="@("timeCriterias_" + index + "_weekdays")" style="display : block">
+            <label class="control-label" for="@("timeCriterias_" + sortIndex + "_weekdays")" style="display : block">
                 Wochentage:
             </label>
-            <select class="form-control" id="@("timeCriterias_" + index + "_weekdays")" name="timeCriterias[@index].weekdays[]" multiple title="nichts Ausgewählt">
+            <select class="form-control" id="@("timeCriterias_" + sortIndex + "_weekdays")" name="timeCriterias[@sortIndex].weekdays[]" multiple title="nichts Ausgewählt">
             @weedayOption
             </select>
         </div>
 
         <div class="form-group span6">
-            <label class="control-label" for="@("timeCriterias_" + index + "_duration")" style="display : block">
+            <label class="control-label" for="@("timeCriterias_" + sortIndex + "_duration")" style="display : block">
                 Wochen
             </label>
-            <select class="form-control" id="@("timeCriterias_" + index + "_duration")" name="timeCriterias[@index].duration">
+            <select class="form-control" id="@("timeCriterias_" + sortIndex + "_duration")" name="timeCriterias[@sortIndex].duration">
                 <option value="@EDuration.WEEKLY">Wöchentlich</option>
                 <option value="@EDuration.EVEN">Gerade Wochen</option>
                 <option value="@EDuration.UNEVEN">Ungerade Wochen</option>

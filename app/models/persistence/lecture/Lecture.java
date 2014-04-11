@@ -131,6 +131,7 @@ public class Lecture extends AbstractLecture {
 
         ret += calculateNumberOfParticipants();
         ret += costField;
+        ret += duration.getSortIndex();
 
         return ret;
     }

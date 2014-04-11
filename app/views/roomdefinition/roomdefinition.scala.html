@@ -45,6 +45,14 @@
                         @repeat(roomDefForm("timeCriterias"), min = 0) { criteriaFields =>
                             <div class="panel panel-info container-fluid" id="@criteriaFields.id">
                                 <div class="row-fluid">
+                                    <div class="pull-right">
+                                        <button id="remove_@criteriaFields.id" role="button" type="button" class="btn btn-danger"> <span class="glyphicon glyphicon-minus"></span> </button>
+                                    </div>
+                                    <script>
+                                    $('#remove_@criteriaFields.id').on('click', function(){
+                                    $('#@criteriaFields.id' ).remove();
+                                    });
+                                    </script>
                                     <h4>Beginn:</h4>
 
                                     @select(criteriaFields("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")

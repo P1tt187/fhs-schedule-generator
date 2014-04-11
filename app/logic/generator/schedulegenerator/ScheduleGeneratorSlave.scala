@@ -43,7 +43,7 @@ class ScheduleGeneratorSlave extends Actor {
 
     case SlaveGenerate(lectures) =>
       try {
-        placeLectures(lectures.sortBy(- _.getCosts))
+        placeLectures(lectures.sortBy(l=> (-l.getCosts, l.getName)))
       }
       catch {
         case e: Exception => Logger.error("error", e)
@@ -71,6 +71,17 @@ class ScheduleGeneratorSlave extends Actor {
 
     val allTimeslots = root.getChildren.flatMap(_.getChildren).toList.asInstanceOf[List[Timeslot]]
 
+    def prepareNextDuration(lecture: Lecture) {
+
+      lecture.increaseCostField();
+      lectures.par.foreach {
+        l =>
+          if (l.getDuration != EDuration.WEEKLY) {
+            l.setDuration(EDuration.UNWEEKLY)
+          }
+      }
+      sender() ! PlacingFailure
+    }
     lectures.foreach {
       lecture =>
       /*
@@ -133,9 +144,7 @@ class ScheduleGeneratorSlave extends Actor {
               case Some(timeslot) =>
                 timeslot.setLectures(timeslot.getLectures :+ parallelLecture)
               case None =>
-                lecture.increaseCostField();
-
-                sender() ! PlacingFailure
+                prepareNextDuration(lecture)
 
                 return
             }
@@ -169,9 +178,7 @@ class ScheduleGeneratorSlave extends Actor {
                }
                }*/
 
-              lecture.increaseCostField();
-
-              sender() ! PlacingFailure
+              prepareNextDuration(lecture)
 
               return
 
@@ -222,8 +229,6 @@ class ScheduleGeneratorSlave extends Actor {
 
     filterRecursive(roomCriterias.toSet).toList
   }
-
-
 
 
   private def findPossibleTimeslots(timeslots: List[Timeslot], lecture: AbstractLecture) = {
