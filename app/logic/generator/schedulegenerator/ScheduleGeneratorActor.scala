@@ -8,6 +8,7 @@ import logic.generator.lecturegenerator.{LectureAnswer, GenerateLectures, Lectur
 import scala.concurrent.Await
 import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
 import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.Logger
 
 
 /**
@@ -40,11 +41,11 @@ class ScheduleGeneratorActor extends Actor {
 
       //val scheduleFuture = context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures))
 
-
+      Logger.debug("number of lectures: " + lectures.size)
       val theSender = sender()
 
       def generate() {
-        val scheduleFuture = context.actorOf(Props[ScheduleGeneratorSlave]) ? SlaveGenerate(lectures.sortBy(-_.getCosts))
+        val scheduleFuture = context.actorOf(Props[ScheduleGeneratorSlave]) ? SlaveGenerate(lectures)
 
         scheduleFuture.onSuccess {
           case  ScheduleAnswer(answer) => theSender ! ScheduleAnswer(answer)

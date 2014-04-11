@@ -43,7 +43,7 @@ class ScheduleGeneratorSlave extends Actor {
 
     case SlaveGenerate(lectures) =>
       try {
-        placeLectures(lectures)
+        placeLectures(lectures.sortBy(- _.getCosts))
       }
       catch {
         case e: Exception => Logger.error("error", e)
@@ -53,7 +53,7 @@ class ScheduleGeneratorSlave extends Actor {
   }
 
   private def placeLectures(lectures: List[Lecture]) {
-    Logger.debug("number of lectures: " + lectures.size)
+
 
     val rooms = Transactions.hibernateAction {
       implicit session =>
