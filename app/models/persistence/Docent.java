@@ -5,11 +5,12 @@ import models.persistence.criteria.CriteriaContainer;
 import javax.persistence.*;
 
 /**
- * Created by fabian on 01.02.14.
+ * @author fabian
+ *         on 01.02.14.
  */
 @Entity
 @Table(name = "TBLDOCENT")
-public class Docent extends AbstractEntity implements Comparable<Docent>{
+public class Docent extends AbstractEntity implements Comparable<Docent> {
 
 
     /**

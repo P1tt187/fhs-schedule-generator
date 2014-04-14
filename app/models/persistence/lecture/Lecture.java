@@ -85,17 +85,17 @@ public class Lecture extends AbstractLecture {
 
     @Transient
     @JsonIgnore
-    private Integer costField = 0;
+    private Integer difficultLevel = 0;
 
-    public void setCostField(Integer costField) {
-        this.costField = costField;
+    public void setDifficultLevel(Integer difficultLevel) {
+        this.difficultLevel = difficultLevel;
     }
 
-    public void increaseCostField() {
-        if (costField == 0 || costField == 1) {
-            costField++;
+    public void increaseDifficultLevel() {
+        if (difficultLevel == 0 || difficultLevel == 1) {
+            difficultLevel++;
         }
-        costField *= costField;
+        difficultLevel *= difficultLevel;
     }
 
     /**
@@ -130,7 +130,9 @@ public class Lecture extends AbstractLecture {
         }
 
         ret += calculateNumberOfParticipants();
-        ret += costField;
+
+        ret += difficultLevel;
+
         ret += duration.getSortIndex();
 
         return ret;

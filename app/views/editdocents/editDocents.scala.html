@@ -1,0 +1,45 @@
+@(title: String, newDocentsForm: Form[models.fhs.pages.editdocents.MDocent], existingDocents: List[models.persistence.Docent])(implicit flash: Flash)
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@main(title, CEditDocents.NAV) {
+
+    <div class="col-md-7">
+        <div class="page-header">
+            <h1>Dozent Hinzufügen</h1>
+        </div>
+
+        @form(action = routes.CEditDocents.saveNewDocent, 'class -> "form-inline") {
+            @inputText(newDocentsForm("lastName"), '_label -> "Nachname", '_class -> "form-group", '_help -> "")
+
+            <div class="form-group">
+                <label class="control-label"><span class="glyphicon"></span> </label>
+                <button class="btn btn-success" type="submit" role="button"><span class="glyphicon glyphicon-plus"></span> </button>
+            </div>
+        }
+        <div class="page-header">
+            <h1>Dozent Bearbeiten</h1>
+        </div>
+        <div class="form-inline">
+            <div class="form-group">
+                <label class="control-label" for="selectDocent">Dozenten</label>
+                <select id="selectDocent" class="form-control">
+                @for(d <- existingDocents) {
+                    <option value="@d.getId">@d.getLastName</option>
+                }
+                </select>
+            </div>
+        </div>
+
+        <script>
+            var getDocentFields = function ( ) {
+            appendHTML ( '/docentFields/' + $ ( '#selectDocent' ).val ( ), '#docentFields' ) ;
+            };
+            getDocentFields();
+        $ ( '#selectDocent' ).on ( 'change', getDocentFields ) ;
+        </script>
+
+        <div id="docentFields"></div>
+    </div>
+}

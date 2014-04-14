@@ -3,13 +3,13 @@
 # ~~~~
 
 # Home page
-GET         /                                                                                         controllers.CIndex.index()
-GET         /defineTimeslots                                                                          controllers.CTimeslotDefintion.page()
-POST        /submitTimeslot                                                                           controllers.CTimeslotDefintion.submit()
+GET         /                                                                                         controllers.CIndex.index
+GET         /defineTimeslots                                                                          controllers.CTimeslotDefintion.page
+POST        /submitTimeslot                                                                           controllers.CTimeslotDefintion.submit
 GET         /deleteTimeslot/:id                                                                       controllers.CTimeslotDefintion.delete(id:Long)
 
 GET         /defineRooms                                                                              controllers.CRoomDefinition.page
-GET         /roomcritfields/:sortIndex                                                                    controllers.CRoomDefinition.getCriteriaFields(sortIndex:Int)
+GET         /roomcritfields/:sortIndex                                                                controllers.CRoomDefinition.getCriteriaFields(sortIndex:Int)
 GET         /editRoom/:id                                                                             controllers.CRoomDefinition.editRoom(id:Long)
 POST        /addRoom                                                                                  controllers.CRoomDefinition.submitRoom
 GET         /removeRoom/:id                                                                           controllers.CRoomDefinition.deleteRoom(id:Long)
@@ -35,11 +35,15 @@ POST        /updateGroup                                                        
 GET         /generator                                                                                controllers.CGenerate.page()
 POST        /generatorAction                                                                          controllers.CGenerate.generatorAction
 GET         /generatorFinished                                                                        controllers.CGenerate.finished
-GET         /generatorGetSchedule                                                                     controllers.CGenerate.sendSchedule
+GET         /generatorGetSchedule/:filterId                                                                     controllers.CGenerate.sendSchedule(filterId:Long)
 
 GET         /exportData                                                                               controllers.CExporter.page
 GET         /data.json                                                                                controllers.CExporter.export
 POST        /uploadJson                                                                               controllers.CExporter.uploadFile
+
+GET         /editDocents                                                                              controllers.CEditDocents.page
+POST        /addNewDocent                                                                             controllers.CEditDocents.saveNewDocent
+GET         /docentFields/:id                                                                         controllers.CEditDocents.sendDocentFields(id:Long)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                                             controllers.Assets.at(path="/public", file)

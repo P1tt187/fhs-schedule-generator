@@ -1,11 +1,13 @@
+
+
 name := "schedule-generator"
 
 version := "1.0-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   javaJdbc,
-  javaWs,
   javaJpa,
+  javaWs,
   cache,
   "org.hibernate" % "hibernate-core" % "4.2.3.Final",
   "org.hibernate" % "hibernate-entitymanager" % "4.2.3.Final",
@@ -15,4 +17,6 @@ libraryDependencies ++= Seq(
 
 scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitConversions")
 
-play.Project.playScalaSettings
+lazy val root = (project in file(".")).addPlugins(PlayScala).addPlugins(SbtWeb)
+
+

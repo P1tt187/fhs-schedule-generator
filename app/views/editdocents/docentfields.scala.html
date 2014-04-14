@@ -1,0 +1,9 @@
+@(existingDocentForm:Form[models.fhs.pages.editdocents.MExistingDocent])
+
+@import helper._
+@import helper.twitterBootstrap._
+
+    @inputText(existingDocentForm("id"), '_class -> "hidden")
+    @inputText(existingDocentForm("lastName"), '_label -> "Nachname", '_class -> "form-group", '_help -> "")
+
+    <script>initSelect();</script>

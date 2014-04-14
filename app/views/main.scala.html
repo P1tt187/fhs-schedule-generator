@@ -20,9 +20,10 @@
         <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
         <!--script src="@routes.Assets.at("javascripts/bootstrap-multiselect.js")" type="text/javascript"></script-->
 
-            <script src="@routes.Assets.at("javascripts/bootstrap-select.min.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/bootstrap-select.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/bootstrap.file-input.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/jquery.serializeObject.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
 
     </head>
     <body>
@@ -105,7 +106,7 @@
         } ).addClass('form-control') ;
 
         $ ( "input[type='file']" ).bootstrapFileInput ( ) ;
-
+        $("input" ).addClass('form-control');
         } ;
 
         $ ( window ).on ( 'load', function ( ) {

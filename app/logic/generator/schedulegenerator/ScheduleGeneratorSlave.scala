@@ -43,7 +43,7 @@ class ScheduleGeneratorSlave extends Actor {
 
     case SlaveGenerate(lectures) =>
       try {
-        placeLectures(lectures.sortBy(l=> (-l.getCosts, l.getName)))
+        placeLectures(lectures.sortBy(l => (-l.getCosts, l.getName)))
       }
       catch {
         case e: Exception => Logger.error("error", e)
@@ -71,9 +71,25 @@ class ScheduleGeneratorSlave extends Actor {
 
     val allTimeslots = root.getChildren.flatMap(_.getChildren).toList.asInstanceOf[List[Timeslot]]
 
+    doPlacing(lectures,allTimeslots ,rooms,root)
+
+
+
+    if (notPlaced == 0) {
+      val schedule = new Schedule
+      Logger.debug("placed: " + placed + ", not placed: " + notPlaced + ", no room: " + noRoom)
+      schedule.setRoot(root)
+      sender() ! ScheduleAnswer(schedule)
+    }
+
+  }
+
+  @tailrec
+  private def doPlacing(lectures:List[Lecture], allTimeslots:List[Timeslot], rooms:List[RoomEntity], root:Root){
+
     def prepareNextDuration(lecture: Lecture) {
 
-      lecture.increaseCostField();
+      lecture.increaseDifficultLevel();
       lectures.par.foreach {
         l =>
           if (l.getDuration != EDuration.WEEKLY) {
@@ -82,116 +98,89 @@ class ScheduleGeneratorSlave extends Actor {
       }
       sender() ! PlacingFailure
     }
-    lectures.foreach {
-      lecture =>
-      /*
-      val criterias = (lecture.getDocents.flatMap(_.getCriteriaContainer.getCriterias) ++ lecture.getCriteriaContainer.getCriterias).toSet
 
-      val (availableRooms, availableTimeslots) = filterAvailableRoomsAndTimeslots(criterias, rooms, allTimeslots) match {
-        case (roomResult, timeslotResult) =>
 
-          val roomReturn = if (!roomResult.isEmpty) {
-            roomResult.toList.sortBy(_.getCapacity)
-          } else {
-            rooms.toList.sortBy(_.getCapacity)
-          }
-          val timeslotReturn = if (!timeslotResult.isEmpty) {
-            timeslotResult.toList.sorted
-          } else {
-            allTimeslots.sorted
-          }
+    if(lectures.isEmpty){
+      return
+    }
+    val lecture = lectures.head
 
-          (roomReturn, timeslotReturn)
+    val (availableRooms, availableTimeslots) = (filterRooms(lecture, rooms), allTimeslots)
+
+    if (lecture.getDuration == EDuration.UNWEEKLY) {
+      val parallelLectures = root.getChildren.flatMap(_.getChildren.flatMap {
+        case slot: Timeslot => slot.getLectures.filter {
+          theLecture =>
+
+            val theLectureCourses = theLecture.getParticipants.map(_.getCourse)
+            val lectureCourses = lecture.getParticipants.map(_.getCourse)
+
+            val participantsClassMatch = theLecture.getParticipants.forall(lecture.getParticipants.head.getClass.isInstance(_))
+
+            val theLectureContainsCourses = theLectureCourses.containsAll(lectureCourses) && (theLectureCourses.size == lectureCourses.size)
+
+            val theLectureContainsDocents = theLecture.getDocents.containsAll(lecture.getDocents) && (theLecture.getDocents.size() == lecture.getDocents.size())
+
+            val theLectureContainsParticipant = lecture.getParticipants.head match {
+              case _: Group =>
+                timeslotContainsParticipants(slot, lecture.getParticipants.toSet)
+              case _ => false
+            }
+
+            theLecture.isInstanceOf[ParallelLecture] && theLectureContainsCourses && theLectureContainsDocents && participantsClassMatch && !theLectureContainsParticipant
+        }
+          .asInstanceOf[mutable.Buffer[ParallelLecture]]
+      })
+
+      // Logger.debug("parallel lectures: " + parallelLectures.flatMap(_.getLectures.map(_.getName)))
+
+      def createParallelLecture() {
+        val parallelLecture = new ParallelLecture
+        parallelLecture.setLectures(List(lecture))
+        lecture.setDuration(EDuration.EVEN)
+        val possibleTimeslots = findPossibleTimeslots(availableTimeslots, parallelLecture)
+        initTimeslotAndRoom(lecture, possibleTimeslots.toList, availableRooms) match {
+          case Some(timeslot) =>
+            timeslot.setLectures(timeslot.getLectures :+ parallelLecture)
+          case None =>
+            prepareNextDuration(lecture)
+        }
+      }
+      if (parallelLectures.isEmpty) {
+        createParallelLecture()
+        if(notPlaced>0){
+          return
+        }
+      } else {
+        val existingParallelLectures = parallelLectures.filter(_.getLectures.size() == 1)
+        if (existingParallelLectures.isEmpty) {
+          createParallelLecture()
+        } else {
+          val existingLecture = existingParallelLectures.head
+          lecture.setDuration(EDuration.UNEVEN)
+          lecture.setRoom(existingLecture.getLectures.head.getRoom)
+          existingLecture.setLectures(existingLecture.getLectures :+ lecture)
+          placed += 1
+        }
+      }
+
+    } else {
+
+
+      val possibleTimeslots = findPossibleTimeslots(availableTimeslots.toList, lecture)
+      initTimeslotAndRoom(lecture, possibleTimeslots.toList, availableRooms.toList) match {
+        case Some(timeslot) => timeslot.setLectures(timeslot.getLectures :+ lecture)
+        case None =>
+
+          prepareNextDuration(lecture)
+
+          return
 
       }
-*/
-      //      val (availableRooms, availableTimeslots) = filterAvailableRoomsAndTimeslotsForLecture(lecture, rooms, allTimeslots)
-        val (availableRooms, availableTimeslots) = (filterRooms(lecture, rooms), allTimeslots)
-
-        if (lecture.getDuration == EDuration.UNWEEKLY) {
-          val parallelLectures = root.getChildren.flatMap(_.getChildren.flatMap {
-            case slot: Timeslot => slot.getLectures.filter {
-              theLecture =>
-
-                val theLectureCourses = theLecture.getParticipants.map(_.getCourse)
-                val lectureCourses = lecture.getParticipants.map(_.getCourse)
-
-                val participantsClassMatch = theLecture.getParticipants.forall(lecture.getParticipants.head.getClass.isInstance(_))
-
-                val theLectureContainsCourses = theLectureCourses.containsAll(lectureCourses) && (theLectureCourses.size == lectureCourses.size)
-
-                val theLectureContainsDocents = theLecture.getDocents.containsAll(lecture.getDocents) && (theLecture.getDocents.size() == lecture.getDocents.size())
-
-                val theLectureContainsParticipant = lecture.getParticipants.head match {
-                  case _: Group =>
-                    timeslotContainsParticipants(slot, lecture.getParticipants.toSet)
-                  case _ => false
-                }
-
-                theLecture.isInstanceOf[ParallelLecture] && theLectureContainsCourses && theLectureContainsDocents && participantsClassMatch && !theLectureContainsParticipant
-            }
-              .asInstanceOf[mutable.Buffer[ParallelLecture]]
-          })
-
-          // Logger.debug("parallel lectures: " + parallelLectures.flatMap(_.getLectures.map(_.getName)))
-
-          def createParallelLecture() {
-            val parallelLecture = new ParallelLecture
-            parallelLecture.setLectures(List(lecture))
-            lecture.setDuration(EDuration.EVEN)
-            val possibleTimeslots = findPossibleTimeslots(availableTimeslots, parallelLecture)
-            initTimeslotAndRoom(lecture, possibleTimeslots.toList, availableRooms) match {
-              case Some(timeslot) =>
-                timeslot.setLectures(timeslot.getLectures :+ parallelLecture)
-              case None =>
-                prepareNextDuration(lecture)
-
-                return
-            }
-          }
-          if (parallelLectures.isEmpty) {
-            createParallelLecture()
-          } else {
-            val existingParallelLectures = parallelLectures.filter(_.getLectures.size() == 1)
-            if (existingParallelLectures.isEmpty) {
-              createParallelLecture()
-            } else {
-              val existingLecture = existingParallelLectures.head
-              lecture.setDuration(EDuration.UNEVEN)
-              lecture.setRoom(existingLecture.getLectures.head.getRoom)
-              existingLecture.setLectures(existingLecture.getLectures :+ lecture)
-              placed += 1
-            }
-          }
-
-        } else {
-
-
-          val possibleTimeslots = findPossibleTimeslots(availableTimeslots.toList, lecture)
-          initTimeslotAndRoom(lecture, possibleTimeslots.toList, availableRooms.toList) match {
-            case Some(timeslot) => timeslot.setLectures(timeslot.getLectures :+ lecture)
-            case None =>
-
-              /* lectures.foreach{element =>
-               if(element.getName.equals(lecture.getName)){
-                 element.increaseCostField()
-               }
-               }*/
-
-              prepareNextDuration(lecture)
-
-              return
-
-          }
-        }
     }
 
-    val schedule = new Schedule
+    doPlacing(lectures.tail,allTimeslots ,rooms,root)
 
-    schedule.setRoot(root)
-    Logger.debug("placed: " + placed + ", not placed: " + notPlaced + ", no room: " + noRoom)
-
-    sender() ! ScheduleAnswer(schedule)
   }
 
   private def filterRooms(lecture: Lecture, allRooms: List[RoomEntity]): List[RoomEntity] = {
@@ -241,7 +230,7 @@ class ScheduleGeneratorSlave extends Actor {
   @tailrec
   private def initTimeslotAndRoom(lecture: Lecture, possibleTimeslots: List[Timeslot], rooms: List[RoomEntity]): Option[Timeslot] = {
     Random.shuffle(possibleTimeslots).headOption match {
-      case None => Logger.warn("cannot place " + lecture.getName + " " + lecture.getKind + " " + lecture.getParticipants.map(_.getName) + " no timeslots available")
+      case None => Logger.warn("already placed " + placed +" cannot place " + lecture.getName + " " + lecture.getKind + " " + lecture.getParticipants.map(_.getName) + " no timeslots available")
         notPlaced += 1
         None
       case Some(timeslot) =>

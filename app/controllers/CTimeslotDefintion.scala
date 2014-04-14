@@ -17,7 +17,8 @@ import views.html.timeslotdefintiion._
 
 
 /**
- * Created by fabian on 23.01.14.
+ * @author fabian
+ *         on 23.01.14.
  */
 object CTimeslotDefintion extends Controller {
 

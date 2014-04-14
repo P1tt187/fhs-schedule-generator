@@ -20,13 +20,8 @@ import org.hibernate.FetchMode
  */
 object MGenerator {
 
-  def filterScheduleWithCourses(schedule: Schedule) = {
-    val courses = Transactions.hibernateAction {
-      implicit session =>
-        session.createCriteria(classOf[Course]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[Course]]
-    }
-
-    courses.map(course => (course.getShortName, collectTimeslotsFromSchedule(schedule.filter(course))))
+  def filterScheduleWithCourse(schedule: Schedule, course:Course) = {
+     (course.getShortName, collectTimeslotsFromSchedule(schedule.filter(course)))
   }
 
   def collectTimeslotsFromSchedule(schedule: Schedule) = {
@@ -59,6 +54,20 @@ object MGenerator {
         session.createCriteria(classOf[Semester]).addOrder(Order.desc("name")).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[Semester]].toList
     }
   }
+    def findCourses():List[Course] = {
+      Transactions.hibernateAction {
+        implicit session =>
+          session.createCriteria(classOf[Course]).addOrder(Order.asc("shortName")).list().asInstanceOf[java.util.List[Course]].toList
+      }
+    }
+
+    def findCourse(courseId: Long) = {
+      Transactions.hibernateAction {
+        implicit session =>
+          session.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).setFetchMode("groups", FetchMode.JOIN).uniqueResult().asInstanceOf[Course]
+      }
+    }
+
 
   @tailrec
   def findTimeRanges(timeslotTemplate: List[TimeslotTemplate], timeRanges: List[TimeRange]): List[TimeRange] = {
