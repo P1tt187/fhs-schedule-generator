@@ -1,6 +1,7 @@
 @(existingDocentForm: Form[models.fhs.pages.editdocents.MExistingDocent], houses: List[models.persistence.location.HouseEntity])
 
-    @import helper._
+@import helper._
+@import helper.twitterBootstrap._
 
     <div class="form-inline">
         @inputText(existingDocentForm("id"), '_class -> "hidden")
