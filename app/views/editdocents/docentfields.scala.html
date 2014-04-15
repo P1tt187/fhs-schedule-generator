@@ -1,9 +1,19 @@
-@(existingDocentForm:Form[models.fhs.pages.editdocents.MExistingDocent])
+@(existingDocentForm: Form[models.fhs.pages.editdocents.MExistingDocent], houses: List[models.persistence.location.HouseEntity])
 
-@import helper._
-@import helper.twitterBootstrap._
+    @import helper._
 
-    @inputText(existingDocentForm("id"), '_class -> "hidden")
-    @inputText(existingDocentForm("lastName"), '_label -> "Nachname", '_class -> "form-group", '_help -> "")
+    <div class="form-inline">
+        @inputText(existingDocentForm("id"), '_class -> "hidden")
+        @inputText(existingDocentForm("lastName"), '_label -> "Nachname", '_class -> "form-group", '_help -> "")
+    <br/>
+    <div class="form-group">
+        <label class="control-label">Bevorzugte Gebäude</label>
+        <select multiple name="houseCriterias[]">
+        @for(h <- houses) {
+            <option value="@h.getName" @if(existingDocentForm.get.houseCriterias.count(house => house.name.equals(h.getName)) > 0) {selected }>@h.getName </option>
+        }
+        </select>
+    </div>
 
-    <script>initSelect();</script>
+    </div>
+    <script>initSelect ( ) ;</script>

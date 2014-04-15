@@ -21,10 +21,37 @@ object CEditDocents extends Controller {
     mapping("lastName" -> nonEmptyText(minLength = 3))(MDocent.apply)(MDocent.unapply)
   )
 
-  val existingDocentForm:Form[MExistingDocent] = Form(
-  mapping(
-    "id"->longNumber,
-  "lastName"->nonEmptyText(minLength = 3)
+  val existingDocentForm: Form[MExistingDocent] = Form(
+    mapping(
+      "id" -> longNumber,
+      "lastName" -> nonEmptyText(minLength = 3),
+      "timeslots" -> list(
+        mapping(
+          "tolerant" -> boolean,
+          "weekday" -> number,
+          "startHour" -> number,
+          "startMinute" -> number,
+          "stopHour" -> number,
+          "stopMinute" -> number
+        )(MTimeslotCriteria.apply)(MTimeslotCriteria.unapply)
+      ),
+
+      "houseCriterias" -> list(
+        mapping(
+          "name" -> nonEmptyText
+        )(MHouseCriteria.apply)(MHouseCriteria.unapply)
+      ),
+      "roomAttr" -> list(
+        mapping("name" -> nonEmptyText)(MRoomAttribute.apply)(MRoomAttribute.unapply)
+      ),
+      "roomCrit" -> list(
+        mapping(
+          "houseName" -> nonEmptyText,
+          "number" -> nonEmptyText
+        )(MRoomCriteria.apply)(MRoomCriteria.unapply)
+      )
+
+
     )(MExistingDocent.apply)(MExistingDocent.unapply)
   )
 
@@ -33,8 +60,8 @@ object CEditDocents extends Controller {
       Ok(editDocents("Dozenten", newDocentForm, findAllDocents()))
   }
 
-  def sendDocentFields(id:Long)=Action{
-    Ok( Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(findDocentById(id))).toString())) )
+  def sendDocentFields(id: Long) = Action {
+    Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(findDocentById(id)), findHouses()).toString())))
   }
 
   def saveNewDocent = Action {

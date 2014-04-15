@@ -16,17 +16,12 @@
         }
     }
 
-    @priority = @{
-        (0 to 10).map {
-            i =>
-                new Html("'<option value=\"" + i + "\">" + i.formatted("%02d") + "</option>'+")
-        }
-    }
+
 
     @weedayOption = @{
         CTimeslotDefintion.WEEKDAYS map {
-            dayname =>
-                new Html("'<option  value=\"" + dayname._1 + "\">" + dayname._2 + "</option>'+ ")
+           case(weekdaySortIndex, dayName) =>
+                new Html("'<option  value=\"" + weekdaySortIndex + "\">" + dayName + "</option>'+ ")
         }
     }
 
