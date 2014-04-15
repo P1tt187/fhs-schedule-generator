@@ -38,7 +38,7 @@ object CEditDocents extends Controller {
 
       "houseCriterias" -> list(
         mapping(
-          "name" -> nonEmptyText
+          "houseId" -> longNumber
         )(MHouseCriteria.apply)(MHouseCriteria.unapply)
       ),
       "roomAttr" -> list(
@@ -46,8 +46,7 @@ object CEditDocents extends Controller {
       ),
       "roomCrit" -> list(
         mapping(
-          "houseName" -> nonEmptyText,
-          "number" -> nonEmptyText
+          "roomId"->longNumber
         )(MRoomCriteria.apply)(MRoomCriteria.unapply)
       )
 
@@ -61,7 +60,7 @@ object CEditDocents extends Controller {
   }
 
   def sendDocentFields(id: Long) = Action {
-    Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(findDocentById(id)), findHouses()).toString())))
+    Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(findDocentById(id)), findHouses(), findAllRooms()).toString())))
   }
 
   def saveNewDocent = Action {

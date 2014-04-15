@@ -40,17 +40,18 @@ public class CriteriaContainer extends AbstractEntity {
      * costs are used to find out how import it is to place a lecture first
      */
     @JsonIgnore
-    public Integer getCost() {
+    public Integer calculateDifficultLevel() {
         return criterias.stream().parallel().mapToInt(c -> {
             Integer ret = c.getPriority().getSortIndex() + (c.isTolerance() ? 0 : 2);
-            if (c instanceof RoomCriteria) {
-                RoomCriteria rc = (RoomCriteria) c;
-                if (rc.getRoom() != null) {
-                    ret += rc.getRoom().getCriteriaContainer().getCost();
-                }
-                if (rc.getHouse() != null) {
-                    ret += rc.getHouse().getRooms().stream().mapToInt(r -> r.getCriteriaContainer().getCost()).sum();
-                }
+            if (!(c instanceof RoomCriteria)) {
+                return ret;
+            }
+            RoomCriteria rc = (RoomCriteria) c;
+            if (rc.getRoom() != null) {
+                ret += rc.getRoom().getCriteriaContainer().calculateDifficultLevel();
+            }
+            if (rc.getHouse() != null) {
+                ret += rc.getHouse().getRooms().stream().mapToInt(r -> r.getCriteriaContainer().calculateDifficultLevel()).sum();
             }
 
             return ret;

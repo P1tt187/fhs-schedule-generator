@@ -71,7 +71,7 @@ class ScheduleGeneratorSlave extends Actor {
 
     val allTimeslots = root.getChildren.flatMap(_.getChildren).toList.asInstanceOf[List[Timeslot]]
 
-    doPlacing(lectures,allTimeslots ,rooms,root)
+    doPlacing(lectures, allTimeslots, rooms, root)
 
 
 
@@ -85,7 +85,7 @@ class ScheduleGeneratorSlave extends Actor {
   }
 
   @tailrec
-  private def doPlacing(lectures:List[Lecture], allTimeslots:List[Timeslot], rooms:List[RoomEntity], root:Root){
+  private def doPlacing(lectures: List[Lecture], allTimeslots: List[Timeslot], rooms: List[RoomEntity], root: Root) {
 
     def prepareNextDuration(lecture: Lecture) {
 
@@ -100,7 +100,7 @@ class ScheduleGeneratorSlave extends Actor {
     }
 
 
-    if(lectures.isEmpty){
+    if (lectures.isEmpty) {
       return
     }
     val lecture = lectures.head
@@ -117,9 +117,17 @@ class ScheduleGeneratorSlave extends Actor {
 
             val participantsClassMatch = theLecture.getParticipants.forall(lecture.getParticipants.head.getClass.isInstance(_))
 
+            val participantsSizeMatch = theLecture match {
+              case p: ParallelLecture =>
+                p.getLectures.head.getParticipants.map(_.getSize.toInt).sum == lecture.getParticipants.map(_.getSize.toInt).sum
+              case _ => false
+            }
+
             val theLectureContainsCourses = theLectureCourses.containsAll(lectureCourses) && (theLectureCourses.size == lectureCourses.size)
 
             val theLectureContainsDocents = theLecture.getDocents.containsAll(lecture.getDocents) && (theLecture.getDocents.size() == lecture.getDocents.size())
+
+            val theLectureParticipantsEqualsCurrentParticipants = theLecture.getParticipants.containsAll(lecture.getParticipants) && theLecture.getParticipants.size() == lecture.getParticipants.size()
 
             val theLectureContainsParticipant = lecture.getParticipants.head match {
               case _: Group =>
@@ -127,7 +135,7 @@ class ScheduleGeneratorSlave extends Actor {
               case _ => false
             }
 
-            theLecture.isInstanceOf[ParallelLecture] && theLectureContainsCourses && theLectureContainsDocents && participantsClassMatch && !theLectureContainsParticipant
+            theLecture.isInstanceOf[ParallelLecture] && theLectureContainsCourses && theLectureContainsDocents && (participantsClassMatch || participantsSizeMatch) && (theLectureParticipantsEqualsCurrentParticipants || !theLectureContainsParticipant)
         }
           .asInstanceOf[mutable.Buffer[ParallelLecture]]
       })
@@ -148,7 +156,7 @@ class ScheduleGeneratorSlave extends Actor {
       }
       if (parallelLectures.isEmpty) {
         createParallelLecture()
-        if(notPlaced>0){
+        if (notPlaced > 0) {
           return
         }
       } else {
@@ -179,7 +187,7 @@ class ScheduleGeneratorSlave extends Actor {
       }
     }
 
-    doPlacing(lectures.tail,allTimeslots ,rooms,root)
+    doPlacing(lectures.tail, allTimeslots, rooms, root)
 
   }
 
@@ -229,8 +237,9 @@ class ScheduleGeneratorSlave extends Actor {
 
   @tailrec
   private def initTimeslotAndRoom(lecture: Lecture, possibleTimeslots: List[Timeslot], rooms: List[RoomEntity]): Option[Timeslot] = {
-    Random.shuffle(possibleTimeslots).headOption match {
-      case None => Logger.warn("already placed " + placed +" cannot place " + lecture.getName + " " + lecture.getKind + " " + lecture.getParticipants.map(_.getName) + " no timeslots available")
+     Random.shuffle(possibleTimeslots).headOption match {
+    //possibleTimeslots.headOption match {
+      case None => Logger.warn("already placed " + placed + " cannot place " + lecture.getName + " " + lecture.getKind + " " + lecture.getParticipants.map(_.getName) + " no timeslots available")
         notPlaced += 1
         None
       case Some(timeslot) =>

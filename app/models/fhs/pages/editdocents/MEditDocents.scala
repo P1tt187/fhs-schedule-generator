@@ -7,7 +7,7 @@ import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
 import org.hibernate.FetchMode
 import models.fhs.pages.JavaList
 import scala.collection.JavaConversions._
-import models.persistence.location.HouseEntity
+import models.persistence.location.{RoomEntity, HouseEntity}
 
 /**
  * @author fabian 
@@ -48,6 +48,22 @@ object MEditDocents {
     }
   }
 
+  def findHouseById(id: Long) = {
+    Transactions.hibernateAction {
+      implicit s =>
+        s.createCriteria(classOf[HouseEntity]).setFetchMode("rooms", FetchMode.SELECT).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[HouseEntity]
+    }
+  }
+
+  def findAllRooms() = {
+    Transactions.hibernateAction {
+      implicit s =>
+        s.createCriteria(classOf[RoomEntity]).setFetchMode("criteriaContainer", FetchMode.SELECT).setFetchMode("house.rooms", FetchMode.SELECT)
+          .setFetchMode("roomAttributes",FetchMode.SELECT).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+          .list().toList.asInstanceOf[List[RoomEntity]]
+    }
+  }
+
   implicit def docent2MExistingDocent(docent: Docent) = {
     val timeslotCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeslotCriteria]).toList.asInstanceOf[List[TimeslotCriteria]]
     val convertedTimeslotCriterias = timeslotCriterias.map {
@@ -58,7 +74,7 @@ object MEditDocents {
     val roomCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).toList.asInstanceOf[List[RoomCriteria]]
     val houseCriterias = roomCriterias.filter(_.getHouse != null).map {
       hCrit =>
-        MHouseCriteria(hCrit.getHouse.getName)
+        MHouseCriteria(hCrit.getHouse.getId)
     }
 
     val roomAttributes = roomCriterias.filter(raCrit => raCrit.getRoomAttributes != null && !raCrit.getRoomAttributes.isEmpty).flatMap {
@@ -71,7 +87,7 @@ object MEditDocents {
 
     val roomCrits = roomCriterias.filter(_.getRoom != null).map {
       rCrit =>
-        MRoomCriteria(rCrit.getRoom.getHouse.getName, rCrit.getRoom.getNumber)
+        MRoomCriteria(rCrit.getRoom.getId)
     }
 
     MExistingDocent(docent.getId, docent.getLastName, convertedTimeslotCriterias, houseCriterias, roomAttributes, roomCrits)
@@ -84,8 +100,8 @@ case class MExistingDocent(id: Long, lastName: String, timeslots: List[MTimeslot
 
 case class MTimeslotCriteria(tolerant: Boolean, weekday: Int, startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)
 
-case class MHouseCriteria(name: String)
+case class MHouseCriteria(houseId: Long)
 
 case class MRoomAttribute(name: String)
 
-case class MRoomCriteria(houseName: String, number: String)
+case class MRoomCriteria(roomId: Long)

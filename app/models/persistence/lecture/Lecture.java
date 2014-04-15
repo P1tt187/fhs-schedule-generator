@@ -118,11 +118,11 @@ public class Lecture extends AbstractLecture {
         Integer ret = 0;
 
         if (criteriaContainer != null) {
-            ret += criteriaContainer.getCost();
+            ret += criteriaContainer.calculateDifficultLevel();
         }
 
         if (docents != null) {
-            ret += docents.parallelStream().mapToInt(d -> d.getCriteriaContainer().getCost()).sum();
+            ret += docents.parallelStream().mapToInt(d -> d.getCriteriaContainer().calculateDifficultLevel()).sum();
         }
 
         if (participants != null) {
