@@ -29,6 +29,7 @@ object CEditSubjects extends Controller {
   val LECTURE = "lecture"
   val EXERCISE = "exercise"
 
+  val TIME_TO_LIFE = 30;
 
   def page = Action {
     Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses()))
@@ -59,26 +60,26 @@ object CEditSubjects extends Controller {
 
       val docents = Cache.getOrElse("docents") {
         val docent = findDocents()
-        Cache.set("docents", docent)
+        Cache.set("docents", docent, expiration = TIME_TO_LIFE)
         docent
       }
 
 
       val courses = Cache.getOrElse("courses") {
         val course = findCourses()
-        Cache.set("courses", course)
+        Cache.set("courses", course, expiration = TIME_TO_LIFE)
         course
       }
 
       val houses = Cache.getOrElse("houses") {
         val house = findHouses()
-        Cache.set("houses", house)
+        Cache.set("houses", house, expiration = TIME_TO_LIFE)
         house
       }
 
       val rooms = Cache.getOrElse("rooms") {
         val room = findRooms()
-        Cache.set("rooms", room)
+        Cache.set("rooms", room, expiration = TIME_TO_LIFE)
         room
       }
 

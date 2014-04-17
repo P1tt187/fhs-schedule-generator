@@ -15,6 +15,8 @@ libraryDependencies ++= Seq(
   "uk.com.robust-it" % "cloning" % "1.9.0"
 )
 
+
+
 scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitConversions")
 
 lazy val root = (project in file(".")).addPlugins(PlayScala).addPlugins(SbtWeb)
