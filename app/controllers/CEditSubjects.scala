@@ -17,6 +17,7 @@ import models.persistence.participants.Course
 import models.persistence.Docent
 import models.persistence.location.{RoomEntity, RoomAttributesEntity, HouseEntity}
 import scala.collection.mutable
+import scala.concurrent.duration._
 
 /**
  * @author fabian 
@@ -29,7 +30,7 @@ object CEditSubjects extends Controller {
   val LECTURE = "lecture"
   val EXERCISE = "exercise"
 
-  val TIME_TO_LIFE = 30;
+  val TIME_TO_LIFE = 30 seconds
 
   def page = Action {
     Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses()))
