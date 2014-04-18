@@ -1,0 +1,43 @@
+@(index:Int,existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent])
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@defining(existingDocentForm("timeslots." + index)){ timeslotCrit =>
+    <div class="panel panel-info" id="@timeslotCrit.id">
+        <button id="remove_@timeslotCrit.id" role="button" class="pull-right btn btn-sm btn-danger"><span class="glyphicon glyphicon-minus"></span></button>
+        <div class="form-group">
+            <label class="control-label">darf abweichen</label>
+            <div class="form-group">
+                <label>
+                    <input type="radio" class="form-control" @if(timeslotCrit("tolerant").value.getOrElse("true") == "true") {
+                    checked } name="@timeslotCrit("tolerant").id" value="true"/>
+                    Ja
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="radio" class="form-control"  @if(timeslotCrit("tolerant").value.getOrElse("true") == "false") {
+                    checked } name="@timeslotCrit("tolerant").id" value="false"/>
+                    Nein
+                </label>
+            </div>
+        </div>
+        <h4>Beginn:</h4>
+
+        @select(timeslotCrit("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
+        @select(timeslotCrit("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
+
+        <h4>Ende:</h4>
+
+        @select(timeslotCrit("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
+        @select(timeslotCrit("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
+        <div class="clearfix"></div>
+        @select(timeslotCrit("weekday"), CTimeslotDefintion.WEEKDAYS, '_class -> "form-group", '_label->"Wochentag")
+    </div>
+    <script>
+    $ ( '#remove_@timeslotCrit.id').on(' click ', function(e){
+    $ ( '#@timeslotCrit.id').remove();
+    } ) ;
+    </script>
+}

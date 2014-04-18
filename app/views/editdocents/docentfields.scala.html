@@ -3,6 +3,7 @@
 @import models.fhs.pages.roomdefinition._
 
 @import helper._
+@import helper.twitterBootstrap._
 
 
 <div class="form-inline">
@@ -31,12 +32,70 @@
         </select>
     </div>
     <div class="form-group">
-        <label class="control-label">Bevorzugte Ausstattung</label>
+        <label class="control-label" for="favoriteAttributes">Bevorzugte Ausstattung</label>
         <select id="favoriteAttributes" name="roomAttr[]" multiple title="nichts ausgewählt">
-            @for(attr <- MRoomdefintion.ATTRIBUTES){
-                <option value="@attr">@attr</option>
-            }
+        @for(attr <- MRoomdefintion.ATTRIBUTES) {
+            <option value="@attr">@attr</option>
+        }
         </select>
     </div>
+    <div id="timeCrits">
+    @repeat(existingDocentForm("timeslots"), min = 0) { timeslotCrit =>
+        <div class="panel panel-info" id="@timeslotCrit.id">
+            <button id="remove_@timeslotCrit.id" role="button" class="pull-right btn btn-sm btn-danger"><span class="glyphicon glyphicon-minus"></span></button>
+            <div class="form-group">
+                <label class="control-label">darf abweichen</label>
+                <div class="form-group">
+                    <label>
+                        <input type="radio" class="form-control" @if(timeslotCrit("tolerant").value.getOrElse("true") == "true") {
+                        checked } name="@timeslotCrit("tolerant").id" value="true"/>
+                        Ja
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="radio" class="form-control"  @if(timeslotCrit("tolerant").value.getOrElse("true") == "false") {
+                        checked } name="@timeslotCrit("tolerant").id" value="false"/>
+                        Nein
+                    </label>
+                </div>
+            </div>
+            <h4>Beginn:</h4>
+
+            @select(timeslotCrit("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
+            @select(timeslotCrit("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
+
+            <h4>Ende:</h4>
+
+            @select(timeslotCrit("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
+            @select(timeslotCrit("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
+            <div class="clearfix"></div>
+            @select(timeslotCrit("weekday"), CTimeslotDefintion.WEEKDAYS, '_class -> "form-group", '_label->"Wochentag")
+
+        </div>
+        <script>
+        $ ( '#remove_@timeslotCrit.id').on('click', function(e){
+        $ ( '#@timeslotCrit.id').remove();
+        } ) ;
+        </script>
+    }
+
+    </div>
+    <div class="form-group">
+        <button id="addTimeCrit" class="btn btn-sm btn-warning" role="button"><span class="glyphicon glyphicon-plus"></span> </button>
+    </div>
+
+
 </div>
-<script> initSelect ( ) ;</script>
+<script>
+ initSelect ( ) ;
+ var index=@existingDocentForm.get.timeslots.length;
+$('#addTimeCrit' ).on('click', function(e){
+    $.getJSON('/timeCritFields/' + index, function(data){
+      $('#timeCrits' ).append(data.htmlresult);
+      initSelect ( ) ;
+     });
+
+    index++;
+});
+</script>

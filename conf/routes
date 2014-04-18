@@ -35,7 +35,7 @@ POST        /updateGroup                                                        
 GET         /generator                                                                                controllers.CGenerate.page()
 POST        /generatorAction                                                                          controllers.CGenerate.generatorAction
 GET         /generatorFinished                                                                        controllers.CGenerate.finished
-GET         /generatorGetSchedule/:filterId                                                                     controllers.CGenerate.sendSchedule(filterId:Long)
+GET         /generatorGetSchedule/:filterId                                                           controllers.CGenerate.sendSchedule(filterId:Long)
 
 GET         /exportData                                                                               controllers.CExporter.page
 GET         /data.json                                                                                controllers.CExporter.export
@@ -44,6 +44,8 @@ POST        /uploadJson                                                         
 GET         /editDocents                                                                              controllers.CEditDocents.page
 POST        /addNewDocent                                                                             controllers.CEditDocents.saveNewDocent
 GET         /docentFields/:id                                                                         controllers.CEditDocents.sendDocentFields(id:Long)
+GET         /timeCritFields/:index                                                                    controllers.CEditDocents.sendTimeCritFields(index:Int)
+POST        /saveEditedDocentData                                                                     controllers.CEditDocents.editDocent
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                                             controllers.Assets.at(path="/public", file)

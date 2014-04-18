@@ -59,8 +59,23 @@ object CEditDocents extends Controller {
       Ok(editDocents("Dozenten", newDocentForm, findAllDocents()))
   }
 
+  def sendTimeCritFields(index:Int) = Action{
+    Ok(Json.stringify(Json.obj("htmlresult"->timeCritFields(index,existingDocentForm).toString())))
+  }
+
   def sendDocentFields(id: Long) = Action {
     Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(findDocentById(id)), findHouses(), findAllRooms()).toString())))
+  }
+
+  def editDocent = Action{
+    implicit request=>
+      val docentResult = newDocentForm.bindFromRequest
+      docentResult.fold(
+      error => {BadRequest("")},
+      mDocent=> {
+        Ok("")
+      }
+      )
   }
 
   def saveNewDocent = Action {
