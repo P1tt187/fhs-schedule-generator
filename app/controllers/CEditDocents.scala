@@ -44,11 +44,8 @@ object CEditDocents extends Controller {
         nonEmptyText
       ),
       "roomCrit" -> list(
-          longNumber
-
+        longNumber
       )
-
-
     )(MExistingDocent.apply)(MExistingDocent.unapply)
   )
 
@@ -61,40 +58,41 @@ object CEditDocents extends Controller {
     Ok(Json.stringify(Json.obj("htmlresult" -> timeCritFields(index, existingDocentForm).toString())))
   }
 
-  def sendDocentFields(id: Long) = Action { implicit request =>
-    Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(findDocentById(id)), findHouses(), findAllRooms()).toString())))
+  def sendDocentFields(id: Long) = Action {
+    implicit request =>
+      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(findDocentById(id)), findHouses(), findAllRooms()).toString())))
   }
 
   def editDocent = Action {
     implicit request =>
 
-     // Logger.debug("edit docent header: " + request.headers)
+    // Logger.debug("edit docent header: " + request.headers)
       val docentResult = existingDocentForm.bindFromRequest
       docentResult.fold(
         error => {
-           val flashing = flash + ("submitResult","false")
+          val flashing = flash +("submitResult", "false")
           Logger.debug("error in form - " + error.value)
-          Ok(Json.obj("htmlresult" -> docentfields(error, findHouses(), findAllRooms())(flashing) .toString()))
+          Ok(Json.obj("htmlresult" -> docentfields(error, findHouses(), findAllRooms())(flashing).toString()))
         },
         mDocent => {
           Logger.debug("edit data - " + mDocent)
 
           val docent = persistEditedDocent(mDocent)
-           val flashing = flash + ("submitResult","true")
+          val flashing = flash +("submitResult", "true")
 
-          Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms())(flashing) .toString))
+          Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms())(flashing).toString))
         }
       )
   }
 
   def deleteDocent(id: Long) = Action {
-    removeDocent(id)
-    Redirect(routes.CEditDocents.page)
+    val (docentName, connectedSubjects) = removeDocent(id)
+    Redirect(routes.CEditDocents.page).flashing("connectedSubjects" -> connectedSubjects.mkString(" "),"docentName" -> docentName)
   }
 
   def saveNewDocent = Action {
     implicit request =>
-      //Logger.debug("add docent header: " + request.headers)
+    //Logger.debug("add docent header: " + request.headers)
       val docentResult = newDocentForm.bindFromRequest
 
       docentResult.fold(

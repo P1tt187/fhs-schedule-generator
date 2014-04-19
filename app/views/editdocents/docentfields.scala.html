@@ -13,7 +13,7 @@
     }
 
 <form id="editDocentForm" class="form-inline">
-    <a class="btn btn-danger btn-sm pull-right" role="button" href="@routes.CEditDocents.deleteDocent(existingDocentForm.value.getOrElse(defaultDocent).id) "><span class="glyphicon glyphicon-minus"></span> </a>
+    <a class="btn btn-danger btn-sm pull-right" role="button" href="@routes.CEditDocents.deleteDocent(existingDocentForm.value.getOrElse(defaultDocent).id) "><span class="glyphicon glyphicon-remove-circle"></span> </a>
     @inputText(existingDocentForm("id"), '_class -> "hidden")
     @inputText(existingDocentForm("lastName"), '_label -> "Nachname", '_class -> "form-group", '_help -> "")
     <br/>

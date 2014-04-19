@@ -11,6 +11,7 @@ import models.persistence.location.{RoomEntity, HouseEntity}
 import models.persistence.template.WeekdayTemplate
 import models.persistence.enumerations.{EPriority, EDuration}
 import models.fhs.pages.roomdefinition.MRoomdefintion
+import models.persistence.subject.AbstractSubject
 
 /**
  * @author fabian 
@@ -30,14 +31,27 @@ object MEditDocents {
     }
   }
 
-  def removeDocent(id: Long) = {
-    val docent = findDocentById(id);
+  def removeDocent(id: Long): (String, List[String]) = {
+    val docent = findDocentById(id)
+
+    Transactions.hibernateAction {
+      implicit s =>
+        val criterion = s.createCriteria(classOf[AbstractSubject])
+        criterion.createCriteria("docents").add(Restrictions.idEq(id))
+        criterion.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+        val result = criterion.list().toList.asInstanceOf[List[AbstractSubject]]
+        val connectedSubjects = result.map("<li>" + _.getName + "</li>")
+        if (!connectedSubjects.isEmpty) {
+          return (docent.getLastName, connectedSubjects)
+        }
+    }
 
     Transactions {
       implicit em =>
         val attachedObject = em.merge(docent)
         em.remove(attachedObject)
     }
+    ("", List[String]())
   }
 
   def findAllDocents() = {
@@ -163,7 +177,7 @@ object MEditDocents {
     val convertedTimeslotCriterias = timeslotCriterias.map {
       tcrit =>
         MTimeslotCriteria(tcrit.isTolerance, tcrit.getWeekday.getSortIndex, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute)
-    }
+    }.sortBy(crit=> (crit.weekday,crit.startHour,crit.startMinute,crit.stopHour,crit.stopMinute))
 
     val roomCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).toList.asInstanceOf[List[RoomCriteria]]
     val houseCriterias = roomCriterias.filter(_.getHouse != null).map {
