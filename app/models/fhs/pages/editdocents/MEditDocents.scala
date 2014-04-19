@@ -1,13 +1,16 @@
 package models.fhs.pages.editdocents
 
 import models.persistence.Docent
-import models.persistence.criteria.{RoomCriteria, TimeslotCriteria, CriteriaContainer}
+import models.persistence.criteria.{AbstractCriteria, RoomCriteria, TimeslotCriteria, CriteriaContainer}
 import models.Transactions
 import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
 import org.hibernate.FetchMode
 import models.fhs.pages.JavaList
 import scala.collection.JavaConversions._
 import models.persistence.location.{RoomEntity, HouseEntity}
+import models.persistence.template.WeekdayTemplate
+import models.persistence.enumerations.{EPriority, EDuration}
+import models.fhs.pages.roomdefinition.MRoomdefintion
 
 /**
  * @author fabian 
@@ -24,6 +27,16 @@ object MEditDocents {
     Transactions {
       implicit em =>
         em.persist(docent)
+    }
+  }
+
+  def removeDocent(id: Long) = {
+    val docent = findDocentById(id);
+
+    Transactions {
+      implicit em =>
+        val attachedObject = em.merge(docent)
+        em.remove(attachedObject)
     }
   }
 
@@ -59,9 +72,90 @@ object MEditDocents {
     Transactions.hibernateAction {
       implicit s =>
         s.createCriteria(classOf[RoomEntity]).setFetchMode("criteriaContainer", FetchMode.SELECT).setFetchMode("house.rooms", FetchMode.SELECT)
-          .setFetchMode("roomAttributes",FetchMode.SELECT).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
+          .setFetchMode("roomAttributes", FetchMode.SELECT).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
           .list().toList.asInstanceOf[List[RoomEntity]]
     }
+  }
+
+  def findRoomById(id: Long) = {
+    Transactions.hibernateAction {
+      implicit s =>
+        s.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
+    }
+  }
+
+  def persistEditedDocent(mDocent: MExistingDocent) = {
+
+
+    val docent = findDocentById(mDocent.id)
+
+    docent.setLastName(mDocent.lastName)
+    val oldCriteriaContainer = docent.getCriteriaContainer
+    val newCriteriaContainer = new CriteriaContainer
+    newCriteriaContainer.setCriterias(List[AbstractCriteria]())
+
+    docent.setCriteriaContainer(newCriteriaContainer)
+    val timeSlotCriterias = mDocent.timeslots.map {
+      crit =>
+        def findOrCreateWeekdayTemplate(sortIndex: Int): WeekdayTemplate = {
+          Transactions.hibernateAction {
+            implicit s =>
+              val result = s.createCriteria(classOf[WeekdayTemplate]).add(Restrictions.eq("sortIndex", sortIndex)).uniqueResult().asInstanceOf[WeekdayTemplate]
+              result match {
+                case null => val template = WeekdayTemplate.createWeekdayFromSortIndex(sortIndex)
+                  s.save(template)
+                  template
+                case template: WeekdayTemplate => template
+              }
+          }
+        }
+
+        val timeCrit = new TimeslotCriteria(crit.startHour, crit.startMinute, crit.stopHour, crit.stopMinute, findOrCreateWeekdayTemplate(crit.weekday), EDuration.WEEKLY)
+        timeCrit.setPriority(EPriority.NORMAL)
+        timeCrit.setTolerance(crit.tolerant)
+
+        timeCrit
+    }
+    newCriteriaContainer.setCriterias(newCriteriaContainer.getCriterias ++ timeSlotCriterias)
+
+    val houseCriterias = mDocent.houseCriterias.map {
+      crit =>
+        val house = findHouseById(crit)
+        val houseCrit = new RoomCriteria
+        houseCrit.setHouse(house)
+        houseCrit.setTolerance(true)
+        houseCrit.setPriority(EPriority.LOW)
+        houseCrit
+    }
+    newCriteriaContainer.setCriterias(newCriteriaContainer.getCriterias ++ houseCriterias)
+
+    if (!mDocent.roomAttr.isEmpty) {
+      val roomAttrCriteria = new RoomCriteria
+      roomAttrCriteria.setTolerance(true)
+      roomAttrCriteria.setPriority(EPriority.LOW)
+      val attributes = mDocent.roomAttr.map {
+        attribute =>
+          MRoomdefintion.findOrCreateRoomAttribute(attribute)
+      }
+      roomAttrCriteria.setRoomAttributes(attributes)
+      newCriteriaContainer.setCriterias(newCriteriaContainer.getCriterias :+ roomAttrCriteria)
+    }
+    val roomCriterias = mDocent.roomCrit.map {
+      crit =>
+        val roomCrit = new RoomCriteria
+        roomCrit.setRoom(findRoomById(crit))
+        roomCrit.setTolerance(true)
+        roomCrit.setPriority(EPriority.LOW)
+        roomCrit
+    }
+    newCriteriaContainer.setCriterias(newCriteriaContainer.getCriterias ++ roomCriterias)
+    Transactions {
+      implicit em =>
+        em.merge(docent)
+        val attachedObject = em.merge(oldCriteriaContainer)
+        em.remove(attachedObject)
+    }
+    docent
   }
 
   implicit def docent2MExistingDocent(docent: Docent) = {
@@ -74,20 +168,20 @@ object MEditDocents {
     val roomCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).toList.asInstanceOf[List[RoomCriteria]]
     val houseCriterias = roomCriterias.filter(_.getHouse != null).map {
       hCrit =>
-        MHouseCriteria(hCrit.getHouse.getId)
+        hCrit.getHouse.getId.toLong
     }
 
     val roomAttributes = roomCriterias.filter(raCrit => raCrit.getRoomAttributes != null && !raCrit.getRoomAttributes.isEmpty).flatMap {
       raCrit =>
         raCrit.getRoomAttributes.map {
           roomAttr =>
-            MRoomAttribute(roomAttr.getAttribute)
+            roomAttr.getAttribute
         }
     }
 
     val roomCrits = roomCriterias.filter(_.getRoom != null).map {
       rCrit =>
-        MRoomCriteria(rCrit.getRoom.getId)
+        rCrit.getRoom.getId.toLong
     }
 
     MExistingDocent(docent.getId, docent.getLastName, convertedTimeslotCriterias, houseCriterias, roomAttributes, roomCrits)
@@ -96,12 +190,8 @@ object MEditDocents {
 
 case class MDocent(lastName: String)
 
-case class MExistingDocent(id: Long, lastName: String, timeslots: List[MTimeslotCriteria], houseCriterias: List[MHouseCriteria], roomAttr: List[MRoomAttribute], roomCrit: List[MRoomCriteria])
+case class MExistingDocent(id: Long, lastName: String, timeslots: List[MTimeslotCriteria], houseCriterias: List[Long], roomAttr: List[String], roomCrit: List[Long])
 
 case class MTimeslotCriteria(tolerant: Boolean, weekday: Int, startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)
 
-case class MHouseCriteria(houseId: Long)
 
-case class MRoomAttribute(name: String)
-
-case class MRoomCriteria(roomId: Long)

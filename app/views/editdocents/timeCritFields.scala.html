@@ -3,7 +3,7 @@
 @import helper._
 @import helper.twitterBootstrap._
 
-@defining(existingDocentForm("timeslots." + index)){ timeslotCrit =>
+@defining(existingDocentForm("timeslots[" + index + "]")){ timeslotCrit =>
     <div class="panel panel-info" id="@timeslotCrit.id">
         <button id="remove_@timeslotCrit.id" role="button" class="pull-right btn btn-sm btn-danger"><span class="glyphicon glyphicon-minus"></span></button>
         <div class="form-group">
@@ -11,14 +11,14 @@
             <div class="form-group">
                 <label>
                     <input type="radio" class="form-control" @if(timeslotCrit("tolerant").value.getOrElse("true") == "true") {
-                    checked } name="@timeslotCrit("tolerant").id" value="true"/>
+                    checked } name="@timeslotCrit("tolerant").name" value="true"/>
                     Ja
                 </label>
             </div>
             <div class="form-group">
                 <label>
                     <input type="radio" class="form-control"  @if(timeslotCrit("tolerant").value.getOrElse("true") == "false") {
-                    checked } name="@timeslotCrit("tolerant").id" value="false"/>
+                    checked } name="@timeslotCrit("tolerant").name" value="false"/>
                     Nein
                 </label>
             </div>

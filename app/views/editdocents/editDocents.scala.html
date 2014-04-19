@@ -22,49 +22,30 @@
             <h1>Dozent Bearbeiten</h1>
         </div>
 
-        <form id="editDocentForm" class="form-inline">
-        <div class="form-inline">
-            <div class="form-group">
-                <label class="control-label" for="selectDocent">Dozenten</label>
-                <select id="selectDocent" class="form-control">
-                @for(d <- existingDocents) {
-                    <option value="@d.getId">@d.getLastName</option>
-                }
-                </select>
-            </div>
-        </div>
 
-         <div id="docentFields"></div>
-        </form>
+
+            <div class="form-inline">
+                <div class="form-group">
+                    <label class="control-label" for="selectDocent">Dozenten</label>
+                    <select id="selectDocent" class="form-control">
+                    @for(d <- existingDocents) {
+                        <option value="@d.getId">@d.getLastName</option>
+                    }
+                    </select>
+                </div>
+            </div>
+
+            <div id="docentFields"></div>
+
 
         <script>
         var getDocentFields = function ( ) {
         appendHTML ( '/docentFields/' + $ ( '#selectDocent' ).val ( ), '#docentFields' ) ;
-        };
-        getDocentFields();
+        } ;
+        getDocentFields ( ) ;
         $ ( '#selectDocent' ).on ( 'change', getDocentFields ) ;
 
-        $('#editDocentForm' ).on('submit', function(e){
 
-            var postData = $(this ).serializeArray();
-            var postUrl = $(this).attr("action","@routes.CEditDocents.editDocent");
-
-            $.ajax({
-            url : postUrl,
-            type: "POST",
-            data : postData,
-            success:function(data, textStatus, jqXHR)
-            {
-            //data: return data from server
-            },
-            error: function(jqXHR, textStatus, errorThrown)
-            {
-            //if fails
-            }
-            });
-        e.preventDefault();
-        e.unbind(); //unbind. to stop multiple form submit.
-        });
 
         </script>
     </div>

@@ -1,12 +1,19 @@
-@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity])
+@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity])(implicit flash:Flash)
+
+@import models.fhs.pages.editdocents._
+
 
 @import models.fhs.pages.roomdefinition._
 
 @import helper._
 @import helper.twitterBootstrap._
 
+    @defaultDocent = @{
+        MExistingDocent(-1, "", List[MTimeslotCriteria](), List[Long](), List[String](), List[Long]())
+    }
 
-<div class="form-inline">
+<form id="editDocentForm" class="form-inline">
+    <a class="btn btn-danger btn-sm pull-right" role="button" href="@routes.CEditDocents.deleteDocent(existingDocentForm.value.getOrElse(defaultDocent).id) "><span class="glyphicon glyphicon-minus"></span> </a>
     @inputText(existingDocentForm("id"), '_class -> "hidden")
     @inputText(existingDocentForm("lastName"), '_label -> "Nachname", '_class -> "form-group", '_help -> "")
     <br/>
@@ -15,7 +22,7 @@
         <select multiple id="favoriteFacility" name="houseCriterias[]" title="nichts ausgewählt">
 
         @for(h <- houses) {
-            @defining(existingDocentForm.get.houseCriterias.count(house => house.houseId.equals(h.getId)) > 0) { isSelected =>
+            @defining(existingDocentForm.value.getOrElse( defaultDocent).houseCriterias.count(houseId => houseId.equals(h.getId)) > 0) { isSelected =>
                 <option value="@h.getId" @if(isSelected) { selected }>@h.getName </option>
             }
         }
@@ -25,7 +32,7 @@
         <label for="favoriteRooms" class="control-label">Bevorzugte Räume</label>
         <select multiple id="favoriteRooms" name="roomCrit[]" data-selected-text-format="count>4" title="nichts ausgewählt">
         @for(r <- rooms) {
-            @defining(existingDocentForm.get.roomCrit.count(_.roomId.equals(r.getId)) > 0) { isSelected =>
+            @defining(existingDocentForm.value.getOrElse(defaultDocent).roomCrit.count(_ == r.getId) > 0) { isSelected =>
                 <option value="@r.getId" @if(isSelected) { selected }>@r.getHouse.getName @r.getNumber </option>
             }
         }
@@ -35,7 +42,9 @@
         <label class="control-label" for="favoriteAttributes">Bevorzugte Ausstattung</label>
         <select id="favoriteAttributes" name="roomAttr[]" multiple title="nichts ausgewählt">
         @for(attr <- MRoomdefintion.ATTRIBUTES) {
-            <option value="@attr">@attr</option>
+            @defining(existingDocentForm.value.getOrElse(defaultDocent).roomAttr.count(_ == attr)>0) { isSelected =>
+                <option @if(isSelected){selected } value="@attr">@attr</option>
+            }
         }
         </select>
     </div>
@@ -48,14 +57,14 @@
                 <div class="form-group">
                     <label>
                         <input type="radio" class="form-control" @if(timeslotCrit("tolerant").value.getOrElse("true") == "true") {
-                        checked } name="@timeslotCrit("tolerant").id" value="true"/>
+                        checked } name="@timeslotCrit("tolerant").name" value="true"/>
                         Ja
                     </label>
                 </div>
                 <div class="form-group">
                     <label>
                         <input type="radio" class="form-control"  @if(timeslotCrit("tolerant").value.getOrElse("true") == "false") {
-                        checked } name="@timeslotCrit("tolerant").id" value="false"/>
+                        checked } name="@timeslotCrit("tolerant").name" value="false"/>
                         Nein
                     </label>
                 </div>
@@ -81,21 +90,60 @@
     }
 
     </div>
+    <br />
     <div class="form-group">
-        <button id="addTimeCrit" class="btn btn-sm btn-warning" role="button"><span class="glyphicon glyphicon-plus"></span> </button>
+        <button type="button" id="addTimeCrit" class="btn btn-sm btn-warning" role="button"><span class="glyphicon glyphicon-plus"></span> </button>
+    </div>
+    <div class="clearfix"></div>
+    <br />
+    <div class="form-group">
+        <div class="form-group">
+            <button class="form-control btn btn-success" type="submit"> <span class="glyphicon glyphicon-ok"></span> </button>
+        </div>
+        <div class="form-group">
+            <button class="form-control btn btn-danger" type="reset"><span class="glyphicon glyphicon-remove"></span> </button>
+        </div>
     </div>
 
+</form>
+    @if(flash.get("submitResult").getOrElse("").equals("true")){
+    <div class="alert alert-success"> <span class="glyphicon glyphicon-thumbs-up"></span> Erfolg </div>
+    }
+   @if(flash.get("submitResult").getOrElse("").equals("false")){
+    <div class="alert alert-danger"> <span class="glyphicon glyphicon-thumbs-down"></span> Fehler </div>
+   }
+<script >
+ initSelect();
 
-</div>
-<script>
- initSelect ( ) ;
- var index=@existingDocentForm.get.timeslots.length;
-$('#addTimeCrit' ).on('click', function(e){
+ index=@existingDocentForm.value.getOrElse(defaultDocent).timeslots.length;
+    $('#addTimeCrit' ).on('click', function(e){
     $.getJSON('/timeCritFields/' + index, function(data){
       $('#timeCrits' ).append(data.htmlresult);
-      initSelect ( ) ;
+      initSelect ();
      });
 
     index++;
 });
+
+$ ( '#editDocentForm' ).on ( 'submit', function ( e ) {
+
+var postData = $ ( this ).serialize ( ) ;
+var postUrl = "@routes.CEditDocents.editDocent";
+var form = $ ( this ) ;
+
+$.ajax ( {
+url : postUrl,
+type : "POST",
+data : postData,
+contentType : form.attr ( "enctype" ),
+success : function ( data, textStatus, jqXHR ) {
+$ ( '#docentFields' ).empty ( ).append ( data.htmlresult ) ;
+},
+error : function ( jqXHR, textStatus, errorThrown ) {
+$ ( '#docentFields' ).empty ( ).append ( '<div class="alert alert-danger"> <span class="glyphicon glyphicon-thumbs-down" />' + errorThrown + ' </div> ' )
+}
+} ) ;
+e.preventDefault ( ) ;
+//e.unbind(); //unbind. to stop multiple form submit.
+} ) ;
 </script>

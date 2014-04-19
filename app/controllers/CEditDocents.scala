@@ -8,6 +8,7 @@ import play.api.libs.json._
 import views.html.editdocents._
 import models.fhs.pages.editdocents._
 import models.fhs.pages.editdocents.MEditDocents._
+import play.api.Logger
 
 /**
  * @author fabian 
@@ -37,17 +38,14 @@ object CEditDocents extends Controller {
       ),
 
       "houseCriterias" -> list(
-        mapping(
-          "houseId" -> longNumber
-        )(MHouseCriteria.apply)(MHouseCriteria.unapply)
+        longNumber
       ),
       "roomAttr" -> list(
-        mapping("name" -> nonEmptyText)(MRoomAttribute.apply)(MRoomAttribute.unapply)
+        nonEmptyText
       ),
       "roomCrit" -> list(
-        mapping(
-          "roomId"->longNumber
-        )(MRoomCriteria.apply)(MRoomCriteria.unapply)
+          longNumber
+
       )
 
 
@@ -59,27 +57,44 @@ object CEditDocents extends Controller {
       Ok(editDocents("Dozenten", newDocentForm, findAllDocents()))
   }
 
-  def sendTimeCritFields(index:Int) = Action{
-    Ok(Json.stringify(Json.obj("htmlresult"->timeCritFields(index,existingDocentForm).toString())))
+  def sendTimeCritFields(index: Int) = Action {
+    Ok(Json.stringify(Json.obj("htmlresult" -> timeCritFields(index, existingDocentForm).toString())))
   }
 
-  def sendDocentFields(id: Long) = Action {
+  def sendDocentFields(id: Long) = Action { implicit request =>
     Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(findDocentById(id)), findHouses(), findAllRooms()).toString())))
   }
 
-  def editDocent = Action{
-    implicit request=>
-      val docentResult = newDocentForm.bindFromRequest
+  def editDocent = Action {
+    implicit request =>
+
+     // Logger.debug("edit docent header: " + request.headers)
+      val docentResult = existingDocentForm.bindFromRequest
       docentResult.fold(
-      error => {BadRequest("")},
-      mDocent=> {
-        Ok("")
-      }
+        error => {
+           val flashing = flash + ("submitResult","false")
+          Logger.debug("error in form - " + error.value)
+          Ok(Json.obj("htmlresult" -> docentfields(error, findHouses(), findAllRooms())(flashing) .toString()))
+        },
+        mDocent => {
+          Logger.debug("edit data - " + mDocent)
+
+          val docent = persistEditedDocent(mDocent)
+           val flashing = flash + ("submitResult","true")
+
+          Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms())(flashing) .toString))
+        }
       )
+  }
+
+  def deleteDocent(id: Long) = Action {
+    removeDocent(id)
+    Redirect(routes.CEditDocents.page)
   }
 
   def saveNewDocent = Action {
     implicit request =>
+      //Logger.debug("add docent header: " + request.headers)
       val docentResult = newDocentForm.bindFromRequest
 
       docentResult.fold(
@@ -88,7 +103,6 @@ object CEditDocents extends Controller {
         },
         mDocent => {
           persistNewDocent(docentResult.get)
-
 
           Redirect(routes.CEditDocents.page)
         }
