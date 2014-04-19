@@ -74,7 +74,7 @@ object MRoomdefintion {
     dbResult.toList.map {
       element =>
         val timeslotCrit = element.getCriteriaContainer.getCriterias map {
-          case tcrit: TimeslotCriteria => MTimeslotDisplay(tcrit.getId, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStartMinute, tcrit.getWeekday.getName, tcrit.getWeekday.getSortIndex, tcrit.getDuration)
+          case tcrit: TimeslotCriteria => MTimeslotDisplay(tcrit.getId, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute, tcrit.getWeekday.getName, tcrit.getWeekday.getSortIndex, tcrit.getDuration)
         }
         MRoomdisplay(element.getId, element.getCapacity, element.getHouse.getName, element.getNumber, element.getRoomAttributes.toList, timeslotCrit.toList.sortBy(_.weekdayIndex))
     }.sortBy(_.house)

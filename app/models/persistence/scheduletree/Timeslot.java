@@ -10,7 +10,8 @@ import java.util.Calendar;
 import java.util.List;
 
 /**
- * Created by fabian on 27.01.14.
+ * @author fabian
+ *         on 27.01.14.
  */
 @Entity
 @Table(name = "TBLTIMESLOT")
@@ -114,6 +115,10 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
         int thisWeekday = ((Weekday) parent).getSortIndex();
         int otherWeekday = timeslotCriteria.getWeekday().getSortIndex();
 
+        if (thisWeekday != otherWeekday) {
+            return false;
+        }
+
         Calendar thisStartDate = Calendar.getInstance();
         Calendar thisStopDate = Calendar.getInstance();
         Calendar thatStartDate = Calendar.getInstance();
@@ -124,7 +129,7 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
         initCalendarFields(thatStartDate, otherStartHour, otherStartMinute, otherWeekday);
         initCalendarFields(thatStopDate, otherStopHour, otherStopMinute, otherWeekday);
 
-        return thisStartDate.compareTo(thatStartDate) >= 0 &&  thatStopDate.compareTo(thisStopDate) <= 0;
+        return thisStartDate.compareTo(thatStartDate) >= 0 && thisStopDate.compareTo(thatStopDate) <= 0;
     }
 
     private void initCalendarFields(Calendar calendar, int hour, int minute, int weekdayIndex) {
