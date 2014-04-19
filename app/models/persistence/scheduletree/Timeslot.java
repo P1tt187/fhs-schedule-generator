@@ -105,7 +105,7 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
     }
 
     @JsonIgnore
-    public Boolean isTimeslotCriteria(TimeslotCriteria timeslotCriteria) {
+    public Boolean isInTimeslotCriteria(TimeslotCriteria timeslotCriteria) {
 
         int otherStartHour = timeslotCriteria.getStartHour();
         int otherStartMinute = timeslotCriteria.getStartMinute();
@@ -124,7 +124,7 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
         initCalendarFields(thatStartDate, otherStartHour, otherStartMinute, otherWeekday);
         initCalendarFields(thatStopDate, otherStopHour, otherStopMinute, otherWeekday);
 
-        return thisStartDate.compareTo(thatStartDate) >= 0 && thisStopDate.compareTo(thatStopDate) <= 0;
+        return thisStartDate.compareTo(thatStartDate) >= 0 &&  thatStopDate.compareTo(thisStopDate) <= 0;
     }
 
     private void initCalendarFields(Calendar calendar, int hour, int minute, int weekdayIndex) {

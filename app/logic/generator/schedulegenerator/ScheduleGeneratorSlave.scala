@@ -259,7 +259,7 @@ class ScheduleGeneratorSlave extends Actor {
               if (criteria.isEmpty) {
                 true
               } else {
-                criteria.count(c => timeslot.isTimeslotCriteria(c)) > 0
+                criteria.count(c => timeslot.isInTimeslotCriteria(c)) > 0
               }
 
           }, lecture).sortBy(_.getCapacity)
