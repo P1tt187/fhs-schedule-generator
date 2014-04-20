@@ -1,11 +1,14 @@
 package models.persistence.criteria;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import models.persistence.enumerations.EDuration;
+import models.persistence.scheduletree.Weekday;
 import models.persistence.template.WeekdayTemplate;
 
 import javax.persistence.*;
+import java.util.Calendar;
 
 /**
  * @author fabian
@@ -146,5 +149,40 @@ public class TimeslotCriteria extends AbstractCriteria {
         result = 31 * result + (weekday != null ? weekday.hashCode() : 0);
         result = 37 * result + (duration != null ? duration.hashCode() : 0);
         return result;
+    }
+
+    @JsonIgnore
+    public Boolean isInTimeslotCriteria(TimeslotCriteria timeslotCriteria) {
+
+        int otherStartHour = timeslotCriteria.getStartHour();
+        int otherStartMinute = timeslotCriteria.getStartMinute();
+        int otherStopHour = timeslotCriteria.getStopHour();
+        int otherStopMinute = timeslotCriteria.getStopMinute();
+        int thisWeekday = weekday.getSortIndex();
+        int otherWeekday = timeslotCriteria.getWeekday().getSortIndex();
+
+        if (thisWeekday != otherWeekday) {
+            return false;
+        }
+
+        Calendar thisStartDate = Calendar.getInstance();
+        Calendar thisStopDate = Calendar.getInstance();
+        Calendar thatStartDate = Calendar.getInstance();
+        Calendar thatStopDate = Calendar.getInstance();
+
+        initCalendarFields(thisStartDate, startHour, startMinute, thisWeekday);
+        initCalendarFields(thisStopDate, stopHour, stopMinute, thisWeekday);
+        initCalendarFields(thatStartDate, otherStartHour, otherStartMinute, otherWeekday);
+        initCalendarFields(thatStopDate, otherStopHour, otherStopMinute, otherWeekday);
+
+        return thisStartDate.compareTo(thatStartDate) >= 0 && thisStopDate.compareTo(thatStopDate) <= 0;
+    }
+
+    private void initCalendarFields(Calendar calendar, int hour, int minute, int weekdayIndex) {
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.DAY_OF_WEEK, weekdayIndex + 1);
     }
 }

@@ -114,7 +114,7 @@ public class Lecture extends AbstractLecture {
      * the more costs a lecture have it will be more important to place it first
      */
     @JsonIgnore
-    public Integer getCosts() {
+    public Integer getDifficulty() {
         Integer ret = 0;
 
         if (criteriaContainer != null) {
