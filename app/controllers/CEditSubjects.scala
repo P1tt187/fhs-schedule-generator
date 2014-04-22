@@ -18,6 +18,7 @@ import models.persistence.Docent
 import models.persistence.location.{RoomEntity, RoomAttributesEntity, HouseEntity}
 import scala.collection.mutable
 import scala.concurrent.duration._
+import scala.collection.JavaConversions._
 
 /**
  * @author fabian 
@@ -36,14 +37,10 @@ object CEditSubjects extends Controller {
     Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses()))
   }
 
-  def getSubjectFields(subjectType: String, idString: String) = Action {
+  def getSubjectFields(semester:String,subjectType: String, idString: String) = Action {
 
-    if (idString.equals("null")) {
 
-      BadRequest("")
-
-    } else {
-      val id = idString.toLong
+      val id = if(idString.equals("null")){ -1l } else { idString.toLong }
 
       val subject = subjectType match {
         case LECTURE =>
@@ -51,6 +48,12 @@ object CEditSubjects extends Controller {
         case EXERCISE =>
           findSubject(classOf[ExerciseSubject], id)
       }
+
+    if(subject.getId==null){
+      subject.setId(-1l)
+      subject.setSemester(findSemester(extractSemesterPattern(semester)))
+      initNewSubject(subject)
+    }
 
       subject match {
         case exerciseSubject: ExerciseSubject =>
@@ -84,12 +87,16 @@ object CEditSubjects extends Controller {
         room
       }
 
-      Ok(Json.stringify(Json.obj("html" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim())))
-    }
+      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim())))
+
+  }
+
+  private def extractSemesterPattern(semester:String)={
+    semester.replaceAll(Pattern.quote("+"), "/").trim
   }
 
   def getNamesField(semester: String, subjectType: String, filterDocentId: Long, filterCourseId: Long, filterActive: String) = Action {
-    val semesterPattern = semester.replaceAll(Pattern.quote("+"), "/").trim
+    val semesterPattern = extractSemesterPattern(semester)
     Logger.debug("semester: " + semesterPattern + " subjectType: " + subjectType)
     //Logger.debug("" +MEditSubjects.findLectureSubjectsForSemester(semester.replaceAll(Pattern.quote("+"),"/").trim))
     subjectType match {
@@ -126,6 +133,8 @@ object CEditSubjects extends Controller {
 
         val roomCriteriaIds = (jsVal \ "roomCriteria").as[JsArray].value.map(_.as[String].toLong).toList
 
+        val semester = (jsVal \ "semester").as[String]
+
         val selectedCourse = findCourses(selectedCourseIds).toSet
 
         val selectedDocents = findDocents(selectDocentsIds).toSet
@@ -135,6 +144,10 @@ object CEditSubjects extends Controller {
         val selectedHouses = findSelectedHouses(houseCriteriaIds)
 
         val selectedRooms = findSelectedRooms(roomCriteriaIds)
+
+        val selectedSemester = findSemester(extractSemesterPattern(semester))
+
+
 
         //Logger.debug("" + (jsVal \ "selectCourse"))
 
@@ -147,6 +160,16 @@ object CEditSubjects extends Controller {
             val exercise = findSubject(classOf[ExerciseSubject], subjectId)
             exercise.setGroupType(groupTypeInput)
             exercise
+        }
+
+        if(subject.getId == null){
+          initNewSubject(subject)
+          subject.setSemester(selectedSemester)
+          subject match {
+            case exercise:ExerciseSubject=>
+              val groupTypeInput = (jsVal \ "groupTypeInput").as[String]
+              exercise.setGroupType(groupTypeInput)
+          }
         }
 
 
@@ -165,14 +188,17 @@ object CEditSubjects extends Controller {
         setRoomCriterias(selectedRooms, criteriaContainer)
 
         Transactions {
-          implicit entitymanager =>
-            entitymanager.merge(subject)
-            existingRoomCriteria.foreach {
-              rc =>
-                val attachedRc = entitymanager.merge(rc)
-                entitymanager.remove(attachedRc)
+          implicit entityManager =>
+            if(subject.getId==null){
+              entityManager.merge(subject)
+            }else {
+              entityManager.merge(subject)
+              existingRoomCriteria.foreach {
+                rc =>
+                  val attachedRc = entityManager.merge(rc)
+                  entityManager.remove(attachedRc)
+              }
             }
-
         }
 
         Ok(Json.stringify(Json.obj("result" -> "succsess")))

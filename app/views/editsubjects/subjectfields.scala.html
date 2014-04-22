@@ -148,7 +148,7 @@ var coursesSizes= {};
 
 var changePlaceholder = function () {
 
-    var selectedCourses = $('#selectCourse' ).val();
+    var selectedCourses = $('#selectCourse' ).val() || [];
     var sum = 0;
     for(var i = 0;i<selectedCourses.length;i++){
     console.debug(coursesSizes[ selectedCourses[i]]);
@@ -246,7 +246,7 @@ if(! $.isNumeric(data['expectedParticipants'])){
 
 data['expectedParticipants']=Number(data['expectedParticipants']);
 
-
+data['semester']= $('#selectSemester').val ( ) ;
 
 var Form = this ;
 $.ajax ( {

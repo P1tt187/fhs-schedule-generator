@@ -2,12 +2,14 @@ package models.fhs.pages.editsubjects
 
 import models.Transactions
 import scala.collection.JavaConversions._
-import models.persistence.subject.{ExerciseSubject, LectureSubject}
+import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
 import org.hibernate.criterion.{Order, CriteriaSpecification, Restrictions}
 import models.persistence.{Semester, Docent}
 import models.persistence.participants.Course
 import models.persistence.location.{RoomEntity, HouseEntity, RoomAttributesEntity}
 import org.hibernate.FetchMode
+import models.persistence.criteria.{AbstractCriteria, CriteriaContainer}
+import play.api.Logger
 
 /**
  * @author fabian 
@@ -79,10 +81,31 @@ object MEditSubjects {
     }
   }
 
-  def findSubject[T](clazz: Class[T], id: Long) = {
+  def findSubject[T](clazz: Class[T], id: Long):T = {
+    if(id == -1l){
+      Logger.debug("new instance")
+      return clazz.newInstance()
+    }
+
     Transactions.hibernateAction {
       implicit session =>
         clazz.cast(session.createCriteria(clazz).add(Restrictions.idEq(id)).uniqueResult())
+    }
+  }
+
+  def initNewSubject(subject:AbstractSubject){
+    subject.setActive(true)
+    subject.setName("")
+    subject.setCourses(Set[Course]())
+    val criteriaContainer = new CriteriaContainer
+    criteriaContainer.setCriterias(List[AbstractCriteria]())
+    subject.setCriteriaContainer(criteriaContainer)
+    subject.setDocents(Set[Docent]())
+    subject.setUnits(0.0f)
+
+    subject match {
+      case _: LectureSubject =>
+      case exerciseSubject: ExerciseSubject => exerciseSubject.setGroupType("")
     }
   }
 

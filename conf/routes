@@ -20,7 +20,7 @@ POST        /blaUpload                                                          
 
 GET         /editSubjects                                                                             controllers.CEditSubjects.page
 GET         /editSucjects/:semester/:subjectType/:filterDocentId/:filterCourseId/:filterActive        controllers.CEditSubjects.getNamesField(semester,subjectType,filterDocentId:Long,filterCourseId:Long,filterActive)
-GET         /subjects/:subjectType/:id                                                                controllers.CEditSubjects.getSubjectFields(subjectType, id )
+GET         /subjects/:semester/:subjectType/:id                                                      controllers.CEditSubjects.getSubjectFields(semester, subjectType, id )
 POST        /editSubject                                                                              controllers.CEditSubjects.saveData
 
 GET         /editCourses                                                                              controllers.CEditCourses.page
