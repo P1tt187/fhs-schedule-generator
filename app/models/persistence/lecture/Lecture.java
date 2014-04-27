@@ -106,7 +106,11 @@ public class Lecture extends AbstractLecture {
         if (expectedParticipants != null && expectedParticipants > 0) {
             return expectedParticipants;
         }
-        return participants.stream().mapToInt(Participant::getSize).sum();
+
+        /** it is expected, that 10% of the participants will not visit this lecture */
+        int ret = participants.stream().mapToInt(Participant::getSize).sum();
+        ret -= Math.floor(((double) ret) * 10.0 / 100.0);
+        return ret;
     }
 
     /**
