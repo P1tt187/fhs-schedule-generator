@@ -16,7 +16,7 @@ class UnweeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], 
     place(lecture, availableTimeSlots.sortBy {
       slot =>
         val equivalent = findEquivalent(slot, allTimeslots)
-        (equivalent.getLectures.find(_.getDocents.containsAll(lecture.getDocents)).isEmpty, !(timeSlotContainsParticipants(equivalent, lecture.getParticipants.toSet)||equivalent.getLectures.find(_.getParticipants.containsAll(lecture.getParticipants)).isEmpty) )
+        (equivalent.getLectures.find(_.getDocents.containsAll(lecture.getDocents)).isEmpty, !(timeSlotContainsParticipants(equivalent, lecture.getParticipants.toSet) || equivalent.getLectures.find(_.getParticipants.containsAll(lecture.getParticipants)).isEmpty))
     })
   }
 
@@ -31,7 +31,7 @@ class UnweeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], 
       return place(lecture, timeSlots.tail)
     }
 
-    val rooms = availableRooms.diff(slot.getLectures.flatMap(_.getRooms)).filter(isRoomAvailableInTimeSlot(_,slot) ).sortBy(_.getCapacity)
+    val rooms = availableRooms.diff(slot.getLectures.flatMap(_.getRooms)).filter(isRoomAvailableInTimeSlot(_, slot)).sortBy(_.getCapacity)
     if (rooms.isEmpty) {
       return place(lecture, timeSlots.tail)
     }
