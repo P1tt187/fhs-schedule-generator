@@ -1,6 +1,6 @@
 package logic.generator.schedulegenerator.placingprocessor
 
-import models.persistence.criteria.TimeslotCriteria
+import models.persistence.criteria.TimeSlotCriteria
 import models.persistence.scheduletree.TimeSlot
 import models.persistence.location.RoomEntity
 import models.persistence.lecture.Lecture
@@ -10,7 +10,7 @@ import scala.collection.JavaConversions._
  * @author fabian 
  *         on 29.04.14.
  */
-class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeslotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity]) extends PlacingProcessor {
+class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity]) extends PlacingProcessor {
   override def doPlacing(lecture: Lecture): Boolean = {
     place(lecture,availableTimeSlots)
   }
@@ -22,7 +22,7 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeslotCriteria], av
     }
     val slot = timeSlots.head
 
-    if (!availableTimeSlotCriterias.isEmpty && availableTimeSlotCriterias.count(slot.isInTimeslotCriteria) == 0) {
+    if (!availableTimeSlotCriterias.isEmpty && availableTimeSlotCriterias.count(slot.isInTimeSlotCriteria) == 0) {
       return place(lecture, timeSlots.tail)
     }
 

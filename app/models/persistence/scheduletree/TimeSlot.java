@@ -3,7 +3,7 @@ package models.persistence.scheduletree;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import models.persistence.criteria.TimeslotCriteria;
+import models.persistence.criteria.TimeSlotCriteria;
 import models.persistence.enumerations.EDuration;
 import models.persistence.lecture.AbstractLecture;
 
@@ -117,14 +117,14 @@ public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
     }
 
     @JsonIgnore
-    public Boolean isInTimeslotCriteria(TimeslotCriteria timeslotCriteria) {
+    public Boolean isInTimeSlotCriteria(TimeSlotCriteria timeSlotCriteria) {
 
-        int otherStartHour = timeslotCriteria.getStartHour();
-        int otherStartMinute = timeslotCriteria.getStartMinute();
-        int otherStopHour = timeslotCriteria.getStopHour();
-        int otherStopMinute = timeslotCriteria.getStopMinute();
+        int otherStartHour = timeSlotCriteria.getStartHour();
+        int otherStartMinute = timeSlotCriteria.getStartMinute();
+        int otherStopHour = timeSlotCriteria.getStopHour();
+        int otherStopMinute = timeSlotCriteria.getStopMinute();
         int thisWeekday = ((Weekday) parent).getSortIndex();
-        int otherWeekday = timeslotCriteria.getWeekday().getSortIndex();
+        int otherWeekday = timeSlotCriteria.getWeekday().getSortIndex();
 
         if (thisWeekday != otherWeekday) {
             return false;
@@ -140,8 +140,8 @@ public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
         initCalendarFields(thatStartDate, otherStartHour, otherStartMinute, otherWeekday);
         initCalendarFields(thatStopDate, otherStopHour, otherStopMinute, otherWeekday);
 
-        return thisStartDate.compareTo(thatStartDate) >= 0 && thisStopDate.compareTo(thatStopDate) <= 0 &&
-                (timeslotCriteria.getDuration() == EDuration.WEEKLY || timeslotCriteria.getDuration() == getDuration());
+        return thisStartDate.compareTo(thatStartDate) >= 0 && thisStopDate.compareTo(thatStopDate) <= 0
+                && (timeSlotCriteria.getDuration() == EDuration.WEEKLY || timeSlotCriteria.getDuration() == getDuration());
     }
 
     private void initCalendarFields(Calendar calendar, int hour, int minute, int weekdayIndex) {

@@ -8,7 +8,7 @@ import play.api.Logger
 import models.persistence.criteria.CriteriaContainer
 import java.util
 import models._
-import models.persistence.criteria.{AbstractCriteria, TimeslotCriteria}
+import models.persistence.criteria.{AbstractCriteria, TimeSlotCriteria}
 import models.persistence.enumerations.{EDuration, EPriority}
 import models.persistence.location.RoomEntity
 import scala.collection.JavaConversions._
@@ -133,7 +133,7 @@ object CRoomDefinition extends Controller {
 
                   val weekday = MRoomdefintion.getWeekdayTemplate(sortIndex)
 
-                  val timeslotCriteria = new TimeslotCriteria(crit.startHour, crit.startMinutes, crit.stopHour, crit.stopMinutes, weekday, EDuration.valueOf(crit.duration))
+                  val timeslotCriteria = new TimeSlotCriteria(crit.startHour, crit.startMinutes, crit.stopHour, crit.stopMinutes, weekday, EDuration.valueOf(crit.duration))
                   timeslotCriteria.setPriority(EPriority.HIGH)
                   timeslotCriteria.setTolerance(false)
 

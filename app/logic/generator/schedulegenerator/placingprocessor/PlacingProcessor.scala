@@ -5,7 +5,7 @@ import models.persistence.lecture.{AbstractLecture, Lecture}
 import models.persistence.location.RoomEntity
 import models.persistence.Docent
 import scala.annotation.tailrec
-import models.persistence.criteria.{RoomCriteria, TimeslotCriteria}
+import models.persistence.criteria.{RoomCriteria, TimeSlotCriteria}
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 import models.persistence.participants.{Course, Group, Participant}
@@ -137,7 +137,7 @@ trait PlacingProcessor {
   protected def filterTimeslotCriterias(docents: Set[Docent]) = {
 
     @tailrec
-    def filterRecursive(docent: Set[Docent], docents: Set[Docent], timeslot: Set[TimeslotCriteria] = Set[TimeslotCriteria]()): Set[TimeslotCriteria] = {
+    def filterRecursive(docent: Set[Docent], docents: Set[Docent], timeslot: Set[TimeSlotCriteria] = Set[TimeSlotCriteria]()): Set[TimeSlotCriteria] = {
       if (docent.isEmpty) {
         return timeslot
       }
@@ -145,18 +145,18 @@ trait PlacingProcessor {
       val timeCriterias = docents.flatMap {
         d =>
           if (docent.head == d) {
-            Set[TimeslotCriteria]()
+            Set[TimeSlotCriteria]()
           } else {
 
-            val allTimeslotCriterias = d.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeslotCriteria]).toSet.asInstanceOf[Set[TimeslotCriteria]]
+            val allTimeslotCriterias = d.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).toSet.asInstanceOf[Set[TimeSlotCriteria]]
             if (allTimeslotCriterias.isEmpty) {
-              docent.head.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeslotCriteria]).toSet.asInstanceOf[Set[TimeslotCriteria]]
+              docent.head.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).toSet.asInstanceOf[Set[TimeSlotCriteria]]
             } else {
 
               docent.head.getCriteriaContainer.getCriterias.filter {
                 case _: RoomCriteria => false
-                case tcrit: TimeslotCriteria => allTimeslotCriterias.count(_.isInTimeslotCriteria(tcrit)) > 0
-              }.toSet.asInstanceOf[Set[TimeslotCriteria]]
+                case tcrit: TimeSlotCriteria => allTimeslotCriterias.count(_.isInTimeslotCriteria(tcrit)) > 0
+              }.toSet.asInstanceOf[Set[TimeSlotCriteria]]
             }
           }
       }
@@ -167,8 +167,8 @@ trait PlacingProcessor {
     if (docents.size == 1) {
       docents.flatMap {
         docent =>
-          docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeslotCriteria])
-      }.toSet.asInstanceOf[Set[TimeslotCriteria]]
+          docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria])
+      }.toSet.asInstanceOf[Set[TimeSlotCriteria]]
     } else {
       filterRecursive(docents, docents)
     }
@@ -223,12 +223,12 @@ trait PlacingProcessor {
   }
 
   protected def isRoomAvailableInTimeSlot(room: RoomEntity, timeslot: TimeSlot): Boolean = {
-    val timeCriterias = room.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeslotCriteria]).toList.asInstanceOf[List[TimeslotCriteria]]
+    val timeCriterias = room.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).toList.asInstanceOf[List[TimeSlotCriteria]]
     if (timeCriterias.isEmpty) {
       return true
     }
 
-    timeCriterias.count(timeslot.isInTimeslotCriteria) > 0
+    timeCriterias.count(timeslot.isInTimeSlotCriteria) > 0
   }
 
 }

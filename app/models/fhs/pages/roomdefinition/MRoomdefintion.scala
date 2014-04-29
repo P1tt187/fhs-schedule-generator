@@ -5,7 +5,7 @@ import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
 import models.persistence.template.WeekdayTemplate
 import models.fhs.pages.timeslot.MTimeslotDisplay
 import scala.collection.JavaConversions._
-import models.persistence.criteria.TimeslotCriteria
+import models.persistence.criteria.TimeSlotCriteria
 import models.persistence.location.{HouseEntity, RoomAttributesEntity, RoomEntity}
 import org.hibernate.FetchMode
 import play.api.Play.current
@@ -52,7 +52,7 @@ object MRoomdefintion {
         val room = session.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
         val attributes = room.getRoomAttributes.map(_.getAttribute).toList
         val criterias = room.getCriteriaContainer.getCriterias.map {
-          case tcrit: TimeslotCriteria => MTtimeslotCritDefine(tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute, List(tcrit.getWeekday.getSortIndex), tcrit.getDuration.name)
+          case tcrit: TimeSlotCriteria => MTtimeslotCritDefine(tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute, List(tcrit.getWeekday.getSortIndex), tcrit.getDuration.name)
         }.toList.sortBy(_.weekdays.sum)
         MRoomdefintion(Some(id), room.getCapacity, room.getHouse.getName, room.getNumber, attributes, criterias)
     }
@@ -74,7 +74,7 @@ object MRoomdefintion {
     dbResult.toList.map {
       element =>
         val timeslotCrit = element.getCriteriaContainer.getCriterias map {
-          case tcrit: TimeslotCriteria => MTimeslotDisplay(tcrit.getId, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute, tcrit.getWeekday.getName, tcrit.getWeekday.getSortIndex, tcrit.getDuration)
+          case tcrit: TimeSlotCriteria => MTimeslotDisplay(tcrit.getId, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute, tcrit.getWeekday.getName, tcrit.getWeekday.getSortIndex, tcrit.getDuration)
         }
         MRoomdisplay(element.getId, element.getCapacity, element.getHouse.getName, element.getNumber, element.getRoomAttributes.toList, timeslotCrit.toList.sortBy(_.weekdayIndex))
     }.sortBy(_.house)

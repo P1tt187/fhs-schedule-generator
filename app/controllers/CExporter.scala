@@ -12,7 +12,7 @@ import models.export.JsonContainer
 import com.fasterxml.jackson.databind.ObjectMapper
 import models.persistence.template.WeekdayTemplate
 import scala.collection.JavaConversions._
-import models.persistence.criteria.TimeslotCriteria
+import models.persistence.criteria.TimeSlotCriteria
 import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
 
 /**
@@ -74,7 +74,7 @@ object CExporter extends Controller {
           Transactions.hibernateAction {
             implicit session =>
               val houseTemplates = jsonContainer.getHouses.flatMap(_.getRooms.flatMap(_.getCriteriaContainer.getCriterias.map {
-                case tcrit: TimeslotCriteria => tcrit.getWeekday
+                case tcrit: TimeSlotCriteria => tcrit.getWeekday
               }))
 
               (houseTemplates ++ jsonContainer.getWeekdayTemplates).map {

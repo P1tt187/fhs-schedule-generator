@@ -5,7 +5,7 @@
 @import models.fhs.pages.roomdefinition.MRoomdefintion
 
 @import models.persistence.subject.ExerciseSubject
-@import models.persistence.criteria.TimeslotCriteria
+@import models.persistence.criteria.TimeSlotCriteria
 
 
 
@@ -77,7 +77,7 @@
                     @for(h<-houses){
                         <option value="@h.getId" @if(
                              subject.getCriteriaContainer.getCriterias.count {
-                                case _: TimeslotCriteria => false
+                                case _: TimeSlotCriteria => false
                                 case rc: RoomCriteria =>
                                     if(rc.getHouse != null) {
                                         rc.getHouse.equals(h)
@@ -93,7 +93,7 @@
                     @for(r<-rooms){
                      <option value="@r.getId" @if(
                             subject.getCriteriaContainer.getCriterias.count {
-                                case _: TimeslotCriteria => false
+                                case _: TimeSlotCriteria => false
                                 case rc: RoomCriteria =>
                                     if(rc.getRoom != null) {
                                         rc.getRoom.equals(r)

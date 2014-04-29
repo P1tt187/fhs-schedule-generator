@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import models.persistence.enumerations.EDuration;
-import models.persistence.scheduletree.Weekday;
 import models.persistence.template.WeekdayTemplate;
 
 import javax.persistence.*;
@@ -16,10 +15,10 @@ import java.util.Calendar;
  */
 @Entity
 @Table(name = "TBLTIMESLOT_CRITERIA")
-public class TimeslotCriteria extends AbstractCriteria {
+public class TimeSlotCriteria extends AbstractCriteria {
 
 
-    public TimeslotCriteria(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute, WeekdayTemplate weekday, EDuration duration) {
+    public TimeSlotCriteria(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute, WeekdayTemplate weekday, EDuration duration) {
         this.startHour = startHour;
         this.startMinute = startMinute;
         this.stopHour = stopHour;
@@ -28,7 +27,7 @@ public class TimeslotCriteria extends AbstractCriteria {
         this.duration = duration;
     }
 
-    public TimeslotCriteria() {
+    public TimeSlotCriteria() {
 
     }
 
@@ -111,7 +110,7 @@ public class TimeslotCriteria extends AbstractCriteria {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        TimeslotCriteria that = (TimeslotCriteria) o;
+        TimeSlotCriteria that = (TimeSlotCriteria) o;
 
         if (startHour != null ? !startHour.equals(that.startHour) : that.startHour != null) return false;
         if (startMinute != null ? !startMinute.equals(that.startMinute) : that.startMinute != null) return false;
@@ -127,7 +126,7 @@ public class TimeslotCriteria extends AbstractCriteria {
 
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("TimeslotCriteria{");
+        final StringBuffer sb = new StringBuffer("TimeSlotCriteria{");
         sb.append("duration=").append(duration);
         sb.append(", startHour=").append(startHour);
         sb.append(", startMinute=").append(startMinute);
@@ -152,14 +151,14 @@ public class TimeslotCriteria extends AbstractCriteria {
     }
 
     @JsonIgnore
-    public Boolean isInTimeslotCriteria(TimeslotCriteria timeslotCriteria) {
+    public Boolean isInTimeslotCriteria(TimeSlotCriteria timeSlotCriteria) {
 
-        int otherStartHour = timeslotCriteria.getStartHour();
-        int otherStartMinute = timeslotCriteria.getStartMinute();
-        int otherStopHour = timeslotCriteria.getStopHour();
-        int otherStopMinute = timeslotCriteria.getStopMinute();
+        int otherStartHour = timeSlotCriteria.getStartHour();
+        int otherStartMinute = timeSlotCriteria.getStartMinute();
+        int otherStopHour = timeSlotCriteria.getStopHour();
+        int otherStopMinute = timeSlotCriteria.getStopMinute();
         int thisWeekday = weekday.getSortIndex();
-        int otherWeekday = timeslotCriteria.getWeekday().getSortIndex();
+        int otherWeekday = timeSlotCriteria.getWeekday().getSortIndex();
 
         if (thisWeekday != otherWeekday) {
             return false;

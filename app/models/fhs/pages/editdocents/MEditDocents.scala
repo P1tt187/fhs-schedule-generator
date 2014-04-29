@@ -1,7 +1,7 @@
 package models.fhs.pages.editdocents
 
 import models.persistence.Docent
-import models.persistence.criteria.{AbstractCriteria, RoomCriteria, TimeslotCriteria, CriteriaContainer}
+import models.persistence.criteria.{AbstractCriteria, RoomCriteria, TimeSlotCriteria, CriteriaContainer}
 import models.Transactions
 import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
 import org.hibernate.FetchMode
@@ -124,7 +124,7 @@ object MEditDocents {
           }
         }
 
-        val timeCrit = new TimeslotCriteria(crit.startHour, crit.startMinute, crit.stopHour, crit.stopMinute, findOrCreateWeekdayTemplate(crit.weekday), EDuration.WEEKLY)
+        val timeCrit = new TimeSlotCriteria(crit.startHour, crit.startMinute, crit.stopHour, crit.stopMinute, findOrCreateWeekdayTemplate(crit.weekday), EDuration.WEEKLY)
         timeCrit.setPriority(EPriority.NORMAL)
         timeCrit.setTolerance(crit.tolerant)
 
@@ -173,7 +173,7 @@ object MEditDocents {
   }
 
   implicit def docent2MExistingDocent(docent: Docent) = {
-    val timeslotCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeslotCriteria]).toList.asInstanceOf[List[TimeslotCriteria]]
+    val timeslotCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).toList.asInstanceOf[List[TimeSlotCriteria]]
     val convertedTimeslotCriterias = timeslotCriterias.map {
       tcrit =>
         MTimeslotCriteria(tcrit.isTolerance, tcrit.getWeekday.getSortIndex, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute)
