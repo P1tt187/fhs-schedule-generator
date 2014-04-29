@@ -25,7 +25,7 @@ public class WeekdayTemplate extends AbstractEntity implements Comparable<Weekda
 
     @JsonManagedReference("timeslotTemplate")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent", fetch = FetchType.EAGER)
-    private List<TimeslotTemplate> children;
+    private List<TimeSlotTemplate> children;
 
     public String getName() {
         return name;
@@ -43,12 +43,12 @@ public class WeekdayTemplate extends AbstractEntity implements Comparable<Weekda
         this.sortIndex = sortIndex;
     }
 
-    public List<TimeslotTemplate> getChildren() {
+    public List<TimeSlotTemplate> getChildren() {
         return children;
     }
 
-    public void setChildren(List<TimeslotTemplate> timeslotTemplates) {
-        this.children = timeslotTemplates;
+    public void setChildren(List<TimeSlotTemplate> timeSlotTemplates) {
+        this.children = timeSlotTemplates;
     }
 
     public WeekdayTemplate(String name, Integer sortIndex) {

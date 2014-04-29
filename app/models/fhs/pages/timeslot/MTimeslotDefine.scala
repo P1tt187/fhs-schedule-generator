@@ -1,7 +1,7 @@
 package models.fhs.pages.timeslot
 
 import models.Transactions
-import models.persistence.template.TimeslotTemplate
+import models.persistence.template.TimeSlotTemplate
 import scala.collection.JavaConversions._
 import java.util.Collections
 import models.persistence.enumerations.EDuration
@@ -28,7 +28,7 @@ object MTimeslotDisplay {
   def findAllTimeslots = {
     val timeslots = Transactions.hibernateAction{
       implicit session =>
-        val dbReslut = session.createCriteria(classOf[TimeslotTemplate]).list().asInstanceOf[java.util.List[TimeslotTemplate]]
+        val dbReslut = session.createCriteria(classOf[TimeSlotTemplate]).list().asInstanceOf[java.util.List[TimeSlotTemplate]]
         Collections.sort(dbReslut)
         dbReslut.toList
     }

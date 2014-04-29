@@ -12,7 +12,7 @@ import models.fhs.pages.timeslot.{MTimeslotDisplay, MTimeslotDefine}
 
 import models.Transactions
 import org.hibernate.criterion.Restrictions
-import models.persistence.template.{TimeslotTemplate, WeekdayTemplate}
+import models.persistence.template.{TimeSlotTemplate, WeekdayTemplate}
 import views.html.timeslotdefintiion._
 
 
@@ -83,7 +83,7 @@ object CTimeslotDefintion extends Controller {
                 }
 
 
-                val slot = new TimeslotTemplate(timeslot.startHour, timeslot.startMinutes, timeslot.stopHour, timeslot.stopMinutes, day)
+                val slot = new TimeSlotTemplate(timeslot.startHour, timeslot.startMinutes, timeslot.stopHour, timeslot.stopMinutes, day)
 
                 day.getChildren.add(slot)
 
@@ -108,7 +108,7 @@ object CTimeslotDefintion extends Controller {
 
     Transactions.hibernateAction {
       implicit session =>
-        val victom = session.createCriteria(classOf[TimeslotTemplate]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[TimeslotTemplate]
+        val victom = session.createCriteria(classOf[TimeSlotTemplate]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[TimeSlotTemplate]
         victom.getParent.getChildren.remove(victom)
         session.saveOrUpdate(victom.getParent)
         Logger.debug("delete " + victom)

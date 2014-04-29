@@ -6,9 +6,9 @@ import scala.collection.JavaConversions._
 import models.persistence.{Schedule, Semester}
 import models.persistence.subject.AbstractSubject
 import models.fhs.pages.JavaList
-import models.persistence.template.TimeslotTemplate
+import models.persistence.template.TimeSlotTemplate
 import scala.annotation.tailrec
-import models.persistence.scheduletree.{Weekday, Timeslot}
+import models.persistence.scheduletree.{Weekday, TimeSlot}
 import models.persistence.participants.Course
 import scala.Some
 import org.hibernate.FetchMode
@@ -25,7 +25,7 @@ object MGenerator {
   }
 
   def collectTimeslotsFromSchedule(schedule: Schedule) = {
-    schedule.getRoot.getChildren.asInstanceOf[JavaList[Weekday]].flatMap(_.getChildren.asInstanceOf[JavaList[Timeslot]]).toList.sorted
+    schedule.getRoot.getChildren.asInstanceOf[JavaList[Weekday]].flatMap(_.getChildren.asInstanceOf[JavaList[TimeSlot]]).toList.sorted
   }
 
   def findActiveSubjectsBySemesterId(id: Long) = {
@@ -70,7 +70,7 @@ object MGenerator {
 
 
   @tailrec
-  def findTimeRanges(timeslotTemplate: List[TimeslotTemplate], timeRanges: List[TimeRange]): List[TimeRange] = {
+  def findTimeRanges(timeslotTemplate: List[TimeSlotTemplate], timeRanges: List[TimeRange]): List[TimeRange] = {
     timeslotTemplate.headOption match {
       case None => timeRanges
       case Some(timeslot) =>
@@ -108,12 +108,12 @@ object TimeRange extends Ordering[TimeRange] {
 
 }
 
-case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int) extends Ordered[Timeslot] {
+case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int) extends Ordered[TimeSlot] {
 
 
   override def toString = "" + startHour.formatted("%02d") + ":" + startMinute.formatted("%02d") + "-" + stopHour.formatted("%02d") + ":" + stopMinute.formatted("%02d")
 
-  override def compare(that: Timeslot): Int = {
+  override def compare(that: TimeSlot): Int = {
     if (startHour.compareTo(that.getStartHour) != 0) {
       return startHour.compareTo(that.getStartHour)
     }

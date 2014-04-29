@@ -20,10 +20,10 @@ import akka.pattern.ask
 import models.persistence.Schedule
 import play.api.Logger
 import models.fhs.pages.JavaList
-import models.persistence.scheduletree.Timeslot
+import models.persistence.scheduletree.TimeSlot
 import scala.collection.JavaConversions._
 import models.Transactions
-import models.persistence.template.TimeslotTemplate
+import models.persistence.template.TimeSlotTemplate
 import org.hibernate.criterion.CriteriaSpecification
 import java.util.Calendar
 
@@ -74,13 +74,13 @@ object CGenerate extends Controller {
 
   def sendSchedule(id: Long) = Action {
     val timeslotsAll = if (schedule == null) {
-      List[Timeslot]()
+      List[TimeSlot]()
     } else {
       collectTimeslotsFromSchedule(schedule)
     }
     val timeslotTemplates = Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[TimeslotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeslotTemplate]].toList.sorted
+        session.createCriteria(classOf[TimeSlotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeSlotTemplate]].toList.sorted
     }
 
     val timeRanges = findTimeRanges(timeslotTemplates, List[TimeRange]())

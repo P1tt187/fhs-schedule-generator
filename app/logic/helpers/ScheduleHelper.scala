@@ -2,7 +2,7 @@ package logic.helpers
 
 import models.persistence.Schedule
 import models.persistence.participants.Course
-import models.persistence.scheduletree.{Timeslot, Weekday, Node, Root}
+import models.persistence.scheduletree._
 import scala.collection.JavaConversions._
 
 /**
@@ -28,12 +28,19 @@ object ScheduleHelper {
    schedule.getRoot.getChildren.foreach{
       case weekday:Weekday =>
        val lectures = weekday.getChildren.map{
-        case ts:Timeslot =>
+        case ts:TimeSlot =>
+
           val theLectures = ts.getLectures.filter{lecture=>
             val courses = lecture.getParticipants.map(_.getCourse)
             lecture.getParticipants.contains(course) || courses.contains(course)
           }
-          val newTs = new Timeslot(ts.getStartHour,ts.getStartMinute,ts.getStopHour,ts.getStopMinute)
+
+          val newTs = ts match {
+            case _:EvenTimeSlot =>
+              new EvenTimeSlot(ts.getStartHour,ts.getStartMinute,ts.getStopHour,ts.getStopMinute)
+            case _:UnevenTimeSlot=>
+              new UnevenTimeSlot(ts.getStartHour,ts.getStartMinute,ts.getStopHour,ts.getStopMinute)
+          }
            newTs.setLectures(theLectures)
           (weekday.getSortIndex, newTs)
       }

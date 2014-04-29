@@ -2,7 +2,9 @@ package models.persistence.scheduletree;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import models.persistence.criteria.TimeslotCriteria;
+import models.persistence.enumerations.EDuration;
 import models.persistence.lecture.AbstractLecture;
 
 import javax.persistence.*;
@@ -15,17 +17,21 @@ import java.util.List;
  */
 @Entity
 @Table(name = "TBLTIMESLOT")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "SLOT_TYPE")
+@DiscriminatorValue("T")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 /** A timeslot is a Node*/
-public class Timeslot extends Node implements Comparable<Timeslot> {
+public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
 
-    public Timeslot(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute) {
+    public TimeSlot(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute) {
         this.startHour = startHour;
         this.startMinute = startMinute;
         this.stopHour = stopHour;
         this.stopMinute = stopMinute;
     }
 
-    public Timeslot() {
+    public TimeSlot() {
 
     }
 
@@ -94,15 +100,20 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
-        Timeslot timeslot = (Timeslot) o;
+        TimeSlot timeSlot = (TimeSlot) o;
 
-        if (startHour != null ? !startHour.equals(timeslot.startHour) : timeslot.startHour != null) return false;
-        if (startMinute != null ? !startMinute.equals(timeslot.startMinute) : timeslot.startMinute != null)
+        if (startHour != null ? !startHour.equals(timeSlot.startHour) : timeSlot.startHour != null) return false;
+        if (startMinute != null ? !startMinute.equals(timeSlot.startMinute) : timeSlot.startMinute != null)
             return false;
-        if (stopHour != null ? !stopHour.equals(timeslot.stopHour) : timeslot.stopHour != null) return false;
-        if (stopMinute != null ? !stopMinute.equals(timeslot.stopMinute) : timeslot.stopMinute != null) return false;
+        if (stopHour != null ? !stopHour.equals(timeSlot.stopHour) : timeSlot.stopHour != null) return false;
+        if (stopMinute != null ? !stopMinute.equals(timeSlot.stopMinute) : timeSlot.stopMinute != null) return false;
+        if (parent != null) {
+            Weekday weekday = (Weekday) parent;
+            Weekday timeSlotWeekday = (Weekday) timeSlot.parent;
+            if (weekday.getSortIndex() != timeSlotWeekday.getSortIndex()) return false;
+        }
+        return this.getDuration() == timeSlot.getDuration();
 
-        return true;
     }
 
     @JsonIgnore
@@ -129,7 +140,8 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
         initCalendarFields(thatStartDate, otherStartHour, otherStartMinute, otherWeekday);
         initCalendarFields(thatStopDate, otherStopHour, otherStopMinute, otherWeekday);
 
-        return thisStartDate.compareTo(thatStartDate) >= 0 && thisStopDate.compareTo(thatStopDate) <= 0;
+        return thisStartDate.compareTo(thatStartDate) >= 0 && thisStopDate.compareTo(thatStopDate) <= 0 &&
+                (timeslotCriteria.getDuration() == EDuration.WEEKLY || timeslotCriteria.getDuration() == getDuration());
     }
 
     private void initCalendarFields(Calendar calendar, int hour, int minute, int weekdayIndex) {
@@ -147,22 +159,29 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
         result = 31 * result + (startMinute != null ? startMinute.hashCode() : 0);
         result = 31 * result + (stopHour != null ? stopHour.hashCode() : 0);
         result = 31 * result + (stopMinute != null ? stopMinute.hashCode() : 0);
+        if (parent != null) {
+            Weekday weekday = (Weekday) parent;
+            result = 31 * result + weekday.getSortIndex();
+        }
+
+        result = 31 * result + getDuration().hashCode();
         return result;
     }
 
     @Override
     public String toString() {
-        return "Timeslot{" +
-                "startHour=" + startHour +
-                ", startMinute=" + startMinute +
-                ", stopHour=" + stopHour +
-                ", stopMinute=" + stopMinute +
-                ", weekday=" + parent +
-                '}';
+        final StringBuffer sb = new StringBuffer("TimeSlot{");
+        sb.append("startHour=").append(startHour);
+        sb.append(", startMinute=").append(startMinute);
+        sb.append(", stopHour=").append(stopHour);
+        sb.append(", stopMinute=").append(stopMinute);
+        sb.append(", Weekday=").append(((Weekday) parent).getName());
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override
-    public int compareTo(Timeslot that) {
+    public int compareTo(TimeSlot that) {
 
         if (that == null) {
             return -1;
@@ -192,4 +211,7 @@ public class Timeslot extends Node implements Comparable<Timeslot> {
 
         return this.stopMinute.compareTo(that.stopMinute);
     }
+
+    @JsonIgnore
+    public abstract EDuration getDuration();
 }
