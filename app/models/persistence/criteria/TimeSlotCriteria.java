@@ -15,6 +15,7 @@ import java.util.Calendar;
  */
 @Entity
 @Table(name = "TBLTIMESLOT_CRITERIA")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class TimeSlotCriteria extends AbstractCriteria {
 
 

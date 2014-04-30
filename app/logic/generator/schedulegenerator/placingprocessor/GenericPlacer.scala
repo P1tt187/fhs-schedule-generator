@@ -26,7 +26,6 @@ class GenericPlacer(allLectures: List[Lecture], allTimeslots: List[TimeSlot], al
     if (!doPlacing(lectures.head)) {
       false
     } else {
-
       placing(lectures.tail)
     }
   }

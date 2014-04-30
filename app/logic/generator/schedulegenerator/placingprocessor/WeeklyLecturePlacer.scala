@@ -1,10 +1,12 @@
 package logic.generator.schedulegenerator.placingprocessor
 
-import models.persistence.criteria.TimeSlotCriteria
+import models.persistence.criteria.{DocentTimeWish, TimeSlotCriteria}
 import models.persistence.scheduletree.TimeSlot
 import models.persistence.location.RoomEntity
 import models.persistence.lecture.Lecture
 import scala.collection.JavaConversions._
+import models.persistence.enumerations.EDocentTimeKind
+import scala.annotation.tailrec
 
 /**
  * @author fabian 
@@ -12,35 +14,45 @@ import scala.collection.JavaConversions._
  */
 class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity]) extends PlacingProcessor {
   override def doPlacing(lecture: Lecture): Boolean = {
-    place(lecture,availableTimeSlots)
+    val timeWishes = lecture.getDocents.flatMap {
+      docent =>
+        docent.getCriteriaContainer.getCriterias.filter {
+          case timeWish: DocentTimeWish => timeWish.getTimeKind == EDocentTimeKind.WISH
+          case _ => false
+        }.toList.asInstanceOf[List[DocentTimeWish]]
+    }
+
+    /** sorting with boolean values will order false as first element, so we invert the conditions */
+    place(lecture, availableTimeSlots.sortBy {
+      slot =>
+        timeWishes.find(slot.isInTimeSlotCriteria).isEmpty
+    })
   }
 
-
+  @tailrec
   private def place(lecture: Lecture, timeSlots: List[TimeSlot]): Boolean = {
     if (timeSlots.isEmpty) {
       return false
     }
     val slot = timeSlots.head
 
-    if (!availableTimeSlotCriterias.isEmpty && availableTimeSlotCriterias.count(slot.isInTimeSlotCriteria) == 0) {
-      return place(lecture, timeSlots.tail)
-    }
+    val notInTimeCriteria = !availableTimeSlotCriterias.isEmpty && availableTimeSlotCriterias.count(slot.isInTimeSlotCriteria) == 0
 
     val equivalent = findEquivalent(slot, allTimeslots)
 
-    //if (timeSlotContainsDocents(equivalent, lecture.getDocents.toSet) || timeSlotContainsParticipants(equivalent, lecture.getParticipants.toSet)) {
-    if(!availableTimeSlots.contains(equivalent)){
-      return place(lecture, timeSlots.tail)
-    }
+    val equivalentNotAvailable = !availableTimeSlots.contains(equivalent)
 
     val rooms = availableRooms.diff(slot.getLectures.flatMap(_.getRooms) ++ equivalent.getLectures.flatMap(_.getRooms)).filter(r => isRoomAvailableInTimeSlot(r, slot) && isRoomAvailableInTimeSlot(r, equivalent)).sortBy(_.getCapacity)
-    if (rooms.isEmpty) {
-      return place(lecture, timeSlots.tail)
-    }
 
-    lecture.setRoom(rooms.head)
-    slot.setLectures(slot.getLectures :+ lecture)
-    equivalent.setLectures(equivalent.getLectures :+ lecture)
-    true
+    val noRoom = rooms.isEmpty
+
+    if (notInTimeCriteria || equivalentNotAvailable || noRoom) {
+      place(lecture, timeSlots.tail)
+    } else {
+      lecture.setRoom(rooms.head)
+      slot.setLectures(slot.getLectures :+ lecture)
+      equivalent.setLectures(equivalent.getLectures :+ lecture)
+      true
+    }
   }
 }

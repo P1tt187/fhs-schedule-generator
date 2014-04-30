@@ -28,13 +28,13 @@ object CEditDocents extends Controller {
       "lastName" -> nonEmptyText(minLength = 3),
       "timeslots" -> list(
         mapping(
-          "tolerant" -> boolean,
+          "timeKind" ->nonEmptyText,
           "weekday" -> number,
           "startHour" -> number,
           "startMinute" -> number,
           "stopHour" -> number,
           "stopMinute" -> number
-        )(MTimeslotCriteria.apply)(MTimeslotCriteria.unapply)
+        )(MDocentTimeWhish.apply)(MDocentTimeWhish.unapply)
       ),
 
       "houseCriterias" -> list(

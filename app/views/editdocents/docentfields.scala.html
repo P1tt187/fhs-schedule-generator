@@ -1,6 +1,7 @@
 @(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity])(implicit flash:Flash)
 
 @import models.fhs.pages.editdocents._
+@import models.persistence.enumerations.EDocentTimeKind
 
 
 @import models.fhs.pages.roomdefinition._
@@ -9,7 +10,7 @@
 @import helper.twitterBootstrap._
 
     @defaultDocent = @{
-        MExistingDocent(-1, "", List[MTimeslotCriteria](), List[Long](), List[String](), List[Long]())
+        MExistingDocent(-1, "", List[MDocentTimeWhish](), List[Long](), List[String](), List[Long]())
     }
 
 <form id="editDocentForm" class="form-inline">
@@ -53,19 +54,19 @@
         <div class="panel panel-info" id="@timeslotCrit.id">
             <button id="remove_@timeslotCrit.id" role="button" class="pull-right btn btn-sm btn-danger"><span class="glyphicon glyphicon-minus"></span></button>
             <div class="form-group">
-                <label class="control-label">darf abweichen</label>
+                <label class="control-label">Art der Verfügbarkeit</label>
                 <div class="form-group">
                     <label>
-                        <input type="radio" class="form-control" @if(timeslotCrit("tolerant").value.getOrElse("true") == "true") {
-                        checked } name="@timeslotCrit("tolerant").name" value="true"/>
-                        Ja
+                        <input type="radio" class="form-control" @if(timeslotCrit("timeKind").value.getOrElse(EDocentTimeKind.AVAILABLE.name()) == EDocentTimeKind.WISH.name()) {
+                        checked } name="@timeslotCrit("timeKind").name" value="@EDocentTimeKind.WISH.name()"/>
+                        Wunschzeit
                     </label>
                 </div>
                 <div class="form-group">
                     <label>
-                        <input type="radio" class="form-control"  @if(timeslotCrit("tolerant").value.getOrElse("true") == "false") {
-                        checked } name="@timeslotCrit("tolerant").name" value="false"/>
-                        Nein
+                        <input type="radio" class="form-control"  @if(timeslotCrit("timeKind").value.getOrElse(EDocentTimeKind.AVAILABLE.name()) == EDocentTimeKind.AVAILABLE.name()) {
+                        checked } name="@timeslotCrit("timeKind").name" value="@EDocentTimeKind.AVAILABLE.name()"/>
+                        Kannzeit
                     </label>
                 </div>
             </div>

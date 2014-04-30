@@ -1,7 +1,7 @@
 package models.fhs.pages.editdocents
 
 import models.persistence.Docent
-import models.persistence.criteria.{AbstractCriteria, RoomCriteria, TimeSlotCriteria, CriteriaContainer}
+import models.persistence.criteria._
 import models.Transactions
 import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
 import org.hibernate.FetchMode
@@ -9,9 +9,10 @@ import models.fhs.pages.JavaList
 import scala.collection.JavaConversions._
 import models.persistence.location.{RoomEntity, HouseEntity}
 import models.persistence.template.WeekdayTemplate
-import models.persistence.enumerations.{EPriority, EDuration}
+import models.persistence.enumerations.{EDocentTimeKind, EPriority, EDuration}
 import models.fhs.pages.roomdefinition.MRoomdefintion
 import models.persistence.subject.AbstractSubject
+
 
 /**
  * @author fabian 
@@ -124,9 +125,10 @@ object MEditDocents {
           }
         }
 
-        val timeCrit = new TimeSlotCriteria(crit.startHour, crit.startMinute, crit.stopHour, crit.stopMinute, findOrCreateWeekdayTemplate(crit.weekday), EDuration.WEEKLY)
+        val timeCrit = new DocentTimeWish(crit.startHour, crit.startMinute, crit.stopHour, crit.stopMinute, findOrCreateWeekdayTemplate(crit.weekday), EDuration.WEEKLY, EDocentTimeKind.valueOf(crit.timeKind))
         timeCrit.setPriority(EPriority.NORMAL)
-        timeCrit.setTolerance(crit.tolerant)
+        timeCrit.setTolerance(false)
+
 
         timeCrit
     }
@@ -173,10 +175,10 @@ object MEditDocents {
   }
 
   implicit def docent2MExistingDocent(docent: Docent) = {
-    val timeslotCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).toList.asInstanceOf[List[TimeSlotCriteria]]
+    val timeslotCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[DocentTimeWish]).toList.asInstanceOf[List[DocentTimeWish]]
     val convertedTimeslotCriterias = timeslotCriterias.map {
       tcrit =>
-        MTimeslotCriteria(tcrit.isTolerance, tcrit.getWeekday.getSortIndex, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute)
+        MDocentTimeWhish(tcrit.getTimeKind.name(), tcrit.getWeekday.getSortIndex, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute)
     }.sortBy(crit=> (crit.weekday,crit.startHour,crit.startMinute,crit.stopHour,crit.stopMinute))
 
     val roomCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).toList.asInstanceOf[List[RoomCriteria]]
@@ -204,8 +206,8 @@ object MEditDocents {
 
 case class MDocent(lastName: String)
 
-case class MExistingDocent(id: Long, lastName: String, timeslots: List[MTimeslotCriteria], houseCriterias: List[Long], roomAttr: List[String], roomCrit: List[Long])
+case class MExistingDocent(id: Long, lastName: String, timeslots: List[MDocentTimeWhish], houseCriterias: List[Long], roomAttr: List[String], roomCrit: List[Long])
 
-case class MTimeslotCriteria(tolerant: Boolean, weekday: Int, startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)
+case class MDocentTimeWhish(timeKind: String, weekday: Int, startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)
 
 
