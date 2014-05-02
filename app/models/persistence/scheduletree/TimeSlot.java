@@ -2,12 +2,20 @@ package models.persistence.scheduletree;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import models.persistence.criteria.TimeSlotCriteria;
 import models.persistence.enumerations.EDuration;
 import models.persistence.lecture.AbstractLecture;
-
-import javax.persistence.*;
+import org.hibernate.annotations.DiscriminatorOptions;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import java.util.Calendar;
 import java.util.List;
 
@@ -17,10 +25,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "TBLTIMESLOT")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "SLOT_TYPE")
-@DiscriminatorValue("T")
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@DiscriminatorOptions(force = true)
 /** A timeslot is a Node*/
 public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
 
@@ -107,10 +114,10 @@ public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
             return false;
         if (stopHour != null ? !stopHour.equals(timeSlot.stopHour) : timeSlot.stopHour != null) return false;
         if (stopMinute != null ? !stopMinute.equals(timeSlot.stopMinute) : timeSlot.stopMinute != null) return false;
-        if (parent != null) {
-            Weekday weekday = (Weekday) parent;
-            Weekday timeSlotWeekday = (Weekday) timeSlot.parent;
-            if (weekday.getSortIndex() != timeSlotWeekday.getSortIndex()) return false;
+        if (getParent() != null) {
+            Weekday weekday = (Weekday) getParent();
+            Weekday timeSlotWeekday = (Weekday) timeSlot.getParent();
+            if (!weekday.getSortIndex().equals(timeSlotWeekday.getSortIndex())) return false;
         }
         return this.getDuration() == timeSlot.getDuration();
 
@@ -123,7 +130,7 @@ public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
         int otherStartMinute = timeSlotCriteria.getStartMinute();
         int otherStopHour = timeSlotCriteria.getStopHour();
         int otherStopMinute = timeSlotCriteria.getStopMinute();
-        int thisWeekday = ((Weekday) parent).getSortIndex();
+        int thisWeekday = ((Weekday) getParent()).getSortIndex();
         int otherWeekday = timeSlotCriteria.getWeekday().getSortIndex();
 
         if (thisWeekday != otherWeekday) {
@@ -159,8 +166,8 @@ public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
         result = 31 * result + (startMinute != null ? startMinute.hashCode() : 0);
         result = 31 * result + (stopHour != null ? stopHour.hashCode() : 0);
         result = 31 * result + (stopMinute != null ? stopMinute.hashCode() : 0);
-        if (parent != null) {
-            Weekday weekday = (Weekday) parent;
+        if (getParent() != null) {
+            Weekday weekday = (Weekday) getParent();
             result = 31 * result + weekday.getSortIndex();
         }
 
@@ -175,20 +182,16 @@ public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
         sb.append(", startMinute=").append(startMinute);
         sb.append(", stopHour=").append(stopHour);
         sb.append(", stopMinute=").append(stopMinute);
-        sb.append(", Weekday=").append(((Weekday) parent).getName());
+        sb.append(", Weekday=").append(((Weekday) getParent()).getName());
         sb.append('}');
         return sb.toString();
     }
 
     @Override
-    public int compareTo(TimeSlot that) {
+    public int compareTo(@NotNull TimeSlot that) {
 
-        if (that == null) {
-            return -1;
-        }
-
-        Weekday thisWeekday = (Weekday) parent;
-        Weekday thatWeekday = (Weekday) that.parent;
+        Weekday thisWeekday = (Weekday) getParent();
+        Weekday thatWeekday = (Weekday) that.getParent();
 
         int ret = thisWeekday.compareTo(thatWeekday);
         if (ret != 0) {

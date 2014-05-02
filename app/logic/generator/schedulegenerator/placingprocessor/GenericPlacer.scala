@@ -7,6 +7,7 @@ import models.persistence.enumerations.EDuration
 import scala.collection.JavaConversions._
 import scala.annotation.tailrec
 import scala.util.Random
+import play.api.Logger
 
 /**
  * @author fabian 
@@ -18,12 +19,16 @@ class GenericPlacer(allLectures: List[Lecture], allTimeslots: List[TimeSlot], al
     placing(allLectures)
   }
 
+  private var placed=0
+
   @tailrec
   private def placing(lectures: List[Lecture]): Boolean = {
     if (lectures.isEmpty) {
       return true
     }
+    placed+=1
     if (!doPlacing(lectures.head)) {
+      Logger.debug("placed: " + placed + " Chancel: " + lectures.head.getName )
       false
     } else {
       placing(lectures.tail)

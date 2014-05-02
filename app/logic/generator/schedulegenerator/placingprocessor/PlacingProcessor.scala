@@ -155,7 +155,7 @@ trait PlacingProcessor {
 
               docent.head.getCriteriaContainer.getCriterias.filter {
                 case _: RoomCriteria => false
-                case tcrit: TimeSlotCriteria => allTimeslotCriterias.count(_.isInTimeslotCriteria(tcrit)) > 0
+                case tcrit: TimeSlotCriteria => allTimeslotCriterias.count(_.isInTimeSlotCriteria(tcrit)) > 0
               }.toSet.asInstanceOf[Set[TimeSlotCriteria]]
             }
           }

@@ -1,5 +1,8 @@
 package models.persistence.scheduletree;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import models.persistence.AbstractEntity;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -14,6 +17,7 @@ import java.util.List;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "TBLNODE")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 //@DiscriminatorOptions(force = true)
 /**superclass of all nodes. required to construct the schedule tree*/
 public abstract class Node extends AbstractEntity {
@@ -21,12 +25,14 @@ public abstract class Node extends AbstractEntity {
     /**
      * each node knows his parent node
      */
+    @JsonBackReference("nodeChildren")
     @ManyToOne(optional = true)
-    protected Node parent;
+    private Node parent;
 
     /**
      * each node has a list of children
      */
+    @JsonManagedReference("nodeChildren")
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent", fetch = FetchType.EAGER)
     private List<Node> children;

@@ -9,13 +9,9 @@ import models.fhs.pages.JavaList
 import scala.collection.JavaConversions._
 import models.persistence.template.{TimeSlotTemplate, WeekdayTemplate}
 import models.persistence.Schedule
-import models.persistence.participants.Course
 import models.persistence.lecture.{Lecture, AbstractLecture}
 import play.api.Logger
-import models.persistence.criteria.RoomCriteria
 import org.hibernate.FetchMode
-import scala.concurrent.duration._
-import akka.util.Timeout
 import logic.generator.schedulegenerator.placingprocessor.GenericPlacer
 
 
@@ -25,17 +21,6 @@ import logic.generator.schedulegenerator.placingprocessor.GenericPlacer
  */
 class ScheduleGeneratorSlave extends Actor {
 
-  private var placed = 0
-
-  private var notPlaced = 0
-
-  private var noRoom = 0
-
-  val TIMEOUT_VAL = 30
-
-  implicit val timeout = Timeout(TIMEOUT_VAL seconds)
-
-  private def filterRoomsWithCapacity(rooms: List[RoomEntity], lecture: Lecture) = rooms.par.filter(_.getCapacity >= lecture.calculateNumberOfParticipants()).toList
 
   override def receive = {
 
@@ -69,26 +54,19 @@ class ScheduleGeneratorSlave extends Actor {
 
     val allTimeSlots = root.getChildren.flatMap(_.getChildren).toList.asInstanceOf[List[TimeSlot]]
 
-   // doPlacing(lectures, allTimeSlots, rooms, root)
-
-
     val genericPlacer = new GenericPlacer(lectures, allTimeSlots, rooms)
 
-    if(!genericPlacer.place()){
+    if (!genericPlacer.place()) {
       sender() ! PlacingFailure
       return
     }
 
+    val schedule = new Schedule
 
-    if (notPlaced == 0) {
-      val schedule = new Schedule
-      Logger.debug("placed: " + placed + ", not placed: " + notPlaced + ", no room: " + noRoom)
-      schedule.setRoot(root)
-      sender() ! ScheduleAnswer(schedule)
-    }
+    schedule.setRoot(root)
+    sender() ! ScheduleAnswer(schedule)
 
   }
-
 
 
   private implicit def weekdayTemplateList2WeekdayList(wl: List[WeekdayTemplate]): List[Weekday] = {
@@ -105,7 +83,7 @@ class ScheduleGeneratorSlave extends Actor {
   }
 
   private def timeSlotTemplate2TimeSlot(timeslotTemplate: TimeSlotTemplate, weekday: Weekday): List[TimeSlot] = {
-    def initTimeSlot(timeSlotTemplate: TimeSlotTemplate,ret:TimeSlot , weekday: Weekday) ={
+    def initTimeSlot(timeSlotTemplate: TimeSlotTemplate, ret: TimeSlot, weekday: Weekday) = {
       ret.setStartHour(timeSlotTemplate.getStartHour)
       ret.setStartMinute(timeSlotTemplate.getStartMinute)
       ret.setStopHour(timeSlotTemplate.getStopHour)
@@ -117,8 +95,6 @@ class ScheduleGeneratorSlave extends Actor {
 
     List(initTimeSlot(timeslotTemplate, new EvenTimeSlot, weekday), initTimeSlot(timeslotTemplate, new UnevenTimeSlot, weekday))
   }
-
-
 
 
 }

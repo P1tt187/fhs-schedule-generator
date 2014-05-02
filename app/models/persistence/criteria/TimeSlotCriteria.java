@@ -152,7 +152,7 @@ public class TimeSlotCriteria extends AbstractCriteria {
     }
 
     @JsonIgnore
-    public Boolean isInTimeslotCriteria(TimeSlotCriteria timeSlotCriteria) {
+    public Boolean isInTimeSlotCriteria(TimeSlotCriteria timeSlotCriteria) {
 
         int otherStartHour = timeSlotCriteria.getStartHour();
         int otherStartMinute = timeSlotCriteria.getStartMinute();
@@ -175,7 +175,8 @@ public class TimeSlotCriteria extends AbstractCriteria {
         initCalendarFields(thatStartDate, otherStartHour, otherStartMinute, otherWeekday);
         initCalendarFields(thatStopDate, otherStopHour, otherStopMinute, otherWeekday);
 
-        return thisStartDate.compareTo(thatStartDate) >= 0 && thisStopDate.compareTo(thatStopDate) <= 0;
+        return thisStartDate.compareTo(thatStartDate) >= 0 && thisStopDate.compareTo(thatStopDate) <= 0
+                && (timeSlotCriteria.duration == EDuration.WEEKLY || timeSlotCriteria.duration == duration);
     }
 
     private void initCalendarFields(Calendar calendar, int hour, int minute, int weekdayIndex) {
