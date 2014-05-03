@@ -35,7 +35,7 @@ POST        /updateGroup                                                        
 GET         /generator                                                                                controllers.CGenerate.page()
 POST        /generatorAction                                                                          controllers.CGenerate.generatorAction
 GET         /generatorFinished                                                                        controllers.CGenerate.finished
-GET         /generatorGetSchedule/:filterId                                                           controllers.CGenerate.sendSchedule(filterId:Long)
+GET         /generatorGetSchedule/:filterCourse/:filterDocent                                         controllers.CGenerate.sendSchedule(filterCourse:Long, filterDocent:Long)
 
 GET         /exportData                                                                               controllers.CExporter.page
 GET         /data.json                                                                                controllers.CExporter.export

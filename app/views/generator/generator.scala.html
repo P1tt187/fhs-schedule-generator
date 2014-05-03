@@ -1,4 +1,4 @@
-@(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm], courses:List[models.persistence.participants.Course] )(implicit flash: Flash)
+@(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm], courses:List[models.persistence.participants.Course] , docents:List[persistence.Docent])(implicit flash: Flash)
 
     @import helper._
     @import helper.twitterBootstrap._
@@ -39,11 +39,20 @@
                 <div class="col-md-5">
                     <div class="form-inline">
                         <div class="form-group">
-                            <label class="control-label" for="selectCourseFilter">Filter</label>
+                            <label class="control-label" for="selectCourseFilter">Kurs</label>
                             <select class="form-control" id="selectCourseFilter">
                             <option value="-1">alle Kurse</option>
-                                @for(c<-courses){
+                                @for(c <- courses){
                                     <option value="@c.getId">@c.getShortName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="selectDocentFilter">Dozent </label>
+                            <select class="form-control" id="selectDocentFilter">
+                                <option value="-1">alle Dozenten</option>
+                                @for(d <- docents){
+                                    <option value="@d.getId">@d.getLastName</option>
                                 }
                             </select>
                         </div>
@@ -60,11 +69,12 @@
             <script type="text/javascript">
 
                 var showSchedule = function(){
-                $.getJSON("generatorGetSchedule/" + $('#selectCourseFilter').val() , function(data){
+                $.getJSON("generatorGetSchedule/" + $('#selectCourseFilter').val() + "/" + $('#selectDocentFilter' ).val(), function(data){
                 $('#scheduleTableContainer' ).empty().append(data.htmlresult);
                   });
                 };
             $('#selectCourseFilter' ).on('change',showSchedule);
+            $('#selectDocentFilter' ).on('change',showSchedule);
 
             var changeProgressBar = function ( ) {
             $ ( '.progress-bar' ).removeClass ( 'progress-bar-warning' ).addClass ( 'progress-bar-success' ) ;

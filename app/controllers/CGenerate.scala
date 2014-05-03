@@ -60,7 +60,7 @@ object CGenerate extends Controller {
         case None => form
       }
 
-      Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses()))
+      Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses(), findDocents()))
   }
 
   def finished = Action {
@@ -72,7 +72,7 @@ object CGenerate extends Controller {
   }
 
 
-  def sendSchedule(id: Long) = Action {
+  def sendSchedule(courseId: Long, docentId:Long) = Action {
     val timeslotsAll = if (schedule == null) {
       List[TimeSlot]()
     } else {
@@ -85,10 +85,10 @@ object CGenerate extends Controller {
 
     val timeRanges = findTimeRanges(timeslotTemplates, List[TimeRange]())
 
-    val filteredPage = if (id == -1) {
+    val filteredPage = if (courseId == -1 && docentId == -1) {
       showSchedule("Alle Kurse", timeRanges, timeslotsAll).toString()
     } else {
-      val (courseName, timeslots) = filterScheduleWithCourse(schedule, findCourse(id))
+      val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId))
       showSchedule(courseName, timeRanges, timeslots).toString()
     }
     Ok(Json.stringify(Json.obj("htmlresult" -> filteredPage)))
@@ -100,7 +100,7 @@ object CGenerate extends Controller {
       val generatorFormResult = form.bindFromRequest()
       generatorFormResult.fold(
         errors => {
-          BadRequest(generator("Generator", findSemesters(), errors, findCourses()))
+          BadRequest(generator("Generator", findSemesters(), errors, findCourses(), findDocents()))
         },
         result => {
           actorFinished = false

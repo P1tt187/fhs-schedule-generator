@@ -3,7 +3,7 @@ package models.fhs.pages.generator
 import models.Transactions
 import org.hibernate.criterion._
 import scala.collection.JavaConversions._
-import models.persistence.{Schedule, Semester}
+import models.persistence.{Docent, Schedule, Semester}
 import models.persistence.subject.AbstractSubject
 import models.fhs.pages.JavaList
 import models.persistence.template.TimeSlotTemplate
@@ -20,8 +20,25 @@ import org.hibernate.FetchMode
  */
 object MGenerator {
 
-  def filterScheduleWithCourse(schedule: Schedule, course:Course) = {
-     (course.getShortName, collectTimeslotsFromSchedule(schedule.filter(course)))
+  def filterScheduleWithCourseAndDocent(schedule: Schedule, course: Course, docent: Docent) = {
+
+    val resultString = new StringBuffer()
+
+    var filteredSchedule = if (course != null) {
+      resultString.append(course.getShortName)
+      resultString.append(" ")
+      schedule.filter(course)
+    } else {
+      schedule
+    }
+
+    filteredSchedule = if (docent != null) {
+      resultString.append(docent.getLastName)
+      filteredSchedule.filter(docent)
+    } else {
+      filteredSchedule
+    }
+    (resultString.toString , collectTimeslotsFromSchedule(filteredSchedule))
   }
 
   def collectTimeslotsFromSchedule(schedule: Schedule) = {
@@ -33,7 +50,7 @@ object MGenerator {
       implicit session =>
         val criterion = session.createCriteria(classOf[AbstractSubject]).add(Restrictions.eq("active", true)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
         criterion.createCriteria("semester").add(Restrictions.idEq(id))
-        criterion.setFetchMode("criteriaContainer.house.rooms",FetchMode.JOIN)
+        criterion.setFetchMode("criteriaContainer.house.rooms", FetchMode.JOIN)
 
         criterion.list().asInstanceOf[JavaList[AbstractSubject]].toList
 
@@ -54,19 +71,23 @@ object MGenerator {
         session.createCriteria(classOf[Semester]).addOrder(Order.desc("name")).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[Semester]].toList
     }
   }
-    def findCourses():List[Course] = {
-      Transactions.hibernateAction {
-        implicit session =>
-          session.createCriteria(classOf[Course]).addOrder(Order.asc("shortName")).list().asInstanceOf[java.util.List[Course]].toList
-      }
-    }
 
-    def findCourse(courseId: Long) = {
-      Transactions.hibernateAction {
-        implicit session =>
-          session.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).setFetchMode("groups", FetchMode.JOIN).uniqueResult().asInstanceOf[Course]
-      }
+  def findCourses(): List[Course] = {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[Course]).addOrder(Order.asc("shortName")).list().asInstanceOf[java.util.List[Course]].toList
     }
+  }
+
+  def findCourse(courseId: Long): Course = {
+    if (courseId == -1l) {
+      return null
+    }
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).setFetchMode("groups", FetchMode.JOIN).uniqueResult().asInstanceOf[Course]
+    }
+  }
 
 
   @tailrec
@@ -89,7 +110,25 @@ object MGenerator {
     }
   }
 
+  def findDocent(id: Long): Docent = {
+    if (id == -1l) {
+      return null
+    }
+    Transactions.hibernateAction {
+      implicit s =>
+        s.createCriteria(classOf[Docent]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[Docent]
+    }
+  }
+
+  def findDocents() = {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[Docent]).setFetchMode("criteriaContainer", FetchMode.SELECT).addOrder(Order.asc("lastName")).list().asInstanceOf[java.util.List[Docent]].toList
+    }
+  }
+
 }
+
 
 object TimeRange extends Ordering[TimeRange] {
   override def compare(range: TimeRange, that: TimeRange): Int = {

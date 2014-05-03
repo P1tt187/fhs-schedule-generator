@@ -68,4 +68,8 @@ public class Schedule extends AbstractEntity {
     public Schedule filter(Course course) {
         return ScheduleHelper.filterCourse(this, course);
     }
+
+    public Schedule filter(Docent docent) {
+        return ScheduleHelper.filterDocent(this, docent);
+    }
 }
