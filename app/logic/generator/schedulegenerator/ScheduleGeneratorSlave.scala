@@ -13,6 +13,7 @@ import models.persistence.lecture.{Lecture, AbstractLecture}
 import play.api.Logger
 import org.hibernate.FetchMode
 import logic.generator.schedulegenerator.placingprocessor.GenericPlacer
+import java.math.BigInteger
 
 
 /**
@@ -26,7 +27,7 @@ class ScheduleGeneratorSlave extends Actor {
 
     case SlaveGenerate(lectures) =>
       try {
-        placeLectures(lectures.sortBy(l => (-l.getDifficulty, l.getName)))
+        placeLectures(lectures.sortBy(l => (l.getDifficulty.multiply(new BigInteger("-1")), l.getName)))
       }
       catch {
         case e: Exception => Logger.error("error", e)

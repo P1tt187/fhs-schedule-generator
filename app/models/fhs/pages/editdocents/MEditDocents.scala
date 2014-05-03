@@ -179,7 +179,7 @@ object MEditDocents {
     val convertedTimeslotCriterias = timeslotCriterias.map {
       tcrit =>
         MDocentTimeWhish(tcrit.getTimeKind.name(), tcrit.getWeekday.getSortIndex, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute)
-    }.sortBy(crit=> (crit.weekday,crit.startHour,crit.startMinute,crit.stopHour,crit.stopMinute))
+    }.sortBy(crit=> (crit.timeKind.length, crit.weekday,crit.startHour,crit.startMinute,crit.stopHour,crit.stopMinute))
 
     val roomCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).toList.asInstanceOf[List[RoomCriteria]]
     val houseCriterias = roomCriterias.filter(_.getHouse != null).map {

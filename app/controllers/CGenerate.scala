@@ -47,7 +47,7 @@ object CGenerate extends Controller {
     mapping("id" -> longNumber)(GeneratorForm.apply)(GeneratorForm.unapply)
   )
 
-  implicit val timeout = Timeout(2 minutes)
+  implicit val timeout = Timeout(5 minutes)
 
   val NAV = "GENERATOR"
 

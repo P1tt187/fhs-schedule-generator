@@ -14,6 +14,7 @@ import models.fhs.pages.JavaList
 import exceptions.NoGroupFoundException
 import scala.util.Random
 import org.hibernate.FetchMode
+import java.math.BigInteger
 
 /**
  * @author fabian 
@@ -49,7 +50,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setLectureSynonyms(lectureSubject.getSubjectSynonyms)
                 lecture.setKind(ELectureKind.LECTURE)
                 lecture.setExpectedParticipants(lectureSubject.getExpectedParticipants)
-                lecture.setDifficultLevel(lectureSubject.getUnits.toInt)
+                lecture.setDifficultLevel(new BigInteger("" + lectureSubject.getUnits.toInt) )
                 addedLectures += 1
                 lecture
               }
@@ -94,7 +95,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setLectureSynonyms(exerciseSubject.getSubjectSynonyms)
                 lecture.setKind(ELectureKind.EXERCISE)
                 lecture.setExpectedParticipants(exerciseSubject.getExpectedParticipants)
-                lecture.setDifficultLevel(exerciseSubject.getUnits.toInt)
+                lecture.setDifficultLevel(new BigInteger("" + exerciseSubject.getUnits.toInt) )
                 addedExercises += 1
                 lecture
               }

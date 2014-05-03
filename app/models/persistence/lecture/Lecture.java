@@ -11,6 +11,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -85,17 +86,17 @@ public class Lecture extends AbstractLecture {
 
     @Transient
     @JsonIgnore
-    private Integer difficultLevel = 0;
+    private BigInteger difficultLevel = new BigInteger("0");
 
-    public void setDifficultLevel(Integer difficultLevel) {
+    public void setDifficultLevel(BigInteger difficultLevel) {
         this.difficultLevel = difficultLevel;
     }
 
     public void increaseDifficultLevel() {
-        if (difficultLevel == 0 || difficultLevel == 1) {
-            difficultLevel++;
+        if (difficultLevel.intValue() == 0 || difficultLevel.intValue() == 1) {
+            difficultLevel = difficultLevel.add(new BigInteger("1"));
         }
-        difficultLevel *= difficultLevel;
+        difficultLevel = difficultLevel.add(difficultLevel);
     }
 
     /**
@@ -118,26 +119,26 @@ public class Lecture extends AbstractLecture {
      * the more costs a lecture have it will be more important to place it first
      */
     @JsonIgnore
-    public Integer getDifficulty() {
-        Integer ret = 0;
+    public BigInteger getDifficulty() {
+        BigInteger ret = new BigInteger("0");
 
         if (criteriaContainer != null) {
-            ret += criteriaContainer.calculateDifficultLevel();
+            ret = ret.add(new BigInteger(String.valueOf(criteriaContainer.calculateDifficultLevel())));
         }
 
         if (docents != null) {
-            ret += docents.parallelStream().mapToInt(d -> d.getCriteriaContainer().calculateDifficultLevel()).sum();
+            ret = ret.add(new BigInteger(String.valueOf(docents.parallelStream().mapToInt(d -> d.getCriteriaContainer().calculateDifficultLevel()).sum())));
         }
 
         if (participants != null) {
-            ret += participants.size();
+            ret = ret.add(new BigInteger(String.valueOf(participants.size())));
         }
 
-        ret += calculateNumberOfParticipants();
+        ret = ret.add(new BigInteger(String.valueOf(calculateNumberOfParticipants())));
 
-        ret += difficultLevel;
+        ret = ret.add(difficultLevel);
 
-        ret += duration.getSortIndex();
+        ret = ret.add(new BigInteger(String.valueOf(duration.getSortIndex())));
 
         return ret;
     }

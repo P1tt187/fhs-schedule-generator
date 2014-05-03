@@ -6,7 +6,6 @@ import models.persistence.location.RoomEntity
 import models.persistence.enumerations.EDuration
 import scala.collection.JavaConversions._
 import scala.annotation.tailrec
-import scala.util.Random
 import play.api.Logger
 
 /**
@@ -28,7 +27,7 @@ class GenericPlacer(allLectures: List[Lecture], allTimeslots: List[TimeSlot], al
     }
     placed+=1
     if (!doPlacing(lectures.head)) {
-      Logger.debug("placed: " + placed + " Chancel: " + lectures.head.getName )
+      Logger.debug("placed: " + placed + " Chancel: " + lectures.head.getName + " " + lectures.head.getDuration /*+ " difficult: " + lectures.head.getDifficulty*/)
       false
     } else {
       placing(lectures.tail)
@@ -39,7 +38,8 @@ class GenericPlacer(allLectures: List[Lecture], allTimeslots: List[TimeSlot], al
 
     val availableRooms = filterRoomsForLecture(lecture, allRooms)
     val availableTimeSlotCriterias = filterTimeslotCriterias(lecture.getDocents.toSet).toList
-    val availableTimeSlots = Random.shuffle(findPossibleTimeSlots(allTimeslots, lecture))
+    //val availableTimeSlots = Random.shuffle(findPossibleTimeSlots(allTimeslots, lecture))
+    val availableTimeSlots = findPossibleTimeSlots(allTimeslots, lecture)
 
 
     val result = lecture.getDuration match {

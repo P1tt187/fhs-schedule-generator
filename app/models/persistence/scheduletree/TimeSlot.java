@@ -6,16 +6,8 @@ import models.persistence.criteria.TimeSlotCriteria;
 import models.persistence.enumerations.EDuration;
 import models.persistence.lecture.AbstractLecture;
 import org.hibernate.annotations.DiscriminatorOptions;
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+
+import javax.persistence.*;
 import java.util.Calendar;
 import java.util.List;
 
@@ -188,7 +180,7 @@ public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
     }
 
     @Override
-    public int compareTo(@NotNull TimeSlot that) {
+    public int compareTo(TimeSlot that) {
 
         Weekday thisWeekday = (Weekday) getParent();
         Weekday thatWeekday = (Weekday) that.getParent();
