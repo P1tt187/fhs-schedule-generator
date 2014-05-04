@@ -86,7 +86,7 @@ public class Lecture extends AbstractLecture {
 
     @Transient
     @JsonIgnore
-    private BigInteger difficultLevel = new BigInteger("0");
+    private BigInteger difficultLevel = BigInteger.ZERO;
 
     public void setDifficultLevel(BigInteger difficultLevel) {
         this.difficultLevel = difficultLevel;
@@ -117,25 +117,25 @@ public class Lecture extends AbstractLecture {
      */
     @JsonIgnore
     public BigInteger getDifficulty() {
-        BigInteger ret = new BigInteger("0");
+        BigInteger ret = BigInteger.ZERO;
 
         if (criteriaContainer != null) {
-            ret = ret.add(new BigInteger(String.valueOf(criteriaContainer.calculateDifficultLevel())));
+            ret = ret.add(BigInteger.valueOf(criteriaContainer.calculateDifficultLevel()));
         }
 
         if (docents != null) {
-            ret = ret.add(new BigInteger(String.valueOf(docents.parallelStream().mapToInt(d -> d.getCriteriaContainer().calculateDifficultLevel()).sum())));
+            ret = ret.add(BigInteger.valueOf(docents.parallelStream().mapToLong(d -> d.getCriteriaContainer().calculateDifficultLevel()).sum()));
         }
 
         if (participants != null) {
-            ret = ret.add(new BigInteger(String.valueOf(participants.size())));
+            ret = ret.add(BigInteger.valueOf(participants.size()));
         }
 
-        ret = ret.add(new BigInteger(String.valueOf(calculateNumberOfParticipants())));
+        ret = ret.add(BigInteger.valueOf(calculateNumberOfParticipants()));
 
         ret = ret.add(difficultLevel);
 
-        ret = ret.add(new BigInteger(String.valueOf(duration.getSortIndex())));
+        ret = ret.add(BigInteger.valueOf(duration.getSortIndex()));
 
         return ret;
     }

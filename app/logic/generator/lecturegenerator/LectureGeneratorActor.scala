@@ -50,7 +50,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setLectureSynonyms(lectureSubject.getSubjectSynonyms)
                 lecture.setKind(ELectureKind.LECTURE)
                 lecture.setExpectedParticipants(lectureSubject.getExpectedParticipants)
-                lecture.setDifficultLevel(new BigInteger("" + lectureSubject.getUnits.toInt) )
+                lecture.setDifficultLevel(BigInteger.valueOf(lectureSubject.getUnits.toLong) )
                 addedLectures += 1
                 lecture
               }
@@ -95,7 +95,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setLectureSynonyms(exerciseSubject.getSubjectSynonyms)
                 lecture.setKind(ELectureKind.EXERCISE)
                 lecture.setExpectedParticipants(exerciseSubject.getExpectedParticipants)
-                lecture.setDifficultLevel(new BigInteger("" + exerciseSubject.getUnits.toInt) )
+                lecture.setDifficultLevel( BigInteger.valueOf( exerciseSubject.getUnits.toLong ))
                 addedExercises += 1
                 lecture
               }

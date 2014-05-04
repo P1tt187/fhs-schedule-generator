@@ -27,7 +27,7 @@ class ScheduleGeneratorSlave extends Actor {
 
     case SlaveGenerate(lectures) =>
       try {
-        placeLectures(lectures.sortBy(l => (l.getDifficulty.multiply(new BigInteger("-1")), l.getName)))
+        placeLectures(lectures.sortBy(l => (l.getDifficulty.multiply(BigInteger.valueOf(-1)), l.getName)))
       }
       catch {
         case e: Exception => Logger.error("error", e)
