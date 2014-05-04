@@ -37,7 +37,7 @@ class GenericPlacer(allLectures: List[Lecture], allTimeslots: List[TimeSlot], al
   override def doPlacing(lecture: Lecture): Boolean = {
 
     val availableRooms = filterRoomsForLecture(lecture, allRooms)
-    val availableTimeSlotCriterias = filterTimeslotCriterias(lecture.getDocents.toSet).toList
+    val availableTimeSlotCriterias = filterTimeWishes(lecture.getDocents.toSet).toList
     //val availableTimeSlots = Random.shuffle(findPossibleTimeSlots(allTimeslots, lecture))
     val availableTimeSlots = findPossibleTimeSlots(allTimeslots, lecture)
 

@@ -13,7 +13,7 @@
     <div class="row-fluid">
         <div class="co-md-9">
                 @helper.form(action = routes.CBLAFileUpload.uploadFile(), 'enctype -> "multipart/form-data") {
-                    <div class="form-horizontal @("has-error".when(flash.get("error"))) @("has-success".when(flash.get("success")))">
+                    <div class="form-inline @("has-error".when(flash.get("error"))) @("has-success".when(flash.get("success")))">
 
 
                         <div class="form-group">
@@ -35,10 +35,12 @@
                                 error=false;
                                 </script>
                             }
-                            <input id="uploadBtn" class="btn btn-info " type="file" name="fileUpload" title="Datei Auswählen" accept="application/bla, .bla">
+                            <div class="form-group">
+                                <input id="uploadBtn" class="form-control btn btn-info " type="file" name="fileUpload" title="Datei Auswählen" accept="application/bla, .bla">
+                            </div>
                         </div>
                         <div class="form-group">
-                            <input class="btn btn-success" type="submit" value="Upload">
+                            <input class="btn btn-success form-control" type="submit" value="Upload">
                         </div>
                     </div>
                 }

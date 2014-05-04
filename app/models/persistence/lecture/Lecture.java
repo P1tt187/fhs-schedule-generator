@@ -93,10 +93,7 @@ public class Lecture extends AbstractLecture {
     }
 
     public void increaseDifficultLevel() {
-        if (difficultLevel.intValue() == 0 || difficultLevel.intValue() == 1) {
-            difficultLevel = difficultLevel.add(new BigInteger("1"));
-        }
-        difficultLevel = difficultLevel.add(difficultLevel);
+        difficultLevel = difficultLevel.add(getDifficulty());
     }
 
     /**
@@ -234,10 +231,8 @@ public class Lecture extends AbstractLecture {
         if (name != null ? !name.equals(lecture.name) : lecture.name != null) return false;
         if (participants != null ? !participants.equals(lecture.participants) : lecture.participants != null)
             return false;
-        if (expectedParticipants != null ? !expectedParticipants.equals(lecture.expectedParticipants) : lecture.expectedParticipants != null)
-            return false;
+        return !(expectedParticipants != null ? !expectedParticipants.equals(lecture.expectedParticipants) : lecture.expectedParticipants != null);
 
-        return true;
     }
 
     @Override

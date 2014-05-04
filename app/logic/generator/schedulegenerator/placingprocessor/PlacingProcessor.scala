@@ -5,7 +5,7 @@ import models.persistence.lecture.{AbstractLecture, Lecture}
 import models.persistence.location.RoomEntity
 import models.persistence.Docent
 import scala.annotation.tailrec
-import models.persistence.criteria.{RoomCriteria, TimeSlotCriteria}
+import models.persistence.criteria.{DocentTimeWish, RoomCriteria, TimeSlotCriteria}
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 import models.persistence.participants.{Course, Group, Participant}
@@ -134,44 +134,37 @@ trait PlacingProcessor {
     allTimeslots.find(t => t.getDuration != timeSlot.getDuration && t.compareTo(timeSlot) == 0).get
   }
 
-  protected def filterTimeslotCriterias(docents: Set[Docent]) = {
-
-    @tailrec
-    def filterRecursive(docent: Set[Docent], docents: Set[Docent], timeslot: Set[TimeSlotCriteria] = Set[TimeSlotCriteria]()): Set[TimeSlotCriteria] = {
-      if (docent.isEmpty) {
-        return timeslot
-      }
-
-      val timeCriterias = docents.flatMap {
-        d =>
-          if (docent.head == d) {
-            Set[TimeSlotCriteria]()
-          } else {
-
-            val allTimeslotCriterias = d.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).toSet.asInstanceOf[Set[TimeSlotCriteria]]
-            if (allTimeslotCriterias.isEmpty) {
-              docent.head.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).toSet.asInstanceOf[Set[TimeSlotCriteria]]
-            } else {
-
-              docent.head.getCriteriaContainer.getCriterias.filter {
-                case _: RoomCriteria => false
-                case tcrit: TimeSlotCriteria => allTimeslotCriterias.count(_.isInTimeSlotCriteria(tcrit)) > 0
-              }.toSet.asInstanceOf[Set[TimeSlotCriteria]]
-            }
-          }
-      }
-
-      filterRecursive(docent.tail, docents, timeslot ++ timeCriterias)
-    }
+  protected def filterTimeWishes(docents: Set[Docent]): Set[TimeSlotCriteria] = {
 
     if (docents.size == 1) {
-      docents.flatMap {
-        docent =>
-          docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria])
-      }.toSet.asInstanceOf[Set[TimeSlotCriteria]]
-    } else {
-      filterRecursive(docents, docents)
+      return docents.head.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).toSet.asInstanceOf[Set[TimeSlotCriteria]]
     }
+
+    @tailrec
+    def checkTimeWishes(timeWish: DocentTimeWish, docents: Set[Docent]): Boolean = {
+      if (docents.isEmpty) {
+        return true
+      }
+      if (docents.head.getCriteriaContainer.getCriterias.find {
+        case timeCrit: DocentTimeWish =>
+          timeWish.isInTimeSlotCriteria(timeCrit)
+        case _ => false
+      }.isEmpty) {
+        false
+      } else {
+        checkTimeWishes(timeWish, docents.tail)
+      }
+    }
+
+    docents.flatMap {
+      d =>
+        d.getCriteriaContainer.getCriterias.filter {
+          case timeCrit: DocentTimeWish =>
+            checkTimeWishes(timeCrit, docents - d)
+          case _ => false
+        }
+    }.asInstanceOf[Set[TimeSlotCriteria]]
+
   }
 
   @tailrec
@@ -201,14 +194,14 @@ trait PlacingProcessor {
   protected def filterRoomsForLecture(lecture: Lecture, allRooms: List[RoomEntity]): List[RoomEntity] = {
 
 
-    val roomCriterias = (lecture.getCriteriaContainer.getCriterias ++ lecture.getDocents.flatMap(_.getCriteriaContainer.getCriterias)).filter(_.isInstanceOf[RoomCriteria]).map {
+    val roomCriterias = lecture.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).map {
       case rcrit: RoomCriteria => rcrit
     }
     if (roomCriterias.isEmpty) {
       return allRooms
     }
 
-    filterRoomsWithCapacity(filterRooms(roomCriterias.toSet, allRooms).toList,lecture)
+    filterRoomsWithCapacity(filterRooms(roomCriterias.toSet, allRooms).toList, lecture)
   }
 
   protected def prepareNextDuration(lectures: List[Lecture], lecture: Lecture) {
@@ -229,6 +222,31 @@ trait PlacingProcessor {
     }
 
     timeCriterias.count(timeslot.isInTimeSlotCriteria) > 0
+  }
+
+  protected def getRoomCriteriasFromDocents(docents: List[Docent]) = {
+    docents.flatMap {
+      d => d.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).toList.asInstanceOf[List[RoomCriteria]]
+    }
+  }
+
+  /** to respect the favorite rooms of a Docent the rooms will be sorted by his given criterias */
+  protected def sortRoomsByCriteria(rooms: List[RoomEntity], roomCriterias: List[RoomCriteria]): List[RoomEntity] = {
+    rooms.sortBy {
+      room =>
+        (roomCriterias.par.find {
+          rc =>
+            if (rc.getHouse != null && rc.getHouse.equals(room.getHouse)) {
+              true
+            } else if (rc.getRoom != null && rc.getRoom.equals(room)) {
+              true
+            } else if (rc.getRoomAttributes != null && !rc.getRoomAttributes.isEmpty && room.getRoomAttributes.containsAll(rc.getRoomAttributes)) {
+              true
+            } else {
+              false
+            }
+        }.isEmpty, room.getCapacity)
+    }
   }
 
 }
