@@ -53,7 +53,7 @@ object MEditSubjects {
         }
 
         criterion.list().asInstanceOf[java.util.List[LectureSubject]].
-          map(element => MSubjects(element.getId, element.getName)).toList
+          map(element => MSubjects(element.getId, element.getName, element.getCourses.map(c=> c.getShortName).mkString(" "))).toList
     }
   }
 
@@ -77,7 +77,7 @@ object MEditSubjects {
         }
 
         criterion.list().asInstanceOf[java.util.List[ExerciseSubject]].
-          map(element => MSubjects(element.getId, element.getName)).toList
+          map(element => MSubjects(element.getId, element.getName, element.getCourses.map(c=> c.getShortName).mkString(" "))).toList
     }
   }
 
@@ -112,7 +112,7 @@ object MEditSubjects {
   def findDocents() = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[Docent]).addOrder(Order.asc("lastName")).list().asInstanceOf[java.util.List[Docent]].toList
+        session.createCriteria(classOf[Docent]).setFetchMode("criteriaContainer",FetchMode.SELECT).addOrder(Order.asc("lastName")).list().asInstanceOf[java.util.List[Docent]].toList
     }
   }
 
@@ -121,7 +121,7 @@ object MEditSubjects {
       id =>
         Transactions.hibernateAction {
           implicit session =>
-            session.createCriteria(classOf[Docent]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[Docent]
+            session.createCriteria(classOf[Docent]).add(Restrictions.idEq(id)).setFetchMode("criteriaContainer",FetchMode.SELECT).uniqueResult().asInstanceOf[Docent]
         }
     }
   }
@@ -199,6 +199,6 @@ object MEditSubjects {
 
 }
 
-case class MSubjects(id: Long, name: String)
+case class MSubjects(id: Long, name: String, participants:String)
 
 

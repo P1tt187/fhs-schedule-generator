@@ -50,21 +50,28 @@ class LectureGeneratorActor extends Actor {
                 lecture.setLectureSynonyms(lectureSubject.getSubjectSynonyms)
                 lecture.setKind(ELectureKind.LECTURE)
                 lecture.setExpectedParticipants(lectureSubject.getExpectedParticipants)
-                lecture.setDifficultLevel(BigInteger.valueOf(lectureSubject.getUnits.toLong) )
+                lecture.setDifficultLevel(BigInteger.valueOf(lectureSubject.getUnits.toLong))
                 addedLectures += 1
                 lecture
               }
-              for (i <- 1 to lectureSubject.getUnits.toInt) {
-                val lecture: Lecture = initLectureLecture
-                result += lecture
+              if (lectureSubject.getDuration != EDuration.UNWEEKLY) {
+                for (i <- 1 to lectureSubject.getUnits.toInt) {
+                  val lecture: Lecture = initLectureLecture
+                  result += lecture
 
+                }
+                if (isUnWeekly(lectureSubject)) {
+                  val lecture = initLectureLecture
+                  lecture.setDuration(EDuration.UNWEEKLY)
+                  result += lecture
+                }
+              } else {
+                for (i <- 1f to lectureSubject.getUnits.toFloat by 0.5f) {
+                  val lecture: Lecture = initLectureLecture
+                  lecture.setDuration(EDuration.UNWEEKLY)
+                  result += lecture
+                }
               }
-              if (isUnWeekly(lectureSubject)) {
-                val lecture = initLectureLecture
-                lecture.setDuration(EDuration.UNWEEKLY)
-                result += lecture
-              }
-
             case exerciseSubject: ExerciseSubject =>
 
               val multipleCourseGroups = exerciseSubject.getCourses.map {
@@ -73,7 +80,7 @@ class LectureGeneratorActor extends Actor {
                     implicit session =>
                       session.createCriteria(classOf[Group]).add(Restrictions.eq("course", course))
                         .add(Restrictions.eq("groupType", exerciseSubject.getGroupType))
-                        .setFetchMode("course.groups",FetchMode.JOIN)
+                        .setFetchMode("course.groups", FetchMode.JOIN)
                         .setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[Group]].toList
                   }
               }.toList
@@ -95,7 +102,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setLectureSynonyms(exerciseSubject.getSubjectSynonyms)
                 lecture.setKind(ELectureKind.EXERCISE)
                 lecture.setExpectedParticipants(exerciseSubject.getExpectedParticipants)
-                lecture.setDifficultLevel( BigInteger.valueOf( exerciseSubject.getUnits.toLong ))
+                lecture.setDifficultLevel(BigInteger.valueOf(exerciseSubject.getUnits.toLong))
                 addedExercises += 1
                 lecture
               }
@@ -105,15 +112,24 @@ class LectureGeneratorActor extends Actor {
                   case Some(group) => group
                   case None => null
                 }.filter(_ != null)
-                //Logger.debug("groups - " + multipleCourseGroups.map(_.lift(groupIndex)))
-                for (i <- 1 to exerciseSubject.getUnits.toInt) {
-                  val lecture: Lecture = initExerciseLecture(groups)
-                  result += lecture
-                }
-                if (isUnWeekly(exerciseSubject)) {
-                  val lecture: Lecture = initExerciseLecture(groups)
-                  lecture.setDuration(EDuration.UNWEEKLY)
-                  result += lecture
+
+                if (exerciseSubject.getDuration != EDuration.UNWEEKLY) {
+
+                  for (i <- 1 to exerciseSubject.getUnits.toInt) {
+                    val lecture: Lecture = initExerciseLecture(groups)
+                    result += lecture
+                  }
+                  if (isUnWeekly(exerciseSubject)) {
+                    val lecture: Lecture = initExerciseLecture(groups)
+                    lecture.setDuration(EDuration.UNWEEKLY)
+                    result += lecture
+                  }
+                } else {
+                  for(i<- 1f to exerciseSubject.getUnits.toFloat by 0.5f){
+                    val lecture: Lecture = initExerciseLecture(groups)
+                    lecture.setDuration(EDuration.UNWEEKLY)
+                    result += lecture
+                  }
                 }
               }
 

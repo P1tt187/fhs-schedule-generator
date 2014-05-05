@@ -12,10 +12,10 @@
             <div class="col-md-5">
             @form(action = routes.CGenerate.generatorAction(), 'class -> "form-inline") {
                 @select(formGenerator("id"), semesters.toSeq.map(s => (s.getId.toString, s.getName)), '_label -> "Semester", '_help -> "", '_class -> "form-group")
-
+                @inputText(formGenerator("time"), '_label -> "Wie lange", '_class -> "form-group", '_help -> "")
                 <div class="clearfix"></div>
                 <div class="form-group">
-                    <button class="btn btn-success form-control" role="button" type="submit">Generieren</button>
+                    <button id="submitGenerating" class="btn btn-success form-control @if(!flash.get("generating").isEmpty){disabled} " role="button" type="submit">Generieren</button>
                 </div>
 
             }
@@ -27,7 +27,7 @@
             <div class="row-fluid">
                 <div id="progressBarContainer" class="col-md-5">
                     <div id="progressBar" class="progress progress-striped active">
-                        <div class="progress-bar progress-bar-warning " role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width : 100%">
+                        <div class="progress-bar progress-bar-warning " id="progressContainer" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width : 0%">
                             <span class="sr-only">100% Complete</span>
                         </div>
                     </div>
@@ -68,6 +68,11 @@
 
             <script type="text/javascript">
 
+                var now =  Date.now();
+                var end = now + @flash.get("lastchoosen").getOrElse("0,0").split(",")(1) * 60000 ;
+                var time = end-now;
+                var w = 0;
+
                 var showSchedule = function(){
                 $.getJSON("generatorGetSchedule/" + $('#selectCourseFilter').val() + "/" + $('#selectDocentFilter' ).val(), function(data){
                 $('#scheduleTableContainer' ).empty().append(data.htmlresult);
@@ -80,18 +85,27 @@
             $ ( '.progress-bar' ).removeClass ( 'progress-bar-warning' ).addClass ( 'progress-bar-success' ) ;
             } ;
 
+            var addProgress= function(progressValue){
+                w+= progressValue;
+                var progress = (w*100)/time;
+                console.log("progress: " + progress);
+
+               $('#progressContainer' ).attr('style', 'width : ' + progress + '%');
+            };
+
             var poll = function ( ) {
 
             $.ajax ( "@routes.CGenerate.finished", {
-
             dataType: "json",
             success : function ( data ) {
             if ( data.result == true ) {
             changeProgressBar ( ) ;
                 $('#filterContainer' ).removeClass('hidden');
+                $('#submitGenerating' ).removeClass('disabled');
             showSchedule();
             } else {
             setTimeout ( poll, 2000 ) ;
+            addProgress(2000);
             }
             }
             } ) ;

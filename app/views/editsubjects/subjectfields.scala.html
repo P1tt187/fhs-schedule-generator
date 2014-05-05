@@ -6,6 +6,7 @@
 
 @import models.persistence.subject.ExerciseSubject
 @import models.persistence.criteria.TimeSlotCriteria
+@import models.persistence.enumerations.EDuration
 
 
 
@@ -35,6 +36,14 @@
 
     <div class="clearfix"></div>
     <br/>
+    <div class="form-group">
+        <label class="control-label" for="duration"><span class="glyphicon"></span> </label>
+        <select id="duration" name="duration">
+            <option @if(subject.getDuration == EDuration.WEEKLY){selected} value="@EDuration.WEEKLY">Wöchentlich</option>
+            <option @if(subject.getDuration == EDuration.UNWEEKLY){selected} value="@EDuration.UNWEEKLY">nicht Wöchentlich</option>
+        </select>
+    </div>
+
     <div id="courses" class="form-group">
         <label class="control-label" for="selectCourse">Kurse</label>
         <select class="form-control" multiple="multiple" id="selectCourse" name="selectCourse" title="nichts ausgewählt" required>

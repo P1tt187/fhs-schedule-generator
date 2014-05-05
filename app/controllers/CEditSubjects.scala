@@ -9,10 +9,9 @@ import views.html.editsubjects._
 import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
 import play.api.cache.Cache
 import play.api.Play.current
-import scala.collection.JavaConversions._
 import models.Transactions
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCriteria}
-import models.persistence.enumerations.EPriority
+import models.persistence.enumerations.{EDuration, EPriority}
 import models.persistence.participants.Course
 import models.persistence.Docent
 import models.persistence.location.{RoomEntity, RoomAttributesEntity, HouseEntity}
@@ -37,61 +36,65 @@ object CEditSubjects extends Controller {
     Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses()))
   }
 
-  def getSubjectFields(semester:String,subjectType: String, idString: String) = Action {
+  def getSubjectFields(semester: String, subjectType: String, idString: String) = Action {
 
 
-      val id = if(idString.equals("null")){ -1l } else { idString.toLong }
+    val id = if (idString.equals("null")) {
+      -1l
+    } else {
+      idString.toLong
+    }
 
-      val subject = subjectType match {
-        case LECTURE =>
-          findSubject(classOf[LectureSubject], id)
-        case EXERCISE =>
-          findSubject(classOf[ExerciseSubject], id)
-      }
+    val subject = subjectType match {
+      case LECTURE =>
+        findSubject(classOf[LectureSubject], id)
+      case EXERCISE =>
+        findSubject(classOf[ExerciseSubject], id)
+    }
 
-    if(subject.getId==null){
+    if (subject.getId == null) {
       subject.setId(-1l)
       subject.setSemester(findSemester(extractSemesterPattern(semester)))
       initNewSubject(subject)
     }
 
-      subject match {
-        case exerciseSubject: ExerciseSubject =>
-          Logger.debug(exerciseSubject.getGroupType)
-        case _ =>
-      }
+    subject match {
+      case exerciseSubject: ExerciseSubject =>
+        Logger.debug(exerciseSubject.getGroupType)
+      case _ =>
+    }
 
 
-      val docents = Cache.getOrElse("docents") {
-        val docent = findDocents()
-        Cache.set("docents", docent, expiration = TIME_TO_LIFE)
-        docent
-      }
+    val docents = Cache.getOrElse("docents") {
+      val docent = findDocents()
+      Cache.set("docents", docent, expiration = TIME_TO_LIFE)
+      docent
+    }
 
 
-      val courses = Cache.getOrElse("courses") {
-        val course = findCourses()
-        Cache.set("courses", course, expiration = TIME_TO_LIFE)
-        course
-      }
+    val courses = Cache.getOrElse("courses") {
+      val course = findCourses()
+      Cache.set("courses", course, expiration = TIME_TO_LIFE)
+      course
+    }
 
-      val houses = Cache.getOrElse("houses") {
-        val house = findHouses()
-        Cache.set("houses", house, expiration = TIME_TO_LIFE)
-        house
-      }
+    val houses = Cache.getOrElse("houses") {
+      val house = findHouses()
+      Cache.set("houses", house, expiration = TIME_TO_LIFE)
+      house
+    }
 
-      val rooms = Cache.getOrElse("rooms") {
-        val room = findRooms()
-        Cache.set("rooms", room, expiration = TIME_TO_LIFE)
-        room
-      }
+    val rooms = Cache.getOrElse("rooms") {
+      val room = findRooms()
+      Cache.set("rooms", room, expiration = TIME_TO_LIFE)
+      room
+    }
 
-      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim())))
+    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim())))
 
   }
 
-  private def extractSemesterPattern(semester:String)={
+  private def extractSemesterPattern(semester: String) = {
     semester.replaceAll(Pattern.quote("+"), "/").trim
   }
 
@@ -135,6 +138,8 @@ object CEditSubjects extends Controller {
 
         val semester = (jsVal \ "semester").as[String]
 
+        val duration = EDuration.valueOf((jsVal \ "duration").as[String])
+
         val selectedCourse = findCourses(selectedCourseIds).toSet
 
         val selectedDocents = findDocents(selectDocentsIds).toSet
@@ -162,16 +167,16 @@ object CEditSubjects extends Controller {
             exercise
         }
 
-        if(subject.getId == null){
+        if (subject.getId == null) {
           initNewSubject(subject)
           subject.setSemester(selectedSemester)
           subject match {
-            case exercise:ExerciseSubject=>
+            case exercise: ExerciseSubject =>
               val groupTypeInput = (jsVal \ "groupTypeInput").as[String]
               exercise.setGroupType(groupTypeInput)
           }
         }
-
+        subject.setDuration(duration)
 
         initCourseValues(subject, activeCheckbox, nameInput, unitInput, selectedCourse, selectedDocents, expectedParticipants)
 
@@ -189,9 +194,9 @@ object CEditSubjects extends Controller {
 
         Transactions {
           implicit entityManager =>
-            if(subject.getId==null){
+            if (subject.getId == null) {
               entityManager.merge(subject)
-            }else {
+            } else {
               entityManager.merge(subject)
               existingRoomCriteria.foreach {
                 rc =>

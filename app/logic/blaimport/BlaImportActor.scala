@@ -12,6 +12,7 @@ import java.util
 import scala.collection.JavaConversions._
 import models.persistence.{Semester, Docent}
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer}
+import models.persistence.enumerations.EDuration
 
 /**
  * @author fabian
@@ -159,20 +160,6 @@ class BlaImportActor extends Actor {
       correctSemester(0)
     }
 
-    def findLectureSubject(name: String) = {
-      Transactions.hibernateAction {
-        implicit session =>
-          session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("name", name)).add(Restrictions.eq("semester", semester)).uniqueResult().asInstanceOf[LectureSubject]
-      }
-    }
-
-    def findExersiseSubject(name: String) = {
-      Transactions.hibernateAction {
-        implicit session =>
-          session.createCriteria(classOf[ExerciseSubject]).add(Restrictions.eq("name", name)).add(Restrictions.eq("semester", semester)).uniqueResult().asInstanceOf[ExerciseSubject]
-      }
-    }
-
     def saveSubject(abstractSubject: AbstractSubject) {
       abstractSubject.setSemester(semester)
       Transactions {
@@ -302,6 +289,7 @@ class BlaImportActor extends Actor {
 
               subject.setSubjectSynonyms(synonyms)
 
+              subject.setDuration(EDuration.WEEKLY)
               subject.setCriteriaContainer(new CriteriaContainer)
               subject.getCriteriaContainer.setCriterias(List[AbstractCriteria]())
 

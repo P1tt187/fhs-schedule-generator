@@ -44,10 +44,12 @@ object CGenerate extends Controller {
   private var actorFinished = false
 
   val form: Form[GeneratorForm] = Form(
-    mapping("id" -> longNumber)(GeneratorForm.apply)(GeneratorForm.unapply)
+    mapping("id" -> longNumber,
+    "time"-> number(min=0)
+    )(GeneratorForm.apply)(GeneratorForm.unapply)
   )
 
-  implicit val timeout = Timeout(5 minutes)
+
 
   val NAV = "GENERATOR"
 
@@ -55,8 +57,11 @@ object CGenerate extends Controller {
     implicit request =>
 
       val chooseSemesterForm = request.flash.get("lastchoosen") match {
-        case Some(idString) =>
-          form.fill(GeneratorForm(idString.toInt))
+        case Some(value) =>
+          val parts = value.split(",")
+          val idString = parts(0)
+          val time = parts(1)
+          form.fill(GeneratorForm(idString.toLong, time.toInt))
         case None => form
       }
 
@@ -107,6 +112,9 @@ object CGenerate extends Controller {
           val subjects = findActiveSubjectsBySemesterId(result.id)
           val semester = findSemesterById(result.id)
           startTime = Calendar.getInstance()
+
+          implicit val timeout = Timeout(result.time+1 minutes)
+
           val generatorActor = Akka.system.actorOf(Props[ScheduleGeneratorActor])
           scheduleFuture = ask(generatorActor, GenerateSchedule(subjects, semester))
           scheduleFuture.onSuccess {
@@ -124,7 +132,7 @@ object CGenerate extends Controller {
 
           //Logger.debug(findActiveSubjectsBySemesterId(result.id).mkString("\n") )
 
-          Redirect(routes.CGenerate.page()).flashing("startpolling" -> "true", "lastchoosen" -> result.id.toString)
+          Redirect(routes.CGenerate.page()).flashing("startpolling" -> "true", "lastchoosen" -> (result.id.toString + "," + result.time.toString) , "generating" -> "disabled")
         }
 
       )

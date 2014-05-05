@@ -7,6 +7,7 @@ import models.persistence.AbstractEntity;
 import models.persistence.Docent;
 import models.persistence.Semester;
 import models.persistence.criteria.CriteriaContainer;
+import models.persistence.enumerations.EDuration;
 import models.persistence.participants.Course;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -82,6 +83,19 @@ public abstract class AbstractSubject extends AbstractEntity {
      */
     @Column(name = "EXPECTED_PARTICIPANTS")
     private Integer expectedParticipants;
+
+    /** if duration is not weekly the system will try to split the units */
+    @Column(name = "duration")
+    @Enumerated(EnumType.STRING)
+    private EDuration duration;
+
+    public EDuration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(EDuration duration) {
+        this.duration = duration;
+    }
 
     public Integer getExpectedParticipants() {
         return expectedParticipants;

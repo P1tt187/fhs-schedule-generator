@@ -8,7 +8,7 @@
         </label>
         <select class="form-control" id="nameField" title="Bezeichnung">
             @for(element <- lectureNames) {
-                <option value="@element.id">@element.name</option>
+                <option value="@element.id">@element.name ( @element.participants )</option>
             }
         </select>
         </div>
