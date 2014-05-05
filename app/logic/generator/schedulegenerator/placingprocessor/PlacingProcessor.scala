@@ -30,9 +30,6 @@ trait PlacingProcessor {
   }
 
   protected def timeSlotContainsParticipants(timeslot: TimeSlot, participants: Set[Participant]): Boolean = {
-    if (timeslot.getLectures.isEmpty) {
-      return false
-    }
 
     @tailrec
     def checkRecursive(existingParticipant: mutable.Buffer[Participant], lectureParticipant: Set[Participant]): Boolean = {
@@ -57,6 +54,10 @@ trait PlacingProcessor {
       checkRecursive(existingParticipant, lectureParticipant.tail)
     }
 
+    if (timeslot.getLectures.isEmpty) {
+      return false
+    }
+
     checkRecursive(timeslot.getLectures.flatMap(_.getParticipants), participants)
   }
 
@@ -66,7 +67,7 @@ trait PlacingProcessor {
       return false
     }
 
-    if (participantsContainsOtherGroupType(group, participants)) {
+    if (participantsContainsOtherGroupType(group, participants) || participantsContainsOtherGroupType(group, participants)) {
       return true
     }
 
@@ -85,18 +86,13 @@ trait PlacingProcessor {
     }
 
 
-    val otherGroupTypes = parentSubgroups.filter(_.getGroupType != group.getGroupType)
-    if (!otherGroupTypes.isEmpty) {
-      for (g <- otherGroupTypes) {
-        if (participants.contains(g)) {
-          return true
-        }
-      }
-    }
-    false
+    val otherGroupTypes = parentSubgroups.filter( !_.getGroupType.trim.equalsIgnoreCase(group.getGroupType.trim))
+
+    !otherGroupTypes.find(g=> participants.contains(g)).isEmpty
   }
 
   private def containsInSubGroups(group: Group, participants: mutable.Buffer[Participant]): Boolean = {
+
     if (participants.contains(group) || participantsContainsOtherGroupType(group, participants)) {
       return true
     }
@@ -105,7 +101,7 @@ trait PlacingProcessor {
       return false
     }
 
-    !group.getSubGroups.filter(subgroup => containsInSubGroups(subgroup, participants)).isEmpty
+    !group.getSubGroups.find(subgroup => containsInSubGroups(subgroup, participants)).isEmpty
   }
 
   protected def timeSlotContainsDocents(timeslot: TimeSlot, docents: Set[Docent]): Boolean = {

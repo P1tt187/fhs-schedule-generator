@@ -123,29 +123,27 @@ public class Group extends Participant implements Comparable<Group> {
         if (course != null ? !course.equals(group.course) : group.course != null) return false;
         if (groupType != null ? !groupType.equals(group.groupType) : group.groupType != null) return false;
         if (groupIndex != null ? !groupIndex.equals(group.groupIndex) : group.groupIndex != null) return false;
-        if (subGroups != null ? !(subGroups.containsAll(group.subGroups) && subGroups.size() == group.subGroups.size()) : group.subGroups != null)
-            return false;
+
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = subGroups != null ? subGroups.hashCode() : 0;
-        result = 31 * result + (course != null ? course.hashCode() : 0);
+
+        int result = 31 * (course != null ? course.hashCode() : 0);
         result = 31 * result + (groupType != null ? groupType.hashCode() : 0);
         result = 31 * result + (groupIndex != null ? groupIndex.hashCode() : 0);
 
-        if (subGroups != null) {
-            for (Group subGroup : subGroups) {
-                result = 31 * result + subGroup.hashCode();
-            }
-        }
+
         return result;
     }
 
     @Override
     public int compareTo(Group that) {
-       return 2 * groupType.compareTo(that.groupType) + groupIndex.compareTo(that.groupIndex);
+        if (groupType.compareTo(that.groupType) != 0) {
+            return groupType.compareTo(that.groupType);
+        }
+        return groupIndex.compareTo(that.groupIndex);
     }
 }

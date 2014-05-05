@@ -52,7 +52,7 @@ object MEditSubjects {
           criterion.add(Restrictions.eq("active", filterActive.toBoolean))
         }
 
-        criterion.list().asInstanceOf[java.util.List[LectureSubject]].
+        criterion.list().asInstanceOf[java.util.List[LectureSubject]].par.
           map(element => MSubjects(element.getId, element.getName, element.getCourses.map(c=> c.getShortName).mkString(" "))).toList
     }
   }
@@ -65,7 +65,7 @@ object MEditSubjects {
         val criterion = session.createCriteria(classOf[ExerciseSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name"))
 
         if (filterDocentId != -1) {
-          criterion.createCriteria("docents").add(Restrictions.idEq(filterDocentId))
+          criterion.createCriteria("docents").setFetchMode("criteriaContainer",FetchMode.SELECT).add(Restrictions.idEq(filterDocentId))
         }
 
         if (filterCourseId != -1) {
@@ -76,7 +76,7 @@ object MEditSubjects {
           criterion.add(Restrictions.eq("active", filterActive.toBoolean))
         }
 
-        criterion.list().asInstanceOf[java.util.List[ExerciseSubject]].
+        criterion.list().asInstanceOf[java.util.List[ExerciseSubject]].par.
           map(element => MSubjects(element.getId, element.getName, element.getCourses.map(c=> c.getShortName).mkString(" "))).toList
     }
   }
