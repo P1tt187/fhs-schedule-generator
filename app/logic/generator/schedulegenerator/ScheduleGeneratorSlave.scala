@@ -65,7 +65,7 @@ class ScheduleGeneratorSlave extends Actor {
     val schedule = new Schedule
 
     schedule.setRoot(root)
-    sender() ! ScheduleAnswer(schedule)
+    sender() ! ScheduleSlaveAnswer(schedule)
 
   }
 

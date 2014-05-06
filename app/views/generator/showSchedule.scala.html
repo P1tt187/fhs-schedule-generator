@@ -1,4 +1,4 @@
-@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot])
+@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], rate:Int)
 
 @import models.fhs.pages.generator.TimeRange
 @import models.persistence.scheduletree.Weekday
@@ -6,6 +6,8 @@
 <div class="page-header">
     <h1>@title</h1>
 </div>
+
+    <h4>Qualität: @rate </h4>
 
 <div class="table-responsive">
     <table class="table table-bordered table-striped">

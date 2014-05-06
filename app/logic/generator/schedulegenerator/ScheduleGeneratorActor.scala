@@ -57,7 +57,7 @@ class ScheduleGeneratorActor extends Actor {
 
         if (Calendar.getInstance.after(endTime)) {
           optimalSchedule match {
-            case Some(schedule) => theSender ! ScheduleAnswer(schedule)
+            case Some(schedule) => theSender ! ScheduleAnswer(schedule, rate)
             case None => theSender ! InplacebleSchedule(lectures.sortBy(_.getDifficulty.multiply(BigInteger.valueOf(-1))).take(20))
           }
           return
@@ -66,7 +66,7 @@ class ScheduleGeneratorActor extends Actor {
         val scheduleFuture = context.actorOf(Props[ScheduleGeneratorSlave]) ? SlaveGenerate(lectures)
 
         scheduleFuture.onSuccess {
-          case ScheduleAnswer(answer) =>
+          case ScheduleSlaveAnswer(answer) =>
 
             val rateFuture = (context.actorOf(Props[ScheduleRateActor]) ? Rate(answer)).mapTo[RateAnswer]
 
@@ -76,7 +76,7 @@ class ScheduleGeneratorActor extends Actor {
               rate = newRate
               optimalSchedule = Some(cloner.deepClone(answer))
             } else {
-              Logger.debug("rate: " + rate + " current: " + newRate)
+              Logger.debug("rate: " + newRate + " current: " + rate)
             }
 
             lectures.par.foreach(l=> if(l.getDuration != EDuration.WEEKLY){ l.setDuration(EDuration.UNWEEKLY) })

@@ -15,7 +15,9 @@ case class GenerateSchedule(subjects: List[AbstractSubject], semester : Semester
 
 case class SlaveGenerate(lectures: List[Lecture]) extends ScheduleGeneratorMessage
 
-case class ScheduleAnswer(schedule: Schedule) extends ScheduleGeneratorMessage
+case class ScheduleAnswer(schedule: Schedule, rate:Int) extends ScheduleGeneratorMessage
+
+case class ScheduleSlaveAnswer(schedule: Schedule)
 
 case class InplacebleSchedule(lectures:List[Lecture])
 

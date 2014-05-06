@@ -90,7 +90,7 @@
                 var progress = (w*100)/time;
                 console.log("progress: " + progress);
 
-               $('#progressContainer' ).attr('style', 'width : ' + progress + '%' ).html('<span>' + Math.floor(progress) + '%</span>');
+               $('#progressContainer' ).attr('aria-valuenow',progress).attr('style', 'width : ' + progress + '%' ).html('<span>' + Math.floor(progress) + '%</span>' );
             };
 
             var poll = function ( ) {

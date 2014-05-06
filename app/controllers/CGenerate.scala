@@ -43,6 +43,8 @@ object CGenerate extends Controller {
 
   private var actorFinished = false
 
+  private var rate = Int.MaxValue
+
   val form: Form[GeneratorForm] = Form(
     mapping("id" -> longNumber,
     "time"-> number(min=0)
@@ -91,10 +93,10 @@ object CGenerate extends Controller {
     val timeRanges = findTimeRanges(timeslotTemplates, List[TimeRange]())
 
     val filteredPage = if (courseId == -1 && docentId == -1) {
-      showSchedule("Alle Kurse", timeRanges, timeslotsAll).toString()
+      showSchedule("Alle Kurse", timeRanges, timeslotsAll, rate).toString()
     } else {
       val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId))
-      showSchedule(courseName, timeRanges, timeslots).toString()
+      showSchedule(courseName, timeRanges, timeslots, rate).toString()
     }
     Ok(Json.stringify(Json.obj("htmlresult" -> filteredPage)))
   }
@@ -120,7 +122,8 @@ object CGenerate extends Controller {
           endTime.add(Calendar.MINUTE, result.time)
           scheduleFuture = ask(generatorActor, GenerateSchedule(subjects, semester, endTime))
           scheduleFuture.onSuccess {
-            case ScheduleAnswer(theSchedule) => this.schedule = theSchedule
+            case ScheduleAnswer(theSchedule, theRate) => this.schedule = theSchedule
+              rate = theRate
               actorFinished = true
               finishTime = Calendar.getInstance()
               Logger.debug("created in " + (finishTime.getTimeInMillis - startTime.getTimeInMillis) + "ms")
