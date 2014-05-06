@@ -231,6 +231,9 @@ public class Lecture extends AbstractLecture {
         if (name != null ? !name.equals(lecture.name) : lecture.name != null) return false;
         if (participants != null ? !participants.equals(lecture.participants) : lecture.participants != null)
             return false;
+
+        if (difficultLevel != null ? !difficultLevel.equals(lecture.difficultLevel) : lecture.difficultLevel != null)
+            return false;
         return !(expectedParticipants != null ? !expectedParticipants.equals(lecture.expectedParticipants) : lecture.expectedParticipants != null);
 
     }
@@ -243,6 +246,7 @@ public class Lecture extends AbstractLecture {
         result = 31 * result + (duration != null ? duration.hashCode() : 0);
         result = 31 * result + (kind != null ? kind.hashCode() : 0);
         result = 31 * result + (expectedParticipants != null ? expectedParticipants.hashCode() : 0);
+        result = 31 * result + (difficultLevel != null ? difficultLevel.hashCode() : 0);
         return result;
     }
 

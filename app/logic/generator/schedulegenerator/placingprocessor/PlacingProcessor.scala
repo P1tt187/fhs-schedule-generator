@@ -86,9 +86,9 @@ trait PlacingProcessor {
     }
 
 
-    val otherGroupTypes = parentSubgroups.filter( !_.getGroupType.trim.equalsIgnoreCase(group.getGroupType.trim))
+    val otherGroupTypes = parentSubgroups.filter(!_.getGroupType.trim.equalsIgnoreCase(group.getGroupType.trim))
 
-    !otherGroupTypes.find(g=> participants.contains(g)).isEmpty
+    !otherGroupTypes.find(g => participants.contains(g)).isEmpty
   }
 
   private def containsInSubGroups(group: Group, participants: mutable.Buffer[Participant]): Boolean = {
@@ -230,19 +230,30 @@ trait PlacingProcessor {
   protected def sortRoomsByCriteria(rooms: List[RoomEntity], roomCriterias: List[RoomCriteria]): List[RoomEntity] = {
     rooms.sortBy {
       room =>
-        (roomCriterias.par.find {
-          rc =>
-            if (rc.getHouse != null && rc.getHouse.equals(room.getHouse)) {
-              true
-            } else if (rc.getRoom != null && rc.getRoom.equals(room)) {
-              true
-            } else if (rc.getRoomAttributes != null && !rc.getRoomAttributes.isEmpty && room.getRoomAttributes.containsAll(rc.getRoomAttributes)) {
-              true
-            } else {
-              false
-            }
-        }.isEmpty, room.getCapacity)
+        (isRoomInCriteria(room,roomCriterias), room.getCapacity)
     }
+  }
+
+  private def isRoomInCriteria(room:RoomEntity, roomCriterias:List[RoomCriteria]):Boolean={
+    !roomCriterias.par.find {
+      rc =>
+        if (rc.getHouse != null && rc.getHouse.equals(room.getHouse)) {
+          true
+        } else if (rc.getRoom != null && rc.getRoom.equals(room)) {
+          true
+        } else if (rc.getRoomAttributes != null && !rc.getRoomAttributes.isEmpty && room.getRoomAttributes.containsAll(rc.getRoomAttributes)) {
+          true
+        } else {
+          false
+        }
+    }.isEmpty
+  }
+
+  protected def roomsInCriteria(rooms: List[RoomEntity], roomCriterias: List[RoomCriteria]):Boolean = {
+    !rooms.par.find {
+      room =>
+        isRoomInCriteria(room, roomCriterias)
+    }.isEmpty
   }
 
 }

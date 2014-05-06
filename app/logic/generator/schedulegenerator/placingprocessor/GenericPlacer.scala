@@ -27,7 +27,7 @@ class GenericPlacer(allLectures: List[Lecture], allTimeslots: List[TimeSlot], al
     }
     placed+=1
     if (!doPlacing(lectures.head)) {
-      Logger.debug("placed: " + placed + " Chancel: " + lectures.head.getName + " " + lectures.head.getDuration /*+ " difficult: " + lectures.head.getDifficulty*/)
+      //Logger.debug("placed: " + placed + " Chancel: " + lectures.head.getName + " " + lectures.head.getDuration /*+ " difficult: " + lectures.head.getDifficulty*/)
       false
     } else {
       placing(lectures.tail)

@@ -44,7 +44,7 @@ class UnweeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], 
     val roomCriterias = getRoomCriteriasFromDocents(lecture.getDocents.toList)
 
     var rooms = availableRooms.diff(slot.getLectures.flatMap(_.getRooms)).filter(isRoomAvailableInTimeSlot(_, slot)).sortBy(_.getCapacity)
-    if (!roomCriterias.isEmpty) {
+    if (!roomCriterias.isEmpty && roomsInCriteria(rooms,roomCriterias)) {
       rooms = sortRoomsByCriteria(rooms, roomCriterias)
     }
 

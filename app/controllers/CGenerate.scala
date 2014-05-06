@@ -116,7 +116,9 @@ object CGenerate extends Controller {
           implicit val timeout = Timeout(result.time+1 minutes)
 
           val generatorActor = Akka.system.actorOf(Props[ScheduleGeneratorActor])
-          scheduleFuture = ask(generatorActor, GenerateSchedule(subjects, semester))
+          val endTime= Calendar.getInstance()
+          endTime.add(Calendar.MINUTE, result.time)
+          scheduleFuture = ask(generatorActor, GenerateSchedule(subjects, semester, endTime))
           scheduleFuture.onSuccess {
             case ScheduleAnswer(theSchedule) => this.schedule = theSchedule
               actorFinished = true
