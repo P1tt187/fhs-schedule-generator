@@ -11,6 +11,8 @@ import models.persistence.scheduletree.{TimeSlot, Weekday}
  */
 class ScheduleRateActor extends Actor{
 
+  private var rates=Map[ERaters, Int]()
+
   override def receive = {
 
     case Rate( schedule ) =>
@@ -21,12 +23,14 @@ class ScheduleRateActor extends Actor{
 
       val lectures = ERaters.values().par.flatMap{
         r =>
-         r.getRater.rate(timeSlots)
+          val (theRate, theLectures) =  r.getRater.rate(timeSlots)
+          rates+= r -> theRate
+          theLectures
       }.toSet
 
-      lectures.foreach(_.increaseDifficultLevel())
+      //lectures.foreach(_.increaseDifficultLevel())
 
-      sender() ! RateAnswer(lectures.size)
+      sender() ! RateAnswer(rates)
 
     case _ =>
   }

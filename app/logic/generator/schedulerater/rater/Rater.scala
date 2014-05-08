@@ -9,6 +9,6 @@ import models.persistence.scheduletree.TimeSlot
  */
 trait Rater {
 
-  def rate(timeSlots:List[TimeSlot]):Set[Lecture]
+  def rate(timeSlots:List[TimeSlot]):(Int, Set[Lecture])
 
 }

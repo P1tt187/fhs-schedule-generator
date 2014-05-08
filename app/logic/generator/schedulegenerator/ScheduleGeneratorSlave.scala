@@ -89,6 +89,7 @@ class ScheduleGeneratorSlave extends Actor {
       ret.setStartMinute(timeSlotTemplate.getStartMinute)
       ret.setStopHour(timeSlotTemplate.getStopHour)
       ret.setStopMinute(timeSlotTemplate.getStopMinute)
+      ret.setUnpopular(timeSlotTemplate.isUnpopular)
       ret.setParent(weekday)
       ret.setLectures(List[AbstractLecture]())
       ret

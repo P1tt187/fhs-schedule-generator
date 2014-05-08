@@ -10,9 +10,9 @@ import models.persistence.enumerations.EDuration
  * @author fabian
  *         on 23.01.14.
  */
-case class MTimeslotDefine(startHour: Int, startMinutes: Int, stopHour: Int, stopMinutes: Int, weekdays: List[Int])
+case class MTimeslotDefine(startHour: Int, startMinutes: Int, stopHour: Int, stopMinutes: Int, unpopular: Boolean, weekdays: List[Int])
 
-case class MTimeslotDisplay(id: Long, startHour: Int, startMinutes: Int, stopHour: Int, stopMinutes: Int, weekday: String, weekdayIndex: Int,duration:EDuration) extends Ordered[MTimeslotDisplay] {
+case class MTimeslotDisplay(id: Long, startHour: Int, startMinutes: Int, stopHour: Int, stopMinutes: Int, weekday: String, weekdayIndex: Int, duration: EDuration) extends Ordered[MTimeslotDisplay] {
   def compare(that: MTimeslotDisplay): Int = {
     val retSeq = Seq(this.weekdayIndex.compareTo(that.weekdayIndex), this.startHour.compareTo(that.startHour), this.stopHour.compareTo(that.stopHour), this.stopMinutes.compareTo(that.stopMinutes)).filter(_ != 0)
     if (retSeq.isEmpty) {
@@ -26,7 +26,7 @@ case class MTimeslotDisplay(id: Long, startHour: Int, startMinutes: Int, stopHou
 object MTimeslotDisplay {
 
   def findAllTimeslots = {
-    val timeslots = Transactions.hibernateAction{
+    val timeslots = Transactions.hibernateAction {
       implicit session =>
         val dbReslut = session.createCriteria(classOf[TimeSlotTemplate]).list().asInstanceOf[java.util.List[TimeSlotTemplate]]
         Collections.sort(dbReslut)
@@ -35,7 +35,7 @@ object MTimeslotDisplay {
 
 
 
-     timeslots
+    timeslots
   }
 
 }

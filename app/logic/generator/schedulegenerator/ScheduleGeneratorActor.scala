@@ -14,6 +14,8 @@ import java.util.Calendar
 import logic.generator.schedulerater.{RateAnswer, ScheduleRateActor, Rate}
 import java.math.BigInteger
 import models.persistence.enumerations.EDuration
+import logic.generator.schedulerater.rater.ERaters
+import scala.annotation.tailrec
 
 
 /**
@@ -28,11 +30,30 @@ class ScheduleGeneratorActor extends Actor {
 
   private var optimalSchedule: Option[Schedule] = None
 
-  private var rate = Int.MaxValue
+  private var rate = Map[ERaters, Int]()
 
   val TIMEOUT_VAL = 60
 
   implicit val timeout = Timeout(TIMEOUT_VAL seconds)
+
+  @tailrec
+  private def isBetter(rater: List[ERaters], newRate: Map[ERaters, Int]): Boolean = {
+    if (rater.isEmpty) {
+      return false
+    }
+    val r = rater.head
+    rate.get(r) match {
+      case None => true
+      case Some(value) =>
+        if (value > newRate(r)) {
+          true
+        } else if (value == newRate(r)) {
+          isBetter(rater.tail, newRate)
+        } else {
+          false
+        }
+    }
+  }
 
   override def receive = {
 
@@ -57,7 +78,7 @@ class ScheduleGeneratorActor extends Actor {
 
         if (Calendar.getInstance.after(endTime)) {
           optimalSchedule match {
-            case Some(schedule) => theSender ! ScheduleAnswer(schedule, rate)
+            case Some(schedule) => theSender ! ScheduleAnswer(schedule, rate.values.sum)
             case None => theSender ! InplacebleSchedule(lectures.sortBy(_.getDifficulty.multiply(BigInteger.valueOf(-1))).take(20))
           }
           return
@@ -71,15 +92,22 @@ class ScheduleGeneratorActor extends Actor {
             val rateFuture = (context.actorOf(Props[ScheduleRateActor]) ? Rate(answer)).mapTo[RateAnswer]
 
             val newRate = Await.result(rateFuture, TIMEOUT_VAL seconds).qualitiy
-            if (newRate < rate) {
-              Logger.debug("new optimum: " + newRate)
+
+
+
+            Logger.debug("************************************")
+
+            if (isBetter(ERaters.values().toList.sortBy(-_.getPriority), newRate)) {
+              Logger.debug("new optimum: " + newRate.values.sum + " " + newRate)
               rate = newRate
               optimalSchedule = Some(cloner.deepClone(answer))
             } else {
               Logger.debug("rate: " + newRate + " current: " + rate)
             }
 
-            lectures.par.foreach(l=> if(l.getDuration != EDuration.WEEKLY){ l.setDuration(EDuration.UNWEEKLY) })
+            lectures.par.foreach(l => if (l.getDuration != EDuration.WEEKLY) {
+              l.setDuration(EDuration.UNWEEKLY)
+            })
 
             generate()
 

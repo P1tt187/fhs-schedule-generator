@@ -23,17 +23,23 @@ import java.util.List;
 /** A timeslot is a Node*/
 public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
 
-    public TimeSlot(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute) {
+    public TimeSlot(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute, Boolean unpopular) {
         this.startHour = startHour;
         this.startMinute = startMinute;
         this.stopHour = stopHour;
         this.stopMinute = stopMinute;
+        this.unpopular = unpopular;
     }
 
     public TimeSlot() {
 
     }
 
+    /**
+     * flag to mark timeslot as umpopular
+     */
+    @Column(name = "UNPOPULAR", nullable = false)
+    private Boolean unpopular;
 
     @Column(name = "STARTHOUR", nullable = false)
     private Integer startHour;
@@ -52,6 +58,14 @@ public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
 
     @OneToMany(fetch = FetchType.EAGER, targetEntity = AbstractLecture.class)
     private List<AbstractLecture> lectures;
+
+    public void setUnpopular(Boolean unpopular) {
+        this.unpopular = unpopular;
+    }
+
+    public Boolean isUnpopular() {
+        return unpopular;
+    }
 
     public List<AbstractLecture> getLectures() {
         return lectures;
@@ -111,6 +125,7 @@ public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
             Weekday timeSlotWeekday = (Weekday) timeSlot.getParent();
             if (!weekday.getSortIndex().equals(timeSlotWeekday.getSortIndex())) return false;
         }
+        if (!unpopular.equals(timeSlot.unpopular)) return false;
         return this.getDuration() == timeSlot.getDuration();
 
     }
@@ -158,6 +173,7 @@ public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
         result = 31 * result + (startMinute != null ? startMinute.hashCode() : 0);
         result = 31 * result + (stopHour != null ? stopHour.hashCode() : 0);
         result = 31 * result + (stopMinute != null ? stopMinute.hashCode() : 0);
+        result = 31 * result + (unpopular != null ? unpopular.hashCode() : 0);
         if (getParent() != null) {
             Weekday weekday = (Weekday) getParent();
             result = 31 * result + weekday.getSortIndex();

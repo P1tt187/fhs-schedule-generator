@@ -9,18 +9,19 @@ import org.hibernate.criterion.CriteriaSpecification
 import models.persistence.criteria.DocentTimeWish
 import models.persistence.enumerations.EDocentTimeKind
 
+
 /**
  * @author fabian 
  *         on 05.05.14.
  */
 class WishTimeRater extends Rater {
-  override def rate(timeSlots: List[TimeSlot]): Set[Lecture] = {
+  override def rate(timeSlots: List[TimeSlot]): (Int, Set[Lecture]) = {
     val docents = Transactions.hibernateAction{
       implicit s =>
         s.createCriteria(classOf[Docent]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().toList.asInstanceOf[List[Docent]]
     }
 
-    docents.flatMap{
+    val lectures = docents.flatMap{
       d=>
 
         val wishTimes = d.getCriteriaContainer.getCriterias.filter{
@@ -44,5 +45,8 @@ class WishTimeRater extends Rater {
         }
 
     }.toSet
+
+    lectures.foreach(_.increaseDifficultLevel())
+    (lectures.size, lectures)
   }
 }

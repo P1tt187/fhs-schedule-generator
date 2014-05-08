@@ -12,7 +12,7 @@
             <div class="col-md-5">
             @form(action = routes.CGenerate.generatorAction(), 'class -> "form-inline") {
                 @select(formGenerator("id"), semesters.toSeq.map(s => (s.getId.toString, s.getName)), '_label -> "Semester", '_help -> "", '_class -> "form-group")
-                @inputText(formGenerator("time"), '_label -> "Wie lange", '_class -> "form-group", '_help -> "")
+                @inputText(formGenerator("time"), '_label -> "Wie lange (Minuten)", '_class -> "form-group", '_help -> "")
                 <div class="clearfix"></div>
                 <div class="form-group">
                     <button id="submitGenerating" class="btn btn-success form-control @if(!flash.get("generating").isEmpty){disabled} " role="button" type="submit">Generieren</button>
@@ -27,7 +27,7 @@
             <div class="row-fluid">
                 <div id="progressBarContainer" class="col-md-5">
                     <div id="progressBar" class="progress progress-striped active">
-                        <div class="progress-bar progress-bar-warning " id="progressContainer" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width : 0%">
+                        <div class="progress-bar progress-bar-warning " id="progressContainer" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width : 0%">
                             <span>0%</span>
                         </div>
                     </div>

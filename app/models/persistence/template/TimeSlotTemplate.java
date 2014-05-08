@@ -47,16 +47,31 @@ public class TimeSlotTemplate extends AbstractEntity implements Comparable<TimeS
     @Column(name = "STOPMINUTE", nullable = false)
     private Integer stopMinute;
 
+    /**
+     * flag to mark timeslot as umpopular
+     */
+    @Column(name = "UNPOPULAR", nullable = false)
+    private Boolean unpopular;
+
     public TimeSlotTemplate() {
 
     }
 
-    public TimeSlotTemplate(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute, WeekdayTemplate parent) {
+    public TimeSlotTemplate(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute, WeekdayTemplate parent, Boolean unpopular) {
         this.parent = parent;
         this.startHour = startHour;
         this.startMinute = startMinute;
         this.stopHour = stopHour;
         this.stopMinute = stopMinute;
+        this.unpopular = unpopular;
+    }
+
+    public void setUnpopular(Boolean unpopular) {
+        this.unpopular = unpopular;
+    }
+
+    public Boolean isUnpopular() {
+        return unpopular;
     }
 
     public WeekdayTemplate getParent() {

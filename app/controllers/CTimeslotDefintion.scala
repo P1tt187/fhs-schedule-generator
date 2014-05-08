@@ -32,6 +32,7 @@ object CTimeslotDefintion extends Controller {
       "startMinute" -> number(min = 0, max = 59),
       "stopHour" -> number(min = 0, max = 23),
       "stopMinute" -> number(min = 0, max = 59),
+      "unpopular" -> boolean,
       "weekdays" -> list(number(min = 0, max = 6))
     )(MTimeslotDefine.apply)(MTimeslotDefine.unapply)
   )
@@ -83,7 +84,7 @@ object CTimeslotDefintion extends Controller {
                 }
 
 
-                val slot = new TimeSlotTemplate(timeslot.startHour, timeslot.startMinutes, timeslot.stopHour, timeslot.stopMinutes, day)
+                val slot = new TimeSlotTemplate(timeslot.startHour, timeslot.startMinutes, timeslot.stopHour, timeslot.stopMinutes, day, timeslot.unpopular)
 
                 day.getChildren.add(slot)
 

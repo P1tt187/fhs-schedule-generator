@@ -25,7 +25,7 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], av
     /** sorting with boolean values will order false as first element, so we invert the conditions */
     place(lecture, availableTimeSlots.sortBy {
       slot =>
-        timeWishes.find(slot.isInTimeSlotCriteria).isEmpty
+        (timeWishes.find(slot.isInTimeSlotCriteria).isEmpty, slot.isUnpopular)
     })
   }
 

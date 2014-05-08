@@ -22,7 +22,7 @@ public class UnevenTimeSlot extends TimeSlot {
         return EDuration.UNEVEN;
     }
 
-    public UnevenTimeSlot(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute) {
-        super(startHour, startMinute, stopHour, stopMinute);
+    public UnevenTimeSlot(Integer startHour, Integer startMinute, Integer stopHour, Integer stopMinute, Boolean unpopular) {
+        super(startHour, startMinute, stopHour, stopMinute, unpopular);
     }
 }

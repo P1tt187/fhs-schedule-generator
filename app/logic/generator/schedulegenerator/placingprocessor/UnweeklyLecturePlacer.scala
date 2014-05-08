@@ -27,7 +27,7 @@ class UnweeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], 
     place(lecture, availableTimeSlots.sortBy {
       slot =>
         val equivalent = findEquivalent(slot, allTimeslots)
-        (timeWishes.find(slot.isInTimeSlotCriteria(_)).isEmpty, equivalent.getLectures.find(_.getDocents.containsAll(lecture.getDocents)).isEmpty, !(timeSlotContainsParticipants(equivalent, lecture.getParticipants.toSet) || equivalent.getLectures.find(_.getParticipants.containsAll(lecture.getParticipants)).isEmpty))
+        (timeWishes.find(slot.isInTimeSlotCriteria(_)).isEmpty,slot.isUnpopular, equivalent.getLectures.find(_.getDocents.containsAll(lecture.getDocents)).isEmpty, !(timeSlotContainsParticipants(equivalent, lecture.getParticipants.toSet) || equivalent.getLectures.find(_.getParticipants.containsAll(lecture.getParticipants)).isEmpty))
     })
   }
 
