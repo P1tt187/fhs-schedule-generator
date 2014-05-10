@@ -78,7 +78,7 @@ class ScheduleGeneratorActor extends Actor {
 
         if (Calendar.getInstance.after(endTime)) {
           optimalSchedule match {
-            case Some(schedule) => theSender ! ScheduleAnswer(schedule, rate.values.sum)
+            case Some(schedule) => theSender ! ScheduleAnswer(schedule, rate(ERaters.WISHTIME_RATER))
             case None => theSender ! InplacebleSchedule(lectures.sortBy(_.getDifficulty.multiply(BigInteger.valueOf(-1))).take(20))
           }
           return

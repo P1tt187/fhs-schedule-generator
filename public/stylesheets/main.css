@@ -5,7 +5,7 @@ html,
 body {
     height: 100%;
     /* The html and body elements cannot have any padding or margin. */
-     padding-top: 2%;
+    padding-top: 2%;
 }
 
 /* Wrapper for page content to push down footer */
@@ -25,11 +25,10 @@ body {
     margin-top: -1%; /* negative value of footer height */
     height: 130px;
     background-color: #f5f5f5;
-    clear:both;
-    padding-top:20px;
+    clear: both;
+    padding-top: 20px;
     text-align: center;
 }
-
 
 /* Custom page CSS
 -------------------------------------------------- */
@@ -40,17 +39,15 @@ body {
     max-width: 90%;
     padding: 0 15px;
 }
+
 .container .text-muted {
     margin: 20px 0;
 }
 
-.selectwidthauto
-{
-    width:250px !important;
+.selectwidthauto {
+    width: 250px !important;
     height: 130px !important;
 }
-
-
 
 label {
     display: block;
@@ -64,3 +61,12 @@ ul.nav li.dropdown:hover > ul.dropdown-submenu {
     font-size: 11px;
 }
 
+.showcase {
+    width: 30px;
+    height: 30px;
+}
+
+.showcase-content {
+    vertical-align: middle;
+    text-align: center;
+}

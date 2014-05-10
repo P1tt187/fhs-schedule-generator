@@ -1,0 +1,16 @@
+@(lectures: List[persistence.lecture.Lecture])
+
+
+<div class="alert alert-danger">
+    <p>Konnte keinen Plan erstellen, erhöhen Sie die Generierungsdauer oder überprüfen Sie die Einstellungen.</p>
+    <p>Mögliche Ursachen:</p>
+    <ol>
+        @for(l <- lectures) {
+            <li>@l.getName ( @for(d <- l.getDocents) {
+                @{
+                    d.getLastName + " "
+                }
+            } )</li>
+        }
+    </ol>
+</div>

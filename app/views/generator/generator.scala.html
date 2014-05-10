@@ -1,7 +1,8 @@
 @(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm], courses:List[models.persistence.participants.Course] , docents:List[persistence.Docent])(implicit flash: Flash)
 
-    @import helper._
-    @import helper.twitterBootstrap._
+@import java.util.Calendar
+@import helper._
+@import helper.twitterBootstrap._
 
     @main(message, CGenerate.NAV) {
 
@@ -68,10 +69,9 @@
 
             <script type="text/javascript">
 
-                var now =  Date.now();
-                var end = now + @flash.get("lastchoosen").getOrElse("0,0").split(",")(1) * 60000 ;
-                var time = end-now;
-                var w = 0;
+
+                var time =  @flash.get("endTime").getOrElse(Calendar.getInstance().getTimeInMillis.toString)  - @flash.get("startTime").getOrElse(Calendar.getInstance().getTimeInMillis.toString) ;
+                var w = @{ Calendar.getInstance().getTimeInMillis - flash.get("startTime").getOrElse(Calendar.getInstance().getTimeInMillis.toString).toLong  };
 
                 var showSchedule = function(){
                 $.getJSON("generatorGetSchedule/" + $('#selectCourseFilter').val() + "/" + $('#selectDocentFilter' ).val(), function(data){
@@ -87,10 +87,13 @@
 
             var addProgress= function(progressValue){
                 w+= progressValue;
+                if(w>time){
+                    w=time;
+                }
                 var progress = (w*100)/time;
                 console.log("progress: " + progress);
 
-               $('#progressContainer' ).attr('aria-valuenow',progress).attr('style', 'width : ' + progress + '%' ).html('<span>' + Math.floor(progress) + '%</span>' );
+               $('#progressContainer' ).attr('aria-valuenow',progress).css('width', progress + '%' ).html('<span>' + Math.floor(progress) + '%</span>' );
             };
 
             var poll = function ( ) {
