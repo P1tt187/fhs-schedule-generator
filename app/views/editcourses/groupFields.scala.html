@@ -17,7 +17,7 @@
                         </div>
                         <div class="form-group" id="containerSize@group.getId">
                             <label class="control-label" for="size@group.getId">Personen</label>
-                            <input id="size@group.getId" name="groupsize" class="form-control" type="number" value="@group.getSize" required>
+                            <input id="size@group.getId" name="groupsize" class="form-control" type="number" value="@group.getSize" min="1" max="@if(group.getParent!=null){ @group.getParent.getSize }else{ @group.getCourse.getSize }  " required>
                         </div>
                         <div class="form-group">
                             <label class="control-label" for="edit@group.getId"><span class="glyphicon"></span></label>
@@ -48,8 +48,8 @@
                     $ ( '#groupForm@group.getId ' ).on ( ' submit ', function ( e ) {
                     e.preventDefault ( ) ;
                     $ ( '.has-error' ).removeClass ( 'has-error' ) ;
-                    if ( ! $.isNumeric ( $ ( '#size@group.getId' ).val ( ) ) ) {
-                    $ ( '#containerSize@group.getId ' ).addClass ( ' has - error ' ) ;
+                    if ( ! $.isNumeric ( $ ( '#size@group.getId' ).val ( ) ) || $ ( '#size@group.getId' ).val ( ) > $ ( '#size@group.getId' ).attr('max') ) {
+                    $ ( '#containerSize@group.getId ' ).addClass ( ' has-error ' ) ;
                     return ;
                     }
                     var formData = $ ( '#groupForm@group.getId ' ).serializeObject ( ) ;
