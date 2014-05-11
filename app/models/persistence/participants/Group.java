@@ -105,10 +105,10 @@ public class Group extends Participant implements Comparable<Group> {
     public String toString() {
         final StringBuffer sb = new StringBuffer("Group{");
         sb.append("parent=").append(parent != null ? parent.getGroupType() : null);
-        sb.append(", subGroups=").append(subGroups);
-        sb.append(", course=").append(course);
         sb.append(", groupType='").append(groupType).append('\'');
         sb.append(", groupIndex=").append(groupIndex);
+        sb.append(", course=").append(course.getShortName());
+        sb.append(", subGroups=").append(subGroups);
         sb.append('}');
         return sb.toString();
     }
@@ -145,5 +145,10 @@ public class Group extends Participant implements Comparable<Group> {
             return groupType.compareTo(that.groupType);
         }
         return groupIndex.compareTo(that.groupIndex);
+    }
+
+
+    public boolean isSubGroupOf(Group g) {
+        return parent != null && (parent.equals(g) || parent.isSubGroupOf(g));
     }
 }

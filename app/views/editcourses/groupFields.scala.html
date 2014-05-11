@@ -48,7 +48,7 @@
                     $ ( '#groupForm@group.getId ' ).on ( ' submit ', function ( e ) {
                     e.preventDefault ( ) ;
                     $ ( '.has-error' ).removeClass ( 'has-error' ) ;
-                    if ( ! $.isNumeric ( $ ( '#size@group.getId' ).val ( ) ) || $ ( '#size@group.getId' ).val ( ) > $ ( '#size@group.getId' ).attr('max') ) {
+                    if ( ! $.isNumeric ( $ ( '#size@group.getId' ).val ( ) ) || Number ( $ ( '#size@group.getId' ).val ( )) > Number ($ ( '#size@group.getId' ).attr('max') )) {
                     $ ( '#containerSize@group.getId ' ).addClass ( ' has-error ' ) ;
                     return ;
                     }

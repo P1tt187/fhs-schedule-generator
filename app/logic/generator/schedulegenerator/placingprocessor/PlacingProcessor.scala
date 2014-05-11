@@ -62,33 +62,42 @@ trait PlacingProcessor {
   }
 
   @tailrec
-  private def containsInParentGroup(group: Group, participants: mutable.Buffer[Participant]): Boolean = {
+  private def containsInParentGroup(group: Group, existingParticipants: mutable.Buffer[Participant]): Boolean = {
+
     if (group == null) {
       return false
     }
 
-    if (participantsContainsOtherGroupType(group, participants) || participantsContainsOtherGroupType(group, participants)) {
+    if (participantsContainsOtherGroupType(group, existingParticipants)) {
       return true
     }
 
-    if (participants.contains(group)) {
+    if (existingParticipants.contains(group)) {
       return true
     }
-    containsInParentGroup(group.getParent, participants)
+    containsInParentGroup(group.getParent, existingParticipants)
   }
 
 
-  private def participantsContainsOtherGroupType(group: Group, participants: mutable.Buffer[Participant]): Boolean = {
+  private def participantsContainsOtherGroupType(group: Group, existingParticipants: mutable.Buffer[Participant]): Boolean = {
+
+    //FIXME check will not detect overlap of subgroup in existingParticipants
     val parentSubgroups = if (group.getParent != null) {
       group.getParent.getSubGroups
     } else {
       group.getCourse.getGroups
     }
+/*
+    if(group.getGroupType.equals("PCPOOL") && !existingParticipants.find(g => g.getCourse.equals(group.getCourse) && g.asInstanceOf[Group].getGroupType.equals("ENGLISCH") ).isEmpty){
+      Logger.debug("yea")
+    }
+*/
+    val otherGroupTypes = parentSubgroups.filter(_.getGroupType.trim.compareToIgnoreCase(group.getGroupType.trim) != 0)
 
-
-    val otherGroupTypes = parentSubgroups.filter(!_.getGroupType.trim.equalsIgnoreCase(group.getGroupType.trim))
-
-    !otherGroupTypes.find(g => participants.contains(g)).isEmpty
+    otherGroupTypes.find(g => existingParticipants.contains(g)) match {
+      case Some(_)=> true
+      case None => false
+    }
   }
 
   private def containsInSubGroups(group: Group, participants: mutable.Buffer[Participant]): Boolean = {

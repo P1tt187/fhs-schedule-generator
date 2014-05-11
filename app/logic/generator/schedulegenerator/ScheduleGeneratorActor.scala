@@ -34,7 +34,7 @@ class ScheduleGeneratorActor extends Actor {
 
   val TIMEOUT_VAL = 60
 
-  implicit val timeout = Timeout(TIMEOUT_VAL seconds)
+  implicit val timeout = Timeout(TIMEOUT_VAL minutes)
 
   @tailrec
   private def isBetter(rater: List[ERaters], newRate: Map[ERaters, Int]): Boolean = {
