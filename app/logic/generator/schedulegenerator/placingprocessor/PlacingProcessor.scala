@@ -43,7 +43,7 @@ trait PlacingProcessor {
         case group: Group =>
           val existingGroups = existingParticipant.filter(_.isInstanceOf[Group])
 
-          if (containsInParentGroup(group, existingGroups) || containsInSubGroups(group, existingGroups)) {
+          if (containsInParentGroup(group, existingGroups) || containsInSubGroups(group, existingGroups) || participantsContainsOtherGroupType(group, existingGroups)) {
             return true
           }
         case course: Course => if (!existingParticipant.filter(_.getCourse.equals(course)).isEmpty) {
@@ -68,10 +68,6 @@ trait PlacingProcessor {
       return false
     }
 
-    if (participantsContainsOtherGroupType(group, existingParticipants)) {
-      return true
-    }
-
     if (existingParticipants.contains(group)) {
       return true
     }
@@ -81,28 +77,21 @@ trait PlacingProcessor {
 
   private def participantsContainsOtherGroupType(group: Group, existingParticipants: mutable.Buffer[Participant]): Boolean = {
 
-    //FIXME check will not detect overlap of subgroup in existingParticipants
-    val parentSubgroups = if (group.getParent != null) {
-      group.getParent.getSubGroups
-    } else {
-      group.getCourse.getGroups
+    val relevantParticipants = existingParticipants.filter(_.getCourse.equals(group.getCourse)).toList.asInstanceOf[List[Group]]
+    if (relevantParticipants.isEmpty) {
+      return false
     }
-/*
-    if(group.getGroupType.equals("PCPOOL") && !existingParticipants.find(g => g.getCourse.equals(group.getCourse) && g.asInstanceOf[Group].getGroupType.equals("ENGLISCH") ).isEmpty){
-      Logger.debug("yea")
-    }
-*/
-    val otherGroupTypes = parentSubgroups.filter(_.getGroupType.trim.compareToIgnoreCase(group.getGroupType.trim) != 0)
 
-    otherGroupTypes.find(g => existingParticipants.contains(g)) match {
-      case Some(_)=> true
+    relevantParticipants.filterNot(g => g.isSubGroupOf(group) || group.isSubGroupOf(g)).find(g => !g.getGroupType.equals(group.getGroupType)) match {
+      case Some(_) => true
       case None => false
     }
+
   }
 
   private def containsInSubGroups(group: Group, participants: mutable.Buffer[Participant]): Boolean = {
 
-    if (participants.contains(group) || participantsContainsOtherGroupType(group, participants)) {
+    if (participants.contains(group)  ) {
       return true
     }
 
@@ -239,11 +228,11 @@ trait PlacingProcessor {
   protected def sortRoomsByCriteria(rooms: List[RoomEntity], roomCriterias: List[RoomCriteria]): List[RoomEntity] = {
     rooms.sortBy {
       room =>
-        (isRoomInCriteria(room,roomCriterias), room.getCapacity)
+        (isRoomInCriteria(room, roomCriterias), room.getCapacity)
     }
   }
 
-  private def isRoomInCriteria(room:RoomEntity, roomCriterias:List[RoomCriteria]):Boolean={
+  private def isRoomInCriteria(room: RoomEntity, roomCriterias: List[RoomCriteria]): Boolean = {
     !roomCriterias.par.find {
       rc =>
         if (rc.getHouse != null && rc.getHouse.equals(room.getHouse)) {
@@ -258,7 +247,7 @@ trait PlacingProcessor {
     }.isEmpty
   }
 
-  protected def roomsInCriteria(rooms: List[RoomEntity], roomCriterias: List[RoomCriteria]):Boolean = {
+  protected def roomsInCriteria(rooms: List[RoomEntity], roomCriterias: List[RoomCriteria]): Boolean = {
     !rooms.par.find {
       room =>
         isRoomInCriteria(room, roomCriterias)
