@@ -76,7 +76,7 @@ object CGenerate extends Controller {
         flashing
       }
 
-      val chooseSemesterForm = request.flash.get("lastchoosen") match {
+      val chooseSemesterForm = request.session.get("lastchoosen") match {
         case Some(value) =>
           val parts = value.split(",")
           val idString = parts(0)
@@ -169,7 +169,8 @@ object CGenerate extends Controller {
 
           //Logger.debug(findActiveSubjectsBySemesterId(result.id).mkString("\n") )
 
-          Redirect(routes.CGenerate.page()).flashing("startpolling" -> "true", "lastchoosen" -> (result.id.toString + "," + result.time.toString), "generating" -> "disabled")
+          Redirect(routes.CGenerate.page()).flashing("startpolling" -> "true",  "generating" -> "disabled")
+            .withSession("lastchoosen" -> (result.id.toString + "," + result.time.toString))
         }
 
       )

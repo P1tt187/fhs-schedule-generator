@@ -60,7 +60,8 @@ object CEditDocents extends Controller {
 
   def sendDocentFields(id: Long) = Action {
     implicit request =>
-      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(findDocentById(id)), findHouses(), findAllRooms()).toString())))
+      val docent = findDocentById(id)
+      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms()).toString()))).withSession("docentName" -> docent.getLastName)
   }
 
   def editDocent = Action {
@@ -87,7 +88,7 @@ object CEditDocents extends Controller {
 
   def deleteDocent(id: Long) = Action {
     val (docentName, connectedSubjects) = removeDocent(id)
-    Redirect(routes.CEditDocents.page).flashing("connectedSubjects" -> connectedSubjects.mkString(" "),"docentName" -> docentName)
+    Redirect(routes.CEditDocents.page).flashing("connectedSubjects" -> connectedSubjects.mkString(" ")).withSession("docentName" -> docentName)
   }
 
   def saveNewDocent = Action {

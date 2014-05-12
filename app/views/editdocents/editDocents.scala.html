@@ -1,7 +1,8 @@
-@(title: String, newDocentsForm: Form[models.fhs.pages.editdocents.MDocent], existingDocents: List[models.persistence.Docent])(implicit flash: Flash)
+@(title: String, newDocentsForm: Form[models.fhs.pages.editdocents.MDocent], existingDocents: List[models.persistence.Docent])(implicit flash: Flash, session:Session)
 
 @import helper._
 @import helper.twitterBootstrap._
+
 
 @main(title, CEditDocents.NAV) {
 
@@ -27,7 +28,7 @@
                     <label class="control-label" for="selectDocent">Dozenten</label>
                     <select id="selectDocent" class="form-control">
                     @for(d <- existingDocents) {
-                        <option @if(flash.get("docentName").getOrElse("").equals(d.getLastName)){ selected } value="@d.getId">@d.getLastName</option>
+                        <option @if(session.get("docentName").getOrElse("").equals(d.getLastName)){ selected } value="@d.getId">@d.getLastName</option>
                     }
                     </select>
                 </div>

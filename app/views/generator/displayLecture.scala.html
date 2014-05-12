@@ -3,6 +3,7 @@
 @import models.persistence.enumerations.ELectureKind
 
 @import models.persistence.enumerations.EDuration
+@import play.api.Play.current
 
 
 <div class="panel-body @{
@@ -33,13 +34,8 @@
     @lecture.getDocents.map(_.getLastName).mkString(", ")
     </div>
     <div> @lecture.getRoom.getHouse.getName @lecture.getRoom.getNumber </div>
-    @*<div> @{
-        lecture.getDuration match {
-            case EDuration.EVEN => "g"
-            case EDuration.UNEVEN => "u"
-            case EDuration.WEEKLY => "w"
-            case other => other.name()
-        }
+    @if(!lecture.getNotOptimalPlaced.isEmpty && current.configuration.getString("schedule.show.outOfWishTime").getOrElse("OFF").equalsIgnoreCase("ON")) {
 
-    } </div> *@
+        <div> @lecture.getNotOptimalPlaced </div>
+    }
 </div>

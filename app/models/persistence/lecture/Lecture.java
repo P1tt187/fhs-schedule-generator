@@ -33,14 +33,15 @@ public class Lecture extends AbstractLecture {
     /**
      * participants can be multiple courses or groups
      */
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Participant.class)
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER, targetEntity = Participant.class )
     @Fetch(FetchMode.SUBSELECT)
     private Set<Participant> participants;
 
     /**
      * docents for this lecture
      */
-    @OneToMany(targetEntity = Docent.class)
+    @Fetch(FetchMode.SUBSELECT)
+    @OneToMany(targetEntity = Docent.class , cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
     private Set<Docent> docents;
     /**
      * room for this lecture
@@ -87,6 +88,24 @@ public class Lecture extends AbstractLecture {
     @Transient
     @JsonIgnore
     private BigInteger difficultLevel = BigInteger.ZERO;
+
+    /**
+     * this is just for debugging
+     *
+     * by setting 'schedule.show.outOfWishTime=on' it will be honored by the schedule presentation
+     *
+     */
+    @Transient
+    private String notOptimalPlaced = "";
+
+
+    public String getNotOptimalPlaced() {
+        return notOptimalPlaced;
+    }
+
+    public void setNotOptimalPlaced(String notOptimalPlaced) {
+        this.notOptimalPlaced = notOptimalPlaced;
+    }
 
     public void setDifficultLevel(BigInteger difficultLevel) {
         this.difficultLevel = difficultLevel;

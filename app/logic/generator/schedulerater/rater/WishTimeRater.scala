@@ -46,7 +46,10 @@ class WishTimeRater extends Rater {
 
     }.toSet
 
-    lectures.foreach(_.increaseDifficultLevel())
+    lectures.foreach{l=>
+      l.increaseDifficultLevel()
+      l.setNotOptimalPlaced("*")
+    }
     (lectures.size, lectures)
   }
 }

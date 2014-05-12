@@ -33,6 +33,7 @@ object CEditSubjects extends Controller {
   val TIME_TO_LIFE = 30 seconds
 
   def page = Action {
+    implicit request =>
     Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses()))
   }
 

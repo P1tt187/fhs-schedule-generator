@@ -105,9 +105,11 @@ class ScheduleGeneratorActor extends Actor {
               Logger.debug("rate: " + newRate + " current: " + rate)
             }
 
-            lectures.par.foreach(l => if (l.getDuration != EDuration.WEEKLY) {
+            lectures.par.foreach { l => if (l.getDuration != EDuration.WEEKLY) {
               l.setDuration(EDuration.UNWEEKLY)
-            })
+            }
+              l.setNotOptimalPlaced("")
+            }
 
             generate()
 
