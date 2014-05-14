@@ -169,4 +169,4 @@ case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute
 
 }
 
-case class GeneratorForm(id: Long, time:Int)
+case class GeneratorForm(id: Long, time:Int, randomRatio:Int)

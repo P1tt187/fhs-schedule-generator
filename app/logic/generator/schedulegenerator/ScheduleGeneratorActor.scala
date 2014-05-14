@@ -58,7 +58,7 @@ class ScheduleGeneratorActor extends Actor {
 
   override def receive = {
 
-    case GenerateSchedule(subjectList, semester, endTime) =>
+    case GenerateSchedule(subjectList, semester, endTime, randomRatio) =>
 
       val lectureGenerationActor = context.actorOf(Props[LectureGeneratorActor])
 
@@ -102,7 +102,7 @@ class ScheduleGeneratorActor extends Actor {
               Logger.debug("new optimum: " + newRate.values.sum + " " + newRate)
               rate = newRate
               optimalSchedule = Some(cloner.deepClone(answer))
-              Random.shuffle(lectures).take(10).foreach(_.increaseDifficultLevel())
+
             } else {
               Logger.debug("rate: " + newRate + " current: " + rate)
             }
@@ -111,6 +111,10 @@ class ScheduleGeneratorActor extends Actor {
               l.setDuration(EDuration.UNWEEKLY)
             }
               l.setNotOptimalPlaced("")
+            }
+
+            if(newRate(ERaters.WISHTIME_RATER) - rate(ERaters.WISHTIME_RATER)<=2){
+              Random.shuffle(lectures).take(randomRatio).foreach(_.increaseDifficultLevel())
             }
 
             generate()

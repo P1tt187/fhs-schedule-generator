@@ -11,7 +11,7 @@ import java.util.Calendar
  */
 sealed trait ScheduleGeneratorMessage
 
-case class GenerateSchedule(subjects: List[AbstractSubject], semester : Semester, endTime:Calendar) extends ScheduleGeneratorMessage
+case class GenerateSchedule(subjects: List[AbstractSubject], semester : Semester, endTime:Calendar, randomRatio:Int) extends ScheduleGeneratorMessage
 
 case class SlaveGenerate(lectures: List[Lecture]) extends ScheduleGeneratorMessage
 
