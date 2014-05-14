@@ -1,8 +1,6 @@
 package models.persistence.criteria;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import models.persistence.AbstractEntity;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -23,8 +21,7 @@ public class CriteriaContainer extends AbstractEntity {
      */
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, targetEntity = AbstractCriteria.class, fetch = FetchType.EAGER)
-    @OrderBy("priority, tolerance")
-    @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class)
+
     private List<AbstractCriteria> criterias;
 
 
@@ -42,7 +39,7 @@ public class CriteriaContainer extends AbstractEntity {
     @JsonIgnore
     public Long calculateDifficultLevel() {
         return criterias.stream().parallel().mapToLong(c -> {
-            Long ret = c.getPriority().getSortIndex() + (c.isTolerance() ? 0l : 2l);
+            Long ret = 0l;
             if (!(c instanceof RoomCriteria)) {
                 return ret;
             }
@@ -65,7 +62,8 @@ public class CriteriaContainer extends AbstractEntity {
 
         CriteriaContainer that = (CriteriaContainer) o;
 
-        if (criterias != null ? !(criterias.containsAll(that.criterias) && criterias.size() == that.criterias.size()) : that.criterias != null) return false;
+        if (criterias != null ? !(criterias.containsAll(that.criterias) && criterias.size() == that.criterias.size()) : that.criterias != null)
+            return false;
 
         return true;
     }

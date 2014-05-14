@@ -16,6 +16,7 @@ import java.math.BigInteger
 import models.persistence.enumerations.EDuration
 import logic.generator.schedulerater.rater.ERaters
 import scala.annotation.tailrec
+import scala.util.Random
 
 
 /**
@@ -101,6 +102,7 @@ class ScheduleGeneratorActor extends Actor {
               Logger.debug("new optimum: " + newRate.values.sum + " " + newRate)
               rate = newRate
               optimalSchedule = Some(cloner.deepClone(answer))
+              Random.shuffle(lectures).take(10).foreach(_.increaseDifficultLevel())
             } else {
               Logger.debug("rate: " + newRate + " current: " + rate)
             }

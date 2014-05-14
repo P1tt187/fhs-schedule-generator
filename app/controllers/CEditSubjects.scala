@@ -11,7 +11,7 @@ import play.api.cache.Cache
 import play.api.Play.current
 import models.Transactions
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCriteria}
-import models.persistence.enumerations.{EDuration, EPriority}
+import models.persistence.enumerations.EDuration
 import models.persistence.participants.Course
 import models.persistence.Docent
 import models.persistence.location.{RoomEntity, RoomAttributesEntity, HouseEntity}
@@ -221,9 +221,8 @@ object CEditSubjects extends Controller {
     val roomCriterias = selectedRooms.map {
       room =>
         val rCrit = new RoomCriteria
-        rCrit.setTolerance(false)
         rCrit.setRoom(room)
-        rCrit.setPriority(EPriority.HIGH)
+
         rCrit
     }
 
@@ -235,8 +234,7 @@ object CEditSubjects extends Controller {
       house =>
         val rCrit = new RoomCriteria
         rCrit.setHouse(house)
-        rCrit.setTolerance(false)
-        rCrit.setPriority(EPriority.HIGH)
+
         rCrit
     }
 
@@ -246,8 +244,7 @@ object CEditSubjects extends Controller {
   private def setRoomAttributesForCriteria(roomAttributes: List[RoomAttributesEntity], criteriaContainer: CriteriaContainer, otherCriterias: mutable.Buffer[AbstractCriteria]) {
     val roomCriteria = new RoomCriteria
     roomCriteria.setRoomAttributes(roomAttributes)
-    roomCriteria.setPriority(EPriority.HIGH)
-    roomCriteria.setTolerance(false)
+
     criteriaContainer.setCriterias(otherCriterias :+ roomCriteria)
   }
 

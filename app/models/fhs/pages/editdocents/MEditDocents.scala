@@ -9,7 +9,7 @@ import models.fhs.pages.JavaList
 import scala.collection.JavaConversions._
 import models.persistence.location.{RoomEntity, HouseEntity}
 import models.persistence.template.WeekdayTemplate
-import models.persistence.enumerations.{EDocentTimeKind, EPriority, EDuration}
+import models.persistence.enumerations.{EDocentTimeKind, EDuration}
 import models.fhs.pages.roomdefinition.MRoomdefintion
 import models.persistence.subject.AbstractSubject
 
@@ -126,9 +126,6 @@ object MEditDocents {
         }
 
         val timeCrit = new DocentTimeWish(crit.startHour, crit.startMinute, crit.stopHour, crit.stopMinute, findOrCreateWeekdayTemplate(crit.weekday), EDuration.WEEKLY, EDocentTimeKind.valueOf(crit.timeKind))
-        timeCrit.setPriority(EPriority.NORMAL)
-        timeCrit.setTolerance(false)
-
 
         timeCrit
     }
@@ -139,16 +136,13 @@ object MEditDocents {
         val house = findHouseById(crit)
         val houseCrit = new RoomCriteria
         houseCrit.setHouse(house)
-        houseCrit.setTolerance(true)
-        houseCrit.setPriority(EPriority.LOW)
         houseCrit
     }
     newCriteriaContainer.setCriterias(newCriteriaContainer.getCriterias ++ houseCriterias)
 
     if (!mDocent.roomAttr.isEmpty) {
       val roomAttrCriteria = new RoomCriteria
-      roomAttrCriteria.setTolerance(true)
-      roomAttrCriteria.setPriority(EPriority.LOW)
+
       val attributes = mDocent.roomAttr.map {
         attribute =>
           MRoomdefintion.findOrCreateRoomAttribute(attribute)
@@ -160,8 +154,7 @@ object MEditDocents {
       crit =>
         val roomCrit = new RoomCriteria
         roomCrit.setRoom(findRoomById(crit))
-        roomCrit.setTolerance(true)
-        roomCrit.setPriority(EPriority.LOW)
+
         roomCrit
     }
     newCriteriaContainer.setCriterias(newCriteriaContainer.getCriterias ++ roomCriterias)

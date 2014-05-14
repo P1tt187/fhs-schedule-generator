@@ -117,8 +117,7 @@ public class TimeSlotCriteria extends AbstractCriteria {
         if (startMinute != null ? !startMinute.equals(that.startMinute) : that.startMinute != null) return false;
         if (stopHour != null ? !stopHour.equals(that.stopHour) : that.stopHour != null) return false;
         if (stopMinute != null ? !stopMinute.equals(that.stopMinute) : that.stopMinute != null) return false;
-        if (isTolerance() != null ? !isTolerance().equals(that.isTolerance()) : that.isTolerance() != null)
-            return false;
+
         if (weekday != null ? !weekday.getSortIndex().equals(that.weekday.getSortIndex()) : that.weekday != null) return false;
         if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
 
@@ -141,7 +140,6 @@ public class TimeSlotCriteria extends AbstractCriteria {
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (isTolerance() != null ? isTolerance().hashCode() : 0);
         result = 31 * result + (startHour != null ? startHour.hashCode() : 0);
         result = 31 * result + (startMinute != null ? startMinute.hashCode() : 0);
         result = 31 * result + (stopHour != null ? stopHour.hashCode() : 0);
