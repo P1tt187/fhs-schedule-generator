@@ -58,7 +58,7 @@ class ScheduleGeneratorActor extends Actor {
 
   override def receive = {
 
-    case GenerateSchedule(subjectList, semester, endTime, randomRatio) =>
+    case GenerateSchedule(subjectList, semester, endTime, randomRatio, maxIterationDeep) =>
 
       val lectureGenerationActor = context.actorOf(Props[LectureGeneratorActor])
 
@@ -75,7 +75,7 @@ class ScheduleGeneratorActor extends Actor {
       Logger.debug("number of lectures: " + lectures.size)
       val theSender = sender()
 
-      def generate() {
+      def generate(iterationDeep: Int) {
 
         if (Calendar.getInstance.after(endTime)) {
           optimalSchedule match {
@@ -98,13 +98,29 @@ class ScheduleGeneratorActor extends Actor {
 
             Logger.debug("************************************")
 
-            if (isBetter(ERaters.values().toList.sortBy(-_.getPriority), newRate)) {
+            val nextIteration = if (isBetter(ERaters.values().toList.sortBy(-_.getPriority), newRate)) {
               Logger.debug("new optimum: " + newRate.values.sum + " " + newRate)
               rate = newRate
               optimalSchedule = Some(cloner.deepClone(answer))
+              Random.shuffle(lectures).take(randomRatio).foreach(_.increaseDifficultLevel())
+              0
 
             } else {
-              Logger.debug("rate: " + newRate + " current: " + rate)
+              Logger.debug("deep: " + iterationDeep + " rate: " + newRate + " current: " + rate)
+
+              /** if the algorithm reaches the maxIterationDeep and the current schedule is not near enough to a new optimum then we will reset the difficultlevel */
+              if (iterationDeep == maxIterationDeep) {
+                lectures.par.foreach(l => l.setDifficultLevel(BigInteger.valueOf(l.calculateNumberOfParticipants().toLong)))
+                Random.shuffle(lectures).take(randomRatio).foreach(_.increaseDifficultLevel())
+                0
+              } else {
+                if (newRate(ERaters.WISHTIME_RATER) - rate(ERaters.WISHTIME_RATER) <= 3) {
+                  Random.shuffle(lectures).take(randomRatio).foreach(_.increaseDifficultLevel())
+                  0
+                } else {
+                  iterationDeep + 1
+                }
+              }
             }
 
             lectures.par.foreach { l => if (l.getDuration != EDuration.WEEKLY) {
@@ -112,23 +128,18 @@ class ScheduleGeneratorActor extends Actor {
             }
               l.setNotOptimalPlaced("")
             }
-
-            if(newRate(ERaters.WISHTIME_RATER) - rate(ERaters.WISHTIME_RATER)<=2){
-              Random.shuffle(lectures).take(randomRatio).foreach(_.increaseDifficultLevel())
-            }
-
-            generate()
+            generate(nextIteration)
 
           case PlacingFailure =>
             if (!stopPlacing) {
-              generate()
+              generate(iterationDeep)
             }
           case _ =>
 
         }
       }
 
-      generate()
+      generate(0)
 
     case PoisonPill =>
       stopPlacing = true

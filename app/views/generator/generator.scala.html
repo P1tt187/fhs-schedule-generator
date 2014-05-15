@@ -15,8 +15,8 @@
                     @select(formGenerator("id"), semesters.toSeq.map(s => (s.getId.toString, s.getName)), '_label -> "Semester", '_help -> "", '_class -> "form-group")
                 <fieldset id="generatorFieldset" @flash.get("generating").getOrElse("") >
                     @inputText(formGenerator("time"), '_label -> "Wie lange (Minuten)", '_class -> "form-group", '_help -> "")
-                    @inputText(formGenerator("randomRatio"), '_label->"Würfelrate", '_class -> "form-group", '_help -> "")
-
+                    @inputText(formGenerator("randomRatio"), '_label->"Würfelstärke", '_class -> "form-group", '_help -> "")
+                    @inputText(formGenerator("maxIterationDeep"), '_label->"Maximale Iterationstiefe", '_class -> "form-group",'_help -> "")
                     <div class="clearfix"></div>
                     <div class="form-group">
                         <button id="submitGenerating" class="btn btn-success form-control" role="button" type="submit">Generieren</button>

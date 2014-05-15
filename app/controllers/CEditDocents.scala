@@ -88,7 +88,7 @@ object CEditDocents extends Controller {
 
   def deleteDocent(id: Long) = Action {
     val (docentName, connectedSubjects) = removeDocent(id)
-    Redirect(routes.CEditDocents.page).flashing("connectedSubjects" -> connectedSubjects.mkString(" ")).withSession("docentName" -> docentName)
+    Redirect(routes.CEditDocents.page).flashing("connectedSubjects" -> connectedSubjects.mkString(" "), "docentName" -> docentName).withSession("docentName" -> docentName)
   }
 
   def saveNewDocent = Action {
