@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("ET")
-@Table(name="TBLEVEN_TIMESLOT")
+@Table(name = "TBLTIMESLOT_EVEN")
 public class EvenTimeSlot extends TimeSlot {
 
     public EvenTimeSlot() {

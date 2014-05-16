@@ -12,6 +12,7 @@ import models.persistence.scheduletree.{Weekday, TimeSlot}
 import models.persistence.participants.Course
 import scala.Some
 import org.hibernate.FetchMode
+import play.api.Logger
 
 
 /**
@@ -38,7 +39,7 @@ object MGenerator {
     } else {
       filteredSchedule
     }
-    (resultString.toString , collectTimeslotsFromSchedule(filteredSchedule))
+    (resultString.toString, collectTimeslotsFromSchedule(filteredSchedule))
   }
 
   def collectTimeslotsFromSchedule(schedule: Schedule) = {
@@ -127,6 +128,29 @@ object MGenerator {
     }
   }
 
+  def persistSchedule(schedule: Schedule): Boolean = {
+    if(schedule==null){
+      return false
+    }
+    try {
+      Transactions.hibernateAction {
+        implicit session =>
+
+          val oldSchedule = session.createCriteria(classOf[Schedule]).add(Restrictions.eq("semester", schedule.getSemester)).uniqueResult().asInstanceOf[Schedule]
+
+          if(oldSchedule!=null) {
+            session.delete(oldSchedule)
+          }
+          session.saveOrUpdate(schedule)
+          true
+      }
+    } catch {
+      case e: Exception =>
+        Logger.error("cannot persist schedule", e)
+        false
+    }
+  }
+
 }
 
 
@@ -169,4 +193,4 @@ case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute
 
 }
 
-case class GeneratorForm(id: Long, time:Int, randomRatio:Int, maxIterationDeep:Int)
+case class GeneratorForm(id: Long, time: Int, randomRatio: Int, maxIterationDeep: Int)

@@ -11,8 +11,9 @@ import scala.concurrent.Future
 import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
-import logic.blaimport.{ImportFinished, ImportFile, BlaImportActor}
+import logic.blaimport.{ImportFailure, ImportFinished, ImportFile, BlaImportActor}
 import play.api.Logger
+import play.api.libs.json._
 
 /**
  * @author fabian
@@ -25,6 +26,8 @@ object CBLAFileUpload extends Controller {
   implicit val timeout = Timeout(30 seconds)
   private var result: Future[Any] = null
   private var actorFinished = false
+  private var error = false
+  private var ex: Exception = null
 
 
   def page() = Action {
@@ -34,11 +37,13 @@ object CBLAFileUpload extends Controller {
 
   def finished = Action {
 
-    val sb = StringBuilder.newBuilder
-    sb.append("{\"result\":")
-    sb.append(actorFinished)
-    sb.append("}")
-    Ok(sb.toString())
+    val json = Json.stringify(Json.obj("result" -> actorFinished, "error" -> error))
+
+    Ok(json)
+  }
+
+  def errorMessage = Action {
+    Ok(Json.stringify(Json.obj("html" -> ex.toString)))
   }
 
   def uploadFile = Action(parse.multipartFormData) {
@@ -49,15 +54,19 @@ object CBLAFileUpload extends Controller {
           import java.io.File
           val filename = file.filename
           val tmpFile = File.createTempFile(filename, "")
+          error=false;
 
           tmpFile.deleteOnExit()
           file.ref.moveTo(tmpFile, replace = true)
 
-          def finishAction(){
+          def finishAction() {
             result.onSuccess {
               case ImportFinished =>
                 actorFinished = true
                 Logger.debug("import finished")
+              case ImportFailure(exception) =>
+                error = true
+                ex = exception
             }
           }
 

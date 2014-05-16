@@ -56,7 +56,7 @@ public abstract class TimeSlot extends Node implements Comparable<TimeSlot> {
     @Column(name = "STOPMINUTE", nullable = false)
     private Integer stopMinute;
 
-    @OneToMany(fetch = FetchType.EAGER, targetEntity = AbstractLecture.class)
+    @ManyToMany(fetch = FetchType.EAGER, targetEntity = AbstractLecture.class, cascade = CascadeType.ALL)
     private List<AbstractLecture> lectures;
 
     public void setUnpopular(Boolean unpopular) {

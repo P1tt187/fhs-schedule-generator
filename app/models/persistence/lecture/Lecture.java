@@ -33,7 +33,7 @@ public class Lecture extends AbstractLecture {
     /**
      * participants can be multiple courses or groups
      */
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH }, fetch = FetchType.EAGER, targetEntity = Participant.class )
+    @OneToMany( fetch = FetchType.EAGER, targetEntity = Participant.class )
     @Fetch(FetchMode.SUBSELECT)
     private Set<Participant> participants;
 
@@ -41,7 +41,7 @@ public class Lecture extends AbstractLecture {
      * docents for this lecture
      */
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = Docent.class , cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
+    @OneToMany(targetEntity = Docent.class )
     private Set<Docent> docents;
     /**
      * room for this lecture
@@ -59,7 +59,7 @@ public class Lecture extends AbstractLecture {
     /**
      * criterias of this lecture
      */
-    @ManyToOne(targetEntity = CriteriaContainer.class)
+    @ManyToOne(targetEntity = CriteriaContainer.class, cascade = CascadeType.ALL)
     private CriteriaContainer criteriaContainer;
 
     /**

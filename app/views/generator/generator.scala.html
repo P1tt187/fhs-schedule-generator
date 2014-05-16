@@ -10,7 +10,7 @@
             <h1>Stundenplan Generieren</h1>
         </div>
         <div class="row-fluid">
-            <div class="col-md-5">
+            <div class="col-md-10">
             @form(action = routes.CGenerate.generatorAction(), 'class -> "form-inline " ) {
                     @select(formGenerator("id"), semesters.toSeq.map(s => (s.getId.toString, s.getName)), '_label -> "Semester", '_help -> "", '_class -> "form-group")
                 <fieldset id="generatorFieldset" @flash.get("generating").getOrElse("") >
@@ -19,12 +19,22 @@
                     @inputText(formGenerator("maxIterationDeep"), '_label->"Maximale Iterationstiefe", '_class -> "form-group",'_help -> "")
                     <div class="clearfix"></div>
                     <div class="form-group">
-                        <button id="submitGenerating" class="btn btn-success form-control" role="button" type="submit">Generieren</button>
+                        <button id="submitGenerating" class="btn btn-warning form-control" role="button" type="submit"><span class="glyphicon glyphicon-play"></span> </button>
+                    </div>
+                    <div class="form-group">
+                        <button id="saveSchedule" class="btn btn-success form-control disabled" role="button" type="button"> <span class="glyphicon glyphicon-floppy-open"></span> </button>
                     </div>
                 </fieldset>
             }
             </div>
         </div>
+    <div class="row-fluid">
+        <div class="col-md-5" id="saveScheduleResult">
+            <br/>
+            <div class="alert alert-success hidden" id="saveScheduleSuccsess"> Erfolg <span class="glyphicon glyphicon-thumbs-up"></span> </div>
+            <div class="alert alert-danger hidden" id="saveScheduleFailure"> Fehler <span class="glyphicon glyphicon-thumbs-down"></span> </div>
+        </div>
+    </div>
         <div class="clearfix"></div>
         <br />
         @if(flash.get("startpolling").getOrElse("false").toBoolean) {
@@ -104,10 +114,16 @@
             $.ajax ( "@routes.CGenerate.finished", {
             dataType: "json",
             success : function ( data ) {
+                console.log(data)
             if ( data.result == true ) {
             changeProgressBar ( ) ;
                 $('#filterContainer' ).removeClass('hidden');
                 $('#generatorFieldset' ).removeAttr('disabled');
+                if(data.error) {
+                $ ( '.progress-bar' ).removeClass ( 'progress-bar-warning' ).addClass ( 'progress-bar-danger' ) ;
+                } else {
+                $ ( '#saveSchedule' ).removeClass ( 'disabled' ) ;
+                }
             showSchedule();
             } else {
             setTimeout ( poll, 2000 ) ;
@@ -119,6 +135,22 @@
             };
 
                 poll();
+
+                $('#saveSchedule' ).click( function(){
+                $.ajax( "@routes.CGenerate.saveSchedule()",{
+            type : "POST",
+            success : function ( data ) {
+                if(data.result){
+                    $('#saveScheduleFailure' ).addClass('hidden');
+                    $('#saveScheduleSuccsess' ).removeClass('hidden');
+                } else {
+                    $('#saveScheduleSuccsess' ).addClass('hidden');
+                    $('#saveScheduleFailure' ).removeClass('hidden');
+                }
+            }
+            } );
+                } );
+
             </script>
 
         }

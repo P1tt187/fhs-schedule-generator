@@ -56,7 +56,7 @@ object CGenerate extends Controller {
     mapping("id" -> longNumber,
       "time" -> number(min = 0),
       "randomRatio" -> number(min = 0),
-    "maxIterationDeep"->number(min=0)
+      "maxIterationDeep" -> number(min = 0)
     )(GeneratorForm.apply)(GeneratorForm.unapply)
   )
 
@@ -83,21 +83,22 @@ object CGenerate extends Controller {
           val parts = value.split(",")
           val idString = parts(0).toLong
           val time = parts(1).toInt
-          val  randomRatio = parts(2).toInt
-          val maxIterationDeep= parts(3).toInt
+          val randomRatio = parts(2).toInt
+          val maxIterationDeep = parts(3).toInt
           form.fill(GeneratorForm(idString, time, randomRatio, maxIterationDeep))
-        case None => form.fill(GeneratorForm(-1,10,10,10))
+        case None => form.fill(GeneratorForm(-1, 10, 10, 50))
       }
 
       Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses(), findDocents())(flashing))
   }
 
+  def saveSchedule() = Action {
+    Ok(Json.stringify(Json.obj("result" -> persistSchedule(schedule).toString)))
+  }
+
   def finished = Action {
-    val sb = StringBuilder.newBuilder
-    sb.append("{\"result\":")
-    sb.append(actorFinished)
-    sb.append("}")
-    Ok(sb.toString())
+    val json = Json.stringify(Json.obj("result" -> actorFinished, "error" -> hasError))
+    Ok(json)
   }
 
 

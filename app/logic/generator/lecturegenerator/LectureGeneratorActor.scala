@@ -15,6 +15,7 @@ import exceptions.NoGroupFoundException
 import scala.util.Random
 import org.hibernate.FetchMode
 import java.math.BigInteger
+import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
 
 /**
  * @author fabian 
@@ -24,6 +25,7 @@ class LectureGeneratorActor extends Actor {
 
   private var addedLectures = 0
   private var addedExercises = 0
+  private val cloner = new Cloner(new ObjenesisInstantiationStrategy)
 
   override def receive = {
 
@@ -42,12 +44,12 @@ class LectureGeneratorActor extends Actor {
 
               def initLectureLecture: Lecture = {
                 val lecture = new Lecture
-                lecture.setDocents(lectureSubject.getDocents)
+                lecture.setDocents(cloner.deepClone(lectureSubject.getDocents))
                 lecture.setParticipants(Set[Participant]() ++ lectureSubject.getCourses)
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(lectureSubject.getName)
                 lecture.setCriteriaContainer(subject.getCriteriaContainer)
-                lecture.setLectureSynonyms(lectureSubject.getSubjectSynonyms)
+                lecture.setLectureSynonyms(cloner.deepClone(lectureSubject.getSubjectSynonyms))
                 lecture.setKind(ELectureKind.LECTURE)
                 lecture.setExpectedParticipants(lectureSubject.getExpectedParticipants)
                 lecture.setDifficultLevel(BigInteger.valueOf(lectureSubject.getUnits.toLong))
@@ -95,11 +97,11 @@ class LectureGeneratorActor extends Actor {
               def initExerciseLecture(groups: List[Group]): Lecture = {
                 val lecture = new Lecture
                 lecture.setParticipants(Set[Participant]() ++ groups)
-                lecture.setDocents(exerciseSubject.getDocents)
+                lecture.setDocents(cloner.deepClone(exerciseSubject.getDocents))
                 lecture.setCriteriaContainer(exerciseSubject.getCriteriaContainer)
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(exerciseSubject.getName)
-                lecture.setLectureSynonyms(exerciseSubject.getSubjectSynonyms)
+                lecture.setLectureSynonyms(cloner.deepClone(exerciseSubject.getSubjectSynonyms))
                 lecture.setKind(ELectureKind.EXERCISE)
                 lecture.setExpectedParticipants(exerciseSubject.getExpectedParticipants)
                 lecture.setDifficultLevel(BigInteger.valueOf(exerciseSubject.getUnits.toLong))

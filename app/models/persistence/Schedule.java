@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Table(name = "TBLSCHEDULE")
 public class Schedule extends AbstractEntity {
 
-    @OneToOne(targetEntity = Root.class)
+    @OneToOne(targetEntity = Root.class, cascade = CascadeType.ALL)
     private Root root;
 
     public Root getRoot() {

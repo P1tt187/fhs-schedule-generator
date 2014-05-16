@@ -34,15 +34,20 @@ class BlaImportActor extends Actor {
   override def receive: Actor.Receive = {
 
     case ImportFile(file) =>
-      shortcut = shortcut.empty
-      shortcutReverse = shortcutReverse.empty
-      subjectNames = subjectNames.empty
-      subjectMetaInformation = subjectMetaInformation.empty
+
+      try {
+        shortcut = shortcut.empty
+        shortcutReverse = shortcutReverse.empty
+        subjectNames = subjectNames.empty
+        subjectMetaInformation = subjectMetaInformation.empty
 
 
-      parseFile(file)
-      sender() ! ImportFinished
-
+        parseFile(file)
+        sender() ! ImportFinished
+      }
+      catch{
+        case ex:Exception => sender() ! ImportFailure(ex)
+      }
     case unkownCommand => throw new IllegalArgumentException("unknown command " + unkownCommand)
   }
 

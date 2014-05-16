@@ -17,6 +17,7 @@ GET         /removeRoom/:id                                                     
 GET         /blaimport                                                                                controllers.CBLAFileUpload.page
 GET         /blaimportFinished                                                                        controllers.CBLAFileUpload.finished
 POST        /blaUpload                                                                                controllers.CBLAFileUpload.uploadFile
+GET         /blaError                                                                                 controllers.CBLAFileUpload.errorMessage
 
 GET         /editSubjects                                                                             controllers.CEditSubjects.page
 GET         /editSucjects/:semester/:subjectType/:filterDocentId/:filterCourseId/:filterActive        controllers.CEditSubjects.getNamesField(semester,subjectType,filterDocentId:Long,filterCourseId:Long,filterActive)
@@ -36,6 +37,7 @@ GET         /generator                                                          
 POST        /generatorAction                                                                          controllers.CGenerate.generatorAction
 GET         /generatorFinished                                                                        controllers.CGenerate.finished
 GET         /generatorGetSchedule/:filterCourse/:filterDocent                                         controllers.CGenerate.sendSchedule(filterCourse:Long, filterDocent:Long)
+POST        /saveSchedule                                                                             controllers.CGenerate.saveSchedule()
 
 GET         /exportData                                                                               controllers.CExporter.page
 GET         /data.json                                                                                controllers.CExporter.export
