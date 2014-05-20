@@ -13,6 +13,11 @@
             <div class="col-md-10">
             @form(action = routes.CGenerate.generatorAction(), 'class -> "form-inline " ) {
                     @select(formGenerator("id"), semesters.toSeq.map(s => (s.getId.toString, s.getName)), '_label -> "Semester", '_help -> "", '_class -> "form-group")
+                    <div class="form-group">
+                        <label class="control-label" for="refreshBtn"><span class="glyphicon"></span></label>
+                        <button id="refreshBtn" type="button" class="btn btn-sm btn-info"> <span class="glyphicon glyphicon-refresh"></span> </button>
+                    </div>
+
                 <fieldset id="generatorFieldset" @flash.get("generating").getOrElse("") >
                     @inputText(formGenerator("time"), '_label -> "Wie lange (Minuten)", '_class -> "form-group", '_help -> "")
                     @inputText(formGenerator("randomRatio"), '_label->"Würfelstärke", '_class -> "form-group", '_help -> "")
@@ -139,7 +144,10 @@
                 $('#saveSchedule' ).click( function(){
                 $.ajax( "@routes.CGenerate.saveSchedule()",{
             type : "POST",
+            dataType: "json",
             success : function ( data ) {
+                console.log(data);
+
                 if(data.result){
                     $('#saveScheduleFailure' ).addClass('hidden');
                     $('#saveScheduleSuccsess' ).removeClass('hidden');

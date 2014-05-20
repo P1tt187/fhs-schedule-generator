@@ -17,6 +17,17 @@ public class Schedule extends AbstractEntity {
     @OneToOne(targetEntity = Root.class, cascade = CascadeType.ALL)
     private Root root;
 
+    @Column(name="rate", nullable = false)
+    private Integer rate;
+
+    public Integer getRate() {
+        return rate;
+    }
+
+    public void setRate(Integer rate) {
+        this.rate = rate;
+    }
+
     public Root getRoot() {
         return root;
     }

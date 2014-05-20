@@ -44,8 +44,6 @@ object CGenerate extends Controller {
 
   private var actorFinished = false
 
-  private var rate = Int.MaxValue
-
   private var end: Calendar = null
 
   private var hasError = false
@@ -93,7 +91,7 @@ object CGenerate extends Controller {
   }
 
   def saveSchedule() = Action {
-    Ok(Json.stringify(Json.obj("result" -> persistSchedule(schedule).toString)))
+    Ok(Json.stringify(Json.obj("result" -> persistSchedule(schedule))))
   }
 
   def finished = Action {
@@ -120,10 +118,10 @@ object CGenerate extends Controller {
       val timeRanges = findTimeRanges(timeslotTemplates, List[TimeRange]())
 
       val filteredPage = if (courseId == -1 && docentId == -1) {
-        showSchedule("Alle Kurse", timeRanges, timeslotsAll, rate).toString()
+        showSchedule("Alle Kurse", timeRanges, timeslotsAll, schedule.getRate).toString()
       } else {
         val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId))
-        showSchedule(courseName, timeRanges, timeslots, rate).toString()
+        showSchedule(courseName, timeRanges, timeslots, schedule.getRate).toString()
       }
       Ok(Json.stringify(Json.obj("htmlresult" -> filteredPage)))
     }
@@ -153,8 +151,8 @@ object CGenerate extends Controller {
           scheduleFuture = ask(generatorActor, GenerateSchedule(subjects, semester, endTime, result.randomRatio, result.maxIterationDeep))
           end = endTime
           scheduleFuture.onSuccess {
-            case ScheduleAnswer(theSchedule, theRate) => this.schedule = theSchedule
-              rate = theRate
+            case ScheduleAnswer(theSchedule) => this.schedule = theSchedule
+
               actorFinished = true
               finishTime = Calendar.getInstance()
               end = null

@@ -33,7 +33,7 @@ public class Lecture extends AbstractLecture {
     /**
      * participants can be multiple courses or groups
      */
-    @OneToMany( fetch = FetchType.EAGER, targetEntity = Participant.class )
+    @ManyToMany( fetch = FetchType.EAGER, targetEntity = Participant.class )
     @Fetch(FetchMode.SUBSELECT)
     private Set<Participant> participants;
 
@@ -41,7 +41,8 @@ public class Lecture extends AbstractLecture {
      * docents for this lecture
      */
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(targetEntity = Docent.class )
+    @ManyToMany(fetch = FetchType.EAGER, targetEntity = Docent.class )
+    //@JoinTable(name="TBLLECTURE_TBLDOCENT", joinColumns = {@JoinColumn(name="docent_ID")} )
     private Set<Docent> docents;
     /**
      * room for this lecture

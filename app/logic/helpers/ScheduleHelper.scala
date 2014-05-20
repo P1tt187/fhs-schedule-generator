@@ -60,6 +60,7 @@ object ScheduleHelper {
 
     val copySchedule = new Schedule
     copySchedule.setRoot(copyRoot)
+    copySchedule.setRate(schedule.getRate)
     copySchedule
 
   }
@@ -111,6 +112,7 @@ object ScheduleHelper {
 
     val copySchedule = new Schedule
     copySchedule.setRoot(copyRoot)
+    copySchedule.setRate(schedule.getRate)
     copySchedule
   }
 

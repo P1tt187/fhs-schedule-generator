@@ -79,7 +79,10 @@ class ScheduleGeneratorActor extends Actor {
 
         if (Calendar.getInstance.after(endTime)) {
           optimalSchedule match {
-            case Some(schedule) => theSender ! ScheduleAnswer(schedule, rate(ERaters.WISHTIME_RATER))
+            case Some(schedule) =>
+              schedule.setSemester(semester)
+              schedule.setRate(rate(ERaters.WISHTIME_RATER))
+              theSender ! ScheduleAnswer(schedule)
             case None => theSender ! InplacebleSchedule(lectures.sortBy(_.getDifficulty.multiply(BigInteger.valueOf(-1))).take(20))
           }
           return
@@ -114,12 +117,14 @@ class ScheduleGeneratorActor extends Actor {
                 Random.shuffle(lectures).take(randomRatio).foreach(_.increaseDifficultLevel())
                 0
               } else {
+
                 if (newRate(ERaters.WISHTIME_RATER) - rate(ERaters.WISHTIME_RATER) <= 3) {
                   Random.shuffle(lectures).take(randomRatio).foreach(_.increaseDifficultLevel())
                   0
                 } else {
                   iterationDeep + 1
                 }
+                //iterationDeep + 1
               }
             }
 

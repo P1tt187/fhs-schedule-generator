@@ -39,13 +39,14 @@ object CExporter extends Controller {
 
           subjectCriterion.createCriteria("courses").setFetchMode("groups", FetchMode.JOIN)
 
-          val subjects = subjectCriterion.list().asInstanceOf[JavaList[AbstractSubject]]
+          //val subjects = subjectCriterion.list().asInstanceOf[JavaList[AbstractSubject]]
 
           val weekdayTemplates = session.createCriteria(classOf[WeekdayTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[WeekdayTemplate]]
 
           val jsonContainer = new JsonContainer
           jsonContainer.setHouses(houses)
-          jsonContainer.setSubjects(subjects)
+          //jsonContainer.setSubjects(subjects)
+          jsonContainer.setSubjects(List[AbstractSubject]())
           jsonContainer.setWeekdayTemplates(weekdayTemplates)
           jsonContainer
       }

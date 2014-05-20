@@ -9,10 +9,11 @@ import models.fhs.pages.JavaList
 import models.persistence.template.TimeSlotTemplate
 import scala.annotation.tailrec
 import models.persistence.scheduletree.{Weekday, TimeSlot}
-import models.persistence.participants.Course
+import models.persistence.participants.{Participant, Course}
 import scala.Some
 import org.hibernate.FetchMode
 import play.api.Logger
+import models.persistence.lecture.Lecture
 
 
 /**
@@ -129,7 +130,7 @@ object MGenerator {
   }
 
   def persistSchedule(schedule: Schedule): Boolean = {
-    if(schedule==null){
+    if (schedule == null) {
       return false
     }
     try {
@@ -138,7 +139,19 @@ object MGenerator {
 
           val oldSchedule = session.createCriteria(classOf[Schedule]).add(Restrictions.eq("semester", schedule.getSemester)).uniqueResult().asInstanceOf[Schedule]
 
-          if(oldSchedule!=null) {
+          if (oldSchedule != null) {
+
+            oldSchedule.getRoot.getChildren.par.foreach {
+              case wd: Weekday =>
+                wd.getChildren.foreach {
+                  case ts: TimeSlot =>
+                    ts.getLectures.foreach {
+                      case l: Lecture => l.setDocents(Set[Docent]())
+                        l.setParticipants(Set[Participant]())
+                    }
+                }
+            }
+            session.saveOrUpdate(oldSchedule)
             session.delete(oldSchedule)
           }
           session.saveOrUpdate(schedule)
