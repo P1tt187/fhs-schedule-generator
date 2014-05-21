@@ -61,6 +61,17 @@ object CGenerate extends Controller {
 
   val NAV = "GENERATOR"
 
+  def loadScheduleForSemester(id: Long) = Action {
+   implicit request=>
+    val parts = request.session.get("lastchoosen").getOrElse("-1,10,10,50").split(",").toSeq
+
+     Logger.debug("lastChoosen " + parts)
+    schedule = findScheduleForSemester(findSemesterById(id))
+    hasError = false
+    actorFinished = true
+    Redirect(routes.CGenerate.page()).withSession("lastchoosen" -> (Seq(id.toString) ++ parts.diff(Seq(parts(0)))).mkString(",") )
+  }
+
   def page() = Action {
     implicit request =>
 

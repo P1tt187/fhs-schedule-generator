@@ -4,13 +4,12 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 /**
- * Created by fabian on 28.01.14.
+ * @author fabian
+ *         on 28.01.14.
+ *         the root node of the scheduletree
+ *         containing a list of Weekdays
  */
 @Entity
 @Table(name = "TBLROOT")
-/**
- * the root node of the scheduletree
- * containing a list of Weekdays
- */
 public class Root extends Node {
 }

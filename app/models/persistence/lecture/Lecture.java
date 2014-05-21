@@ -1,8 +1,8 @@
 package models.persistence.lecture;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import models.persistence.Docent;
 import models.persistence.criteria.CriteriaContainer;
+import models.persistence.docents.LectureDocent;
 import models.persistence.enumerations.EDuration;
 import models.persistence.enumerations.ELectureKind;
 import models.persistence.location.RoomEntity;
@@ -40,10 +40,9 @@ public class Lecture extends AbstractLecture {
     /**
      * docents for this lecture
      */
-    @Fetch(FetchMode.SUBSELECT)
-    @ManyToMany(fetch = FetchType.EAGER, targetEntity = Docent.class )
-    //@JoinTable(name="TBLLECTURE_TBLDOCENT", joinColumns = {@JoinColumn(name="docent_ID")} )
-    private Set<Docent> docents;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name="TBLLECTURE_DOCENTS")
+    private Set<LectureDocent> docents;
     /**
      * room for this lecture
      */
@@ -60,7 +59,7 @@ public class Lecture extends AbstractLecture {
     /**
      * criterias of this lecture
      */
-    @ManyToOne(targetEntity = CriteriaContainer.class, cascade = CascadeType.ALL)
+    @Transient
     private CriteriaContainer criteriaContainer;
 
     /**
@@ -224,11 +223,11 @@ public class Lecture extends AbstractLecture {
         this.participants = participants;
     }
 
-    public Set<Docent> getDocents() {
+    public Set<LectureDocent> getDocents() {
         return docents;
     }
 
-    public void setDocents(Set<Docent> docent) {
+    public void setDocents(Set<LectureDocent> docent) {
         this.docents = docent;
     }
 

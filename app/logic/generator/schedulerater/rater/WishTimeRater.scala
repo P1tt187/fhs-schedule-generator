@@ -4,10 +4,10 @@ import models.persistence.scheduletree.TimeSlot
 import models.persistence.lecture.Lecture
 import scala.collection.JavaConversions._
 import models.Transactions
-import models.persistence.Docent
 import org.hibernate.criterion.CriteriaSpecification
 import models.persistence.criteria.DocentTimeWish
 import models.persistence.enumerations.EDocentTimeKind
+import models.persistence.docents.Docent
 
 
 /**
@@ -31,7 +31,8 @@ class WishTimeRater extends Rater {
 
         val slots = timeSlots.filter{
           ts=>
-            !ts.getLectures.find(_.getDocents.contains(d)).isEmpty
+            /** find all timeslots which contains docent */
+            !ts.getLectures.find(!_.getDocents.find(_.compareTo(d)==0).isEmpty).isEmpty
 
         }
 
@@ -41,7 +42,7 @@ class WishTimeRater extends Rater {
 
         }.map{
           ts=>
-          ts.getLectures.filter(_.getDocents.contains(d)).head.asInstanceOf[Lecture]
+          ts.getLectures.filter(!_.getDocents.find(_.compareTo(d)==0).isEmpty).head.asInstanceOf[Lecture]
         }
 
     }.toSet

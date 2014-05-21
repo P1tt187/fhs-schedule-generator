@@ -13,11 +13,11 @@ import models.Transactions
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCriteria}
 import models.persistence.enumerations.EDuration
 import models.persistence.participants.Course
-import models.persistence.Docent
 import models.persistence.location.{RoomEntity, RoomAttributesEntity, HouseEntity}
 import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
+import models.persistence.docents.Docent
 
 /**
  * @author fabian 

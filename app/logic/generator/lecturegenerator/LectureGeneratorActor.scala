@@ -44,7 +44,7 @@ class LectureGeneratorActor extends Actor {
 
               def initLectureLecture: Lecture = {
                 val lecture = new Lecture
-                lecture.setDocents(cloner.deepClone(lectureSubject.getDocents))
+                lecture.setDocents(lectureSubject.getDocents.map(_.docent2LectureDocent()))
                 lecture.setParticipants(Set[Participant]() ++ lectureSubject.getCourses)
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(lectureSubject.getName)
@@ -97,7 +97,7 @@ class LectureGeneratorActor extends Actor {
               def initExerciseLecture(groups: List[Group]): Lecture = {
                 val lecture = new Lecture
                 lecture.setParticipants(Set[Participant]() ++ groups)
-                lecture.setDocents(cloner.deepClone(exerciseSubject.getDocents))
+                lecture.setDocents(exerciseSubject.getDocents.map(_.docent2LectureDocent()))
                 lecture.setCriteriaContainer(exerciseSubject.getCriteriaContainer)
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(exerciseSubject.getName)

@@ -10,9 +10,10 @@ import models.persistence.participants.{Group, Course}
 import org.hibernate.criterion.Restrictions
 import java.util
 import scala.collection.JavaConversions._
-import models.persistence.{Semester, Docent}
+import models.persistence.Semester
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer}
 import models.persistence.enumerations.EDuration
+import models.persistence.docents.Docent
 
 /**
  * @author fabian

@@ -3,17 +3,17 @@ package models.fhs.pages.generator
 import models.Transactions
 import org.hibernate.criterion._
 import scala.collection.JavaConversions._
-import models.persistence.{Docent, Schedule, Semester}
+import models.persistence.{Schedule, Semester}
 import models.persistence.subject.AbstractSubject
 import models.fhs.pages.JavaList
 import models.persistence.template.TimeSlotTemplate
 import scala.annotation.tailrec
 import models.persistence.scheduletree.{Weekday, TimeSlot}
-import models.persistence.participants.{Participant, Course}
+import models.persistence.participants.Course
 import scala.Some
 import org.hibernate.FetchMode
 import play.api.Logger
-import models.persistence.lecture.Lecture
+import models.persistence.docents.Docent
 
 
 /**
@@ -129,28 +129,24 @@ object MGenerator {
     }
   }
 
+
+  def findScheduleForSemester(semester: Semester): Schedule = {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[Schedule]).add(Restrictions.eq("semester", semester)).uniqueResult().asInstanceOf[Schedule]
+    }
+  }
+
   def persistSchedule(schedule: Schedule): Boolean = {
     if (schedule == null) {
       return false
     }
     try {
+      val oldSchedule = findScheduleForSemester(schedule.getSemester)
       Transactions.hibernateAction {
         implicit session =>
 
-          val oldSchedule = session.createCriteria(classOf[Schedule]).add(Restrictions.eq("semester", schedule.getSemester)).uniqueResult().asInstanceOf[Schedule]
-
           if (oldSchedule != null) {
-
-            oldSchedule.getRoot.getChildren.par.foreach {
-              case wd: Weekday =>
-                wd.getChildren.foreach {
-                  case ts: TimeSlot =>
-                    ts.getLectures.foreach {
-                      case l: Lecture => l.setDocents(Set[Docent]())
-                        l.setParticipants(Set[Participant]())
-                    }
-                }
-            }
             session.saveOrUpdate(oldSchedule)
             session.delete(oldSchedule)
           }

@@ -4,12 +4,13 @@ import models.Transactions
 import scala.collection.JavaConversions._
 import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
 import org.hibernate.criterion.{Order, CriteriaSpecification, Restrictions}
-import models.persistence.{Semester, Docent}
+import models.persistence.Semester
 import models.persistence.participants.Course
 import models.persistence.location.{RoomEntity, HouseEntity, RoomAttributesEntity}
 import org.hibernate.FetchMode
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer}
 import play.api.Logger
+import models.persistence.docents.Docent
 
 /**
  * @author fabian 

@@ -3,13 +3,13 @@ package logic.generator.schedulegenerator.placingprocessor
 import models.persistence.scheduletree.TimeSlot
 import models.persistence.lecture.{AbstractLecture, Lecture}
 import models.persistence.location.RoomEntity
-import models.persistence.Docent
 import scala.annotation.tailrec
 import models.persistence.criteria.{DocentTimeWish, RoomCriteria, TimeSlotCriteria}
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 import models.persistence.participants.{Course, Group, Participant}
 import models.persistence.enumerations.EDuration
+import models.persistence.docents.LectureDocent
 
 /**
  * @author fabian 
@@ -91,7 +91,7 @@ trait PlacingProcessor {
 
   private def containsInSubGroups(group: Group, participants: mutable.Buffer[Participant]): Boolean = {
 
-    if (participants.contains(group)  ) {
+    if (participants.contains(group)) {
       return true
     }
 
@@ -102,13 +102,13 @@ trait PlacingProcessor {
     !group.getSubGroups.find(subgroup => containsInSubGroups(subgroup, participants)).isEmpty
   }
 
-  protected def timeSlotContainsDocents(timeslot: TimeSlot, docents: Set[Docent]): Boolean = {
+  protected def timeSlotContainsDocents(timeslot: TimeSlot, docents: Set[LectureDocent]): Boolean = {
     if (timeslot.getLectures.isEmpty) {
       return false
     }
 
     @tailrec
-    def checkRecursive(docents: Set[Docent], existingDocents: mutable.Buffer[Docent]): Boolean = {
+    def checkRecursive(docents: Set[LectureDocent], existingDocents: mutable.Buffer[LectureDocent]): Boolean = {
       if (existingDocents.isEmpty) {
         return false
       }
@@ -128,14 +128,14 @@ trait PlacingProcessor {
     allTimeslots.find(t => t.getDuration != timeSlot.getDuration && t.compareTo(timeSlot) == 0).get
   }
 
-  protected def filterTimeWishes(docents: Set[Docent]): Set[TimeSlotCriteria] = {
+  protected def filterTimeWishes(docents: Set[LectureDocent]): Set[TimeSlotCriteria] = {
 
     if (docents.size == 1) {
       return docents.head.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).toSet.asInstanceOf[Set[TimeSlotCriteria]]
     }
 
     @tailrec
-    def checkTimeWishes(timeWish: DocentTimeWish, docents: Set[Docent]): Boolean = {
+    def checkTimeWishes(timeWish: DocentTimeWish, docents: Set[LectureDocent]): Boolean = {
       if (docents.isEmpty) {
         return true
       }
@@ -218,7 +218,7 @@ trait PlacingProcessor {
     timeCriterias.count(timeslot.isInTimeSlotCriteria) > 0
   }
 
-  protected def getRoomCriteriasFromDocents(docents: List[Docent]) = {
+  protected def getRoomCriteriasFromDocents(docents: List[LectureDocent]) = {
     docents.flatMap {
       d => d.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).toList.asInstanceOf[List[RoomCriteria]]
     }

@@ -1,6 +1,7 @@
 package models.persistence;
 
 import logic.helpers.ScheduleHelper;
+import models.persistence.docents.Docent;
 import models.persistence.participants.Course;
 import models.persistence.scheduletree.Root;
 

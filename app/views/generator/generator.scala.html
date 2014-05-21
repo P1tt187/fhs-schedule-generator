@@ -1,4 +1,5 @@
-@(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm], courses:List[models.persistence.participants.Course] , docents:List[persistence.Docent])(implicit flash: Flash)
+@(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm], courses:List[models.persistence.participants.Course] , docents:List[persistence.docents.Docent])(implicit flash: Flash)
+
 
 @import java.util.Calendar
 @import helper._
@@ -42,6 +43,13 @@
     </div>
         <div class="clearfix"></div>
         <br />
+    <script>
+    $('#refreshBtn' ).on('click', function(){
+    $(location).attr('href','loadSchedule/' + $('#' +'@formGenerator("id" ).id' ).val());
+
+    });
+    </script>
+
         @if(flash.get("startpolling").getOrElse("false").toBoolean) {
             <div class="row-fluid">
                 <div id="progressBarContainer" class="col-md-5">

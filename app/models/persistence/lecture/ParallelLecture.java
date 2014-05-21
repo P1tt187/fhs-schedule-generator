@@ -1,6 +1,6 @@
 package models.persistence.lecture;
 
-import models.persistence.Docent;
+import models.persistence.docents.LectureDocent;
 import models.persistence.location.RoomEntity;
 import models.persistence.participants.Participant;
 
@@ -10,13 +10,16 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by fabian on 28.01.14.
+ * @author fabian
+ *         on 28.01.14.
  */
 @Entity
-@Table(name = "TBLPARALLELLECTURE")
+@Table(name = "TBLLECTURE_PARALLEL")
 public class ParallelLecture extends AbstractLecture {
 
-    // @JoinColumn(name = "fk_lecture")
+    /**
+     * lectures in this parallel lecture
+     */
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, targetEntity = Lecture.class)
     private List<Lecture> lectures;
 
@@ -29,8 +32,8 @@ public class ParallelLecture extends AbstractLecture {
     }
 
     @Override
-    public Set<Docent> getDocents() {
-        return new HashSet<Docent>() {{
+    public Set<LectureDocent> getDocents() {
+        return new HashSet<LectureDocent>() {{
             for (Lecture l : lectures) {
                 addAll(l.getDocents());
             }

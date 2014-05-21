@@ -2,7 +2,7 @@ package models.persistence.lecture;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import models.persistence.AbstractEntity;
-import models.persistence.Docent;
+import models.persistence.docents.LectureDocent;
 import models.persistence.location.RoomEntity;
 import models.persistence.participants.Participant;
 
@@ -13,16 +13,17 @@ import javax.persistence.Table;
 import java.util.Set;
 
 /**
- * Created by fabian on 28.01.14.
+ * @author fabian
+ *         on 28.01.14.
  */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name="TBLALECTURE")
+@Table(name = "TBLLECTURE_ABSTRACT")
 public abstract class AbstractLecture extends AbstractEntity {
 
 
     @JsonIgnore
-    public abstract Set<Docent> getDocents();
+    public abstract Set<LectureDocent> getDocents();
 
     @JsonIgnore
     public abstract Set<Participant> getParticipants();

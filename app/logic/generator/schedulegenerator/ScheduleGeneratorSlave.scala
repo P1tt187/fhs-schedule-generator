@@ -52,6 +52,7 @@ class ScheduleGeneratorSlave extends Actor {
     val root = new Root
 
     root.setChildren(weekdays)
+    weekdays.foreach(_.setParent(root))
 
     val allTimeSlots = root.getChildren.flatMap(_.getChildren).toList.asInstanceOf[List[TimeSlot]]
 

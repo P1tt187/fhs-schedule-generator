@@ -1,6 +1,5 @@
 package models.fhs.pages.editdocents
 
-import models.persistence.Docent
 import models.persistence.criteria._
 import models.Transactions
 import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
@@ -12,6 +11,7 @@ import models.persistence.template.WeekdayTemplate
 import models.persistence.enumerations.{EDocentTimeKind, EDuration}
 import models.fhs.pages.roomdefinition.MRoomdefintion
 import models.persistence.subject.AbstractSubject
+import models.persistence.docents.Docent
 
 
 /**

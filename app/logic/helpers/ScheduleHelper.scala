@@ -1,9 +1,10 @@
 package logic.helpers
 
-import models.persistence.{Docent, Schedule}
+import models.persistence.Schedule
 import models.persistence.participants.Course
 import models.persistence.scheduletree._
 import scala.collection.JavaConversions._
+import models.persistence.docents.Docent
 
 /**
  * @author fabian 
@@ -86,7 +87,7 @@ object ScheduleHelper {
 
             val theLectures = ts.getLectures.filter {
               lecture =>
-                lecture.getDocents.contains(docent)
+                !lecture.getDocents.find(_.compareTo(docent) ==0 ).isEmpty
             }
 
             val newTs = ts match {
