@@ -56,7 +56,7 @@
                 </td>
                 @for(day <- CTimeslotDefintion.WEEKDAYS) {
                     <td >
-                        <div style="max-height: 350px;  overflow:auto; display:compact">
+                        <div style=" overflow:auto; display:compact">
                         @for(lecture <- timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt).flatMap(_.getLectures.toList) ) {
                             <div class="panel panel-info smallText" >
                                @displayAbstractLecture(lecture)
