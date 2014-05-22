@@ -244,10 +244,19 @@ public class Lecture extends AbstractLecture {
         for (int i = 0; i < name.length(); i++) {
             if (Character.isUpperCase(name.charAt(i)) || Character.isDigit(name.charAt(i)) || name.charAt(i) == ' ' || name.charAt(i) == '/' || name.charAt(i) == '+' || name.charAt(i) == '-') {
                 sb.append(name.charAt(i));
+
+                if (Character.isUpperCase(name.charAt(i))) {
+                    for (int j = i; j < i + 3 && j < name.length(); j++) {
+                        if (Character.isLowerCase(name.charAt(j))) {
+                            sb.append(name.charAt(j));
+                        }
+                    }
+                }
             }
         }
 
-        return sb.toString().replaceAll("Ä","AE").replaceAll("Ö","OE").replaceAll("Ü","UE");
+        return sb.toString().trim();
+        //return sb.toString().replaceAll("Ä","AE").replaceAll("Ö","OE").replaceAll("Ü","UE").trim();
     }
 
     @Override

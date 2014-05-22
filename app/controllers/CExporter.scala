@@ -22,6 +22,8 @@ import models.persistence.lecture.Lecture
 import models.persistence.enumerations.ELectureKind
 import play.api.libs.json._
 import java.nio.charset.Charset
+import java.nio.file.attribute.PosixFilePermissions
+
 
 /**
  * @author fabian 
@@ -70,13 +72,13 @@ object CExporter extends Controller {
     def timeSlotToString(timeSlot: TimeSlot) = {
       val sb = new StringBuilder
 
-      sb append timeSlot.getStartHour.formatted("%2d")
+      sb append timeSlot.getStartHour.formatted("%02d")
       sb append "."
-      sb append timeSlot.getStartMinute.formatted("%2d")
+      sb append timeSlot.getStartMinute.formatted("%02d")
       sb append "-"
-      sb append timeSlot.getStopHour.formatted("%2d")
+      sb append timeSlot.getStopHour.formatted("%02d")
       sb append "."
-      sb append timeSlot.getStopMinute.formatted("%2d")
+      sb append timeSlot.getStopMinute.formatted("%02d")
       sb.toString
     }
 
@@ -86,11 +88,14 @@ object CExporter extends Controller {
     val path = Files.createTempDirectory("schedule" + semester.getName.replaceAll("/", "") + System.currentTimeMillis())
     val weekDays = Map((1, "Montag"), (2, "Dienstag"), (3, "Mittwoch"), (4, "Donnerstag"), (5, "Freitag"), (6, "Samstag"), (0, "Sonntag"))
 
+    val importScriptFile = Files.createFile(Paths.get(path.toString,"import.sh"))
+
+    var firstRun = true
 
     Transactions.hibernateAction {
       implicit s =>
         val courses = s.createCriteria(classOf[Course]).list().asInstanceOf[JavaList[Course]]
-        courses.par.foreach {
+        var importCommands = courses.par.map {
           course =>
 
             val tmpFile = Files.createFile(Paths.get(path.toString, course.getName.toLowerCase + ".json"))
@@ -131,20 +136,27 @@ object CExporter extends Controller {
                       "place" -> Json.obj(
                         "building" -> lecture.getRoom.getHouse.getName,
                         "room" -> lecture.getRoom.getNumber
-                      ),
-                      "time" -> timeSlotToString(timeSlot),
-                      "week" -> lecture.getDuration.getShortName
-                    )
+                      )
+                    ),
+                    "time" -> timeSlotToString(timeSlot),
+                    "week" -> lecture.getDuration.getShortName
                   ),
-                  "classname" -> course.getShortName.toLowerCase,
                   "className" -> course.getShortName.toLowerCase,
                   "eventType" -> eventType,
-                  "group" -> group,
-                  "member" -> Json.obj(
-                    "fhs_id" -> "",
-                    "name" -> lecture.getDocents.map(_.getLastName).mkString(",")
-                  ),
-                  "titleLong" -> lecture.getName.replaceAll("Ä","AE").replaceAll("Ö","OE").replaceAll("Ü","UE"),
+                  "group" -> (if (group.isEmpty) {
+                    group
+                  } else {
+                    " " + group
+                  }),
+                  "member" ->
+                    lecture.getDocents.map {
+                      d =>
+                        Json.obj("fhs_id" -> "",
+                          "name" -> d.getLastName
+                        )
+                    }
+                  ,
+                  "titleLong" -> lecture.getName.replaceAll("Ä", "AE").replaceAll("Ö", "OE").replaceAll("Ü", "UE"),
                   "titleShort" -> lecture.getShortName
                 )
                 )
@@ -153,7 +165,28 @@ object CExporter extends Controller {
 
             Files.write(tmpFile, content, Charset.forName("UTF-8"), StandardOpenOption.WRITE)
 
-        }
+            val sb = new StringBuilder
+
+            sb append "mongoimport --db spirit_news --collection schedulerecords --type json --file "
+
+            sb append course.getShortName.toLowerCase
+            sb append ".json --jsonArray "
+
+            if (firstRun) {
+              firstRun = false
+              sb append "--drop"
+            }
+            sb.toString()
+        }.toList.sortBy(- _.length)
+
+        importCommands = "#/bin/bash" ::"echo \"\" > ./entrycountersFields.txt" ::"echo \"\" > ./entrysFields.txt" ::"mongoexport --db spirit_news --collection entrycounters --fieldFile entrycountersFields.txt --csv -o entrycounters.csv" ::"mongoexport --db spirit_news --collection entrys --fieldFile entrysFields.txt --csv -o entrys.csv" :: importCommands
+
+        importCommands = importCommands :+ "mongoimport --db spirit_news --collection entrycounters --type csv --file entrycounters.csv --fieldFile entrycountersFields.txt"
+
+        importCommands = importCommands :+ "mongoimport --db spirit_news --collection entrys --type csv --file entrys.csv --fieldFile entrysFields.txt"
+
+        Files.write(importScriptFile, importCommands, Charset.forName("UTF-8"), StandardOpenOption.WRITE)
+
     }
 
     Redirect(routes.CExporter.page())
