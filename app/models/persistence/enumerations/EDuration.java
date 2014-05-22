@@ -7,31 +7,43 @@ public enum EDuration {
     /**
      * enum constant
      */
-    WEEKLY(0),
+    WEEKLY(0, "w"),
 
     /**
      * enum constant
      */
-    UNWEEKLY(12),
+    UNWEEKLY(12, "uw"),
 
     /**
      * enum constant
      */
-    EVEN(0),
+    EVEN(0, "g"),
 
     /**
      * enum constant
      */
-    UNEVEN(0);
+    UNEVEN(0, "u");
 
-    /** sortindex */
+    /**
+     * sortindex
+     */
     private int sortIndex;
+    /**
+     * short name for schedule export
+     */
+    private String shortName;
 
     public int getSortIndex() {
         return sortIndex;
     }
 
-    EDuration(int sortIndex) {
-        this.sortIndex = sortIndex;
+    public String getShortName() {
+        return shortName;
     }
+
+    EDuration(int sortIndex, String shortName) {
+        this.sortIndex = sortIndex;
+        this.shortName = shortName;
+    }
+
 }

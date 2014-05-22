@@ -69,7 +69,8 @@ object CGenerate extends Controller {
     schedule = findScheduleForSemester(findSemesterById(id))
     hasError = false
     actorFinished = true
-    Redirect(routes.CGenerate.page()).withSession("lastchoosen" -> (Seq(id.toString) ++ parts.diff(Seq(parts(0)))).mkString(",") )
+
+    Redirect(routes.CGenerate.page()).withSession("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1,parts.size)).mkString(",") )
   }
 
   def page() = Action {

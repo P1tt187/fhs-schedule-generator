@@ -5,12 +5,16 @@ import models.persistence.participants.Course
 import models.persistence.scheduletree._
 import scala.collection.JavaConversions._
 import models.persistence.docents.Docent
+import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
+import models.persistence.lecture.Lecture
 
 /**
  * @author fabian 
  *         on 30.03.14.
  */
 object ScheduleHelper {
+
+  private lazy val cloner = new Cloner(new ObjenesisInstantiationStrategy)
 
   def filterCourse(schedule: Schedule, course: Course) = {
 
@@ -36,6 +40,12 @@ object ScheduleHelper {
               lecture =>
                 val courses = lecture.getParticipants.map(_.getCourse)
                 lecture.getParticipants.contains(course) || courses.contains(course)
+            }.map {
+              case lecture: Lecture =>
+                val copyLecture = cloner.deepClone(lecture)
+                copyLecture.setName(lecture.getLectureSynonyms.getOrDefault(course.getShortName, lecture.getName))
+                copyLecture
+              case p => p
             }
 
             val newTs = ts match {
@@ -87,7 +97,7 @@ object ScheduleHelper {
 
             val theLectures = ts.getLectures.filter {
               lecture =>
-                !lecture.getDocents.find(_.compareTo(docent) ==0 ).isEmpty
+                !lecture.getDocents.find(_.compareTo(docent) == 0).isEmpty
             }
 
             val newTs = ts match {

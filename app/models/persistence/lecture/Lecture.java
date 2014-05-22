@@ -33,7 +33,7 @@ public class Lecture extends AbstractLecture {
     /**
      * participants can be multiple courses or groups
      */
-    @ManyToMany( fetch = FetchType.EAGER, targetEntity = Participant.class )
+    @ManyToMany(fetch = FetchType.EAGER, targetEntity = Participant.class)
     @Fetch(FetchMode.SUBSELECT)
     private Set<Participant> participants;
 
@@ -41,7 +41,7 @@ public class Lecture extends AbstractLecture {
      * docents for this lecture
      */
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name="TBLLECTURE_DOCENTS")
+    @CollectionTable(name = "TBLLECTURE_DOCENTS")
     private Set<LectureDocent> docents;
     /**
      * room for this lecture
@@ -91,9 +91,8 @@ public class Lecture extends AbstractLecture {
 
     /**
      * this is just for debugging
-     *
+     * <p>
      * by setting 'schedule.show.outOfWishTime=on' it will be honored by the schedule presentation
-     *
      */
     @Transient
     private String notOptimalPlaced = "";
@@ -236,6 +235,19 @@ public class Lecture extends AbstractLecture {
         return new HashSet<RoomEntity>() {{
             add(room);
         }};
+    }
+
+    @JsonIgnore
+    public String getShortName() {
+        StringBuffer sb = new StringBuffer();
+
+        for (int i = 0; i < name.length(); i++) {
+            if (Character.isUpperCase(name.charAt(i)) || Character.isDigit(name.charAt(i)) || name.charAt(i) == ' ' || name.charAt(i) == '/' || name.charAt(i) == '+' || name.charAt(i) == '-') {
+                sb.append(name.charAt(i));
+            }
+        }
+
+        return sb.toString().replaceAll("Ä","AE").replaceAll("Ö","OE").replaceAll("Ü","UE");
     }
 
     @Override
