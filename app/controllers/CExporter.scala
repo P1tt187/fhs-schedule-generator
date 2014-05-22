@@ -15,14 +15,14 @@ import models.persistence.criteria.TimeSlotCriteria
 import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
 import models.fhs.pages.exporter.MExporter._
 import models.fhs.pages.generator.MGenerator._
-import java.nio.file.{Paths, StandardOpenOption, Files}
+import java.nio.file._
 import models.persistence.participants.{Group, Course}
 import models.persistence.scheduletree.{TimeSlot, Weekday}
 import models.persistence.lecture.Lecture
 import models.persistence.enumerations.ELectureKind
 import play.api.libs.json._
 import java.nio.charset.Charset
-import java.nio.file.attribute.PosixFilePermissions
+import java.net.URI
 
 
 /**
@@ -85,10 +85,18 @@ object CExporter extends Controller {
 
     val semester = findSemester(id)
     val schedule = findScheduleForSemester(semester)
-    val path = Files.createTempDirectory("schedule" + semester.getName.replaceAll("/", "") + System.currentTimeMillis())
+    val fileName = "schedule" + semester.getName.replaceAll("/", "") + System.currentTimeMillis()
+    val path = Files.createTempDirectory(fileName)
+
+    val env = Map("create" -> "true")
+    val zipUri = URI.create(("jar:file:" + path.getParent.toString + "/" + fileName + ".zip").replaceAll(" ", ""))
+    val zipFs = FileSystems.newFileSystem(zipUri, env)
+
+
+
     val weekDays = Map((1, "Montag"), (2, "Dienstag"), (3, "Mittwoch"), (4, "Donnerstag"), (5, "Freitag"), (6, "Samstag"), (0, "Sonntag"))
 
-    val importScriptFile = Files.createFile(Paths.get(path.toString,"import.sh"))
+    val importScriptFile = Files.createFile(Paths.get(path.toString, "import.sh"))
 
     var firstRun = true
 
@@ -172,14 +180,18 @@ object CExporter extends Controller {
             sb append course.getShortName.toLowerCase
             sb append ".json --jsonArray "
 
-            if (firstRun) {
+            if (firstRun && !content.head.trim.equals("[]")) {
               firstRun = false
               sb append "--drop"
             }
-            sb.toString()
-        }.toList.sortBy(- _.length)
+            if(content.head.trim.equals("[]")){
+              sb append "NOIMPORT"
+            }
 
-        importCommands = "#/bin/bash" ::"echo \"\" > ./entrycountersFields.txt" ::"echo \"\" > ./entrysFields.txt" ::"mongoexport --db spirit_news --collection entrycounters --fieldFile entrycountersFields.txt --csv -o entrycounters.csv" ::"mongoexport --db spirit_news --collection entrys --fieldFile entrysFields.txt --csv -o entrys.csv" :: importCommands
+            sb.toString()
+        }.toList.filterNot(_.endsWith("NOIMPORT")).sortBy(-_.length)
+
+        importCommands = "#!/bin/bash" :: "echo \"\" > ./entrycountersFields.txt" :: "echo \"\" > ./entrysFields.txt" :: "mongoexport --db spirit_news --collection entrycounters --fieldFile entrycountersFields.txt --csv -o entrycounters.csv" :: "mongoexport --db spirit_news --collection entrys --fieldFile entrysFields.txt --csv -o entrys.csv" :: importCommands
 
         importCommands = importCommands :+ "mongoimport --db spirit_news --collection entrycounters --type csv --file entrycounters.csv --fieldFile entrycountersFields.txt"
 
@@ -187,9 +199,22 @@ object CExporter extends Controller {
 
         Files.write(importScriptFile, importCommands, Charset.forName("UTF-8"), StandardOpenOption.WRITE)
 
+        Files.newDirectoryStream(path).foreach {
+          p =>
+            val zipPath = zipFs.getPath("/", p.getFileName.toString)
+            Files.copy(p, zipPath)
+            Files.delete(p)
+        }
+        zipFs.close()
+        Files.delete(path)
+        val fileContent = Paths.get(path.getParent.toString, ("/" + fileName + ".zip").replaceAll(" ", "")).toFile
+
+        fileContent.deleteOnExit()
+
+        Ok.sendFile(content = fileContent, fileName = _ => semester.getName.replaceAll("/","") + ".zip")
     }
 
-    Redirect(routes.CExporter.page())
+
   }
 
 
