@@ -242,7 +242,7 @@ public class Lecture extends AbstractLecture {
         StringBuffer sb = new StringBuffer();
 
         for (int i = 0; i < name.length(); i++) {
-            if (Character.isUpperCase(name.charAt(i)) || Character.isDigit(name.charAt(i)) || name.charAt(i) == ' ' || name.charAt(i) == '/' || name.charAt(i) == '+' || name.charAt(i) == '-') {
+            if (Character.isUpperCase(name.charAt(i)) || Character.isDigit(name.charAt(i)) || name.charAt(i) == '/' || name.charAt(i) == '+' || name.charAt(i) == '-') {
                 sb.append(name.charAt(i));
 
                 if (Character.isUpperCase(name.charAt(i))) {
@@ -255,7 +255,7 @@ public class Lecture extends AbstractLecture {
             }
         }
 
-        return sb.toString().trim();
+        return sb.toString().replaceAll("AE","Ä").replaceAll("OE","Ö").replaceAll("UE","Ü").trim();
         //return sb.toString().replaceAll("Ä","AE").replaceAll("Ö","OE").replaceAll("Ü","UE").trim();
     }
 

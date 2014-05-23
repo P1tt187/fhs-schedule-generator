@@ -27,14 +27,15 @@ import models.persistence.template.TimeSlotTemplate
 import org.hibernate.criterion.CriteriaSpecification
 import java.util.Calendar
 import models.persistence.lecture.Lecture
+import logic.generator.lecturegenerator.{LectureAnswer, GenerateLectures, LectureGeneratorActor}
+import scala.collection.mutable.Buffer
+import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
 
 /**
  * @author fabian 
  *         on 20.03.14.
  */
 object CGenerate extends Controller {
-
-  private var scheduleFuture: Future[Any] = null
 
   private var schedule: Schedule = null
 
@@ -50,8 +51,13 @@ object CGenerate extends Controller {
 
   private var errorList: List[Lecture] = null
 
+  private lazy val schedules = Buffer[Schedule]()
+
+  private lazy val scheduleFutures = Buffer[Future[Any]]()
+
   val form: Form[GeneratorForm] = Form(
     mapping("id" -> longNumber,
+      "threads" -> number(min = 1),
       "time" -> number(min = 0),
       "randomRatio" -> number(min = 0),
       "maxIterationDeep" -> number(min = 0)
@@ -62,15 +68,15 @@ object CGenerate extends Controller {
   val NAV = "GENERATOR"
 
   def loadScheduleForSemester(id: Long) = Action {
-   implicit request=>
-    val parts = request.session.get("lastchoosen").getOrElse("-1,10,10,50").split(",").toSeq
+    implicit request =>
+      val parts = request.session.get("lastchoosen").getOrElse("-1,2,10,10,50").split(",").toSeq
 
-     Logger.debug("lastChoosen " + parts)
-    schedule = findScheduleForSemester(findSemesterById(id))
-    hasError = false
-    actorFinished = true
+      Logger.debug("lastChoosen " + parts)
+      schedule = findScheduleForSemester(findSemesterById(id))
+      hasError = false
+      actorFinished = true
 
-    Redirect(routes.CGenerate.page()).withSession("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1,parts.size)).mkString(",") )
+      Redirect(routes.CGenerate.page()).withSession("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(","))
   }
 
   def page() = Action {
@@ -92,11 +98,12 @@ object CGenerate extends Controller {
         case Some(value) =>
           val parts = value.split(",")
           val idString = parts(0).toLong
-          val time = parts(1).toInt
-          val randomRatio = parts(2).toInt
-          val maxIterationDeep = parts(3).toInt
-          form.fill(GeneratorForm(idString, time, randomRatio, maxIterationDeep))
-        case None => form.fill(GeneratorForm(-1, 10, 10, 50))
+          val threads = parts(1).toInt
+          val time = parts(2).toInt
+          val randomRatio = parts(3).toInt
+          val maxIterationDeep = parts(4).toInt
+          form.fill(GeneratorForm(idString, threads, time, randomRatio, maxIterationDeep))
+        case None => form.fill(GeneratorForm(-1, 2, 10, 10, 50))
       }
 
       Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses(), findDocents())(flashing))
@@ -107,6 +114,8 @@ object CGenerate extends Controller {
   }
 
   def finished = Action {
+
+
     val json = Json.stringify(Json.obj("result" -> actorFinished, "error" -> hasError))
     Ok(json)
   }
@@ -151,41 +160,66 @@ object CGenerate extends Controller {
           actorFinished = false
           hasError = false
           schedule = null
+          schedules.clear()
+          scheduleFutures.clear()
+
           val subjects = findActiveSubjectsBySemesterId(result.id)
           val semester = findSemesterById(result.id)
           startTime = Calendar.getInstance()
 
+          val cloner = new Cloner(new ObjenesisInstantiationStrategy)
+
           implicit val timeout = Timeout(result.time + 1 minutes)
 
-          val generatorActor = Akka.system.actorOf(Props[ScheduleGeneratorActor])
+          val lectureGeneratorActor = Akka.system.actorOf(Props[LectureGeneratorActor])
+
+          val lectureFuture = lectureGeneratorActor?GenerateLectures(subjects)
+
           val endTime = Calendar.getInstance()
           endTime.add(Calendar.MINUTE, result.time)
-          scheduleFuture = ask(generatorActor, GenerateSchedule(subjects, semester, endTime, result.randomRatio, result.maxIterationDeep))
+          lectureFuture.onSuccess{
+            case LectureAnswer(lecturesAnswer)=>
+              (1 to result.threads).foreach{
+                i=>
+                  val generatorActor = Akka.system.actorOf(Props[ScheduleGeneratorActor])
+
+                  val scheduleFuture = ask(generatorActor, GenerateSchedule(cloner.deepClone(lecturesAnswer), semester, endTime, result.randomRatio, result.maxIterationDeep))
+                  scheduleFutures+=scheduleFuture
+
+                  scheduleFuture.onSuccess {
+                    case ScheduleAnswer(theSchedule) =>
+
+                      schedules+=theSchedule
+
+                      val completetList =  scheduleFutures.map(_.isCompleted).toSet
+                      actorFinished = completetList.size==1 && completetList.head
+
+                      if(actorFinished){
+                        schedule = schedules.sortBy(_.getRate.toInt).head
+                      }
+
+                      finishTime = Calendar.getInstance()
+                      end = null
+                      Logger.debug("created in " + (finishTime.getTimeInMillis - startTime.getTimeInMillis) + "ms")
+
+                    case InplacebleSchedule(lectures) => errorList = lectures
+                      hasError = true
+                      actorFinished = true
+                  }
+
+                  scheduleFuture.onFailure {
+                    case e: Exception =>
+                      generatorActor ! PoisonPill
+                      end = null
+
+                  }
+              }
+          }
           end = endTime
-          scheduleFuture.onSuccess {
-            case ScheduleAnswer(theSchedule) => this.schedule = theSchedule
-
-              actorFinished = true
-              finishTime = Calendar.getInstance()
-              end = null
-              Logger.debug("created in " + (finishTime.getTimeInMillis - startTime.getTimeInMillis) + "ms")
-
-            case InplacebleSchedule(lectures) => errorList = lectures
-              hasError = true
-              actorFinished = true
-          }
-
-          scheduleFuture.onFailure {
-            case e: Exception =>
-              generatorActor ! PoisonPill
-              end = null
-
-          }
-
           //Logger.debug(findActiveSubjectsBySemesterId(result.id).mkString("\n") )
 
           Redirect(routes.CGenerate.page()).flashing("startpolling" -> "true", "generating" -> "disabled")
-            .withSession("lastchoosen" -> Seq(result.id, result.time, result.randomRatio, result.maxIterationDeep).mkString(","))
+            .withSession("lastchoosen" -> Seq(result.id, result.threads, result.time, result.randomRatio, result.maxIterationDeep).mkString(","))
         }
 
       )

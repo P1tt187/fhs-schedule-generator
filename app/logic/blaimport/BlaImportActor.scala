@@ -227,7 +227,7 @@ class BlaImportActor extends Actor {
         if (line.startsWith("klv(")) {
           val part = line.substring(4).replace("\"", "").split(",")
           val course = part(0)
-          val subjectName = part(1)
+          val subjectName = part(1).replaceAll("AE","Ä").replaceAll("OE","Ö").replaceAll("UE","Ü").trim()
           //val lehrveranstaltungSchluessel = part(2)
           val semester = part(3)
           val docent = part(4)

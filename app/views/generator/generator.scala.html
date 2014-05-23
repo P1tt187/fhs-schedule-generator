@@ -21,6 +21,8 @@
 
                 <fieldset id="generatorFieldset" @flash.get("generating").getOrElse("") >
                     @inputText(formGenerator("time"), '_label -> "Wie lange (Minuten)", '_class -> "form-group", '_help -> "")
+                    @inputText(formGenerator("threads"), '_label->"Wieviele Threads?" , '_class -> "form-group", '_help -> "")
+                    <div class="clearfix"></div>
                     @inputText(formGenerator("randomRatio"), '_label->"Würfelstärke", '_class -> "form-group", '_help -> "")
                     @inputText(formGenerator("maxIterationDeep"), '_label->"Maximale Iterationstiefe", '_class -> "form-group",'_help -> "")
                     <div class="clearfix"></div>

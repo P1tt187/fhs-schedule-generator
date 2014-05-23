@@ -4,7 +4,7 @@ import akka.actor.{PoisonPill, Props, Actor}
 import akka.util.Timeout
 import scala.concurrent.duration._
 import akka.pattern.ask
-import logic.generator.lecturegenerator.{LectureAnswer, GenerateLectures, LectureGeneratorActor}
+import logic.generator.lecturegenerator.LectureGeneratorActor
 import scala.concurrent.Await
 import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -58,17 +58,8 @@ class ScheduleGeneratorActor extends Actor {
 
   override def receive = {
 
-    case GenerateSchedule(subjectList, semester, endTime, randomRatio, maxIterationDeep) =>
+    case GenerateSchedule(lectures, semester, endTime, randomRatio, maxIterationDeep) =>
 
-      val lectureGenerationActor = context.actorOf(Props[LectureGeneratorActor])
-
-      val lectureFuture = ask(lectureGenerationActor, GenerateLectures(subjectList)).mapTo[LectureAnswer]
-
-      val lectures = Await.result(lectureFuture, TIMEOUT_VAL seconds).lectures
-
-      //Logger.debug("lectures: \n" + lectures.mkString("\n"))
-
-      cloner.setCloningEnabled(true)
 
       //val scheduleFuture = context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures))
 

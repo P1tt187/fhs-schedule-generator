@@ -1,7 +1,6 @@
 package logic.generator.schedulegenerator
 
 import models.persistence.{Semester, Schedule}
-import models.persistence.subject.AbstractSubject
 import models.persistence.lecture.Lecture
 import java.util.Calendar
 
@@ -11,7 +10,7 @@ import java.util.Calendar
  */
 sealed trait ScheduleGeneratorMessage
 
-case class GenerateSchedule(subjects: List[AbstractSubject], semester : Semester, endTime:Calendar, randomRatio:Int, maxIterationDeep:Int) extends ScheduleGeneratorMessage
+case class GenerateSchedule(lectures: List[Lecture], semester : Semester, endTime:Calendar, randomRatio:Int, maxIterationDeep:Int) extends ScheduleGeneratorMessage
 
 case class SlaveGenerate(lectures: List[Lecture]) extends ScheduleGeneratorMessage
 

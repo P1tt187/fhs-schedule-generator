@@ -67,6 +67,13 @@ object CExporter extends Controller {
 
   }
 
+
+  /**
+   * create data for spirit news system
+   * it creates a ZIP - file, which includes all necessary json files for spirit data and an install script
+   *
+   * @param id - the id of the Schedule
+   */
   def createSpiritSchedule(id: Long) = Action {
 
     def timeSlotToString(timeSlot: TimeSlot) = {
@@ -175,6 +182,9 @@ object CExporter extends Controller {
 
             val sb = new StringBuilder
 
+            /**
+             * append command for install script
+             */
             sb append "mongoimport --db spirit_news --collection schedulerecords --type json --file "
 
             sb append course.getShortName.toLowerCase
@@ -184,12 +194,16 @@ object CExporter extends Controller {
               firstRun = false
               sb append "--drop"
             }
-            if(content.head.trim.equals("[]")){
+
+            /** ignore this command if its an empty file */
+            if (content.head.trim.equals("[]")) {
               sb append "NOIMPORT"
             }
 
             sb.toString()
         }.toList.filterNot(_.endsWith("NOIMPORT")).sortBy(-_.length)
+
+        /** the longest command includs the --drop command */
 
         importCommands = "#!/bin/bash" :: "echo \"\" > ./entrycountersFields.txt" :: "echo \"\" > ./entrysFields.txt" :: "mongoexport --db spirit_news --collection entrycounters --fieldFile entrycountersFields.txt --csv -o entrycounters.csv" :: "mongoexport --db spirit_news --collection entrys --fieldFile entrysFields.txt --csv -o entrys.csv" :: importCommands
 
@@ -211,13 +225,18 @@ object CExporter extends Controller {
 
         fileContent.deleteOnExit()
 
-        Ok.sendFile(content = fileContent, fileName = _ => semester.getName.replaceAll("/","") + ".zip")
+        Ok.sendFile(content = fileContent, fileName = _ => semester.getName.replaceAll("/", "") + ".zip")
     }
 
 
   }
 
 
+  /**
+   * import an json file and parse it to database
+   *
+   */
+  //FIXME: Still buggy
   def uploadFile = Action(parse.multipartFormData) {
     request =>
       request.body.file("fileUpload").map {
