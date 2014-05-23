@@ -62,6 +62,7 @@ object CEditCourses extends Controller {
           group.setSize(course.getSize / groupCount)
           group.setSubGroups(List[Group]())
           group.setGroupIndex(numberOfExistingGroups + i)
+          group.setIgnoreGroupIndex(false)
 
           if (i == groupCount) {
             group.setSize(course.getSize / groupCount + course.getSize % groupCount)
@@ -107,6 +108,7 @@ object CEditCourses extends Controller {
           group.setSize(parent.getSize / groupCount)
           group.setSubGroups(List[Group]())
           group.setGroupIndex(i)
+          group.setIgnoreGroupIndex(false)
 
          group.setGroupIndex(numberOfExistingGroups + i)
 
@@ -149,8 +151,11 @@ object CEditCourses extends Controller {
 
         val groupType = (jsVal \ "grouptype").as[String]
 
+        val ignoreGroupIndex = (jsVal \ "ignoreGroupIndex").as[Boolean]
+
         group.setGroupType(groupType)
         group.setSize(size)
+        group.setIgnoreGroupIndex(ignoreGroupIndex)
 
         Transactions {
           implicit em =>

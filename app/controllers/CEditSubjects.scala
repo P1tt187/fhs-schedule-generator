@@ -175,6 +175,7 @@ object CEditSubjects extends Controller {
             case exercise: ExerciseSubject =>
               val groupTypeInput = (jsVal \ "groupTypeInput").as[String]
               exercise.setGroupType(groupTypeInput)
+            case _ =>
           }
         }
         subject.setDuration(duration)

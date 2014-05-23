@@ -44,7 +44,16 @@
     <table class="table table-bordered table-striped">
         <thead>
             <th class="text-info text-center" >Uhrzeit</th>
-            @for(day <- CTimeslotDefintion.WEEKDAYS) {
+
+            @days= @{
+                CTimeslotDefintion.WEEKDAYS.filter{
+                    case (sortIndexString,dayname)=>
+                            val sortIndex=sortIndexString.toInt
+                    !timeslots.find(_.getParent.asInstanceOf[Weekday].getSortIndex.toInt == sortIndex).isEmpty
+                }.sortBy(_._1)
+            }
+
+            @for(day <- days) {
                 <th class="text-info text-center" > @day._2</th>
             }
         </thead>
@@ -54,10 +63,10 @@
                 <td class="text-center" style=" vertical-align : middle ; width : 8% ;" >
                 @range.toString
                 </td>
-                @for(day <- CTimeslotDefintion.WEEKDAYS) {
+                @for(day <- days) {
                     <td >
                         <div style=" overflow:auto; display:compact">
-                        @for(lecture <- timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt).flatMap(_.getLectures.toList) ) {
+                        @for(lecture <- timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt).flatMap(_.getLectures.toList).toList.sortBy(_.getDocents.head.getLastName) ) {
                             <div class="panel panel-info smallText" >
                                @displayAbstractLecture(lecture)
                             </div>

@@ -140,7 +140,13 @@ object CExporter extends Controller {
 
                 val group = lecture.getKind match {
                   case ELectureKind.LECTURE => ""
-                  case ELectureKind.EXERCISE => lecture.getParticipants.find(_.getCourse.equals(course)).get.asInstanceOf[Group].getGroupIndex.toString
+                  case ELectureKind.EXERCISE => val g = lecture.getParticipants.find(_.getCourse.equals(course)).get.asInstanceOf[Group]
+                    if (g.isIgnoreGroupIndex == true) {
+                      ""
+                    } else {
+                      g.getGroupIndex.toString
+                    }
+
                 }
 
                 Json.stringify(Json.obj(

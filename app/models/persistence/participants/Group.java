@@ -55,6 +55,18 @@ public class Group extends Participant implements Comparable<Group> {
     @Column(name = "GROUPINDEX")
     private Integer groupIndex;
 
+    /** flag for view */
+    @Column(name = "IGNORE_GROUPINDEX")
+    private Boolean ignoreGroupIndex;
+
+    public Boolean isIgnoreGroupIndex() {
+        return ignoreGroupIndex;
+    }
+
+    public void setIgnoreGroupIndex(Boolean ignoreGroupIndex) {
+        this.ignoreGroupIndex = ignoreGroupIndex;
+    }
+
     public Integer getGroupIndex() {
         return groupIndex;
     }
