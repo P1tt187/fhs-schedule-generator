@@ -14,6 +14,7 @@ import scala.Some
 import org.hibernate.FetchMode
 import play.api.Logger
 import models.persistence.docents.Docent
+import models.persistence.enumerations.EDuration
 
 
 /**
@@ -22,7 +23,7 @@ import models.persistence.docents.Docent
  */
 object MGenerator {
 
-  def filterScheduleWithCourseAndDocent(schedule: Schedule, course: Course, docent: Docent) = {
+  def filterScheduleWithCourseAndDocent(schedule: Schedule, course: Course, docent: Docent, durationStr:String) = {
 
     val resultString = new StringBuffer()
 
@@ -40,6 +41,15 @@ object MGenerator {
     } else {
       filteredSchedule
     }
+
+    filteredSchedule = if(!durationStr.equals("-1")){
+      val duration = EDuration.valueOf(durationStr)
+      resultString.append(durationStr)
+      filteredSchedule.filter(duration)
+    } else {
+      filteredSchedule
+    }
+
     (resultString.toString, collectTimeslotsFromSchedule(filteredSchedule))
   }
 

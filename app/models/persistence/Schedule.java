@@ -2,6 +2,7 @@ package models.persistence;
 
 import logic.helpers.ScheduleHelper;
 import models.persistence.docents.Docent;
+import models.persistence.enumerations.EDuration;
 import models.persistence.participants.Course;
 import models.persistence.scheduletree.Root;
 
@@ -18,7 +19,7 @@ public class Schedule extends AbstractEntity {
     @OneToOne(targetEntity = Root.class, cascade = CascadeType.ALL)
     private Root root;
 
-    @Column(name="rate", nullable = false)
+    @Column(name = "rate", nullable = false)
     private Integer rate;
 
     public Integer getRate() {
@@ -83,5 +84,9 @@ public class Schedule extends AbstractEntity {
 
     public Schedule filter(Docent docent) {
         return ScheduleHelper.filterDocent(this, docent);
+    }
+
+    public Schedule filter(EDuration duration) {
+        return ScheduleHelper.filterDuration(this, duration);
     }
 }

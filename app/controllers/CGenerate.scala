@@ -121,7 +121,7 @@ object CGenerate extends Controller {
   }
 
 
-  def sendSchedule(courseId: Long, docentId: Long) = Action {
+  def sendSchedule(courseId: Long, docentId: Long, filterDuration: String) = Action {
     if (hasError) {
       Ok(Json.stringify(Json.obj("htmlresult" -> errorpage(errorList).toString())))
     } else {
@@ -138,10 +138,10 @@ object CGenerate extends Controller {
 
       val timeRanges = findTimeRanges(timeslotTemplates, List[TimeRange]())
 
-      val filteredPage = if (courseId == -1 && docentId == -1) {
+      val filteredPage = if (courseId == -1 && docentId == -1 && filterDuration.equals("-1")) {
         showSchedule("Alle Kurse", timeRanges, timeslotsAll, schedule.getRate).toString()
       } else {
-        val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId))
+        val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId), filterDuration)
         showSchedule(courseName, timeRanges, timeslots, schedule.getRate).toString()
       }
       Ok(Json.stringify(Json.obj("htmlresult" -> filteredPage)))
@@ -173,28 +173,28 @@ object CGenerate extends Controller {
 
           val lectureGeneratorActor = Akka.system.actorOf(Props[LectureGeneratorActor])
 
-          val lectureFuture = lectureGeneratorActor?GenerateLectures(subjects)
+          val lectureFuture = lectureGeneratorActor ? GenerateLectures(subjects)
 
           val endTime = Calendar.getInstance()
           endTime.add(Calendar.MINUTE, result.time)
-          lectureFuture.onSuccess{
-            case LectureAnswer(lecturesAnswer)=>
-              (1 to result.threads).foreach{
-                i=>
+          lectureFuture.onSuccess {
+            case LectureAnswer(lecturesAnswer) =>
+              (1 to result.threads).foreach {
+                i =>
                   val generatorActor = Akka.system.actorOf(Props[ScheduleGeneratorActor])
 
                   val scheduleFuture = ask(generatorActor, GenerateSchedule(cloner.deepClone(lecturesAnswer), semester, endTime, result.randomRatio, result.maxIterationDeep))
-                  scheduleFutures+=scheduleFuture
+                  scheduleFutures += scheduleFuture
 
                   scheduleFuture.onSuccess {
                     case ScheduleAnswer(theSchedule) =>
 
-                      schedules+=theSchedule
+                      schedules += theSchedule
 
-                      val completetList =  scheduleFutures.map(_.isCompleted).toSet
-                      actorFinished = completetList.size==1 && completetList.head
+                      val completetList = scheduleFutures.map(_.isCompleted).toSet
+                      actorFinished = completetList.size == 1 && completetList.head
 
-                      if(actorFinished){
+                      if (actorFinished) {
                         schedule = schedules.sortBy(_.getRate.toInt).head
                       }
 

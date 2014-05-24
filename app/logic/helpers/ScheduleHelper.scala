@@ -7,6 +7,7 @@ import scala.collection.JavaConversions._
 import models.persistence.docents.Docent
 import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
 import models.persistence.lecture.Lecture
+import models.persistence.enumerations.EDuration
 
 /**
  * @author fabian 
@@ -19,17 +20,7 @@ object ScheduleHelper {
   def filterCourse(schedule: Schedule, course: Course) = {
 
     val copyRoot = new Root
-    copyRoot.setChildren(List[Node]())
-    copyRoot.setChildren(copyRoot.getChildren ++ schedule.getRoot.getChildren.map {
-      case w: Weekday =>
-        val newDay = new Weekday()
-        newDay.setName(w.getName)
-        newDay.setSortIndex(w.getSortIndex)
-        newDay.setChildren(List[Node]())
-        newDay.setParent(copyRoot)
-
-        newDay
-    })
+    initRoot(schedule, copyRoot)
 
     schedule.getRoot.getChildren.foreach {
       case weekday: Weekday =>
@@ -76,8 +67,7 @@ object ScheduleHelper {
 
   }
 
-  def filterDocent(schedule: Schedule, docent: Docent) = {
-    val copyRoot = new Root
+  private def initRoot(schedule: Schedule, copyRoot: Root) {
     copyRoot.setChildren(List[Node]())
     copyRoot.setChildren(copyRoot.getChildren ++ schedule.getRoot.getChildren.map {
       case w: Weekday =>
@@ -89,6 +79,11 @@ object ScheduleHelper {
 
         newDay
     })
+  }
+
+  def filterDocent(schedule: Schedule, docent: Docent) = {
+    val copyRoot = new Root
+    initRoot(schedule, copyRoot)
 
     schedule.getRoot.getChildren.foreach {
       case weekday: Weekday =>
@@ -119,6 +114,40 @@ object ScheduleHelper {
             copyDay.setChildren(copyDay.getChildren :+ ts)
         }
 
+    }
+
+    val copySchedule = new Schedule
+    copySchedule.setRoot(copyRoot)
+    copySchedule.setRate(schedule.getRate)
+    copySchedule
+  }
+
+  def filterDuration(schedule: Schedule, duration: EDuration) = {
+    val copyRoot = new Root
+    initRoot(schedule, copyRoot)
+
+    val copyWeekdays = copyRoot.getChildren.toList.asInstanceOf[List[Weekday]]
+
+    schedule.getRoot.getChildren.foreach {
+      case wd: Weekday =>
+        wd.getChildren.foreach {
+          case ts: TimeSlot =>
+
+            val newTs = ts match {
+              case _: EvenTimeSlot =>
+                new EvenTimeSlot(ts.getStartHour, ts.getStartMinute, ts.getStopHour, ts.getStopMinute, ts.isUnpopular)
+              case _: UnevenTimeSlot =>
+                new UnevenTimeSlot(ts.getStartHour, ts.getStartMinute, ts.getStopHour, ts.getStopMinute, ts.isUnpopular)
+            }
+            newTs.setLectures(ts.getLectures)
+
+
+            val copyDay = copyWeekdays.find(_.getSortIndex == wd.getSortIndex).get
+            newTs.setParent(copyDay)
+            if (ts.getDuration == duration) {
+              copyDay.setChildren(copyDay.getChildren :+ newTs)
+            }
+        }
     }
 
     val copySchedule = new Schedule

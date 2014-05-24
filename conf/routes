@@ -36,7 +36,7 @@ POST        /updateGroup                                                        
 GET         /generator                                                                                controllers.CGenerate.page()
 POST        /generatorAction                                                                          controllers.CGenerate.generatorAction
 GET         /generatorFinished                                                                        controllers.CGenerate.finished
-GET         /generatorGetSchedule/:filterCourse/:filterDocent                                         controllers.CGenerate.sendSchedule(filterCourse:Long, filterDocent:Long)
+GET         /generatorGetSchedule/:filterCourse/:filterDocent/:filterDuration                         controllers.CGenerate.sendSchedule(filterCourse:Long, filterDocent:Long, filterDuration)
 POST        /saveSchedule                                                                             controllers.CGenerate.saveSchedule()
 GET         /loadSchedule/:id                                                                         controllers.CGenerate.loadScheduleForSemester(id:Long)
 
