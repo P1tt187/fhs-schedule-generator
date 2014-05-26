@@ -21,7 +21,6 @@ public class CriteriaContainer extends AbstractEntity {
      */
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, targetEntity = AbstractCriteria.class, fetch = FetchType.EAGER)
-
     private List<AbstractCriteria> criterias;
 
 

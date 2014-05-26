@@ -44,7 +44,6 @@ object MGenerator {
 
     filteredSchedule = if(!durationStr.equals("-1")){
       val duration = EDuration.valueOf(durationStr)
-      resultString.append(durationStr)
       filteredSchedule.filter(duration)
     } else {
       filteredSchedule

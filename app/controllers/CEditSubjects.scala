@@ -14,7 +14,6 @@ import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCri
 import models.persistence.enumerations.EDuration
 import models.persistence.participants.Course
 import models.persistence.location.{RoomEntity, RoomAttributesEntity, HouseEntity}
-import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 import models.persistence.docents.Docent
@@ -182,29 +181,30 @@ object CEditSubjects extends Controller {
 
         initCourseValues(subject, activeCheckbox, nameInput, unitInput, selectedCourse, selectedDocents, expectedParticipants)
 
-        val criteriaContainer = subject.getCriteriaContainer
-        val otherCriteria = criteriaContainer.getCriterias.filterNot(_.isInstanceOf[RoomCriteria])
-        val existingRoomCriteria = criteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria])
+        val criteriaContainer = new CriteriaContainer
+        criteriaContainer.setCriterias(List[AbstractCriteria]())
 
-        if (!roomAttributes.isEmpty) {
-          setRoomAttributesForCriteria(roomAttributes, criteriaContainer, otherCriteria)
-        }
+        val oldCriteriaContainer = subject.getCriteriaContainer
+        val existingRoomCriteria = oldCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria])
+if(!roomAttributes.isEmpty) {
+  setRoomAttributesForCriteria(roomAttributes, criteriaContainer)
+}
 
         setHouseCriterias(selectedHouses, criteriaContainer)
 
         setRoomCriterias(selectedRooms, criteriaContainer)
+
+        subject.setCriteriaContainer(criteriaContainer)
 
         Transactions {
           implicit entityManager =>
             if (subject.getId == null) {
               entityManager.merge(subject)
             } else {
+
+              val attachedObject = entityManager.merge(oldCriteriaContainer)
+              entityManager.remove(attachedObject)
               entityManager.merge(subject)
-              existingRoomCriteria.foreach {
-                rc =>
-                  val attachedRc = entityManager.merge(rc)
-                  entityManager.remove(attachedRc)
-              }
             }
         }
 
@@ -242,11 +242,10 @@ object CEditSubjects extends Controller {
     criteriaContainer.setCriterias(criteriaContainer.getCriterias.toList ++ houseCriterias)
   }
 
-  private def setRoomAttributesForCriteria(roomAttributes: List[RoomAttributesEntity], criteriaContainer: CriteriaContainer, otherCriterias: mutable.Buffer[AbstractCriteria]) {
+  private def setRoomAttributesForCriteria(roomAttributes: List[RoomAttributesEntity], criteriaContainer: CriteriaContainer) {
     val roomCriteria = new RoomCriteria
     roomCriteria.setRoomAttributes(roomAttributes)
-
-    criteriaContainer.setCriterias(otherCriterias :+ roomCriteria)
+    criteriaContainer.setCriterias(criteriaContainer.getCriterias :+ roomCriteria)
   }
 
   private def initCourseValues(subject: AbstractSubject, activeCheckbox: Boolean, nameInput: String, unitInput: Float, selectedCourse: Set[Course], selectedDocents: Set[Docent], expectedParticipants: Int) {

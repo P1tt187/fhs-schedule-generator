@@ -11,7 +11,8 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * Created by fabian on 27.01.14.
+ * @author fabian
+ *         on 27.01.14.
  */
 
 @Entity
