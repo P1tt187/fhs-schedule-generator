@@ -19,8 +19,19 @@ public class Schedule extends AbstractEntity {
     @OneToOne(targetEntity = Root.class, cascade = CascadeType.ALL)
     private Root root;
 
-    @Column(name = "rate", nullable = false)
+    @Column(name = "RATE", nullable = false)
     private Integer rate;
+
+    @Column(name="RATE_SUM")
+    private Integer rateSum;
+
+    public Integer getRateSum() {
+        return rateSum;
+    }
+
+    public void setRateSum(Integer rateSum) {
+        this.rateSum = rateSum;
+    }
 
     public Integer getRate() {
         return rate;

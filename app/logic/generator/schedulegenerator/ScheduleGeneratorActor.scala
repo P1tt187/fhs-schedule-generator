@@ -4,7 +4,6 @@ import akka.actor.{PoisonPill, Props, Actor}
 import akka.util.Timeout
 import scala.concurrent.duration._
 import akka.pattern.ask
-import logic.generator.lecturegenerator.LectureGeneratorActor
 import scala.concurrent.Await
 import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -73,6 +72,9 @@ class ScheduleGeneratorActor extends Actor {
             case Some(schedule) =>
               schedule.setSemester(semester)
               schedule.setRate(rate(ERaters.WISHTIME_RATER))
+
+              schedule.setRateSum(rate.values.sum)
+
               theSender ! ScheduleAnswer(schedule)
             case None => theSender ! InplacebleSchedule(lectures.sortBy(_.getDifficulty.multiply(BigInteger.valueOf(-1))).take(20))
           }

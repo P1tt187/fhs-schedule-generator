@@ -187,7 +187,6 @@ trait PlacingProcessor {
 
   protected def filterRoomsForLecture(lecture: Lecture, allRooms: List[RoomEntity]): List[RoomEntity] = {
 
-
     val roomCriterias = lecture.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).map {
       case rcrit: RoomCriteria => rcrit
     }
@@ -215,7 +214,7 @@ trait PlacingProcessor {
       return true
     }
 
-    timeCriterias.count(timeslot.isInTimeSlotCriteria) > 0
+    !timeCriterias.find(timeslot.isInTimeSlotCriteria).isEmpty
   }
 
   protected def getRoomCriteriasFromDocents(docents: List[LectureDocent]) = {

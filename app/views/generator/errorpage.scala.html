@@ -1,4 +1,5 @@
 @(lectures: List[persistence.lecture.Lecture])
+@import models.persistence.enumerations.ELectureKind
 
 
 <div class="alert alert-danger">
@@ -6,7 +7,12 @@
     <p>Mögliche Ursachen:</p>
     <ol>
         @for(l <- lectures) {
-            <li>@l.getName ( @for(d <- l.getDocents) {
+            <li>@l.getName,  @{
+                l.getKind match {
+                    case ELectureKind.EXERCISE => "Übung"
+                    case ELectureKind.LECTURE => "Vorlesung"
+                }
+            }, Teilnehmer: @l.calculateNumberOfParticipants() ( @for(d <- l.getDocents) {
                 @{
                     d.getLastName + " "
                 }

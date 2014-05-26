@@ -6,7 +6,6 @@ import models.persistence.location.RoomEntity
 import models.persistence.enumerations.EDuration
 import scala.collection.JavaConversions._
 import scala.annotation.tailrec
-import play.api.Logger
 
 /**
  * @author fabian 
@@ -27,7 +26,7 @@ class GenericPlacer(allLectures: List[Lecture], allTimeslots: List[TimeSlot], al
     }
     placed+=1
     if (!doPlacing(lectures.head)) {
-      //Logger.debug("placed: " + placed + " Chancel: " + lectures.head.getName + " " + lectures.head.getDuration /*+ " difficult: " + lectures.head.getDifficulty*/)
+    //  Logger.debug("placed: " + placed + " Chancel: " + lectures.head.getName + " " + lectures.head.getDuration /*+ " difficult: " + lectures.head.getDifficulty*/)
       false
     } else {
       placing(lectures.tail)

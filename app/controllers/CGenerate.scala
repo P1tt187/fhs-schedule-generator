@@ -195,7 +195,7 @@ object CGenerate extends Controller {
                       actorFinished = completetList.size == 1 && completetList.head
 
                       if (actorFinished) {
-                        schedule = schedules.sortBy(_.getRate.toInt).head
+                        schedule = schedules.sortBy(s=> (s.getRate.toInt, s.getRateSum)).head
                       }
 
                       finishTime = Calendar.getInstance()
