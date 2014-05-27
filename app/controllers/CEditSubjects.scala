@@ -36,7 +36,7 @@ object CEditSubjects extends Controller {
     Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses()))
   }
 
-  def getSubjectFields(semester: String, subjectType: String, idString: String) = Action {
+  def getSubjectFields(semester: Long, subjectType: String, idString: String) = Action {
 
 
     val id = if (idString.equals("null")) {
@@ -54,7 +54,7 @@ object CEditSubjects extends Controller {
 
     if (subject.getId == null) {
       subject.setId(-1l)
-      subject.setSemester(findSemester(extractSemesterPattern(semester)))
+      subject.setSemester(findSemesterById(semester))
       initNewSubject(subject)
     }
 
@@ -98,18 +98,24 @@ object CEditSubjects extends Controller {
     semester.replaceAll(Pattern.quote("+"), "/").trim
   }
 
-  def getNamesField(semester: String, subjectType: String, filterDocentId: Long, filterCourseId: Long, filterActive: String) = Action {
-    val semesterPattern = extractSemesterPattern(semester)
-    Logger.debug("semester: " + semesterPattern + " subjectType: " + subjectType)
+  def getNamesField(semester: Long, subjectType: String, filterDocentId: Long, filterCourseId: Long, filterActive: String) = Action {
+
     //Logger.debug("" +MEditSubjects.findLectureSubjectsForSemester(semester.replaceAll(Pattern.quote("+"),"/").trim))
     subjectType match {
       case LECTURE =>
-        Ok(Json.stringify(Json.obj("html" -> namefield(findLectureSubjectsForSemester(semesterPattern, filterDocentId, filterCourseId, filterActive), LECTURE).toString())))
+        Ok(Json.stringify(Json.obj("html" -> namefield(findLectureSubjectsForSemester(semester, filterDocentId, filterCourseId, filterActive), LECTURE).toString())))
       case EXERCISE =>
-        Ok(Json.stringify(Json.obj("html" -> namefield(findExerciseSubjectsForSemester(semesterPattern, filterDocentId, filterCourseId, filterActive), EXERCISE).toString())))
+        Ok(Json.stringify(Json.obj("html" -> namefield(findExerciseSubjectsForSemester(semester, filterDocentId, filterCourseId, filterActive), EXERCISE).toString())))
     }
   }
 
+  def deleteSemester(semesterID:Long) = Action{
+
+    val semester = findSemesterById(semesterID)
+    deleteLecturesAndSchedules(semester)
+
+    Redirect(routes.CEditSubjects.page())
+  }
 
   def saveData = Action(parse.json) {
     implicit request =>

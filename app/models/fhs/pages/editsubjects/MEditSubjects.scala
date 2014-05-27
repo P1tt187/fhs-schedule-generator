@@ -4,13 +4,14 @@ import models.Transactions
 import scala.collection.JavaConversions._
 import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
 import org.hibernate.criterion.{Order, CriteriaSpecification, Restrictions}
-import models.persistence.Semester
+import models.persistence.{Schedule, Semester}
 import models.persistence.participants.Course
 import models.persistence.location.{RoomEntity, HouseEntity, RoomAttributesEntity}
 import org.hibernate.FetchMode
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer}
 import play.api.Logger
 import models.persistence.docents.Docent
+import models.fhs.pages.JavaList
 
 /**
  * @author fabian 
@@ -21,7 +22,7 @@ object MEditSubjects {
   def findSemesters() = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[Semester]).list().asInstanceOf[java.util.List[Semester]].map(_.getName).toList
+        session.createCriteria(classOf[Semester]).list().asInstanceOf[java.util.List[Semester]].toList
     }
   }
 
@@ -32,17 +33,39 @@ object MEditSubjects {
     }
   }
 
-  def findLectureSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive: String) = {
+  def findSemesterById(id: Long) = {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[Semester]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[Semester]
+    }
+  }
 
-    val semesterDO = findSemester(semester)
+
+  def deleteLecturesAndSchedules(semester: Semester) {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.saveOrUpdate(semester)
+        val schedules = session.createCriteria(classOf[Schedule]).add(Restrictions.eq("semester", semester)).list().asInstanceOf[JavaList[Schedule]]
+        schedules.foreach(session.delete)
+        val subjects = session.createCriteria(classOf[AbstractSubject]).add(Restrictions.eq("semester", semester)).list().asInstanceOf[JavaList[AbstractSubject]]
+        subjects.foreach(session.delete)
+
+        session.delete(semester)
+    }
+  }
+
+
+  def findLectureSubjectsForSemester(semester: Long, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive: String) = {
+
+    val semesterDO = findSemesterById(semester)
 
     Transactions.hibernateAction {
       implicit session =>
         val criterion = session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name"))
 
-        criterion.setFetchMode("criteriaContainer",FetchMode.SELECT)
+        criterion.setFetchMode("criteriaContainer", FetchMode.SELECT)
         if (filterDocentId != -1) {
-          criterion.createCriteria("docents").setFetchMode("criteriaContainer",FetchMode.SELECT).add(Restrictions.idEq(filterDocentId))
+          criterion.createCriteria("docents").setFetchMode("criteriaContainer", FetchMode.SELECT).add(Restrictions.idEq(filterDocentId))
         }
 
         if (filterCourseId != -1) {
@@ -54,19 +77,19 @@ object MEditSubjects {
         }
 
         criterion.list().asInstanceOf[java.util.List[LectureSubject]].par.
-          map(element => MSubjects(element.getId, element.getName, element.getCourses.map(c=> c.getShortName).mkString(" "))).toList
+          map(element => MSubjects(element.getId, element.getName, element.getCourses.map(c => c.getShortName).mkString(" "))).toList
     }
   }
 
-  def findExerciseSubjectsForSemester(semester: String, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive: String) = {
-    val semesterDO = findSemester(semester)
+  def findExerciseSubjectsForSemester(semester: Long, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive: String) = {
+    val semesterDO = findSemesterById(semester)
 
     Transactions.hibernateAction {
       implicit session =>
         val criterion = session.createCriteria(classOf[ExerciseSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name"))
 
         if (filterDocentId != -1) {
-          criterion.createCriteria("docents").setFetchMode("criteriaContainer",FetchMode.SELECT).add(Restrictions.idEq(filterDocentId))
+          criterion.createCriteria("docents").setFetchMode("criteriaContainer", FetchMode.SELECT).add(Restrictions.idEq(filterDocentId))
         }
 
         if (filterCourseId != -1) {
@@ -78,12 +101,12 @@ object MEditSubjects {
         }
 
         criterion.list().asInstanceOf[java.util.List[ExerciseSubject]].par.
-          map(element => MSubjects(element.getId, element.getName, element.getCourses.map(c=> c.getShortName).mkString(" "))).toList
+          map(element => MSubjects(element.getId, element.getName, element.getCourses.map(c => c.getShortName).mkString(" "))).toList
     }
   }
 
-  def findSubject[T](clazz: Class[T], id: Long):T = {
-    if(id == -1l){
+  def findSubject[T](clazz: Class[T], id: Long): T = {
+    if (id == -1l) {
       Logger.debug("new instance")
       return clazz.newInstance()
     }
@@ -94,7 +117,7 @@ object MEditSubjects {
     }
   }
 
-  def initNewSubject(subject:AbstractSubject){
+  def initNewSubject(subject: AbstractSubject) {
     subject.setActive(true)
     subject.setName("")
     subject.setCourses(Set[Course]())
@@ -113,7 +136,7 @@ object MEditSubjects {
   def findDocents() = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[Docent]).setFetchMode("criteriaContainer",FetchMode.SELECT).addOrder(Order.asc("lastName")).list().asInstanceOf[java.util.List[Docent]].toList
+        session.createCriteria(classOf[Docent]).setFetchMode("criteriaContainer", FetchMode.SELECT).addOrder(Order.asc("lastName")).list().asInstanceOf[java.util.List[Docent]].toList
     }
   }
 
@@ -122,7 +145,7 @@ object MEditSubjects {
       id =>
         Transactions.hibernateAction {
           implicit session =>
-            session.createCriteria(classOf[Docent]).add(Restrictions.idEq(id)).setFetchMode("criteriaContainer",FetchMode.SELECT).uniqueResult().asInstanceOf[Docent]
+            session.createCriteria(classOf[Docent]).add(Restrictions.idEq(id)).setFetchMode("criteriaContainer", FetchMode.SELECT).uniqueResult().asInstanceOf[Docent]
         }
     }
   }
@@ -184,7 +207,7 @@ object MEditSubjects {
   def findRooms() = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[RoomEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).setFetchMode("house.rooms", FetchMode.SELECT).setFetchMode("roomAttributes",FetchMode.SELECT).list().toList.asInstanceOf[List[RoomEntity]].sorted
+        session.createCriteria(classOf[RoomEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).setFetchMode("house.rooms", FetchMode.SELECT).setFetchMode("roomAttributes", FetchMode.SELECT).list().toList.asInstanceOf[List[RoomEntity]].sorted
     }
   }
 
@@ -200,6 +223,6 @@ object MEditSubjects {
 
 }
 
-case class MSubjects(id: Long, name: String, participants:String)
+case class MSubjects(id: Long, name: String, participants: String)
 
 

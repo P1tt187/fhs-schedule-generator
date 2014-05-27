@@ -20,9 +20,10 @@ POST        /blaUpload                                                          
 GET         /blaError                                                                                 controllers.CBLAFileUpload.errorMessage
 
 GET         /editSubjects                                                                             controllers.CEditSubjects.page
-GET         /editSucjects/:semester/:subjectType/:filterDocentId/:filterCourseId/:filterActive        controllers.CEditSubjects.getNamesField(semester,subjectType,filterDocentId:Long,filterCourseId:Long,filterActive)
-GET         /subjects/:semester/:subjectType/:id                                                      controllers.CEditSubjects.getSubjectFields(semester, subjectType, id )
+GET         /editSucjects/:semester/:subjectType/:filterDocentId/:filterCourseId/:filterActive        controllers.CEditSubjects.getNamesField(semester:Long,subjectType,filterDocentId:Long,filterCourseId:Long,filterActive)
+GET         /subjects/:semester/:subjectType/:id                                                      controllers.CEditSubjects.getSubjectFields(semester:Long, subjectType, id )
 POST        /editSubject                                                                              controllers.CEditSubjects.saveData
+GET        /deleteSemester/:semesterID                                                               controllers.CEditSubjects.deleteSemester(semesterID:Long)
 
 GET         /editCourses                                                                              controllers.CEditCourses.page
 GET         /editCourses/courseFields/:courseId                                                       controllers.CEditCourses.getCourseFields(courseId:Long)
