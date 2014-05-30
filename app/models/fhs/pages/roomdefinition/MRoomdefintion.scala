@@ -9,6 +9,8 @@ import models.persistence.criteria.TimeSlotCriteria
 import models.persistence.location.{HouseEntity, RoomAttributesEntity, RoomEntity}
 import org.hibernate.FetchMode
 import play.api.Play.current
+import scala.annotation.tailrec
+
 /**
  * @author fabian
  *         on 04.02.14.
@@ -17,6 +19,28 @@ case class MRoomdefintion(id: Option[Long], capacity: Int, house: String, number
 
 case class MRoomdisplay(id: Long, capacity: Int, house: String, number: String, roomAttributes: List[RoomAttributesEntity], timeCriterias: List[MTimeslotDisplay])
 
+case class TimeCritTimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int){
+  def compare(that:MTimeslotDisplay):Int = {
+    if (startHour.compareTo(that.startHour) != 0) {
+      return startHour.compareTo(that.startHour)
+    }
+    if (startMinute.compareTo(that.startMinutes) != 0) {
+      return startMinute.compareTo(that.startMinutes)
+    }
+    if (stopHour.compareTo(that.stopHour) != 0) {
+      return stopHour.compareTo(that.stopHour)
+    }
+
+    stopMinute.compareTo(that.stopMinutes)
+  }
+
+  override def toString = "" + startHour.formatted("%02d") + ":" + startMinute.formatted("%02d") + "-" + stopHour.formatted("%02d") + ":" + stopMinute.formatted("%02d")
+}
+
+object TimeCritTimeRange {
+  implicit val TimeCritTimeRangeOrdering = Ordering.by{(range:TimeCritTimeRange) => (range.startHour,range.startMinute,range.stopHour,range.stopMinute) }
+}
+
 object MRoomdefintion {
   /**
    * predefinded constants for the attribute
@@ -24,6 +48,26 @@ object MRoomdefintion {
   //final val ATTRIBUTES: Array[String] = Array[String]("Seminar-Room", "PC-Pool", "Beamer", "Whiteboard", "Blackboard", "Overhead")
   lazy val ATTRIBUTES=current.configuration.getString("roomattributes").getOrElse("").split(",")
 
+
+  @tailrec
+  def findTimeRanges(timeslotCriterias: List[MTimeslotDisplay], timeRanges: List[TimeCritTimeRange]=List[TimeCritTimeRange]()): List[TimeCritTimeRange] = {
+    timeslotCriterias.headOption match {
+      case None => timeRanges
+      case Some(timeslot) =>
+        val existingRange = timeRanges.find {
+          case TimeCritTimeRange(startHour, startMinute, stopHour, stopMinute) =>
+            val startEqual = startHour == timeslot.startHour && startMinute == timeslot.startMinutes
+            val stopEqual = stopHour == timeslot.stopHour && stopMinute == timeslot.stopMinutes
+
+            startEqual && stopEqual
+        }
+        if (existingRange.isEmpty) {
+          findTimeRanges(timeslotCriterias.tail, timeRanges :+ TimeCritTimeRange(timeslot.startHour, timeslot.startMinutes, timeslot.stopHour, timeslot.stopMinutes))
+        } else {
+          findTimeRanges(timeslotCriterias.tail, timeRanges)
+        }
+    }
+  }
 
   def findOrCreateHouseEntityByName(name: String): HouseEntity = {
     Transactions.hibernateAction {

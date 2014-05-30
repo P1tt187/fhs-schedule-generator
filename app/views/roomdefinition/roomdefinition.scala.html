@@ -16,7 +16,7 @@
     <div class="clearfix">
         <div class="row-fluid">
             <div class="col-md-5">
-                @form(action = routes.CRoomDefinition.submitRoom, 'class -> "span2  form-inline") {
+                @form(action = routes.CRoomDefinition.submitRoom, 'class -> " form-inline") {
 
                     <fieldset>
 
@@ -175,21 +175,21 @@
                                     <button role="button" class="btn btn-sm btn-warning" onclick="$ ( location ).attr ( 'href', ' @routes.CRoomDefinition.editRoom(roomEntity.id) ');"><span class="glyphicon glyphicon-pencil"></span> </button>
                                 </td>
                                 <td>
-                                    <button role="button" class="btn btn-sm btn-danger" onclick="$ ( location ).attr ( 'href', ' @routes.CRoomDefinition.deleteRoom(roomEntity.id) ');"><span class="glyphicon glyphicon-remove-circle"></span></button>
+                                    <button role="button" class="btn btn-sm btn-danger" onclick="$ ( location ).attr ( 'href', ' @routes.CRoomDefinition.deleteRoom(roomEntity.id) ');"><span class="glyphicon glyphicon-trash"></span></button>
                                 </td>
                             </tr>
                         }
                         </tbody>
                     </table>
+                   </div>
                 </div>
-</div>
             </div>
 
 
 
 
                 <!-- display availability -->
-                @for(roomEntity <- existingRooms.filterNot(_.timeCriterias.isEmpty)) {
+                @for(roomEntity <- existingRooms.filterNot(_.timeCriterias.isEmpty).sortBy(_.house)) {
                     <div class="col-md-5">
                     <div class="panel panel-info">
                         <div class="panel-heading">
@@ -200,39 +200,55 @@
 
                         <div class="panel-body">
                             <div class="table-responsive">
+
+                            @defining(CTimeslotDefintion.WEEKDAYS.filterNot{
+                                case (sortIndexString,dayname)=>
+                                    val sortIndex=sortIndexString.toInt
+                                    roomEntity.timeCriterias.find(tc=> tc.weekdayIndex == sortIndex).isEmpty
+                            }.sortBy(_._1)) { days =>
                                 <table class="table table-bordered table-striped table-hover table-condensed text-center" >
                                     <thead>
-                                        <tr class="text-info" >
-                                            <th class="text-center">Tag</th>
-                                            <th class="text-center">Von</th>
-                                            <th class="text-center">Bis</th>
-                                            <th class="text-center">Wöchentlich</th>
-                                        </tr>
+                                        <th class="text-info text-center" >Uhrzeit</th>
+                                        @for(day <- days) {
+                                            <th class="text-info text-center" > @day._2</th>
+                                        }
                                     </thead>
                                     <tbody>
-
-
-                                        @for(tcrit <- roomEntity.timeCriterias.sorted) {
-                                            <tr >
-                                                <td>@tcrit.weekday.substring(0, 2)</td>
-                                                <td>@tcrit.startHour.formatted("%02d")
-                                                    : @tcrit.startMinutes.formatted("%02d")</td>
-                                                <td>@tcrit.stopHour.formatted("%02d")
-                                                    : @tcrit.stopMinutes.formatted("%02d")</td>
-                                                <td>
-                                                @{
-                                                    tcrit.duration match {
-                                                        case EDuration.WEEKLY => "Wöchentlich"
-                                                        case EDuration.EVEN => "Gerade Wochen"
-                                                        case EDuration.UNEVEN => "Ungerade Wochen"
-                                                        case other => other.name()
-                                                    }
-                                                }
+                                        @for(range <- MRoomdefintion.findTimeRanges(roomEntity.timeCriterias).sorted){
+                                            <tr>
+                                                <td style=" vertical-align : middle ; width : 8% ;">
+                                                    @range.toString
                                                 </td>
+
+                                                @for(day <- days) {
+                                                    <td >
+                                                        @for(tcrit<-roomEntity.timeCriterias.filter(slot=> range.compare(slot) == 0 && slot.weekdayIndex == day._1.toInt)){
+                                                           <div class=" text-center @{
+                                                                tcrit.duration match {
+                                                                    case EDuration.WEEKLY => "bg-info"
+                                                                    case EDuration.EVEN => "bg-warning"
+                                                                    case EDuration.UNEVEN => "bg-primary"
+                                                                    case other => other.name()
+                                                                }
+                                                            }
+                                                         "> @{
+                                                               tcrit.duration match {
+                                                                   case EDuration.WEEKLY => "w"
+                                                                   case EDuration.EVEN => "g"
+                                                                   case EDuration.UNEVEN => "ug"
+                                                                   case other => other.name()
+                                                               }
+                                                           } </div>
+                                                        }
+                                                    </td>
+                                                }
+
                                             </tr>
                                         }
+
                                     </tbody>
-                                </table>
+                              </table>
+                            }
                             </div>
                         </div>
                     </div>

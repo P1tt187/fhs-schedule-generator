@@ -65,13 +65,15 @@
                 </td>
                 @for(day <- days) {
                     <td >
-                        <div style=" overflow:auto; display:compact">
+
                         @for(lecture <- timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt).flatMap(_.getLectures.toList).toList.sortBy(_.getDocents.head.getLastName) ) {
-                            <div class="panel panel-info smallText" >
-                               @displayAbstractLecture(lecture)
+                            <div style=" overflow:auto; display:compact">
+                                <div class="panel panel-info smallText" >
+                                   @displayAbstractLecture(lecture)
+                                </div>
                             </div>
                         }
-                        </div>
+
                     </td>
                 }
             </tr>
