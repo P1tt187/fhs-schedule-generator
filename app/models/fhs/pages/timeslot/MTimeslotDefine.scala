@@ -9,6 +9,8 @@ import models.persistence.enumerations.EDuration
 /**
  * @author fabian
  *         on 23.01.14.
+ *
+ *         this is one of the first classes in the project, sry for the chaos ;)
  */
 case class MTimeslotDefine(startHour: Int, startMinutes: Int, stopHour: Int, stopMinutes: Int, unpopular: Boolean, weekdays: List[Int])
 
@@ -33,9 +35,8 @@ object MTimeslotDisplay {
         dbReslut.toList
     }
 
-
-
     timeslots
   }
+
 
 }

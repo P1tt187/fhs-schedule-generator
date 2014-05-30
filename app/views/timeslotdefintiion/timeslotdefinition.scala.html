@@ -1,7 +1,9 @@
-@(message: String, errorIds: List[String], timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: Seq[(String, String)], timeslots: List[models.persistence.template.TimeSlotTemplate])
+@(message: String, errorIds: List[String], timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: Seq[(String, String)], timeslots: List[models.persistence.template.TimeSlotTemplate], timeRanges: List[models.fhs.pages.generator.TimeRange])
+
 
 @import helper._
 @import helper.twitterBootstrap._
+@import models.fhs.pages.generator.TimeRange
 
     @errorWeekdaySelect = @{
         errorIds.contains("weekdays")
@@ -61,45 +63,51 @@
             </div>
         </div>
         <!-- display existing timeSlots -->
-
         <div class="row-fluid">
             <div class="col-md-5">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover table-condensed">
-                        <thead>
-                            <tr class="text-info">
-                                <th>Wochentag</th>
-                                <th>Beginn</th>
-                                <th>Ende</th>
-                                <th>unbeliebt</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody >
-                        @for(slot <- timeslots) {
-                            <tr >
-                                <td>
-                                @slot.getParent.getName
-                                </td>
-                                <td>
-                                    @slot.getStartHour.formatted("%02d") : @slot.getStartMinute.formatted("%02d")
-                                </td>
-                                <td>
-                                    @slot.getStopHour.formatted("%02d") : @slot.getStopMinute.formatted("%02d")
-                                </td>
-                                <td>
-                                    @if(slot.isUnpopular){ja}else{nein}
-                                </td>
-                                <td>
-                                    <button class="btn btn-danger btn-sm" onclick="$(location).attr('href','@routes.CTimeslotDefintion.delete(slot.getId)');"><span class="glyphicon glyphicon-remove-sign"></span></button>
-                                </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
+                @defining(CTimeslotDefintion.WEEKDAYS.filterNot{
+                    case (sortIndexString,dayname)=>
+                        val sortIndex=sortIndexString.toInt
+                        timeslots.find(_.getParent.getSortIndex == sortIndex).isEmpty
+                }.sortBy(_._1)) { days =>
+
+                        <table class="table table-striped table-hover table-condensed">
+                            <thead>
+                                <th class="text-info text-center" >Uhrzeit</th>
+
+
+                                @for(day <- days) {
+                                    <th class="text-info text-center" >
+                                    @day._2
+                                    </th>
+                                }
+                            </thead>
+                            <tbody>
+                                @for(timeRange<-timeRanges.sorted(TimeRange)){
+                                    <tr>
+                                        <td style=" vertical-align : middle ; width : 8% ;">
+                                            @timeRange.toString
+                                        </td>
+                                        @for(day <- days){
+                                            <td>
+                                                @for(slot<-timeslots.filter(slot=> timeRange.compare(slot)==0 && slot.getParent.getSortIndex == day._1.toInt)){
+                                                    <div class="alert alert-info input-group">
+                                                        <span class="input-group-addon glyphicon @if(slot.isUnpopular){ glyphicon-thumbs-down }else{ glyphicon-thumbs-up  } "></span>
+                                                        <button class="btn btn-danger btn-sm" onclick="$(location).attr('href','@routes.CTimeslotDefintion.delete(slot.getId)');"><span class="glyphicon glyphicon-trash"></span></button>
+                                                    </div>
+                                                }
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                }
+                    </div>
                 </div>
             </div>
-        </div>
+
     </div>
 
 }

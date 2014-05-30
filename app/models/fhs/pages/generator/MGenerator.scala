@@ -102,11 +102,11 @@ object MGenerator {
 
 
   @tailrec
-  def findTimeRanges(timeslotTemplate: List[TimeSlotTemplate], timeRanges: List[TimeRange]): List[TimeRange] = {
+  def findTimeRanges(timeslotTemplate: List[TimeSlotTemplate], timeRanges: List[TimeRange]=List[TimeRange]()): List[TimeRange] = {
     timeslotTemplate.headOption match {
       case None => timeRanges
       case Some(timeslot) =>
-        val existingRange = timeRanges.filter {
+        val existingRange = timeRanges.find {
           case TimeRange(startHour, startMinute, stopHour, stopMinute) =>
             val startEqual = startHour == timeslot.getStartHour && startMinute == timeslot.getStartMinute
             val stopEqual = stopHour == timeslot.getStopHour && stopMinute == timeslot.getStopMinute
@@ -195,6 +195,20 @@ case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute
   override def toString = "" + startHour.formatted("%02d") + ":" + startMinute.formatted("%02d") + "-" + stopHour.formatted("%02d") + ":" + stopMinute.formatted("%02d")
 
   override def compare(that: TimeSlot): Int = {
+    if (startHour.compareTo(that.getStartHour) != 0) {
+      return startHour.compareTo(that.getStartHour)
+    }
+    if (startMinute.compareTo(that.getStartMinute) != 0) {
+      return startMinute.compareTo(that.getStartMinute)
+    }
+    if (stopHour.compareTo(that.getStopHour) != 0) {
+      return stopHour.compareTo(that.getStopHour)
+    }
+
+    stopMinute.compareTo(that.getStopMinute)
+  }
+
+  def compare(that:TimeSlotTemplate):Int = {
     if (startHour.compareTo(that.getStartHour) != 0) {
       return startHour.compareTo(that.getStartHour)
     }

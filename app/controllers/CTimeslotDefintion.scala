@@ -14,6 +14,7 @@ import models.Transactions
 import org.hibernate.criterion.Restrictions
 import models.persistence.template.{TimeSlotTemplate, WeekdayTemplate}
 import views.html.timeslotdefintiion._
+import models.fhs.pages.generator.MGenerator
 
 
 /**
@@ -39,11 +40,12 @@ object CTimeslotDefintion extends Controller {
 
   @Transactional(readOnly = true)
   def page =
-      Action {
-
-        Ok(timeslotdefinition("Timeslots", List[String](), timeslotForm, WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
-        //Ok(views.html.index("test"))
-      }
+    Action {
+      val allTimeSlots = MTimeslotDisplay.findAllTimeslots
+      val timeRanges = MGenerator.findTimeRanges(allTimeSlots)
+      Ok(timeslotdefinition("Timeslots", List[String](), timeslotForm, WEEKDAYS, allTimeSlots, timeRanges))
+      //Ok(views.html.index("test"))
+    }
 
 
   @Transactional
@@ -54,14 +56,19 @@ object CTimeslotDefintion extends Controller {
 
       timeslotResult.fold(
         errors => {
-          BadRequest(timeslotdefinition("Timeslots", List[String](), errors, WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
+          val allTimeSlots = MTimeslotDisplay.findAllTimeslots
+          val timeRanges = MGenerator.findTimeRanges(allTimeSlots)
+
+          BadRequest(timeslotdefinition("Timeslots", List[String](), errors, WEEKDAYS, allTimeSlots, timeRanges))
         },
         timeslot => {
 
           Logger.debug("weekdays" + timeslot.weekdays)
 
           if (timeslot.weekdays.isEmpty) {
-            BadRequest(timeslotdefinition("Timeslots", List("weekdays"), timeslotForm.fill(timeslot), WEEKDAYS,MTimeslotDisplay.findAllTimeslots))
+            val allTimeSlots = MTimeslotDisplay.findAllTimeslots
+            val timeRanges = MGenerator.findTimeRanges(allTimeSlots)
+            BadRequest(timeslotdefinition("Timeslots", List("weekdays"), timeslotForm.fill(timeslot), WEEKDAYS,  allTimeSlots, timeRanges))
           } else {
 
             timeslot.weekdays.foreach {

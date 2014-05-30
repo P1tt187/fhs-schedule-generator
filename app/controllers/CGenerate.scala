@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 import models.fhs.pages.generator.MGenerator._
 import play.api.data._
 import play.api.data.Forms._
-import models.fhs.pages.generator.{TimeRange, GeneratorForm}
+import models.fhs.pages.generator.GeneratorForm
 import scala.concurrent.Future
 import logic.generator.schedulegenerator.{InplacebleSchedule, GenerateSchedule, ScheduleGeneratorActor, ScheduleAnswer}
 
@@ -136,7 +136,7 @@ object CGenerate extends Controller {
           session.createCriteria(classOf[TimeSlotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeSlotTemplate]].toList.sorted
       }
 
-      val timeRanges = findTimeRanges(timeslotTemplates, List[TimeRange]())
+      val timeRanges = findTimeRanges(timeslotTemplates)
 
       val filteredPage = if (courseId == -1 && docentId == -1 && filterDuration.equals("-1")) {
         showSchedule("Alle Kurse", timeRanges, timeslotsAll, schedule.getRate).toString()
