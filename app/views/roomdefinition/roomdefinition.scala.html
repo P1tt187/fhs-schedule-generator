@@ -182,10 +182,15 @@
                         </tbody>
                     </table>
                 </div>
+</div>
+            </div>
+
+
 
 
                 <!-- display availability -->
                 @for(roomEntity <- existingRooms.filterNot(_.timeCriterias.isEmpty)) {
+                    <div class="col-md-5">
                     <div class="panel panel-info">
                         <div class="panel-heading">
                             <h3 class="panel-title">
@@ -231,9 +236,10 @@
                             </div>
                         </div>
                     </div>
+                  </div>
                 }
-            </div>
-        </div>
+
+
     </div>
 
 }
