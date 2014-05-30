@@ -184,12 +184,8 @@
                    </div>
                 </div>
             </div>
-
-
-
-
-                <!-- display availability -->
-                @for(roomEntity <- existingRooms.filterNot(_.timeCriterias.isEmpty).sortBy(_.house)) {
+               <!-- display availability -->
+                @for(roomEntity <- existingRooms.filterNot(_.timeCriterias.isEmpty).sortBy(r =>(r.house,r.number))) {
                     <div class="col-md-5">
                     <div class="panel panel-info">
                         <div class="panel-heading">

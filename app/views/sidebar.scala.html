@@ -2,23 +2,45 @@
 
     @navList = @{
         List(
-            (CTimeslotDefintion.NAV, routes.CTimeslotDefintion.page, "Zeitslots Definieren"),
-            (CRoomDefinition.NAV, routes.CRoomDefinition.page, "Räume erstellen"),
+            (CEditSubjects.NAV, routes.CEditSubjects.page, "Fächer Editieren"),
             (CEditCourses.NAV, routes.CEditCourses.page, "Kurse & Gruppen"),
             (CEditDocents.NAV,routes.CEditDocents.page,"Dozenten"),
-            (CEditSubjects.NAV, routes.CEditSubjects.page, "Fächer Editieren"),
             (CGenerate.NAV, routes.CGenerate.page, "Generator")
 
+        )
+    }
+
+    @exportList = @{
+        List(
+            (CBLAFileUpload.NAV,routes.CBLAFileUpload.page,"Bla Datei Importieren"),
+            (CExporter.NAV,routes.CExporter.page,"JSON Im-/Export")
+        )
+    }
+
+    @baseDataList = @{
+        List(
+            (CTimeslotDefintion.NAV, routes.CTimeslotDefintion.page, "Zeitslots Definieren"),
+            (CRoomDefinition.NAV, routes.CRoomDefinition.page, "Räume erstellen")
         )
     }
 
     <li role="presentation" class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Im-/Exporter <b class="caret"></b></a>
         <ul class="dropdown-menu">
-            <li role="presentation" class="@if(nav==CBLAFileUpload.NAV){active}"><a href="@routes.CBLAFileUpload.page">Bla Datei Importieren</a> </li>
-            <li role="presentation" class="@if(nav==CExporter.NAV){active}"><a href="@routes.CExporter.page">JSON Im-/Export</a> </li>
+        @for(element <- exportList) {
+            <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+        }
         </ul>
     </li>
+
+<li role="presentation" class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Stammdaten <b class="caret"></b></a>
+    <ul class="dropdown-menu">
+    @for(element <- baseDataList) {
+        <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+    }
+    </ul>
+</li>
 
 @for(element <- navList) {
     <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
