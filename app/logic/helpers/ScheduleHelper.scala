@@ -28,9 +28,8 @@ object ScheduleHelper {
           case ts: TimeSlot =>
 
             val theLectures = ts.getLectures.filter {
-              lecture =>
-                val courses = lecture.getParticipants.map(_.getCourse)
-                lecture.getParticipants.contains(course) || courses.contains(course)
+              case lecture:Lecture =>
+                !lecture.getLectureParticipants.find(_.getCourseName.equals(course.getShortName)).isEmpty
             }.map {
               case lecture: Lecture =>
                 val copyLecture = cloner.deepClone(lecture)

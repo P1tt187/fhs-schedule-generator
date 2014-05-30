@@ -1,9 +1,7 @@
 @(lecture: models.persistence.lecture.Lecture)
-@import models.persistence.participants.Group
 
 
 @import models.persistence.enumerations.ELectureKind
-@import models.persistence.participants.Course
 @import models.persistence.enumerations.EDuration
 @import play.api.Play.current
 
@@ -28,18 +26,8 @@
     </div>
 
     <div>
-    @for(participant <- lecture.getParticipants.toList.sortBy(_.getName)) {
-        @{
-            participant match {
-                case c:Course => c.getName
-                case group:Group =>
-                if(group.isIgnoreGroupIndex == true){
-                    group.getCourse.getName
-                } else {
-                    group.getName
-                }
-            }
-        }
+    @for(participant <- lecture.getLectureParticipants.toList.sortBy(_.getCourseName)) {
+        @participant.getShortName
     }
     </div>
     <div class="pull-right">

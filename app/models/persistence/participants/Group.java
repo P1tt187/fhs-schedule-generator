@@ -55,7 +55,9 @@ public class Group extends Participant implements Comparable<Group> {
     @Column(name = "GROUPINDEX")
     private Integer groupIndex;
 
-    /** flag for view */
+    /**
+     * flag for view
+     */
     @Column(name = "IGNORE_GROUPINDEX")
     private Boolean ignoreGroupIndex;
 
@@ -78,6 +80,18 @@ public class Group extends Participant implements Comparable<Group> {
     @Override
     public String getName() {
         return course.getShortName() + " " + groupIndex;
+    }
+
+    @Override
+    public LectureParticipant participant2LectureParticipant() {
+
+        LectureParticipant lp = new LectureParticipant();
+        lp.setCourseName(course.getShortName());
+        lp.setGroupIndex(groupIndex);
+        boolean ignoreValue = ignoreGroupIndex != null ? ignoreGroupIndex : false;
+        lp.setIgnoreGroupIndex(ignoreValue);
+
+        return lp;
     }
 
     public Group getParent() {

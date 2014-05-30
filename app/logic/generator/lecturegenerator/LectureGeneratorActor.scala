@@ -4,7 +4,7 @@ import akka.actor.Actor
 import models.persistence.lecture.Lecture
 import scala.collection.mutable
 import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
-import models.persistence.participants.{Group, Participant}
+import models.persistence.participants.{LectureParticipant, Group, Participant}
 import scala.collection.JavaConversions._
 import models.persistence.enumerations.{ELectureKind, EDuration}
 import play.api.Logger
@@ -46,6 +46,8 @@ class LectureGeneratorActor extends Actor {
                 val lecture = new Lecture
                 lecture.setDocents(lectureSubject.getDocents.map(_.docent2LectureDocent()))
                 lecture.setParticipants(Set[Participant]() ++ lectureSubject.getCourses)
+                lecture.setLectureParticipants(lectureSubject.getCourses.map(_.participant2LectureParticipant()))
+
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(lectureSubject.getName)
                 lecture.setCriteriaContainer(subject.getCriteriaContainer)
@@ -97,6 +99,7 @@ class LectureGeneratorActor extends Actor {
               def initExerciseLecture(groups: List[Group]): Lecture = {
                 val lecture = new Lecture
                 lecture.setParticipants(Set[Participant]() ++ groups)
+                lecture.setLectureParticipants(Set[LectureParticipant]() ++ groups.map(_.participant2LectureParticipant()))
                 lecture.setDocents(exerciseSubject.getDocents.map(_.docent2LectureDocent()))
                 lecture.setCriteriaContainer(exerciseSubject.getCriteriaContainer)
                 lecture.setDuration(EDuration.WEEKLY)

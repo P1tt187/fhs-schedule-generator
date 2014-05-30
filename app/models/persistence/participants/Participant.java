@@ -34,4 +34,6 @@ public abstract class Participant extends AbstractEntity {
     @JsonIgnore
     public abstract String getName();
 
+    public abstract LectureParticipant participant2LectureParticipant();
+
 }

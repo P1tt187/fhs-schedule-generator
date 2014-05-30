@@ -6,6 +6,7 @@ import models.persistence.docents.LectureDocent;
 import models.persistence.enumerations.EDuration;
 import models.persistence.enumerations.ELectureKind;
 import models.persistence.location.RoomEntity;
+import models.persistence.participants.LectureParticipant;
 import models.persistence.participants.Participant;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -33,8 +34,7 @@ public class Lecture extends AbstractLecture {
     /**
      * participants can be multiple courses or groups
      */
-    @ManyToMany(fetch = FetchType.EAGER, targetEntity = Participant.class)
-    @Fetch(FetchMode.SUBSELECT)
+    @Transient
     private Set<Participant> participants;
 
     /**
@@ -89,6 +89,10 @@ public class Lecture extends AbstractLecture {
     @JsonIgnore
     private BigInteger difficultLevel = BigInteger.ZERO;
 
+    @CollectionTable(name = "TBLLECTURE_PARTICIPANTS")
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<LectureParticipant> lectureParticipants;
+
     /**
      * this is just for debugging
      * <p>
@@ -98,6 +102,13 @@ public class Lecture extends AbstractLecture {
     @Transient
     private String notOptimalPlaced = "";
 
+    public Set<LectureParticipant> getLectureParticipants() {
+        return lectureParticipants;
+    }
+
+    public void setLectureParticipants(Set<LectureParticipant> lectureParticipants) {
+        this.lectureParticipants = lectureParticipants;
+    }
 
     public String getNotOptimalPlaced() {
         return notOptimalPlaced;

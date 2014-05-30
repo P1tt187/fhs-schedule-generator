@@ -54,6 +54,14 @@ public class Course extends Participant {
     }
 
     @Override
+    public LectureParticipant participant2LectureParticipant() {
+        LectureParticipant lp = new LectureParticipant();
+        lp.setCourseName(shortName);
+        lp.setIgnoreGroupIndex(true);
+        return lp;
+    }
+
+    @Override
     public Course getCourse() {
         return this;
     }

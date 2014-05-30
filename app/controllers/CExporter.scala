@@ -16,7 +16,7 @@ import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
 import models.fhs.pages.exporter.MExporter._
 import models.fhs.pages.generator.MGenerator._
 import java.nio.file._
-import models.persistence.participants.{Group, Course}
+import models.persistence.participants.Course
 import models.persistence.scheduletree.{TimeSlot, Weekday}
 import models.persistence.lecture.Lecture
 import models.persistence.enumerations.ELectureKind
@@ -140,7 +140,7 @@ object CExporter extends Controller {
 
                 val group = lecture.getKind match {
                   case ELectureKind.LECTURE => ""
-                  case ELectureKind.EXERCISE => val g = lecture.getParticipants.find(_.getCourse.equals(course)).get.asInstanceOf[Group]
+                  case ELectureKind.EXERCISE => val g = lecture.getLectureParticipants.find(_.getCourseName.equals(course.getShortName)).get
                     if (g.isIgnoreGroupIndex == true) {
                       ""
                     } else {
