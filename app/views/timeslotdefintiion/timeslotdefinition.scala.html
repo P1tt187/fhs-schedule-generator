@@ -18,16 +18,6 @@
             <div class="col-md-5">
             @form(action = routes.CTimeslotDefintion.submit, 'class -> "span12 form-inline ") {
                 <fieldset>
-                    <h4>Beginn:</h4>
-
-                    @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
-                    @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
-
-                    <h4>Ende:</h4>
-
-                    @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group  ", '_label -> "Stunde", '_help -> "")
-                    @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group  ", '_label -> "Minute", '_help -> "")
-
 
                     <h4>Wochentage:</h4>
 
@@ -43,7 +33,20 @@
                         }
                         </select>
                     </div>
+
                     @checkbox(timeslotForm("unpopular"),'_class -> "form-group",'_label -> "bei Studenten unbeliebt", '_help ->"")
+
+                    <h4>Beginn:</h4>
+
+                    @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
+                    @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
+
+                    <h4>Ende:</h4>
+
+                    @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group  ", '_label -> "Stunde", '_help -> "")
+                    @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group  ", '_label -> "Minute", '_help -> "")
+
+
                     <br/>
 
                     <div class="form-group " style="margin-top : 1%">
@@ -57,6 +60,8 @@
 
             </div>
         </div>
+        <!-- display existing timeSlots -->
+
         <div class="row-fluid">
             <div class="col-md-5">
                 <div class="table-responsive">
