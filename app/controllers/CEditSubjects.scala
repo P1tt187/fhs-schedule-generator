@@ -17,6 +17,7 @@ import models.persistence.location.{RoomEntity, RoomAttributesEntity, HouseEntit
 import scala.concurrent.duration._
 import scala.collection.JavaConversions._
 import models.persistence.docents.Docent
+import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
 
 /**
  * @author fabian 
@@ -33,7 +34,28 @@ object CEditSubjects extends Controller {
 
   def page = Action {
     implicit request =>
-    Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses()))
+      Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses()))
+  }
+
+  def copySubject(subjectType: String, id: Long) = Action {
+    val cloner = new Cloner(new ObjenesisInstantiationStrategy)
+
+    val subject = subjectType match {
+      case LECTURE =>
+        findSubject(classOf[LectureSubject], id)
+      case EXERCISE =>
+        findSubject(classOf[ExerciseSubject], id)
+    }
+
+    val subjectClone = cloner.deepClone(subject)
+    subjectClone.setId(-1l)
+    subjectClone.setName("*" + subjectClone.getName)
+
+    val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity]) = loadCachedData()
+
+    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subjectClone, docents, courses, houses, rooms).toString().trim())))
+
+
   }
 
   def getSubjectFields(semester: Long, subjectType: String, idString: String) = Action {
@@ -65,6 +87,13 @@ object CEditSubjects extends Controller {
     }
 
 
+    val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity]) = loadCachedData()
+
+    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim())))
+
+  }
+
+  private def loadCachedData(): (List[Docent], List[Course], List[HouseEntity], List[RoomEntity]) = {
     val docents = Cache.getOrElse("docents") {
       val docent = findDocents()
       Cache.set("docents", docent, expiration = TIME_TO_LIFE)
@@ -89,9 +118,7 @@ object CEditSubjects extends Controller {
       Cache.set("rooms", room, expiration = TIME_TO_LIFE)
       room
     }
-
-    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim())))
-
+    (docents, courses, houses, rooms)
   }
 
   private def extractSemesterPattern(semester: String) = {
@@ -109,7 +136,7 @@ object CEditSubjects extends Controller {
     }
   }
 
-  def deleteSemester(semesterID:Long) = Action{
+  def deleteSemester(semesterID: Long) = Action {
 
     val semester = findSemesterById(semesterID)
     deleteLecturesAndSchedules(semester)
@@ -142,7 +169,7 @@ object CEditSubjects extends Controller {
 
         val roomCriteriaIds = (jsVal \ "roomCriteria").as[JsArray].value.map(_.as[String].toLong).toList
 
-        val semester = (jsVal \ "semester").as[String]
+        val semester = (jsVal \ "semester").as[Long]
 
         val duration = EDuration.valueOf((jsVal \ "duration").as[String])
 
@@ -156,7 +183,7 @@ object CEditSubjects extends Controller {
 
         val selectedRooms = findSelectedRooms(roomCriteriaIds)
 
-        val selectedSemester = findSemester(extractSemesterPattern(semester))
+        val selectedSemester = findSemesterById (semester)
 
 
 
@@ -173,9 +200,12 @@ object CEditSubjects extends Controller {
             exercise
         }
 
-        if (subject.getId == null) {
+        if (null == subject.getId ) {
+          Logger.debug("init new subject")
           initNewSubject(subject)
           subject.setSemester(selectedSemester)
+
+          Logger.debug("semester " + selectedSemester)
           subject match {
             case exercise: ExerciseSubject =>
               val groupTypeInput = (jsVal \ "groupTypeInput").as[String]
@@ -191,16 +221,18 @@ object CEditSubjects extends Controller {
         criteriaContainer.setCriterias(List[AbstractCriteria]())
 
         val oldCriteriaContainer = subject.getCriteriaContainer
-        val existingRoomCriteria = oldCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria])
-if(!roomAttributes.isEmpty) {
-  setRoomAttributesForCriteria(roomAttributes, criteriaContainer)
-}
+
+        if (!roomAttributes.isEmpty) {
+          setRoomAttributesForCriteria(roomAttributes, criteriaContainer)
+        }
 
         setHouseCriterias(selectedHouses, criteriaContainer)
 
         setRoomCriterias(selectedRooms, criteriaContainer)
 
         subject.setCriteriaContainer(criteriaContainer)
+
+        Logger.debug("save subject " + subject.getId)
 
         Transactions {
           implicit entityManager =>

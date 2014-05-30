@@ -48,24 +48,8 @@
             </nav>
             <div class="container-fluid" id="mainContainer">
                 <div class="row-fluid">
-                    <div class="column col-xs-2 hidden-sm hidden-xs">
-                        <nav class="collapse navbar-left navbar-collapse pull-left" role="navigation">
-                            <ul class="nav navbar-pills nav-stacked" >
-                                <li class="@if(nav == controllers.CIndex.NAV) {active}"><a href="@routes.CIndex.index">
-                                    Home</a>
-                                </li>
-                                <li class="dropdown">
-                                    <a class="dropdown-toggle" href="#" data-toggle="dropdown">Menü
-                                        <span class="caret"></span>
-                                    </a>
-                                    <ul class="dropdown-menu">@sidebar(nav)</ul>
 
-                                </li>
-
-                            </ul>
-                        </nav>
-                    </div>
-                    <div class="column col-md-10 ">
+                    <div class="column col-md-12 ">
                         <article class=" " role="main"> @content </article>
                     </div>
                 </div>

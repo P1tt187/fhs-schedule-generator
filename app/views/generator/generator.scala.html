@@ -144,10 +144,10 @@
             changeProgressBar ( ) ;
                 $('#filterContainer' ).removeClass('hidden');
                 $('#generatorFieldset' ).removeAttr('disabled');
+                $('#refreshBtn' ).removeClass('disabled');
                 if(data.error) {
                 $ ( '.progress-bar' ).removeClass ( 'progress-bar-warning' ).addClass ( 'progress-bar-danger' ) ;
                 } else {
-                $('#refreshBtn' ).removeClass('disabled');
                 $ ( '#saveSchedule' ).removeClass ( 'disabled' ) ;
                 }
             showSchedule();

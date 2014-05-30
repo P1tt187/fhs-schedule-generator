@@ -185,7 +185,7 @@
 
 
                 <!-- display availability -->
-                @for(roomEntity <- existingRooms) {
+                @for(roomEntity <- existingRooms.filterNot(_.timeCriterias.isEmpty)) {
                     <div class="panel panel-info">
                         <div class="panel-heading">
                             <h3 class="panel-title">
@@ -205,14 +205,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @if(roomEntity.timeCriterias.isEmpty) {
-                                            <tr>
-                                                <td>-</td>
-                                                <td>immer</td>
-                                                <td>verfügbar</td>
-                                                <td>Wöchentlich</td>
-                                            </tr>
-                                        }
+
 
                                         @for(tcrit <- roomEntity.timeCriterias.sorted) {
                                             <tr >

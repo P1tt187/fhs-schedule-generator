@@ -20,7 +20,9 @@
         <label for="unitInput" class="control-label">Einheiten</label>
         <input class="form-control" id="unitInput" name="unitInput" type="number" placeholder="einheiten" value="@subject.getUnits" step="0.5" min="0.5" required>
     </div>
-
+<div class="form-group">
+    <button id="cloneSubjectBtn" type="button" class="btn btn-warning"><span class="glyphicon glyphicon-repeat"></span> </button>
+</div>
     <div class="clearfix"></div>
     <div class="form-group" id="expectedParticipantsContainer">
         <label class="control-label" for="expectedParticipantsInput">Erwartete Teilnehmerzahl <br/> (optional) </label>
@@ -149,6 +151,18 @@
 
 <script type="text/javascript">
 
+$('#cloneSubjectBtn' ).on('click', function(){
+    console.log('btn pressed');
+
+$.getJSON ( '/copySubject' + '/@lectureType/@subject.getId'
+, function ( data ) {
+    console.log(data);
+$ ( '#inputContainer' ).empty ( ).append ( data.htmlresult ) ;
+reenableSelectBoxes ( ) ;
+} ) ;
+
+});
+
 var coursesSizes= {};
     @for(c<- courses) {
         coursesSizes['@c.getId'] = @c.getSize;
@@ -254,7 +268,7 @@ if(! $.isNumeric(data['expectedParticipants'])){
 
 data['expectedParticipants']=Number(data['expectedParticipants']);
 
-data['semester']= $('#selectSemester').val ( ) ;
+data['semester']= Number($('#selectSemester').val ( )) ;
 
 var Form = this ;
 $.ajax ( {
