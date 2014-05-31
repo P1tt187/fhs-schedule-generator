@@ -116,20 +116,19 @@
 
             };
 
+            var getNameField = function ( ) {
+
+            $.getJSON ( '/editSucjects/' + $ ( '#selectSemester' ).val ( ) + "/" +
+            $ ( '#selectLectureType' ).val ( ) + '/' +$('#filterDocent' ).val()
+            + '/' +$('#filterCourses' ).val()+ '/' +$('#filterActive' ).val(), function ( data ) {
+
+            $ ( '#nameContainer' ).empty ( ).append ( data.html ) ;
+
+            reenableSelectBoxes();
+            } ) ;
+            };
+
         $ ( window ).on ( 'load', function ( ) {
-
-        var getNameField = function ( ) {
-
-        $.getJSON ( '/editSucjects/' + $ ( '#selectSemester' ).val ( ) + "/" +
-        $ ( '#selectLectureType' ).val ( ) + '/' +$('#filterDocent' ).val()
-        + '/' +$('#filterCourses' ).val()+ '/' +$('#filterActive' ).val(), function ( data ) {
-
-        $ ( '#nameContainer' ).empty ( ).append ( data.html ) ;
-
-        reenableSelectBoxes();
-        } ) ;
-        };
-
         $ ( '#selectLectureType' ).on ( 'change', getNameField ) ;
         $ ( '#selectSemester' ).on ( 'change', getNameField ) ;
         $ ( '#filterDocent' ).on('change', getNameField);

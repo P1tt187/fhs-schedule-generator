@@ -58,6 +58,18 @@ object CEditSubjects extends Controller {
 
   }
 
+  def deleteSubject(subjectType:String, id:Long)= Action{
+    val subject = subjectType match {
+      case LECTURE =>
+        findSubject(classOf[LectureSubject], id)
+      case EXERCISE =>
+        findSubject(classOf[ExerciseSubject], id)
+    }
+
+    removeSubject(subject)
+    Redirect(routes.CEditSubjects.page())
+  }
+
   def getSubjectFields(semester: Long, subjectType: String, idString: String) = Action {
 
 

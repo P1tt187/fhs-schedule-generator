@@ -4,7 +4,7 @@
         List(
             (CEditSubjects.NAV, routes.CEditSubjects.page, "Fächer Editieren"),
             (CEditCourses.NAV, routes.CEditCourses.page, "Kurse & Gruppen"),
-            (CEditDocents.NAV,routes.CEditDocents.page,"Dozenten"),
+            (CEditDocents.NAV, routes.CEditDocents.page, "Dozenten"),
             (CGenerate.NAV, routes.CGenerate.page, "Generator")
 
         )
@@ -12,8 +12,8 @@
 
     @exportList = @{
         List(
-            (CBLAFileUpload.NAV,routes.CBLAFileUpload.page,"Bla Datei Importieren"),
-            (CExporter.NAV,routes.CExporter.page,"JSON Im-/Export")
+            (CBLAFileUpload.NAV, routes.CBLAFileUpload.page, "Bla Datei Importieren"),
+            (CExporter.NAV, routes.CExporter.page, "JSON Im-/Export")
         )
     }
 
@@ -24,14 +24,14 @@
         )
     }
 
-    <li role="presentation" class="dropdown">
+<li role="presentation" class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Im-/Exporter <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-        @for(element <- exportList) {
-            <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
-        }
-        </ul>
-    </li>
+    <ul class="dropdown-menu">
+    @for(element <- exportList) {
+        <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+    }
+    </ul>
+</li>
 
 <li role="presentation" class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Stammdaten <b class="caret"></b></a>

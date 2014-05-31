@@ -20,9 +20,37 @@
         <label for="unitInput" class="control-label">Einheiten</label>
         <input class="form-control" id="unitInput" name="unitInput" type="number" placeholder="einheiten" value="@subject.getUnits" step="0.5" min="0.5" required>
     </div>
-<div class="form-group">
-    <button id="cloneSubjectBtn" type="button" class="btn btn-warning"><span class="glyphicon glyphicon-repeat"></span> </button>
-</div>
+    <div class="form-group">
+        <button id="cloneSubjectBtn" type="button" class="btn btn-warning"><span class="glyphicon glyphicon-repeat"></span> </button>
+    </div>
+    <div class="form-group">
+        <button id="deleteSubjectModalBtn" type="button" class="btn btn-danger @if(subject.getId == -1l){hidden} " data-toggle="modal" data-target=".delete-subject"><span class="glyphicon glyphicon-trash"></span> </button>
+    </div>
+    <div class="modal fade delete-subject" id="deleteSubjectModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header alert alert-danger">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="text-center modal-title"><strong> DANGERZONE!!! </strong></h4>
+                </div>
+                <div class="modal-body">
+                    Sind Sie sich sicher, das Sie die Veranstaltung <strong><span id="subjectPlaceholder"></span> löschen</strong> wollen?
+                    <div class="hidden" id="subjectProgressContainer">
+                        <div class="progress progress-striped active">
+                            <div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                                <span class="sr-only">100% Complete</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-dismiss="modal" ><span class="glyphicon glyphicon-remove"></span> </button>
+                    <button type="button" id="deleteSubjectBtn" class="btn btn-danger" ><span class="glyphicon glyphicon-ok"></span> </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="clearfix"></div>
     <div class="form-group" id="expectedParticipantsContainer">
         <label class="control-label" for="expectedParticipantsInput">Erwartete Teilnehmerzahl <br/> (optional) </label>
@@ -150,6 +178,26 @@
 
 
 <script type="text/javascript">
+
+    $('#deleteSubjectModalBtn' ).on('click', function(){
+      $('#subjectPlaceholder' ).html( $('#nameInput' ).val());
+    });
+
+    $('#deleteSubjectBtn' ).on('click', function(){
+    console.log('delete btn clicked');
+    $('#subjectProgressContainer' ).removeClass('hidden');
+
+    $.ajax ( {
+    cache : false,
+    type : "GET",
+    url:"@routes.CEditSubjects.deleteSubject(lectureType,subject.getId)",
+   success : function(){
+   $('#deleteSubjectModal').modal('toggle');
+
+   getNameField();
+   }
+   });
+  });
 
 $('#cloneSubjectBtn' ).on('click', function(){
     console.log('btn pressed');

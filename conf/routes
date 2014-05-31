@@ -25,6 +25,7 @@ GET         /subjects/:semester/:subjectType/:id                                
 POST        /editSubject                                                                              controllers.CEditSubjects.saveData
 GET         /deleteSemester/:semesterID                                                               controllers.CEditSubjects.deleteSemester(semesterID:Long)
 GET         /copySubject/:subjectType/:subjectId                                                      controllers.CEditSubjects.copySubject(subjectType, subjectId:Long)
+GET         /deleteSubject/:subjectType/:subjectId                                                    controllers.CEditSubjects.deleteSubject(subjectType,subjectId:Long)
 
 GET         /editCourses                                                                              controllers.CEditCourses.page
 GET         /editCourses/courseFields/:courseId                                                       controllers.CEditCourses.getCourseFields(courseId:Long)

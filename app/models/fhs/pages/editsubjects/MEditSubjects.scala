@@ -55,6 +55,14 @@ object MEditSubjects {
   }
 
 
+  def removeSubject(subject:AbstractSubject){
+    Transactions.hibernateAction{
+      implicit s=>
+        s.saveOrUpdate(subject)
+        s.delete(subject)
+    }
+  }
+
   def findLectureSubjectsForSemester(semester: Long, filterDocentId: Long = -1, filterCourseId: Long = -1, filterActive: String) = {
 
     val semesterDO = findSemesterById(semester)
