@@ -87,7 +87,7 @@
                                 @if(lectures.length>1){
                                     </td>
                                 }
-                                @if(idx % 2 != 0 && lectures.length>1){
+                                @if((idx % 2 != 0 || (idx % 2 == 0 && idx == lectures.length-1)) && lectures.length>1){
                                     </tr>
                                     }
                             }

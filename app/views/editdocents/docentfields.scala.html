@@ -16,7 +16,7 @@
 <form id="editDocentForm" class="form-inline">
     <a class="btn btn-danger btn-sm pull-right" role="button" href="@routes.CEditDocents.deleteDocent(existingDocentForm.value.getOrElse(defaultDocent).id) "><span class="glyphicon glyphicon-remove-circle"></span> </a>
     @inputText(existingDocentForm("id"), '_class -> "hidden")
-    @inputText(existingDocentForm("lastName"), '_label -> "Nachname", '_class -> "form-group", '_help -> "")
+    @inputText(existingDocentForm("lastName"), '_label -> "Nachname", '_class -> "form-group", '_help -> "",'_id->"lastNameContainer")
     <br/>
     <div class="form-group">
         <label class="control-label" for="favoriteFacility">Bevorzugte Gebäude</label>
@@ -85,30 +85,42 @@
 
                                 <form class="subform form-inline">
                                 <div class="form-group">
-                                    <label>
+                                    <div class="radio">
+                                    <label >
                                       <input class="form-control" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.WISH" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.WISH.name())){checked} >
                                         Wunsch
                                     </label>
+                                    </div>
+                                    <div class="radio">
                                     <label>
                                         <input class="form-control" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.AVAILABLE" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.AVAILABLE.name())){checked}>
                                         Kann
                                     </label>
-                                    <label>
+                                        </div>
+                                    <div class="radio">
+                                       <label>
                                         <input class="form-control" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,N" @if(wishes.isEmpty){checked} >
                                         N
                                     </label>
+                                    </div>
                                 </div>
-
+                                <div class="clearfix"></div>
                                 <div class="form-group" >
+                                    <div class="radio">
                                     <label>
                                         <input class="form-control" name="duration" type="radio" value="@EDuration.WEEKLY" @if(wishes.isEmpty || wishes.head.duration.equals(EDuration.WEEKLY.name())){checked}> wöch
                                     </label>
+                                     </div>
+                                    <div class="radio">
                                     <label>
                                         <input class="form-control" name="duration" type="radio" value="@EDuration.EVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.EVEN.name())){checked}> g
                                     </label>
+                                     </div>
+                                    <div class="radio">
                                     <label>
                                         <input class="form-control" name="duration" type="radio" value="@EDuration.UNEVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.UNEVEN.name())){checked}> ug
                                     </label>
+                                    </div>
                                 </div>
                                 </form>
                                 }
@@ -197,6 +209,8 @@
     index++;
 });
 
+$('#@existingDocentForm("lastName").id').attr('required','required');
+
 $ ( '#editDocentForm' ).on ( 'submit', function ( e ) {
 e.preventDefault ( ) ;
 
@@ -205,15 +219,24 @@ var postData = $ ( this ).serializeObject() ;
     var timeslotBuffer = [];
     $('.subform' ).each(function(index, value){
         var subFormData = $(value ).serializeObject();
-
-        timeslotBuffer.push ( subFormData )
-
+     if(subFormData['timerange' ].indexOf('N')==-1) {
+     timeslotBuffer.push ( subFormData )
+     }
     });
 
-    timeslotBuffer.push({"timerange" : postData['timerange'], "duration":postData['duration']});
+    if(postData['timerange' ].indexOf('N')==-1) {
+    timeslotBuffer.push ( { "timerange" : postData[ 'timerange' ], "duration" : postData[ 'duration' ] } ) ;
+    }
 postData['timeslots'] = timeslotBuffer ;
 
 var postUrl = "@routes.CEditDocents.editDocent";
+
+    $('.has-error' ).removeClass('has-error');
+
+    if(!postData['@existingDocentForm("lastName").name'].trim()){
+    $('#lastNameContainer' ).addClass('has-error');
+    return;
+    }
 
 if(postData['roomCrit']==null){
 postData['roomCrit']=[];
