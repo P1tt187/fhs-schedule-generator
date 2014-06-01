@@ -13,7 +13,7 @@
         case EDuration.WEEKLY => "bg-info"
         case other => "bg-danger " + other
     }
-}">
+}" >
     <div class=""> <strong>  @lecture.getShortName </strong></div>
     <div class="pull-right">
         <span class="glyphicon @{
@@ -25,7 +25,7 @@
         </span>
     </div>
 
-    <div>
+    <div style="font-size: 90%">
     @for(participant <- lecture.getLectureParticipants.toList.sortBy(_.getCourseName)) {
         @participant.getShortName
     }

@@ -42,6 +42,7 @@ GET         /generatorFinished                                                  
 GET         /generatorGetSchedule/:filterCourse/:filterDocent/:filterDuration                         controllers.CGenerate.sendSchedule(filterCourse:Long, filterDocent:Long, filterDuration)
 POST        /saveSchedule                                                                             controllers.CGenerate.saveSchedule()
 GET         /loadSchedule/:id                                                                         controllers.CGenerate.loadScheduleForSemester(id:Long)
+GET         /switchSchedule/:idString                                                                 controllers.CGenerate.switchSchedule(idString )
 
 GET         /exportData                                                                               controllers.CExporter.page
 GET         /data.json                                                                                controllers.CExporter.export

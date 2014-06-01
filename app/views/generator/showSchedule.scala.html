@@ -1,10 +1,27 @@
-@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], rate:Int)
+@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], rate:Int, alternatives:Map[java.util.UUID,persistence.Schedule])(implicit session:Session)
 
 @import models.persistence.scheduletree.Weekday
 
 <div class="page-header">
     <h1>@title</h1>
 </div>
+
+    <div class="form-inline ">
+        <div class="form-group">
+        <label class="control-label" for="alternativSelector">Altenativen</label>
+        <select class="form-control" id="alternativSelector" title="keine alternativen">
+            @for(id <- alternatives.keySet){
+                <option @if(id.toString.equals(session.get("selectedSchedule").getOrElse(""))){selected } value="@id.toString"> Restmängel: @alternatives(id).getRate Gesamtsumme: @alternatives(id).getRateSum </option>
+            }
+        </select>
+        </div>
+    </div>
+    <script>
+    $('#alternativSelector' ).on('change',function(){
+        $(location ).attr('href','/switchSchedule/' + $(this ).val() );
+    });
+    initSelect();
+    </script>
 
     <h4>Restmängel: @rate </h4>
     <div class="form-inline">
@@ -79,9 +96,9 @@
                                     <tr>
                                 }
                                 @if(lectures.length>1){
-                                    <td style="width: 50%">
+                                    <td style="width: 49%">
                                 }
-                                    <div class="panel panel-info smallText" >
+                                    <div class="panel panel-info small smallText" >
                                     @displayAbstractLecture(lectures(idx))
                                     </div>
                                 @if(lectures.length>1){

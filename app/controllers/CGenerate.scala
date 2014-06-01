@@ -25,7 +25,7 @@ import scala.collection.JavaConversions._
 import models.Transactions
 import models.persistence.template.TimeSlotTemplate
 import org.hibernate.criterion.CriteriaSpecification
-import java.util.Calendar
+import java.util.{UUID, Calendar}
 import models.persistence.lecture.Lecture
 import logic.generator.lecturegenerator.{LectureAnswer, GenerateLectures, LectureGeneratorActor}
 import scala.collection.mutable.Buffer
@@ -51,9 +51,10 @@ object CGenerate extends Controller {
 
   private var errorList: List[Lecture] = null
 
-  private lazy val schedules = Buffer[Schedule]()
+  private lazy val schedules = scala.collection.mutable.Map[UUID, Schedule]()
 
   private lazy val scheduleFutures = Buffer[Future[Any]]()
+
 
   val form: Form[GeneratorForm] = Form(
     mapping("id" -> longNumber,
@@ -120,32 +121,39 @@ object CGenerate extends Controller {
     Ok(json)
   }
 
+  def switchSchedule(idString: String) = Action {
+
+    schedule = schedules(schedules.keySet.find(_.toString.equals(idString)).get)
+    Redirect(routes.CGenerate.page()).withSession("selectedSchedule" -> idString)
+  }
 
   def sendSchedule(courseId: Long, docentId: Long, filterDuration: String) = Action {
-    if (hasError) {
-      Ok(Json.stringify(Json.obj("htmlresult" -> errorpage(errorList).toString())))
-    } else {
+    implicit request =>
 
-      val timeslotsAll = if (schedule == null) {
-        List[TimeSlot]()
+      if (hasError) {
+        Ok(Json.stringify(Json.obj("htmlresult" -> errorpage(errorList).toString())))
       } else {
-        collectTimeslotsFromSchedule(schedule)
-      }
-      val timeslotTemplates = Transactions.hibernateAction {
-        implicit session =>
-          session.createCriteria(classOf[TimeSlotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeSlotTemplate]].toList.sorted
-      }
 
-      val timeRanges = findTimeRanges(timeslotTemplates)
+        val timeslotsAll = if (schedule == null) {
+          List[TimeSlot]()
+        } else {
+          collectTimeslotsFromSchedule(schedule)
+        }
+        val timeslotTemplates = Transactions.hibernateAction {
+          implicit session =>
+            session.createCriteria(classOf[TimeSlotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeSlotTemplate]].toList.sorted
+        }
 
-      val filteredPage = if (courseId == -1 && docentId == -1 && filterDuration.equals("-1")) {
-        showSchedule("Alle Kurse", timeRanges, timeslotsAll, schedule.getRate).toString()
-      } else {
-        val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId), filterDuration)
-        showSchedule(courseName, timeRanges, timeslots, schedule.getRate).toString()
+        val timeRanges = findTimeRanges(timeslotTemplates)
+
+        val filteredPage = if (courseId == -1 && docentId == -1 && filterDuration.equals("-1")) {
+          showSchedule("Alle Kurse", timeRanges, timeslotsAll, schedule.getRate, schedules.toMap).toString()
+        } else {
+          val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId), filterDuration)
+          showSchedule(courseName, timeRanges, timeslots, schedule.getRate, schedules.toMap).toString()
+        }
+        Ok(Json.stringify(Json.obj("htmlresult" -> filteredPage)))
       }
-      Ok(Json.stringify(Json.obj("htmlresult" -> filteredPage)))
-    }
   }
 
   def generatorAction = Action {
@@ -189,13 +197,13 @@ object CGenerate extends Controller {
                   scheduleFuture.onSuccess {
                     case ScheduleAnswer(theSchedule) =>
 
-                      schedules += theSchedule
+                      schedules += UUID.randomUUID() -> theSchedule
 
                       val completetList = scheduleFutures.map(_.isCompleted).toSet
                       actorFinished = completetList.size == 1 && completetList.head
 
                       if (actorFinished) {
-                        schedule = schedules.sortBy(s=> (s.getRate.toInt, s.getRateSum)).head
+                        schedule = schedules.values.toList.sortBy(s => (s.getRate.toInt, s.getRateSum)).head
                       }
 
                       finishTime = Calendar.getInstance()
