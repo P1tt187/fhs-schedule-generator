@@ -49,10 +49,10 @@
         }
         </select>
     </div>
-    <div id="timeCrits">
+    <div id="timeCrits" class="small">
 
         <div class="table-responsive">
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered table-striped table-condensed">
                 <thead>
                     <th class="text-center text-info" >Uhrzeit</th>
 
@@ -72,6 +72,7 @@
                         <th class="text-info text-center" > @day._2</th>
                     }
                 </thead>
+                <tbody>
                 @for(range<-timeRanges.sorted){
                     <tr>
                         <td class="text-center"  style="vertical-align: middle; width : 8% ; ">
@@ -82,31 +83,31 @@
                             <td>
                                 @if(!allTimeSlots.find(slot=> range.compare(slot) == 0 && slot.getParent.getSortIndex == day._1.toInt).isEmpty){
 
-                                <form class="subform">
-                                <div style="display: inline; float: left">
+                                <form class="subform form-inline">
+                                <div class="form-group">
                                     <label>
-                                      <input name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.WISH" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.WISH.name())){checked} >
+                                      <input class="form-control" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.WISH" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.WISH.name())){checked} >
                                         Wunsch
                                     </label>
                                     <label>
-                                        <input name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.AVAILABLE" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.AVAILABLE.name())){checked}>
+                                        <input class="form-control" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.AVAILABLE" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.AVAILABLE.name())){checked}>
                                         Kann
                                     </label>
                                     <label>
-                                        <input name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,N" @if(wishes.isEmpty){checked} >
+                                        <input class="form-control" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,N" @if(wishes.isEmpty){checked} >
                                         N
                                     </label>
                                 </div>
 
-                                <div style="float: right">
+                                <div class="form-group" >
                                     <label>
-                                        <input name="duration" type="radio" value="@EDuration.WEEKLY" @if(wishes.isEmpty || wishes.head.duration.equals(EDuration.WEEKLY.name())){checked}> wöch
+                                        <input class="form-control" name="duration" type="radio" value="@EDuration.WEEKLY" @if(wishes.isEmpty || wishes.head.duration.equals(EDuration.WEEKLY.name())){checked}> wöch
                                     </label>
                                     <label>
-                                        <input name="duration" type="radio" value="@EDuration.EVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.EVEN.name())){checked}> g
+                                        <input class="form-control" name="duration" type="radio" value="@EDuration.EVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.EVEN.name())){checked}> g
                                     </label>
                                     <label>
-                                        <input name="duration" type="radio" value="@EDuration.UNEVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.UNEVEN.name())){checked}> ug
+                                        <input class="form-control" name="duration" type="radio" value="@EDuration.UNEVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.UNEVEN.name())){checked}> ug
                                     </label>
                                 </div>
                                 </form>
@@ -116,6 +117,7 @@
                         }
                     </tr>
                 }
+                </tbody>
             </table>
         </div>
 @*
