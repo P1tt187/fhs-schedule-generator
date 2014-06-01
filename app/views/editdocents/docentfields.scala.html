@@ -208,6 +208,7 @@ var postData = $ ( this ).serializeObject() ;
 
     });
 
+    timeslotBuffer.push({"timerange" : postData['timerange'], "duration":postData['duration']});
 postData['timeslots'] = timeslotBuffer ;
 
 var postUrl = "@routes.CEditDocents.editDocent";

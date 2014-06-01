@@ -85,7 +85,7 @@ object CEditDocents extends Controller {
       val houseCriterias = (jsVal \ existingDocentForm("houseCriterias").name).as[JsArray].value.map(_.as[String].toLong).toList
       val roomAttr = (jsVal \ existingDocentForm("roomAttr").name).as[JsArray].value.map(_.as[String]).toList
       val roomCrit = (jsVal \ existingDocentForm("roomCrit").name).as[JsArray].value.map(_.as[String].toLong).toList
-      val timeslots = (jsVal \ "timeslots").as[JsArray].value.map{
+      val timeslots = (jsVal \ "timeslots").as[JsArray].value.par.map{
         slot=>
           val rangeString = (slot \ "timerange").as[String].split(",")
 
