@@ -3,7 +3,7 @@
 
 @import helper._
 @import helper.twitterBootstrap._
-@import models.fhs.pages.generator.TimeRange
+
 
     @errorWeekdaySelect = @{
         errorIds.contains("weekdays")
@@ -84,7 +84,7 @@
                                 }
                             </thead>
                             <tbody>
-                                @for(timeRange<-timeRanges.sorted(TimeRange)){
+                                @for(timeRange<-timeRanges.sorted){
                                     <tr>
                                         <td style=" vertical-align : middle ; width : 8% ;">
                                             @timeRange.toString

@@ -4,7 +4,6 @@ import play.api.mvc._
 import play.api.libs.json._
 import models.fhs.pages.editsubjects.MEditSubjects._
 import play.api.Logger
-import java.util.regex.Pattern
 import views.html.editsubjects._
 import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
 import play.api.cache.Cache
@@ -131,10 +130,6 @@ object CEditSubjects extends Controller {
       room
     }
     (docents, courses, houses, rooms)
-  }
-
-  private def extractSemesterPattern(semester: String) = {
-    semester.replaceAll(Pattern.quote("+"), "/").trim
   }
 
   def getNamesField(semester: Long, subjectType: String, filterDocentId: Long, filterCourseId: Long, filterActive: String) = Action {

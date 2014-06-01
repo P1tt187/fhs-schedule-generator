@@ -15,6 +15,7 @@ import org.hibernate.FetchMode
 import play.api.Logger
 import models.persistence.docents.Docent
 import models.persistence.enumerations.EDuration
+import models.fhs.pages.editdocents.MDocentTimeWhish
 
 
 /**
@@ -172,21 +173,9 @@ object MGenerator {
 }
 
 
-object TimeRange extends Ordering[TimeRange] {
-  override def compare(range: TimeRange, that: TimeRange): Int = {
-    if (range.startHour.compareTo(that.startHour) != 0) {
-      return range.startHour.compareTo(that.startHour)
-    }
-    if (range.startMinute.compareTo(that.startMinute) != 0) {
-      return range.startMinute.compareTo(that.startMinute)
-    }
-    if (range.stopHour.compareTo(that.stopHour) != 0) {
-      return range.stopHour.compareTo(that.stopHour)
-    }
+object TimeRange {
 
-    range.stopMinute.compareTo(that.stopMinute)
-  }
-
+  implicit val TimeRangeOrdering = Ordering.by( (range:TimeRange)=> (range.startHour,range.startMinute,range.startHour,range.stopMinute) )
 }
 
 case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int) extends Ordered[TimeSlot] {
@@ -222,7 +211,19 @@ case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute
     stopMinute.compareTo(that.getStopMinute)
   }
 
+  def compare(that:MDocentTimeWhish):Int = {
+    if (startHour.compareTo(that.startHour) != 0) {
+      return startHour.compareTo(that.startHour)
+    }
+    if (startMinute.compareTo(that.startMinute) != 0) {
+      return startMinute.compareTo(that.startMinute)
+    }
+    if (stopHour.compareTo(that.stopHour) != 0) {
+      return stopHour.compareTo(that.stopHour)
+    }
 
+    stopMinute.compareTo(that.stopMinute)
+  }
 }
 
 case class GeneratorForm(id: Long, threads: Int, time: Int, randomRatio: Int, maxIterationDeep: Int)

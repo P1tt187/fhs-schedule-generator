@@ -1,7 +1,7 @@
-@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity])(implicit flash:Flash)
+@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.generator.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate])(implicit flash:Flash)
 
 @import models.fhs.pages.editdocents._
-@import models.persistence.enumerations.EDocentTimeKind
+@import models.persistence.enumerations._
 
 
 @import models.fhs.pages.roomdefinition._
@@ -20,7 +20,7 @@
     <br/>
     <div class="form-group">
         <label class="control-label" for="favoriteFacility">Bevorzugte Gebäude</label>
-        <select multiple id="favoriteFacility" name="houseCriterias[]" title="nichts ausgewählt">
+        <select multiple id="favoriteFacility" name="houseCriterias" title="nichts ausgewählt">
 
         @for(h <- houses) {
             @defining(existingDocentForm.value.getOrElse( defaultDocent).houseCriterias.count(houseId => houseId.equals(h.getId)) > 0) { isSelected =>
@@ -31,7 +31,7 @@
     </div>
     <div class="form-group">
         <label for="favoriteRooms" class="control-label">Bevorzugte Räume</label>
-        <select multiple id="favoriteRooms" name="roomCrit[]" data-selected-text-format="count>4" title="nichts ausgewählt">
+        <select multiple id="favoriteRooms" name="roomCrit" data-selected-text-format="count>4" title="nichts ausgewählt">
         @for(r <- rooms) {
             @defining(existingDocentForm.value.getOrElse(defaultDocent).roomCrit.count(_ == r.getId) > 0) { isSelected =>
                 <option value="@r.getId" @if(isSelected) { selected }>@r.getHouse.getName @r.getNumber </option>
@@ -41,7 +41,7 @@
     </div>
     <div class="form-group">
         <label class="control-label" for="favoriteAttributes">Bevorzugte Ausstattung</label>
-        <select id="favoriteAttributes" name="roomAttr[]" multiple title="nichts ausgewählt">
+        <select id="favoriteAttributes" name="roomAttr" multiple title="nichts ausgewählt">
         @for(attr <- MRoomdefintion.ATTRIBUTES) {
             @defining(existingDocentForm.value.getOrElse(defaultDocent).roomAttr.count(_ == attr)>0) { isSelected =>
                 <option @if(isSelected){selected } value="@attr">@attr</option>
@@ -50,6 +50,75 @@
         </select>
     </div>
     <div id="timeCrits">
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <th class="text-center text-info" >Uhrzeit</th>
+
+                    @existingTimeWishes= @{
+                        existingDocentForm.value.getOrElse(defaultDocent).timeslots
+                    }
+
+                    @days= @{
+                        CTimeslotDefintion.WEEKDAYS.filterNot{
+                            case (sortIndexString,dayname)=>
+                                val sortIndex=sortIndexString.toInt
+                                allTimeSlots.find(_.getParent.getSortIndex == sortIndex).isEmpty
+                        }.sortBy(_._1)
+                    }
+
+                    @for(day <- days) {
+                        <th class="text-info text-center" > @day._2</th>
+                    }
+                </thead>
+                @for(range<-timeRanges.sorted){
+                    <tr>
+                        <td class="text-center"  style="vertical-align: middle; width : 8% ; ">
+                            @range.toString
+                        </td>
+                        @for(day <- days) {
+                            @defining(existingTimeWishes.filter(w=> range.compare(w)==0 && w.weekday == day._1.toInt)){ wishes=>
+                            <td>
+                                @if(!allTimeSlots.find(slot=> range.compare(slot) == 0 && slot.getParent.getSortIndex == day._1.toInt).isEmpty){
+
+                                <form class="subform">
+                                <div style="display: inline; float: left">
+                                    <label>
+                                      <input name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.WISH" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.WISH.name())){checked} >
+                                        Wunsch
+                                    </label>
+                                    <label>
+                                        <input name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.AVAILABLE" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.AVAILABLE.name())){checked}>
+                                        Kann
+                                    </label>
+                                    <label>
+                                        <input name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,N" @if(wishes.isEmpty){checked} >
+                                        N
+                                    </label>
+                                </div>
+
+                                <div style="float: right">
+                                    <label>
+                                        <input name="duration" type="radio" value="@EDuration.WEEKLY" @if(wishes.isEmpty || wishes.head.duration.equals(EDuration.WEEKLY.name())){checked}> wöch
+                                    </label>
+                                    <label>
+                                        <input name="duration" type="radio" value="@EDuration.EVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.EVEN.name())){checked}> g
+                                    </label>
+                                    <label>
+                                        <input name="duration" type="radio" value="@EDuration.UNEVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.UNEVEN.name())){checked}> ug
+                                    </label>
+                                </div>
+                                </form>
+                                }
+                            </td>
+                            }
+                        }
+                    </tr>
+                }
+            </table>
+        </div>
+@*
     @repeat(existingDocentForm("timeslots"), min = 0) { timeslotCrit =>
         <div class="panel panel-info" id="@timeslotCrit.id">
             <button id="remove_@timeslotCrit.id" role="button" class="pull-right btn btn-sm btn-danger"><span class="glyphicon glyphicon-minus"></span></button>
@@ -88,13 +157,13 @@
         $ ( '#@timeslotCrit.id').remove();
         } ) ;
         </script>
-    }
+    } *@
 
     </div>
     <br />
-    <div class="form-group">
+    <!--div class="form-group">
         <button type="button" id="addTimeCrit" class="btn btn-sm btn-warning" role="button"><span class="glyphicon glyphicon-plus"></span> </button>
-    </div>
+    </div -->
     <div class="clearfix"></div>
     <br />
     <div class="form-group">
@@ -127,24 +196,62 @@
 });
 
 $ ( '#editDocentForm' ).on ( 'submit', function ( e ) {
+e.preventDefault ( ) ;
 
-var postData = $ ( this ).serialize ( ) ;
+var postData = $ ( this ).serializeObject() ;
+
+    var timeslotBuffer = [];
+    $('.subform' ).each(function(index, value){
+        var subFormData = $(value ).serializeObject();
+
+        timeslotBuffer.push ( subFormData )
+
+    });
+
+postData['timeslots'] = timeslotBuffer ;
+
 var postUrl = "@routes.CEditDocents.editDocent";
-var form = $ ( this ) ;
+
+if(postData['roomCrit']==null){
+postData['roomCrit']=[];
+}
+if(! $.isArray(postData['roomCrit'])){
+postData['roomCrit']=[postData['roomCrit']];
+}
+
+if(postData['houseCriterias']==null){
+postData['houseCriterias']=[];
+}
+if(! $.isArray(postData['houseCriterias'])){
+postData['houseCriterias']=[postData['houseCriterias']];
+}
+
+if(postData['roomAttr']==null){
+postData['roomAttr']=[];
+}
+if(! $.isArray(postData['roomAttr'])){
+postData['roomAttr']=[postData['roomAttr']];
+}
+
+var Form = this;
+
+console.log(JSON.stringify(postData));
 
 $.ajax ( {
 url : postUrl,
 type : "POST",
-data : postData,
-contentType : form.attr ( "enctype" ),
-success : function ( data, textStatus, jqXHR ) {
+data :JSON.stringify(postData),
+dataType : "json",
+context : Form,
+contentType : "application/json; charset=utf-8",
+success : function ( data) {
 $ ( '#docentFields' ).empty ( ).append ( data.htmlresult ) ;
 },
 error : function ( jqXHR, textStatus, errorThrown ) {
 $ ( '#docentFields' ).empty ( ).append ( '<div class="alert alert-danger"> <span class="glyphicon glyphicon-thumbs-down" />' + errorThrown + ' </div> ' )
 }
 } ) ;
-e.preventDefault ( ) ;
+
 //e.unbind(); //unbind. to stop multiple form submit.
 } ) ;
 </script>

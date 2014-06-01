@@ -125,7 +125,7 @@ object MEditDocents {
           }
         }
 
-        val timeCrit = new DocentTimeWish(crit.startHour, crit.startMinute, crit.stopHour, crit.stopMinute, findOrCreateWeekdayTemplate(crit.weekday), EDuration.WEEKLY, EDocentTimeKind.valueOf(crit.timeKind))
+        val timeCrit = new DocentTimeWish(crit.startHour, crit.startMinute, crit.stopHour, crit.stopMinute, findOrCreateWeekdayTemplate(crit.weekday), EDuration.valueOf(crit.duration), EDocentTimeKind.valueOf(crit.timeKind))
 
         timeCrit
     }
@@ -171,7 +171,7 @@ object MEditDocents {
     val timeslotCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[DocentTimeWish]).toList.asInstanceOf[List[DocentTimeWish]]
     val convertedTimeslotCriterias = timeslotCriterias.map {
       tcrit =>
-        MDocentTimeWhish(tcrit.getTimeKind.name(), tcrit.getWeekday.getSortIndex, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute)
+        MDocentTimeWhish(tcrit.getTimeKind.name(), tcrit.getDuration.name(), tcrit.getWeekday.getSortIndex, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute)
     }.sortBy(crit=> (crit.timeKind.length, crit.weekday,crit.startHour,crit.startMinute,crit.stopHour,crit.stopMinute))
 
     val roomCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).toList.asInstanceOf[List[RoomCriteria]]
@@ -201,6 +201,6 @@ case class MDocent(lastName: String)
 
 case class MExistingDocent(id: Long, lastName: String, timeslots: List[MDocentTimeWhish], houseCriterias: List[Long], roomAttr: List[String], roomCrit: List[Long])
 
-case class MDocentTimeWhish(timeKind: String, weekday: Int, startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)
+case class MDocentTimeWhish(timeKind: String, duration:String, weekday: Int, startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)
 
 

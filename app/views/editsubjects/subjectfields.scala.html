@@ -192,9 +192,8 @@
     type : "GET",
     url:"@routes.CEditSubjects.deleteSubject(lectureType,subject.getId)",
    success : function(){
-   $('#deleteSubjectModal').modal('toggle');
-
    getNameField();
+   $('#deleteSubjectModal').modal('toggle' );
    }
    });
   });
@@ -238,7 +237,7 @@ $ ( '#result' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span
 }
 
 $ ( '#chancelButton' ).on ( 'click', function ( ) {
-$ ( location ).attr ( 'href', "    @routes.CEditSubjects.page ".trim());
+$ ( location ).attr ( 'href', "@routes.CEditSubjects.page ".trim());
 } ) ;
 
 
