@@ -6,20 +6,28 @@ import javax.persistence.Embeddable;
 /**
  * @author fabian
  *         on 30.05.14.
- *
+ *         <p>
  *         just a wrapper class to prevent database conflicts when deleting groups in existing view
  */
 
 @Embeddable
 public class LectureParticipant {
-/** name of the course*/
+    /**
+     * name of the course
+     */
     @Column(name = "COURSENAME")
     private String courseName;
 
+    /**
+     * groupindex, if this is a group
+     */
     @Column(name = "GROUPINDEX")
     private Integer groupIndex;
 
-    @Column(name="IGNORE_GROUPINDEX")
+    /**
+     * flag to ignore groupindex if exists
+     */
+    @Column(name = "IGNORE_GROUPINDEX")
     private Boolean ignoreGroupIndex;
 
     public LectureParticipant() {

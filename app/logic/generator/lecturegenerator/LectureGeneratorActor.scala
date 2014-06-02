@@ -70,7 +70,7 @@ class LectureGeneratorActor extends Actor {
                   result += lecture
                 }
               } else {
-                for (i <- 1f to lectureSubject.getUnits.toFloat by 0.5f) {
+                for (i <- 0f to lectureSubject.getUnits.toFloat by 0.5f) {
                   val lecture: Lecture = initLectureLecture
                   lecture.setDuration(EDuration.UNWEEKLY)
                   result += lecture
@@ -130,7 +130,7 @@ class LectureGeneratorActor extends Actor {
                     result += lecture
                   }
                 } else {
-                  for(i<- 1f to exerciseSubject.getUnits.toFloat by 0.5f){
+                  for(i<- 0f to exerciseSubject.getUnits.toFloat by 0.5f){
                     val lecture: Lecture = initExerciseLecture(groups)
                     lecture.setDuration(EDuration.UNWEEKLY)
                     result += lecture

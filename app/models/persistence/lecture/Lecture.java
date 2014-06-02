@@ -281,7 +281,7 @@ public class Lecture extends AbstractLecture {
         if (docents != null ? !docents.equals(lecture.docents) : lecture.docents != null) return false;
         if (duration != lecture.duration) return false;
         if (name != null ? !name.equals(lecture.name) : lecture.name != null) return false;
-        if (participants != null ? !participants.equals(lecture.participants) : lecture.participants != null)
+        if (lectureParticipants != null ? !(lectureParticipants.containsAll(lecture.lectureParticipants) && lectureParticipants.size() == lecture.lectureParticipants.size()) : lecture.lectureParticipants != null)
             return false;
 
         if (difficultLevel != null ? !difficultLevel.equals(lecture.difficultLevel) : lecture.difficultLevel != null)
