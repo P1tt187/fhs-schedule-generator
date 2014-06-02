@@ -1,0 +1,10 @@
+@(message:String)
+
+<div class="alert alert-danger">
+    Fehler: Die Zeitwünsche der folgenden Dozenten passen nicht zur Anzahl ihrer Lehveranstaltungen
+    <ol>
+        @for(d<- message.split(",")){
+            <li>@d</li>
+        }
+    </ol>
+</div>

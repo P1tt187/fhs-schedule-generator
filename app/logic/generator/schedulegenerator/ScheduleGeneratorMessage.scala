@@ -3,6 +3,7 @@ package logic.generator.schedulegenerator
 import models.persistence.{Semester, Schedule}
 import models.persistence.lecture.Lecture
 import java.util.Calendar
+import models.persistence.docents.Docent
 
 /**
  * @author fabian 
@@ -16,8 +17,10 @@ case class SlaveGenerate(lectures: List[Lecture]) extends ScheduleGeneratorMessa
 
 case class ScheduleAnswer(schedule: Schedule) extends ScheduleGeneratorMessage
 
-case class ScheduleSlaveAnswer(schedule: Schedule)
+case class ScheduleSlaveAnswer(schedule: Schedule) extends ScheduleGeneratorMessage
 
-case class InplacebleSchedule(lectures:List[Lecture])
+case class InplacebleSchedule(lectures:List[Lecture]) extends ScheduleGeneratorMessage
+
+case class TimeWishNotMatch(docents:List[Docent]) extends ScheduleGeneratorMessage
 
 case object PlacingFailure extends ScheduleGeneratorMessage

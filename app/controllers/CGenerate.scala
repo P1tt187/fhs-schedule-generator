@@ -8,9 +8,8 @@ import scala.concurrent.duration._
 import models.fhs.pages.generator.MGenerator._
 import play.api.data._
 import play.api.data.Forms._
-import models.fhs.pages.generator.GeneratorForm
 import scala.concurrent.Future
-import logic.generator.schedulegenerator.{InplacebleSchedule, GenerateSchedule, ScheduleGeneratorActor, ScheduleAnswer}
+import logic.generator.schedulegenerator._
 
 import play.api.libs.concurrent.Akka
 import akka.actor.{PoisonPill, Props}
@@ -27,9 +26,16 @@ import models.persistence.template.TimeSlotTemplate
 import org.hibernate.criterion.CriteriaSpecification
 import java.util.{UUID, Calendar}
 import models.persistence.lecture.Lecture
-import logic.generator.lecturegenerator.{LectureAnswer, GenerateLectures, LectureGeneratorActor}
+import logic.generator.lecturegenerator.LectureGeneratorActor
 import scala.collection.mutable.Buffer
 import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
+import logic.generator.lecturegenerator.GenerateLectures
+import models.fhs.pages.generator.GeneratorForm
+import logic.generator.schedulegenerator.ScheduleAnswer
+import scala.Some
+import logic.generator.schedulegenerator.GenerateSchedule
+import logic.generator.schedulegenerator.InplacebleSchedule
+import logic.generator.lecturegenerator.LectureAnswer
 
 /**
  * @author fabian 
@@ -54,6 +60,10 @@ object CGenerate extends Controller {
   private lazy val schedules = scala.collection.mutable.Map[UUID, Schedule]()
 
   private lazy val scheduleFutures = Buffer[Future[Any]]()
+
+  private var errorMessage: String = null
+
+  private var docentWishTimeError = false
 
 
   val form: Form[GeneratorForm] = Form(
@@ -131,7 +141,11 @@ object CGenerate extends Controller {
     implicit request =>
 
       if (hasError) {
-        Ok(Json.stringify(Json.obj("htmlresult" -> errorpage(errorList).toString())))
+        if (docentWishTimeError) {
+          Ok(Json.stringify(Json.obj("htmlresult" -> docentWishTimeErrorPage(errorMessage).toString())))
+        } else {
+          Ok(Json.stringify(Json.obj("htmlresult" -> errorpage(errorList).toString())))
+        }
       } else {
 
         val timeslotsAll = if (schedule == null) {
@@ -167,6 +181,7 @@ object CGenerate extends Controller {
         result => {
           actorFinished = false
           hasError = false
+          docentWishTimeError = false
           schedule = null
           schedules.clear()
           scheduleFutures.clear()
@@ -212,6 +227,11 @@ object CGenerate extends Controller {
 
                     case InplacebleSchedule(lectures) => errorList = lectures
                       hasError = true
+                      actorFinished = true
+                    case TimeWishNotMatch(docents) =>
+                      hasError = true
+                      docentWishTimeError = true
+                      errorMessage = docents.map( _.getLastName ).sorted.mkString(",")
                       actorFinished = true
                   }
 

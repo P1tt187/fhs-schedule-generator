@@ -16,6 +16,12 @@ import models.persistence.enumerations.EDuration
 import logic.generator.schedulerater.rater.ERaters
 import scala.annotation.tailrec
 import scala.util.Random
+import models.Transactions
+import models.persistence.docents.Docent
+import scala.collection.JavaConversions._
+import models.persistence.template.TimeSlotTemplate
+import models.persistence.criteria.DocentTimeWish
+import models.persistence.lecture.Lecture
 
 
 /**
@@ -55,6 +61,7 @@ class ScheduleGeneratorActor extends Actor {
     }
   }
 
+
   override def receive = {
 
     case GenerateSchedule(lectures, semester, endTime, randomRatio, maxIterationDeep) =>
@@ -63,6 +70,14 @@ class ScheduleGeneratorActor extends Actor {
       //val scheduleFuture = context.actorOf(Props[ScheduleGeneratorSlave])?SlaveGenerate(cloner.deepClone(lectures))
 
       Logger.debug("number of lectures: " + lectures.size)
+
+      val outOfTimeDocents = findOutOfTimeDocents(lectures)
+
+      if (!outOfTimeDocents.isEmpty) {
+        sender() ! TimeWishNotMatch(outOfTimeDocents)
+        stopPlacing = true
+      }
+
       val theSender = sender()
 
       def generate(iterationDeep: Int) {
@@ -145,4 +160,60 @@ class ScheduleGeneratorActor extends Actor {
   }
 
 
+  private def findOutOfTimeDocents(lectures: List[Lecture]) = {
+    def compareTimeSlotTemplate(template: TimeSlotTemplate, timeWish: DocentTimeWish) = {
+      List(template.getParent.getSortIndex == timeWish.getWeekday.getSortIndex,
+        template.getStartHour == timeWish.getStartHour,
+        template.getStartMinute == timeWish.getStartMinute,
+        template.getStopHour == timeWish.getStopHour,
+        template.getStopMinute == timeWish.getStopMinute
+      ).sorted.head
+
+    }
+
+    val outOfTimeDocents = Transactions.hibernateAction {
+      implicit s =>
+        val docents = s.createCriteria(classOf[Docent]).list().toList.asInstanceOf[List[Docent]]
+        val templates = s.createCriteria(classOf[TimeSlotTemplate]).list().toList.asInstanceOf[List[TimeSlotTemplate]]
+
+        val filteredDocents = docents.filter {
+          d =>
+            val timeWishes = d.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[DocentTimeWish]).toList.asInstanceOf[List[DocentTimeWish]]
+            if (timeWishes.isEmpty) {
+              false
+            } else {
+              val numberOfLectures = lectures.map {
+                l =>
+                  if (!l.getDocents.find(_.compareTo(d)==0).isEmpty) {
+                    l.getDuration match {
+                      case EDuration.WEEKLY => 2
+                      case EDuration.UNWEEKLY => 1
+                      case _ => 0
+                    }
+                  } else {
+                    0
+                  }
+              }.sum
+              val numberOfAvailableTimes = timeWishes.map {
+                tw =>
+                  if (templates.find(compareTimeSlotTemplate(_, tw)).isEmpty) {
+                    0
+                  } else {
+                    tw.getDuration match {
+                      case EDuration.WEEKLY => 2
+                      case EDuration.EVEN => 1
+                      case EDuration.UNEVEN => 1
+                      case _ => 0
+                    }
+                  }
+              }.sum
+              //Logger.debug("docent: " + d.getLastName + " nol " + numberOfLectures + " nat " + numberOfAvailableTimes)
+              numberOfAvailableTimes < numberOfLectures
+            }
+        }
+        filteredDocents
+    }
+
+    outOfTimeDocents
+  }
 }

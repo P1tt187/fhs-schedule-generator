@@ -10,7 +10,7 @@
         <div class="form-group">
         <label class="control-label" for="alternativSelector">Altenativen</label>
         <select class="form-control" id="alternativSelector" title="keine alternativen">
-            @for(id <- alternatives.keySet){
+            @for(id <- alternatives.keySet.toList.sortBy(k=> (alternatives(k).getRate,alternatives(k).getRateSum) )){
                 <option @if(id.toString.equals(session.get("selectedSchedule").getOrElse(""))){selected } value="@id.toString"> Restmängel: @alternatives(id).getRate Gesamtsumme: @alternatives(id).getRateSum </option>
             }
         </select>
