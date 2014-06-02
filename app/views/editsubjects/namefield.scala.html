@@ -1,4 +1,5 @@
-@(lectureNames: List[models.fhs.pages.editsubjects.MSubjects], lectureType: String)
+@(lectureNames: List[models.fhs.pages.editsubjects.MSubjects], lectureType: String)(implicit session:Session)
+
 
     <br/>
     <div class="form-inline">
@@ -8,7 +9,7 @@
         </label>
         <select class="form-control" id="nameField" title="Bezeichnung">
             @for(element <- lectureNames) {
-                <option value="@element.id">@element.name ( @element.participants )</option>
+                <option @if(element.id == session.get("subjectFields").getOrElse("-1").toLong){selected} value="@element.id">@element.name ( @element.participants )</option>
             }
         </select>
         </div>

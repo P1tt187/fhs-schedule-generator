@@ -70,8 +70,7 @@ object CEditSubjects extends Controller {
   }
 
   def getSubjectFields(semester: Long, subjectType: String, idString: String) = Action {
-
-
+  implicit request=>
     val id = if (idString.equals("null")) {
       -1l
     } else {
@@ -100,7 +99,7 @@ object CEditSubjects extends Controller {
 
     val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity]) = loadCachedData()
 
-    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim())))
+    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim()))).withSession("subjectFields"->idString)
 
   }
 
@@ -133,7 +132,7 @@ object CEditSubjects extends Controller {
   }
 
   def getNamesField(semester: Long, subjectType: String, filterDocentId: Long, filterCourseId: Long, filterActive: String) = Action {
-
+  implicit request=>
     //Logger.debug("" +MEditSubjects.findLectureSubjectsForSemester(semester.replaceAll(Pattern.quote("+"),"/").trim))
     subjectType match {
       case LECTURE =>
