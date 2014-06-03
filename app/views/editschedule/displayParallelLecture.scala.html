@@ -1,0 +1,11 @@
+@(parallelLecutre:models.persistence.lecture.ParallelLecture)
+
+<div class="panel-group">
+@for(lecture<- parallelLecutre.getLectures){
+
+        <div class="panel panel-warning" >
+            @displayLecture(lecture)
+        </div>
+
+}
+</div>

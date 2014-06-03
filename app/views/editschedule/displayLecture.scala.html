@@ -1,0 +1,41 @@
+@(lecture: models.persistence.lecture.Lecture)
+
+
+@import models.persistence.enumerations.ELectureKind
+@import models.persistence.enumerations.EDuration
+@import play.api.Play.current
+
+
+<div class="panel-body @{
+    lecture.getDuration match {
+        case EDuration.EVEN => "bg-warning"
+        case EDuration.UNEVEN => "bg-primary"
+        case EDuration.WEEKLY => "bg-info"
+        case other => "bg-danger " + other
+    }
+}" >
+    <div class=""> <strong>  @lecture.getShortName </strong></div>
+    <div class="pull-right">
+        <span class="glyphicon @{
+            lecture.getKind match {
+                case ELectureKind.EXERCISE => "glyphicon-hdd"
+                case ELectureKind.LECTURE => "glyphicon-book"
+            }
+        } " >
+        </span>
+    </div>
+
+    <div style="font-size: 90%">
+    @for(participant <- lecture.getLectureParticipants.toList.sortBy(_.getCourseName)) {
+        @participant.getShortName
+    }
+    </div>
+    <div class="pull-right">
+    @lecture.getDocents.map(_.getLastName).mkString(", ")
+    </div>
+    <div> @lecture.getRoom.getHouse.getName @lecture.getRoom.getNumber </div>
+    @if(!lecture.getNotOptimalPlaced.isEmpty && current.configuration.getString("schedule.show.outOfWishTime").getOrElse("OFF").equalsIgnoreCase("ON")) {
+
+        <div> @lecture.getNotOptimalPlaced </div>
+    }
+</div>

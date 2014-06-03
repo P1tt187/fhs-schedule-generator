@@ -1,0 +1,94 @@
+@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot])
+
+@import models.persistence.scheduletree.Weekday
+
+<div class="page-header">
+    <h1>@title</h1>
+</div>
+
+    <div class="form-inline">
+        <div class="form-group">
+            Legende:
+         </div>
+        <div class="form-group">
+            <div class="showcase panel-info">
+                <div class="bg-info showcase-content">w</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="showcase">
+                <div class=" bg-warning showcase-content">g</div>
+            </div>
+        </div>
+       <div class="form-group">
+           <div class="showcase">
+               <div class="bg-primary showcase-content">ug</div>
+            </div>
+       </div>
+        <div class="form-group">
+             <div class="showcase">
+               <span class="glyphicon glyphicon-book"></span> V
+             </div>
+        </div>
+        <div class="form-group">
+             <div class="showcase">
+               <span class="glyphicon glyphicon-hdd"></span> Ü
+             </div>
+        </div>
+    </div>
+    <br/>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-condensed">
+        <thead>
+            <th class="text-info text-center" >Uhrzeit</th>
+
+            @days= @{
+                CTimeslotDefintion.WEEKDAYS.filter{
+                    case (sortIndexString,dayname)=>
+                            val sortIndex=sortIndexString.toInt
+                    !timeslots.find(_.getParent.asInstanceOf[Weekday].getSortIndex.toInt == sortIndex).isEmpty
+                }.sortBy(_._1)
+            }
+
+            @for(day <- days) {
+                <th class="text-info text-center" > @day._2</th>
+            }
+        </thead>
+        <tbody>
+        @for(range <- timeRanges.sorted) {
+            <tr>
+                <td class="text-center" style=" vertical-align : middle ; width : 8% ;" >
+                @range.toString
+                </td>
+                @for(day <- days) {
+                    <td >
+
+                        @defining(timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt).flatMap(_.getLectures.toList).toList.sortBy(_.getDocents.head.getLastName)) { lectures =>
+
+                                @* check if timeslots are available*@
+                            @if(!timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt).isEmpty) {
+                               <ul class="connected list-unstyled">
+                                @for(lecture <- lectures) {
+                                    <li class="">
+                                        <div class="panel panel-info small smallText" >
+                                        @displayAbstractLecture(lecture)
+                                        </div>
+                                    </li>
+                                }
+                               </ul>
+                            }
+                        }
+                    </td>
+                }
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+    <script>
+    $('.connected').sortable({
+    connectWith: '.connected'
+    });
+
+    </script>

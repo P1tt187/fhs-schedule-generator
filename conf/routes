@@ -56,5 +56,8 @@ GET         /timeCritFields/:index                                              
 POST        /saveEditedDocentData                                                                     controllers.CEditDocents.editDocent
 GET         /deleteDocent/:id                                                                         controllers.CEditDocents.deleteDocent(id:Long)
 
+GET         /editSchedule                                                                             controllers.CEditSchedule.page()
+GET         /sendEditableSchedule/:semesterId                                                         controllers.CEditSchedule.findAndSendSchedule(semesterId:Long)
+
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                                             controllers.Assets.at(path="/public", file)

@@ -4,8 +4,8 @@
         List(
             (CEditSubjects.NAV, routes.CEditSubjects.page, "Fächer Editieren"),
             (CEditCourses.NAV, routes.CEditCourses.page, "Kurse & Gruppen"),
-            (CEditDocents.NAV, routes.CEditDocents.page, "Dozenten"),
-            (CGenerate.NAV, routes.CGenerate.page, "Generator")
+            (CEditDocents.NAV, routes.CEditDocents.page, "Dozenten")
+
 
         )
     }
@@ -21,6 +21,13 @@
         List(
             (CTimeslotDefintion.NAV, routes.CTimeslotDefintion.page, "Zeitslots Definieren"),
             (CRoomDefinition.NAV, routes.CRoomDefinition.page, "Räume erstellen")
+        )
+    }
+
+    @scheduleList = @{
+        List(
+            (CGenerate.NAV, routes.CGenerate.page, "Generator"),
+            (CEditSchedule.NAV,routes.CEditSchedule.page,"Stundenplan bearbeiten")
         )
     }
 
@@ -46,3 +53,11 @@
     <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
 }
 
+    <li role="presentation" class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Stundenplan <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+        @for(element <- scheduleList) {
+            <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+        }
+        </ul>
+    </li>

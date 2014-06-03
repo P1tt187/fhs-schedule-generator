@@ -1,0 +1,33 @@
+@(title: String, schedules: Set[persistence.Semester])
+
+@main(title, CEditSchedule.NAV) {
+
+    <div class="page-header">
+        <h1>@title</h1>
+    </div>
+
+    <div class="form-inline">
+        <div class="form-group">
+            <label class="control-label" for="selectSemester">Semester Auswählen</label>
+            <select class="form-control" id="selectSemester">
+            @for(s <- schedules) {
+                <option value="@s.getId">
+                @s.getName
+                </option>
+            }
+            </select>
+        </div>
+    </div>
+    <div id="scheduleContainer">
+
+    </div>
+
+    <script>
+
+        var changeScheduleContainer = function(){
+        appendHTML("/sendEditableSchedule/" + $('#selectSemester' ).val(), "#scheduleContainer" );
+        };
+        changeScheduleContainer();
+        $('#selectSemester' ).on('change', changeScheduleContainer);
+    </script>
+}
