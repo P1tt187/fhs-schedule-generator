@@ -1,10 +1,10 @@
-@(parallelLecutre:models.persistence.lecture.ParallelLecture)
+@(parallelLecutre:models.persistence.lecture.ParallelLecture, allRooms:List[persistence.location.RoomEntity])
 
 <div class="panel-group">
 @for(lecture<- parallelLecutre.getLectures){
 
         <div class="panel panel-warning" >
-            @displayLecture(lecture)
+            @displayLecture(lecture, allRooms)
         </div>
 
 }

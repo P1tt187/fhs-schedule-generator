@@ -1,4 +1,4 @@
-@(lecture: models.persistence.lecture.Lecture)
+@(lecture: models.persistence.lecture.Lecture, allRooms:List[persistence.location.RoomEntity])
 
 
 @import models.persistence.enumerations.ELectureKind
@@ -6,7 +6,7 @@
 @import play.api.Play.current
 
 
-<div class="panel-body @{
+<div id="panel@lecture.getId" class="panel-body @{
     lecture.getDuration match {
         case EDuration.EVEN => "bg-warning"
         case EDuration.UNEVEN => "bg-primary"
@@ -14,16 +14,21 @@
         case other => "bg-danger " + other
     }
 }" >
-    <div class=""> <strong>  @lecture.getShortName </strong></div>
     <div class="pull-right">
-        <span class="glyphicon @{
-            lecture.getKind match {
-                case ELectureKind.EXERCISE => "glyphicon-hdd"
-                case ELectureKind.LECTURE => "glyphicon-book"
-            }
-        } " >
+
+            <span class="glyphicon @{
+                lecture.getKind match {
+                    case ELectureKind.EXERCISE => "glyphicon-hdd"
+                    case ELectureKind.LECTURE => "glyphicon-book"
+                }
+            } " >
         </span>
+
+
     </div>
+    <div class=""> <strong>  @lecture.getShortName </strong></div>
+
+
 
     <div style="font-size: 90%">
     @for(participant <- lecture.getLectureParticipants.toList.sortBy(_.getCourseName)) {
@@ -31,11 +36,57 @@
     }
     </div>
     <div class="pull-right">
-    @lecture.getDocents.map(_.getLastName).mkString(", ")
+    @lecture.getDocents.map(_.getLastName).mkString(" ")
     </div>
-    <div> @lecture.getRoom.getHouse.getName @lecture.getRoom.getNumber </div>
+
     @if(!lecture.getNotOptimalPlaced.isEmpty && current.configuration.getString("schedule.show.outOfWishTime").getOrElse("OFF").equalsIgnoreCase("ON")) {
 
         <div> @lecture.getNotOptimalPlaced </div>
     }
+
+    <form class="lectureform">
+    <input class="hidden disabled" type="number" name="lectureId" value="@lecture.getId">
+    <input name="duration" id="duration@lecture.getId" type="text" value="@lecture.getDuration" class="hidden disabled">
+    <div class="form-inline">
+        <div class="form-group">
+            <button id="durationSwitcher@lecture.getId" role="button" type="button" class=" btn btn-sm btn-info form-control"><span class="glyphicon glyphicon-transfer"></span> </button>
+        </div>
+
+        <div class="form-group">
+            <select name="room" class="form-control editRoom" >
+            @for(room<-allRooms){
+                <option  @if(room.equals(lecture.getRoom)){selected } value="@room.getId">@room.getHouse.getName @room.getNumber </option>
+            }
+
+            </select>
+
+        </div>
+    </div>
+    </form>
 </div>
+    <script>
+        $('#durationSwitcher@lecture.getId').on('click',function(){
+
+        var newDuration={};
+        switch ($('#duration@lecture.getId').val()){
+    case "@EDuration.WEEKLY":
+        newDuration['bgclass']='bg-warning';
+        newDuration['duration']="@EDuration.EVEN" ;
+        break;
+    case "@EDuration.EVEN":
+        newDuration ['bgclass']='bg-primary';
+        newDuration['duration']="@EDuration.UNEVEN" ;
+        break;
+    case "@EDuration.UNEVEN":
+        newDuration ['bgclass']='bg-info';
+    newDuration['duration']="@EDuration.WEEKLY";
+        break;
+    default:
+        console.log('holy shit');
+    }
+        console.log(newDuration ['bgclass']);
+      $('#panel@lecture.getId').removeClass('bg-primary').removeClass('bg-info').removeClass('bg-warning');
+    $('#panel@lecture.getId').addClass(newDuration ['bgclass']);
+        $('#duration@lecture.getId').val(newDuration.duration);
+    });
+    </script>

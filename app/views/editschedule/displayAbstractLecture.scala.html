@@ -1,10 +1,10 @@
-@(abstractLecture: models.persistence.lecture.AbstractLecture)
+@(abstractLecture: models.persistence.lecture.AbstractLecture, allRooms:List[persistence.location.RoomEntity])
 @import models.persistence.lecture.Lecture
 @import models.persistence.lecture.ParallelLecture
 
 @{
     abstractLecture match {
-        case parallelLecture: ParallelLecture => displayParallelLecture(parallelLecture)
-        case lecture: Lecture => displayLecture(lecture)
+        case parallelLecture: ParallelLecture => displayParallelLecture(parallelLecture, allRooms)
+        case lecture: Lecture => displayLecture(lecture, allRooms)
     }
 }

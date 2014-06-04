@@ -1,4 +1,4 @@
-@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot])
+@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], allRooms:List[persistence.location.RoomEntity], semesterId:Long)
 
 @import models.persistence.scheduletree.Weekday
 
@@ -6,6 +6,9 @@
     <h1>@title</h1>
 </div>
 
+<div class="col-md-5 resultSuccsess hidden alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span>  </div>
+<div class="col-md-5 resultError hidden alert alert-success">Fehler <span class="glyphicon glyphicon-thumbs-down"></span>  </div>
+<div class="clearfix"></div>
     <div class="form-inline">
         <div class="form-group">
             Legende:
@@ -35,6 +38,12 @@
                <span class="glyphicon glyphicon-hdd"></span> Ü
              </div>
         </div>
+        <div class="form-group">
+            <button class="btn btn-sm btn-success savebtn form-control"> <span class="glyphicon glyphicon-floppy-disk"></span> </button>
+        </div>
+        <div class="form-group">
+            <a href="@routes.CEditSchedule.page()" class="btn btn-sm btn-danger form-control"> <span class="glyphicon glyphicon-remove"></span> </a>
+        </div>
     </div>
     <br/>
 
@@ -52,43 +61,100 @@
             }
 
             @for(day <- days) {
-                <th class="text-info text-center" > @day._2</th>
+                <th class="text-info text-center" style="min-width: 370px"> @day._2</th>
             }
         </thead>
         <tbody>
-        @for(range <- timeRanges.sorted) {
+          @timeRanges.sorted.par.map { range =>
             <tr>
                 <td class="text-center" style=" vertical-align : middle ; width : 8% ;" >
                 @range.toString
                 </td>
                 @for(day <- days) {
                     <td >
-
-                        @defining(timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt).flatMap(_.getLectures.toList).toList.sortBy(_.getDocents.head.getLastName)) { lectures =>
-
+                        @defining(timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt)) { timeSlotsInRange =>
+                            @defining(timeSlotsInRange.flatMap(_.getLectures.toList).toList.sortBy(_.getDocents.head.getLastName)) { lectures =>
                                 @* check if timeslots are available*@
-                            @if(!timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt).isEmpty) {
-                               <ul class="connected list-unstyled list-inline table-bordered" >
-                                @for(lecture <- lectures) {
-                                    <li class="" style="min-width: 150px; max-width: 200px">
-                                        <div class="panel panel-info small smallText" >
-                                        @displayAbstractLecture(lecture)
-                                        </div>
-                                    </li>
+                                @if(!timeSlotsInRange.isEmpty) {
+                                    <ul class="connected list-unstyled list-inline table-bordered" data-metainfo='{ "startHour":@range.startHour,"startMinute":@range.startMinute,"stopHour":@range.stopHour,"stopMinute":@range.stopMinute, "day":@day._1}' style="height : 100% ; min-height : 300px">
+                                    @for(lecture <- lectures) {
+                                        <li class="" style="min-width : 170px ; max-width : 220px">
+                                            <div class="panel panel-info small smallText" >
+                                            @displayAbstractLecture(lecture, allRooms)
+                                            </div>
+                                        </li>
+                                    }
+                                    </ul>
                                 }
-                               </ul>
                             }
                         }
                     </td>
                 }
             </tr>
-        }
+        }.toList
         </tbody>
     </table>
 </div>
+    <div class="form-inline">
+        <div class="form-group">
+            <button class="btn btn-sm btn-success savebtn form-control"> <span class="glyphicon glyphicon-floppy-disk"></span> </button>
+        </div>
+        <div class="form-group">
+            <a href="@routes.CEditSchedule.page()" class="btn btn-sm btn-danger form-control"> <span class="glyphicon glyphicon-remove"></span> </a>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="col-md-5 resultSuccsess hidden alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span>  </div>
+    <div class="col-md-5 resultError hidden alert alert-success">Fehler <span class="glyphicon glyphicon-thumbs-down"></span>  </div>
+
     <script>
     $('.connected').sortable({
     connectWith: '.connected'
     });
+    $ ( ".editRoom" ).attr ( 'data-live-search', true ).selectpicker ( {
+    //'selectedText' : 'cat',
+    'style' : 'btn btn-primary btn-sm small smallText'
+    } );
+        $('.savebtn' ).on('click', function(){
+        var semester = @semesterId ;
+        var lectureBuffer = [];
+
+            $('.lectureform' ).each(function(index, value){
+            var formData = $(value ).serializeObject();
+            var metaInfo = $(value ).parents('.connected' ).data('metainfo');
+                var fields = ['startHour','startMinute','stopHour','stopMinute','day'];
+                fields.forEach(function(field){
+                formData[ field ] = metaInfo[ field ] ;
+                });
+
+                lectureBuffer.push(formData);
+            });
+        var data = {
+            'semester':semester,
+            'lectures':lectureBuffer
+        };
+    console.log(JSON.stringify(data));
+
+    $.ajax ( {
+    cache : false,
+    type : "POST",
+    dataType : "json",
+    data : JSON.stringify ( data ),
+    contentType : "application/json; charset=utf-8",
+    url : "  @routes.CEditSchedule.saveEditedSchedule",
+    success:function(response){
+        console.log(response);
+        $('.resultError' ).addClass('hidden');
+        $('.resultSuccsess' ).removeClass('hidden');
+        $(location ).attr('href','@routes.CEditSchedule.page()');
+        },
+    error:function(response){
+        console.log(response);
+    $('.resultError' ).removeClass('hidden');
+    $('.resultSuccsess' ).addClass('hidden');
+    }
+    });
+
+   });
 
     </script>

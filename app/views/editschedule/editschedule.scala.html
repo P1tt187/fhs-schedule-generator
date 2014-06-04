@@ -1,4 +1,4 @@
-@(title: String, schedules: Set[persistence.Semester])
+@(title: String, schedules: Set[persistence.Semester])(implicit session:Session)
 
 @main(title, CEditSchedule.NAV) {
 
@@ -11,7 +11,7 @@
             <label class="control-label" for="selectSemester">Semester Auswählen</label>
             <select class="form-control" id="selectSemester">
             @for(s <- schedules) {
-                <option value="@s.getId">
+                <option @if(session.get("editschedule").getOrElse("-1").toLong == s.getId.toLong){selected} value="@s.getId">
                 @s.getName
                 </option>
             }
