@@ -13,7 +13,7 @@
         case EDuration.WEEKLY => "bg-info"
         case other => "bg-danger " + other
     }
-}" >
+} @lecture.getDocents.map(_.getLastName).mkString(" ") @lecture.getLectureParticipants.map(_.getCourseName).mkString(" ")" >
     <div class="pull-right">
 
             <span class="glyphicon @{

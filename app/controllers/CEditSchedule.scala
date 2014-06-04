@@ -20,6 +20,10 @@ import models.persistence.enumerations.EDuration
 import models.persistence.location.RoomEntity
 import models.fhs.pages.generator.TimeRange
 
+import play.api.libs.json.JsArray
+import models.fhs.pages.generator.MGenerator.findSemesterById
+import models.fhs.pages.generator.MGenerator.findCourses
+
 /**
  * @author fabian 
  *         on 03.06.14.
@@ -49,6 +53,19 @@ object CEditSchedule extends Controller {
       room
     }
 
+    val docents = Cache.getOrElse("docents") {
+      val docent = findDocents()
+      Cache.set("docents", docent, expiration = TIME_TO_LIFE)
+      docent
+    }
+
+
+    val courses = Cache.getOrElse("courses") {
+      val course = findCourses()
+      Cache.set("courses", course, expiration = TIME_TO_LIFE)
+      course
+    }
+
     val semester = findSemesterById(semesterId)
 
     val timeRanges = findTimeRanges(timeslotTemplates)
@@ -57,7 +74,7 @@ object CEditSchedule extends Controller {
     val timeSlots = schedule.getRoot.getChildren.flatMap {
       case wd: Weekday => wd.getChildren.toList.asInstanceOf[List[TimeSlot]]
     }.toList
-    Ok(Json.obj("htmlresult" -> showSchedule("", timeRanges, timeSlots, rooms, semesterId).toString())).withSession("editschedule" -> semesterId.toString)
+    Ok(Json.obj("htmlresult" -> showSchedule("", timeRanges, timeSlots, rooms,courses,docents, semesterId).toString())).withSession("editschedule" -> semesterId.toString)
   }
 
   def saveEditedSchedule = Action(parse.json) {
