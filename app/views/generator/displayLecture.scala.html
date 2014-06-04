@@ -36,6 +36,6 @@
     <div> @lecture.getRoom.getHouse.getName @lecture.getRoom.getNumber </div>
     @if(!lecture.getNotOptimalPlaced.isEmpty && current.configuration.getString("schedule.show.outOfWishTime").getOrElse("OFF").equalsIgnoreCase("ON")) {
 
-        <div> @lecture.getNotOptimalPlaced </div>
+        <span class="label label-danger">@lecture.getNotOptimalPlaced</span>
     }
 </div>
