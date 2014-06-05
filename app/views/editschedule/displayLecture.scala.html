@@ -71,20 +71,20 @@
        function(){
 
         var newDuration={};
-        switch ($('#duration@lecture.getId').val())
-        {
+           var i = $('#duration@lecture.getId').val();
 
-            case "@EDuration.EVEN":
-                newDuration ['bgclass']='bg-primary';
-                newDuration['duration']="@EDuration.UNEVEN" ;
-                break;
-            case "@EDuration.UNEVEN":
-                newDuration ['bgclass']='bg-warning';
-            newDuration['duration']="@EDuration.EVEN";
-                break;
-            default:
-                console.log('holy shit');
-            }
+        if(i=='@EDuration.EVEN')
+        {
+        newDuration ['bgclass']='bg-primary';
+        newDuration['duration']="@EDuration.UNEVEN" ;
+        } else
+        if(i=="@EDuration.UNEVEN")
+        {
+        newDuration ['bgclass']='bg-warning';
+        newDuration['duration']="@EDuration.EVEN";
+        }
+
+
         console.log(newDuration ['bgclass']);
       $('#panel@lecture.getId').removeClass('bg-primary').removeClass('bg-info').removeClass('bg-warning');
     $('#panel@lecture.getId').addClass(newDuration ['bgclass']);
