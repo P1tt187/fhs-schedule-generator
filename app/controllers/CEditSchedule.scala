@@ -74,7 +74,7 @@ object CEditSchedule extends Controller {
     val timeSlots = schedule.getRoot.getChildren.flatMap {
       case wd: Weekday => wd.getChildren.toList.asInstanceOf[List[TimeSlot]]
     }.toList
-    Ok(Json.obj("htmlresult" -> showSchedule("", timeRanges, timeSlots, rooms,courses,docents, semesterId).toString())).withSession("editschedule" -> semesterId.toString)
+    Ok(Json.obj("htmlresult" -> showSchedule("", timeRanges, timeSlots, rooms,courses,docents, semesterId).toString().trim)).withSession("editschedule" -> semesterId.toString)
   }
 
   def saveEditedSchedule = Action(parse.json) {

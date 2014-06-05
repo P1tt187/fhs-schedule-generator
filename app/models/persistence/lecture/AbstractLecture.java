@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import models.persistence.AbstractEntity;
 import models.persistence.docents.LectureDocent;
 import models.persistence.location.RoomEntity;
+import models.persistence.participants.LectureParticipant;
 import models.persistence.participants.Participant;
 
 import javax.persistence.Entity;
@@ -27,6 +28,9 @@ public abstract class AbstractLecture extends AbstractEntity {
 
     @JsonIgnore
     public abstract Set<Participant> getParticipants();
+
+    @JsonIgnore
+    public abstract Set<LectureParticipant> getLectureParticipants();
 
     @JsonIgnore
     public abstract Set<RoomEntity> getRooms();

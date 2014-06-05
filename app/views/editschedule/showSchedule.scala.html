@@ -99,7 +99,7 @@
                 @for(day <- days) {
                     <td >
                         @defining(timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt)) { timeSlotsInRange =>
-                            @defining(timeSlotsInRange.flatMap(_.getLectures.toList).toList.sortBy(_.getDocents.head.getLastName)) { lectures =>
+                            @defining(timeSlotsInRange.flatMap(_.getLectures.toList).toList.sortBy(l=> (- timeSlotsInRange.map(_.getLectures.count(_.getDocents.contains(l.getDocents.head))).sum, l.getDocents.head.getLastName))) { lectures =>
                                 @* check if timeslots are available*@
                                 @if(!timeSlotsInRange.isEmpty) {
                                     <ul class="connected list-unstyled list-inline table-bordered" data-metainfo='{ "startHour":@range.startHour,"startMinute":@range.startMinute,"stopHour":@range.stopHour,"stopMinute":@range.stopMinute, "day":@day._1}' style="height : 100% ; min-height : 30px">

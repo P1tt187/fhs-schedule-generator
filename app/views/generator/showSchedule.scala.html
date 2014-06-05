@@ -89,8 +89,8 @@
                                 </th>
                             </thead>
                             <tbody>
-
-                        @defining(timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt).flatMap(_.getLectures.toList).toList.sortBy(_.getDocents.head.getLastName)){ lectures=>
+                    @defining(timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt)){ relevantSlots=>
+                        @defining(relevantSlots.flatMap(_.getLectures.toList).toList.sortBy(l=> (- relevantSlots.map(rs=>rs.getLectures.count( lec=> lec.getDocents.contains(l.getDocents.head))).sum ,l.getDocents.head.getLastName))){ lectures=>
                             @for(idx<- 0 to (lectures.length - 1)){
                                 @if(idx % 2 == 0 && lectures.length>1){
                                     <tr>
@@ -109,6 +109,7 @@
                                     }
                             }
                         }
+                    }
                             </tbody>
                         </table>
                     </td>

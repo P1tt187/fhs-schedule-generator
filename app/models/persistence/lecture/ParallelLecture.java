@@ -2,12 +2,14 @@ package models.persistence.lecture;
 
 import models.persistence.docents.LectureDocent;
 import models.persistence.location.RoomEntity;
+import models.persistence.participants.LectureParticipant;
 import models.persistence.participants.Participant;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author fabian
@@ -47,6 +49,11 @@ public class ParallelLecture extends AbstractLecture {
                 addAll(l.getParticipants());
             }
         }};
+    }
+
+    @Override
+    public Set<LectureParticipant> getLectureParticipants() {
+        return lectures.stream().flatMap(l-> l.getLectureParticipants().stream() ).collect(Collectors.toSet());
     }
 
     @Override
