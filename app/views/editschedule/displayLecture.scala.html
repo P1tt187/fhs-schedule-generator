@@ -67,10 +67,12 @@
 </div>
     @if(lecture.getDuration != EDuration.WEEKLY){
     <script>
-        $('#durationSwitcher@lecture.getId').on('click',function(){
+        $('#durationSwitcher@lecture.getId').on('click',
+       function(){
 
         var newDuration={};
-        switch ($('#duration@lecture.getId').val()){
+        switch ($('#duration@lecture.getId').val())
+        {
 
             case "@EDuration.EVEN":
                 newDuration ['bgclass']='bg-primary';
