@@ -3,6 +3,7 @@ package models.persistence.lecture;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import models.persistence.AbstractEntity;
 import models.persistence.docents.LectureDocent;
+import models.persistence.enumerations.EDuration;
 import models.persistence.location.RoomEntity;
 import models.persistence.participants.LectureParticipant;
 import models.persistence.participants.Participant;
@@ -31,6 +32,9 @@ public abstract class AbstractLecture extends AbstractEntity {
 
     @JsonIgnore
     public abstract Set<LectureParticipant> getLectureParticipants();
+
+    @JsonIgnore
+    public abstract EDuration getDuration();
 
     @JsonIgnore
     public abstract Set<RoomEntity> getRooms();

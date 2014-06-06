@@ -1,6 +1,8 @@
 @(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], rate:Int, alternatives:Map[java.util.UUID,persistence.Schedule])(implicit session:Session)
 
 @import models.persistence.scheduletree.Weekday
+@import models.persistence.enumerations.EDuration
+
 
 <div class="page-header">
     <h1>@title</h1>
@@ -90,7 +92,7 @@
                             </thead>
                             <tbody>
                     @defining(timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt)){ relevantSlots=>
-                        @defining(relevantSlots.flatMap(_.getLectures.toList).toList.sortBy(l=> (- relevantSlots.map(rs=>rs.getLectures.count( lec=> lec.getDocents.contains(l.getDocents.head))).sum ,l.getDocents.head.getLastName))){ lectures=>
+                        @defining(relevantSlots.flatMap(_.getLectures.toList).toList.sortBy{l=> ( if(l.getDuration == EDuration.WEEKLY){0}else{ -relevantSlots.map(_.getLectures.count(_.getDocents.contains(l.getDocents.head))).sum}, l.getDocents.head.getLastName)}){ lectures=>
                             @for(idx<- 0 to (lectures.length - 1)){
                                 @if(idx % 2 == 0 && lectures.length>1){
                                     <tr>

@@ -209,7 +209,7 @@ public class Lecture extends AbstractLecture {
     public void setRoom(RoomEntity room) {
         this.room = room;
     }
-
+    @Override
     public EDuration getDuration() {
         return duration;
     }
