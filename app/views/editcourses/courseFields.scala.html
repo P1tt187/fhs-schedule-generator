@@ -27,9 +27,18 @@
                 <button class="btn btn-success" type="submit" ><span class="glyphicon glyphicon-ok-sign"></span> </button>
             </div>
             <div class="form-group">
-                <button class="btn btn-danger" type="reset" ><span class="glyphicon glyphicon-trash"></span></button>
+                <button id="deleteCurseBtn" class="btn btn-danger" type="button" ><span class="glyphicon glyphicon-trash"></span></button>
             </div>
         </form>
+
+    </div>
+    <div class="clearfix"></div>
+    <div class="col-md-5 hidden" id="deleteErrorContainer">
+        <div class="alert alert-danger">
+            Fehler <span class="glyphicon glyphicon-thumbs-down"></span><br/>
+            Die Folgenden Veranstaltungen sind noch mit dem Kurs verknüpft:
+            <ul id="displayDeleteError"></ul>
+        </div>
     </div>
 </div>
 <div class="clearfix"></div>
@@ -42,6 +51,29 @@
 <script type="text/javascript">
 initSelect ( ) ;
 
+
+    $('#deleteCurseBtn' ).on('click',function(){
+        console.log('delete Button Clicked');
+        $.ajax({
+        type : "POST",
+
+        url: "@routes.CEditCourses.deleteCourse(course.getId)",
+        success : function ( callback ) {
+            $(location ).attr('href','@routes.CEditCourses.page()');
+        },
+        error:function(jqXHR ,  textStatus,  errorThrown){
+            console.log( jqXHR.responseText);
+        var errorString = '';
+        jqXHR.responseText.split(',').forEach(function(element){
+                errorString+= '<li>' + element + '</li>'
+            });
+            $('#deleteErrorContainer' ).removeClass('hidden');
+            $('#displayDeleteError' ).html(errorString);
+        }
+        });
+    });
+
+
 $ ( '#courseFieldForm' ).on ( 'submit', function ( e ) {
 e.preventDefault ( ) ;
 $ ( '.has-error' ).removeClass ( 'has-error' ) ;
@@ -49,6 +81,7 @@ if ( ! $.isNumeric ( $ ( '#courseSize' ).val ( ) ) ) {
 $ ( '#courseSizeContainer' ).addClass ( 'has-error' ) ;
 return ;
 }
+
 var formData = $ ( '#courseFieldForm' ).serializeObject ( ) ;
 
 formData[ 'courseId' ] = @course.getId ;

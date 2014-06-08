@@ -5,6 +5,7 @@ import models.persistence.participants.{Group, Course}
 import org.hibernate.criterion.{Projections, Restrictions, Order}
 import scala.collection.JavaConversions._
 import org.hibernate.FetchMode
+import models.persistence.subject.AbstractSubject
 
 
 /**
@@ -73,6 +74,22 @@ object MEditCourses {
           add(Restrictions.eq("course", course)).
           add(Restrictions.eq("groupType", groupType)).
           setProjection(Projections.rowCount()).uniqueResult().asInstanceOf[Long].toInt
+    }
+  }
+
+  def findSubjectsWithCourse(courseId: Long): List[AbstractSubject] = {
+    Transactions.hibernateAction {
+      implicit s =>
+        val criterion = s.createCriteria(classOf[AbstractSubject])
+        criterion.createCriteria("courses").add(Restrictions.idEq(courseId))
+        criterion.list().toList.asInstanceOf[List[AbstractSubject]]
+    }
+  }
+
+  def removeCourse(courseId: Long) {
+    Transactions.hibernateAction {
+      implicit s =>
+        s.delete(s.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).uniqueResult())
     }
   }
 

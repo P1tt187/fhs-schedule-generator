@@ -63,6 +63,20 @@ object CEditCourses extends Controller {
       )
   }
 
+  def deleteCourse(courseId: Long) = Action {
+
+    val subjects = findSubjectsWithCourse(courseId)
+    if (subjects.isEmpty) {
+      removeCourse(courseId)
+      Ok( "ok")
+    } else {
+      val errorSubjects = subjects.map(s => s.getName).mkString(",")
+      BadRequest(errorSubjects)
+    }
+
+
+  }
+
   def saveCourseData = Action(parse.json) {
     implicit request =>
       try {

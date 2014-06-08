@@ -37,6 +37,7 @@ POST        /submitCourseData                                                   
 POST        /submitNewGroup                                                                           controllers.CEditCourses.saveGroupData
 POST        /submitSubGroup                                                                           controllers.CEditCourses.saveSubGroupData
 POST        /updateGroup                                                                              controllers.CEditCourses.updateGroup
+POST        /deleteCourse:courseId                                                                    controllers.CEditCourses.deleteCourse(courseId:Long)
 
 GET         /generator                                                                                controllers.CGenerate.page()
 POST        /generatorAction                                                                          controllers.CGenerate.generatorAction
