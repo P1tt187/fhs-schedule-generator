@@ -1,9 +1,25 @@
-@(message: String, courses: List[models.persistence.participants.Course])(implicit flash: Flash)
+@(message: String, courses: List[models.persistence.participants.Course], courseForm:Form[fhs.pages.editcourses.MCourse])(implicit flash: Flash)
 
+@import helper._
+@import helper.twitterBootstrap._
 
 @main(message, CEditCourses.NAV) {
+
     <div class="page-header">
-      <h1> Kurse bearbeiten </h1>
+        <h3> Kurs hinzufügen </h3>
+    </div>
+    @form(action= routes.CEditCourses.addCourse(),'class->"form-inline"){
+        @inputText(courseForm("longName"), '_class->"form-group",'_label->"Kursname",'_help->"")
+        @inputText(courseForm("shortName"), '_class->"form-group",'_label->"Abkürzung",'_help->"")
+        @inputText(courseForm("size"), '_class->"form-group",'_label->"Kursstärke",'_help->"")
+        <div class="form-group">
+            <label class="control-label"> <span class="glyphicon"></span> </label>
+            <button class="form-control btn btn-success" type="submit"> <span class="glyphicon glyphicon-plus"></span> </button>
+        </div>
+    }
+
+    <div class="page-header">
+      <h3> Kurse bearbeiten </h3>
     </div>
 
     <div class="row-fluid">
@@ -31,6 +47,8 @@
     };
 
     $('#courseSelect' ).on('change',getCourseFields);
+
+    $('#@courseForm("size").id' ).attr('type','number');
 
     getCourseFields();
 </script>

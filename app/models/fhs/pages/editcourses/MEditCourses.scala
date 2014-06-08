@@ -66,7 +66,7 @@ object MEditCourses {
     }
   }
 
-  def getGroupCount(groupType:String, course:Course) = {
+  def getGroupCount(groupType: String, course: Course) = {
     Transactions.hibernateAction {
       implicit session =>
         session.createCriteria(classOf[Group]).
@@ -77,3 +77,5 @@ object MEditCourses {
   }
 
 }
+
+case class MCourse(longName: String, shortName: String, size: Int)

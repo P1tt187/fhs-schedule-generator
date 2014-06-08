@@ -41,10 +41,9 @@ object CEditSubjects extends Controller {
   val TIME_TO_LIFE = 30 seconds
 
 
-
-  val semesterForm:Form[MSemester] = Form(
-  mapping (
-    "name"->nonEmptyText
+  val semesterForm: Form[MSemester] = Form(
+    mapping(
+      "name" -> nonEmptyText
     )(MSemester.apply)(MSemester.unapply)
   )
 
@@ -53,24 +52,24 @@ object CEditSubjects extends Controller {
       Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses(), semesterForm))
   }
 
-  def addSemester = Action{
-    implicit request=>
+  def addSemester = Action {
+    implicit request =>
       val formResult = semesterForm.bindFromRequest
       formResult.fold(
-      error=>{
-        BadRequest(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses(), error))
-      },
-      result=>{
-        val newSemester = new Semester
-        newSemester.setName(result.name)
+        error => {
+          BadRequest(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses(), error))
+        },
+        result => {
+          val newSemester = new Semester
+          newSemester.setName(result.name)
 
-        Transactions{
-          implicit em=>
-            em.persist(newSemester)
+          Transactions {
+            implicit em =>
+              em.persist(newSemester)
+          }
+
+          Redirect(routes.CEditSubjects.page())
         }
-
-        Redirect(routes.CEditSubjects.page())
-      }
       )
   }
 
@@ -95,7 +94,7 @@ object CEditSubjects extends Controller {
 
   }
 
-  def deleteSubject(subjectType:String, id:Long)= Action{
+  def deleteSubject(subjectType: String, id: Long) = Action {
     val subject = subjectType match {
       case LECTURE =>
         findSubject(classOf[LectureSubject], id)
@@ -108,38 +107,42 @@ object CEditSubjects extends Controller {
   }
 
   def getSubjectFields(semester: Long, subjectType: String, idString: String) = Action {
-  implicit request=>
-    val id = if (idString.equals("null")) {
-      -1l
-    } else {
-      idString.toLong
-    }
+    implicit request =>
+      val id = if (idString.equals("null")) {
+        -1l
+      } else {
+        idString.toLong
+      }
 
-    val subject = subjectType match {
-      case LECTURE =>
-        findSubject(classOf[LectureSubject], id)
-      case EXERCISE =>
-        findSubject(classOf[ExerciseSubject], id)
-    }
+      val subject = subjectType match {
+        case LECTURE =>
+          findSubject(classOf[LectureSubject], id)
+        case EXERCISE =>
+          findSubject(classOf[ExerciseSubject], id)
+      }
 
-    if (subject.getId == null) {
-      subject.setId(-1l)
-      subject.setSemester(findSemesterById(semester))
-      initNewSubject(subject)
-    }
+      if (subject.getId == null) {
+        subject.setId(-1l)
+        subject.setSemester(findSemesterById(semester))
+        initNewSubject(subject)
+      }
 
-    subject match {
-      case exerciseSubject: ExerciseSubject =>
-        Logger.debug(exerciseSubject.getGroupType)
-      case _ =>
-    }
+      subject match {
+        case exerciseSubject: ExerciseSubject =>
+          Logger.debug(exerciseSubject.getGroupType)
+        case _ =>
+      }
 
 
-    val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity]) = loadCachedData()
+      val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity]) = loadCachedData()
 
-    val selectedSubject = if(idString=="null"){"-1"} else {idString}
+      val selectedSubject = if (idString == "null") {
+        "-1"
+      } else {
+        idString
+      }
 
-    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim()))).withSession("subjectFields"-> selectedSubject )
+      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim()))).withSession("subjectFields" -> selectedSubject)
 
   }
 
@@ -172,14 +175,14 @@ object CEditSubjects extends Controller {
   }
 
   def getNamesField(semester: Long, subjectType: String, filterDocentId: Long, filterCourseId: Long, filterActive: String) = Action {
-  implicit request=>
-    //Logger.debug("" +MEditSubjects.findLectureSubjectsForSemester(semester.replaceAll(Pattern.quote("+"),"/").trim))
-    subjectType match {
-      case LECTURE =>
-        Ok(Json.stringify(Json.obj("html" -> namefield(findLectureSubjectsForSemester(semester, filterDocentId, filterCourseId, filterActive), LECTURE).toString())))
-      case EXERCISE =>
-        Ok(Json.stringify(Json.obj("html" -> namefield(findExerciseSubjectsForSemester(semester, filterDocentId, filterCourseId, filterActive), EXERCISE).toString())))
-    }
+    implicit request =>
+      //Logger.debug("" +MEditSubjects.findLectureSubjectsForSemester(semester.replaceAll(Pattern.quote("+"),"/").trim))
+      subjectType match {
+        case LECTURE =>
+          Ok(Json.stringify(Json.obj("html" -> namefield(findLectureSubjectsForSemester(semester, filterDocentId, filterCourseId, filterActive), LECTURE).toString())))
+        case EXERCISE =>
+          Ok(Json.stringify(Json.obj("html" -> namefield(findExerciseSubjectsForSemester(semester, filterDocentId, filterCourseId, filterActive), EXERCISE).toString())))
+      }
   }
 
   def deleteSemester(semesterID: Long) = Action {
@@ -229,7 +232,7 @@ object CEditSubjects extends Controller {
 
         val selectedRooms = findSelectedRooms(roomCriteriaIds)
 
-        val selectedSemester = findSemesterById (semester)
+        val selectedSemester = findSemesterById(semester)
 
 
 
@@ -246,7 +249,7 @@ object CEditSubjects extends Controller {
             exercise
         }
 
-        if (null == subject.getId ) {
+        if (null == subject.getId) {
           Logger.debug("init new subject")
           initNewSubject(subject)
           subject.setSemester(selectedSemester)

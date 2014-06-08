@@ -13,11 +13,11 @@
             </div>
 
             <div class="form-group">
-                <label for="courseShortName" class="control-label">Kursname</label>
+                <label for="courseShortName" class="control-label">Abkürzung</label>
                 <input class="form-control " type="text" name="courseShortName" id="courseShortName" value="@course.getShortName" required/>
             </div>
             <div class="form-group" id="courseSizeContainer">
-                <label for="courseSize" class="control-label">Kursgröße</label>
+                <label for="courseSize" class="control-label">Kursstärke</label>
                 <input type="number" class="form-control" name="courseSize" id="courseSize" value="@course.getSize" step="1" min="1" required/>
             </div>
 
@@ -27,7 +27,7 @@
                 <button class="btn btn-success" type="submit" ><span class="glyphicon glyphicon-ok-sign"></span> </button>
             </div>
             <div class="form-group">
-                <button class="btn btn-danger" type="reset" ><span class="glyphicon glyphicon-ban-circle"></span></button>
+                <button class="btn btn-danger" type="reset" ><span class="glyphicon glyphicon-trash"></span></button>
             </div>
         </form>
     </div>

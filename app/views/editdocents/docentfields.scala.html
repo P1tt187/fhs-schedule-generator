@@ -51,8 +51,9 @@
     </div>
     <div class="clearfix"></div>
     <div id="timeCrits" class="small">
+     <div class="form-inline">
 
-        <div>
+        <div class="form-group">
            <strong> Bedeutung:</strong>
             <ul class="list-unstyled">
                 <li><strong>Wunsch</strong> - ich möchte zu dieser Zeit eingeteilt werden</li>
@@ -60,6 +61,17 @@
                 <li><strong>N</strong> - nicht verfügbar</li>
             </ul>
         </div>
+         <div class="form-group">
+             <span class="glyphicon"></span>
+         </div>
+         <div class="form-group">
+             <ul class="list-unstyled">
+                 <li> <strong>w</strong> - Wöchentlich  </li>
+                 <li> <strong>g</strong> - Gerade Wochen </li>
+                 <li><strong>ug</strong> - Ungerade Wochen </li>
+             </ul>
+         </div>
+     </div>
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-condensed">
                 <thead>
@@ -117,7 +129,7 @@
                                 <div class="form-group" >
                                     <div class="radio">
                                     <label>
-                                        <input class="form-control" name="duration" type="radio" value="@EDuration.WEEKLY" @if(wishes.isEmpty || wishes.head.duration.equals(EDuration.WEEKLY.name())){checked}> wöch
+                                        <input class="form-control" name="duration" type="radio" value="@EDuration.WEEKLY" @if(wishes.isEmpty || wishes.head.duration.equals(EDuration.WEEKLY.name())){checked}> w
                                     </label>
                                      </div>
                                     <div class="radio">

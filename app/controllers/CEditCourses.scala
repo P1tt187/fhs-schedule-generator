@@ -4,10 +4,15 @@ import play.api.mvc._
 import views.html.editcourses._
 import models.fhs.pages.editcourses.MEditCourses._
 import play.api.libs.json._
-import play.api.Logger
-import models.persistence.participants.Group
+import models.persistence.participants.{Course, Group}
 import scala.collection.JavaConversions._
 import models.Transactions
+
+import play.api._
+
+import play.api.data._
+import play.api.data.Forms._
+import models.fhs.pages.editcourses.MCourse
 
 /**
  * @author fabian 
@@ -17,14 +22,45 @@ object CEditCourses extends Controller {
 
   val NAV = "EDITCOURSES"
 
+  val courseForm = Form[MCourse](
+    mapping("longName" -> nonEmptyText,
+      "shortName" -> nonEmptyText,
+      "size" -> number(min = 1)
+    )(MCourse.apply)(MCourse.unapply)
+  )
+
   def page() = Action {
     implicit request =>
-      Ok(editcourses("Kurse editieren", findCourses()))
+      Ok(editcourses("Kurse editieren", findCourses(), courseForm))
   }
 
 
   def getCourseFields(courseId: Long) = Action {
     Ok(Json.stringify(Json.obj("htmlresult" -> courseFields(findCourse(courseId)).toString())))
+  }
+
+  def addCourse = Action {
+    implicit request =>
+      val result = courseForm.bindFromRequest()
+
+      result.fold(
+        error => {
+          BadRequest(editcourses("Kurse editieren", findCourses(), error))
+        },
+        mCourse => {
+          val newCourse = new Course
+          newCourse.setFullName(mCourse.longName)
+          newCourse.setShortName(mCourse.shortName)
+          newCourse.setSize(mCourse.size)
+          newCourse.setGroups(List[Group]())
+
+          Transactions {
+            implicit em =>
+              em.persist(newCourse)
+          }
+          Redirect(routes.CEditCourses.page())
+        }
+      )
   }
 
   def saveCourseData = Action(parse.json) {
@@ -52,7 +88,7 @@ object CEditCourses extends Controller {
         val course = findCourse((jsVal \ "courseId").as[Long])
         val groupType = (jsVal \ "addGroupTypeName").as[String]
         val groupCount = (jsVal \ "addGroupCount").as[Int]
-        val numberOfExistingGroups = getGroupCount(groupType,course)
+        val numberOfExistingGroups = getGroupCount(groupType, course)
 
         val result = (1 to groupCount).map { i =>
           val group = new Group
@@ -83,7 +119,7 @@ object CEditCourses extends Controller {
             em.merge(course)
         }
 
-        Ok(Json.stringify(Json.obj("htmlresult" -> result.map(g=> groupFields(g).toString()).foldLeft("")(_+_))))
+        Ok(Json.stringify(Json.obj("htmlresult" -> result.map(g => groupFields(g).toString()).foldLeft("")(_ + _))))
       }
       catch {
         case ex: Exception => Logger.error("saveGroupData", ex)
@@ -98,9 +134,9 @@ object CEditCourses extends Controller {
         val parent = findGroup((jsVal \ "groupId").as[Long])
         val groupType = (jsVal \ "addSubGroupTypeName").as[String]
         val groupCount = (jsVal \ "addSubGroupCount").as[Int]
-        val numberOfExistingGroups = getGroupCount(groupType,parent.getCourse)
+        val numberOfExistingGroups = getGroupCount(groupType, parent.getCourse)
 
-       val result=  (1 to groupCount).map { i =>
+        val result = (1 to groupCount).map { i =>
           val group = new Group
           group.setGroupType(groupType)
           group.setParent(parent)
@@ -110,7 +146,7 @@ object CEditCourses extends Controller {
           group.setGroupIndex(i)
           group.setIgnoreGroupIndex(false)
 
-         group.setGroupIndex(numberOfExistingGroups + i)
+          group.setGroupIndex(numberOfExistingGroups + i)
 
           if (i == groupCount) {
             group.setSize(parent.getSize / groupCount + parent.getSize % groupCount)
@@ -128,12 +164,12 @@ object CEditCourses extends Controller {
               em.merge(parent)
           }
 
-         group
+          group
         }
 
 
 
-        Ok(Json.stringify(Json.obj("htmlresult" -> result.map(g=> groupFields(g).toString()).foldLeft("")(_+_))))
+        Ok(Json.stringify(Json.obj("htmlresult" -> result.map(g => groupFields(g).toString()).foldLeft("")(_ + _))))
       }
       catch {
         case ex: Exception => Logger.error("saveGroupData", ex)
@@ -170,7 +206,7 @@ object CEditCourses extends Controller {
       }
   }
 
-  def deleteGroup(groupId:Long)=Action{
+  def deleteGroup(groupId: Long) = Action {
     try {
 
       removeGroup(groupId)
