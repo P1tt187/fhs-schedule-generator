@@ -18,6 +18,13 @@
             </select>
         </div>
     </div>
+    <div id="activityContainer" class="col-md-5 hidden">
+    <div  class=" progress progress-striped active">
+        <div class="progress-bar progress-bar-warning"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+            <span class="sr-only">10% Complete</span>
+        </div>
+    </div>
+    </div>
     <div id="scheduleContainer">
 
     </div>
@@ -25,7 +32,9 @@
     <script>
 
         var changeScheduleContainer = function(){
-        appendHTML("/sendEditableSchedule/" + $('#selectSemester' ).val(), "#scheduleContainer" );
+            $('#activityContainer' ).removeClass('hidden');
+           appendHTML("/sendEditableSchedule/" + $('#selectSemester' ).val(), "#scheduleContainer" );
+
         };
         changeScheduleContainer();
         $('#selectSemester' ).on('change', changeScheduleContainer);
