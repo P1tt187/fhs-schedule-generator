@@ -233,4 +233,6 @@ object MEditSubjects {
 
 case class MSubjects(id: Long, name: String, participants: String)
 
+case class MSemester (name:String)
+
 

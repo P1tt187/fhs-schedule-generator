@@ -1,10 +1,22 @@
-@(message: String, semesters: List[models.persistence.Semester], docents:List[models.persistence.docents.Docent], courses:List[models.persistence.participants.Course])
+@(message: String, semesters: List[models.persistence.Semester], docents:List[models.persistence.docents.Docent], courses:List[models.persistence.participants.Course], semesterForm:Form[models.fhs.pages.editsubjects.MSemester])
 
+@import helper._
+@import helper.twitterBootstrap._
 
 @main(message, CEditSubjects.NAV) {
+    <div class="page-header">
+        <h3>Semester hinzufügen </h3>
+    </div>
+    @form(action= routes.CEditSubjects.addSemester(), 'class -> " form-inline "){
+        @inputText(semesterForm("name"),'_class->"form-group", '_label->"Name", '_help->"")
+        <div class="form-group">
+            <label class="control-label"><span class="glyphicon"></span> </label>
+            <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span> </button>
+        </div>
+    }
 
         <div class="page-header">
-            <h1> Fächer bearbeiten </h1>
+            <h3> Fächer bearbeiten </h3>
         </div>
 
         <div class="row-fluid">

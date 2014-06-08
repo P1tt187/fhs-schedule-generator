@@ -1,9 +1,7 @@
 package controllers
 
-import play.api.mvc._
 import play.api.libs.json._
 import models.fhs.pages.editsubjects.MEditSubjects._
-import play.api.Logger
 import views.html.editsubjects._
 import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
 import play.api.cache.Cache
@@ -18,6 +16,17 @@ import scala.collection.JavaConversions._
 import models.persistence.docents.Docent
 import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
 
+import play.api.mvc._
+import play.api._
+
+import play.api.data._
+import play.api.data.Forms._
+
+import models.fhs.pages.editsubjects.MSemester
+import play.api.libs.json.JsArray
+import models.persistence.Semester
+
+
 /**
  * @author fabian 
  *         on 05.03.14.
@@ -31,9 +40,38 @@ object CEditSubjects extends Controller {
 
   val TIME_TO_LIFE = 30 seconds
 
+
+
+  val semesterForm:Form[MSemester] = Form(
+  mapping (
+    "name"->nonEmptyText
+    )(MSemester.apply)(MSemester.unapply)
+  )
+
   def page = Action {
     implicit request =>
-      Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses()))
+      Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses(), semesterForm))
+  }
+
+  def addSemester = Action{
+    implicit request=>
+      val formResult = semesterForm.bindFromRequest
+      formResult.fold(
+      error=>{
+        BadRequest(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses(), error))
+      },
+      result=>{
+        val newSemester = new Semester
+        newSemester.setName(result.name)
+
+        Transactions{
+          implicit em=>
+            em.persist(newSemester)
+        }
+
+        Redirect(routes.CEditSubjects.page())
+      }
+      )
   }
 
   def copySubject(subjectType: String, id: Long) = Action {
@@ -99,7 +137,9 @@ object CEditSubjects extends Controller {
 
     val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity]) = loadCachedData()
 
-    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim()))).withSession("subjectFields"->idString)
+    val selectedSubject = if(idString=="null"){"-1"} else {idString}
+
+    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim()))).withSession("subjectFields"-> selectedSubject )
 
   }
 
