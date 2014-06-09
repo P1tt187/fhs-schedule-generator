@@ -62,6 +62,9 @@
             </select>
 
         </div>
+        <div> @lecture.getAlternativeLectureRooms.map{ lr=>
+            <span class="label label-warning">@lr.getHouse @lr.getNumber</span>
+        }</div>
     </div>
     </form>
 </div>

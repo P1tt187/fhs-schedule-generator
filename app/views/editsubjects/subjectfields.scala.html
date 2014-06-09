@@ -102,7 +102,20 @@
             </select>
         </div>
     </div>
+
     <div class="clearfix"></div>
+    <div>
+        <h4> Synonyme </h4>
+        <button id="addSynonymBtn" type="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-plus"></span> </button>
+        <div id="synonymContainer">
+        @for(course<-subject.getSubjectSynonyms.keySet().toList.sorted){
+            <div class="synonymForm" >
+            @synonyms(course, subject.getSubjectSynonyms.get(course))
+            </div>
+        }
+        </div>
+    </div>
+
     <div class="panel panel-info">
         <fieldset >
             <legend > Einschränkungen (Optional) </legend>
@@ -151,6 +164,7 @@
             </div>
         </fieldset>
     </div>
+
     <div class="clearfix"></div>
     <div class="form-group">
         <label class="control-label" >Für den Plan Berücksichtigen</label>
@@ -180,12 +194,24 @@
     </div>
 
 </form>
+
 <div class="clearfix"></div>
 
 <div id="result" ></div>
 
+<span id="synonymTemplate" class="sr-only">
+@synonyms("","")
+</span>
 
 <script type="text/javascript">
+
+
+
+    $('#addSynonymBtn' ).on('click', function(){
+        var addString = "<div class='synonymForm'>" + $('#synonymTemplate' ).html() + "</div>" ;
+
+        $('#synonymContainer' ).append(addString);
+    });
 
     $('#deleteSubjectModalBtn' ).on('click', function(){
       $('#subjectPlaceholder' ).html( $('#nameInput' ).val());
@@ -262,9 +288,26 @@ appendError ( ) ;
 return ;
 }
 
+    var synonymBuffer = [];
+    $('.synonymForm' ).each(function(index,value){
+
+        var c = $(value ).find('input[name=courseShortName]' ).val();
+        var s = $(value ).find('input[name=synonym]' ).val();
+        console.log(c);
+
+        var synonymObject={
+        courseShortName:c,
+        synonym:s
+        };
+
+
+        synonymBuffer.push(synonymObject);
+    });
+
 var data = $ ( '#subjectForm' ).serializeObject ( ) ;
 data[ 'subjectType' ] = '  @lectureType '.trim();
 data[ 'subjectId' ] = @subject.getId ;
+data[ 'synonyms' ] = synonymBuffer;
 
 /** proof if checkbox is checked or not */
     data[ 'activeCheckbox' ] = $.parseJSON(data[ 'activeCheckbox' ]);

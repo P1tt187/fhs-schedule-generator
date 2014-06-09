@@ -224,6 +224,11 @@ object CEditSubjects extends Controller {
 
         val duration = EDuration.valueOf((jsVal \ "duration").as[String])
 
+        val synonyms = (jsVal \ "synonyms").as[JsArray].value.map{
+          js=>
+            ((js\ "courseShortName").as[String], (js \"synonym").as[String])
+        }.toMap
+
         val selectedCourse = findCourses(selectedCourseIds).toSet
 
         val selectedDocents = findDocents(selectDocentsIds).toSet
@@ -268,6 +273,7 @@ object CEditSubjects extends Controller {
 
         initCourseValues(subject, activeCheckbox, nameInput, unitInput, selectedCourse, selectedDocents, expectedParticipants)
         subject.setAlternativRooms(alternativRooms)
+        subject.setSubjectSynonyms(synonyms)
 
         Logger.debug("alternativeRooms: " + alternativRooms)
 

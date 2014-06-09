@@ -1,0 +1,24 @@
+@(key: String, value: String)
+
+
+<div class='form-group'>
+    <label class='control-label'>Kursname</label>
+    <input class="form-control" required name='courseShortName' value='@key'>
+</div>
+<div class='form-group'>
+    <label class='control-label'>Bezeichnung</label>
+    <input class='form-control' required name='synonym' value='@value'>
+</div>
+<div class='form-group'>
+    <button type='button' class='form-control btn btn-danger removeSynonymButton'> <span class='glyphicon glyphicon-minus'></span> </button>
+</div>
+
+<script>
+$ ( '.removeSynonymButton' ).on ( 'click', function ( ) {
+console.log ( 'remove synonym pressed' ) ;
+var form = $ ( this ).parent ( ).parent ( ) ;
+$ ( form ).empty ( ).remove ( ) ;
+
+} ) ;
+
+</script>
