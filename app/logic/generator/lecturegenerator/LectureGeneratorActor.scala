@@ -5,7 +5,6 @@ import models.persistence.lecture.Lecture
 import scala.collection.mutable
 import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
 import models.persistence.participants.{LectureParticipant, Group, Participant}
-import scala.collection.JavaConversions._
 import models.persistence.enumerations.{ELectureKind, EDuration}
 import play.api.Logger
 import models.Transactions
@@ -16,6 +15,8 @@ import scala.util.Random
 import org.hibernate.FetchMode
 import java.math.BigInteger
 import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
+import scala.collection.JavaConversions._
+import models.persistence.location.LectureRoom
 
 /**
  * @author fabian 
@@ -47,6 +48,9 @@ class LectureGeneratorActor extends Actor {
                 lecture.setDocents(lectureSubject.getDocents.map(_.docent2LectureDocent()))
                 lecture.setParticipants(Set[Participant]() ++ lectureSubject.getCourses)
                 lecture.setLectureParticipants(lectureSubject.getCourses.map(_.participant2LectureParticipant()))
+
+                lecture.setAlternativeRooms(subject.getAlternativRooms)
+                lecture.setAlternativeLectureRooms(Set[LectureRoom]() ++  subject.getAlternativRooms.map(_.roomEntity2LectureRoom()))
 
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(lectureSubject.getName)
@@ -99,6 +103,8 @@ class LectureGeneratorActor extends Actor {
               def initExerciseLecture(groups: List[Group]): Lecture = {
                 val lecture = new Lecture
                 lecture.setParticipants(Set[Participant]() ++ groups)
+                lecture.setAlternativeRooms(subject.getAlternativRooms)
+                lecture.setAlternativeLectureRooms(Set[LectureRoom]() ++ subject.getAlternativRooms.map(_.roomEntity2LectureRoom()))
                 lecture.setLectureParticipants(Set[LectureParticipant]() ++ groups.map(_.participant2LectureParticipant()))
                 lecture.setDocents(exerciseSubject.getDocents.map(_.docent2LectureDocent()))
                 lecture.setCriteriaContainer(exerciseSubject.getCriteriaContainer)
@@ -130,7 +136,7 @@ class LectureGeneratorActor extends Actor {
                     result += lecture
                   }
                 } else {
-                  for(i<- 0.5f to exerciseSubject.getUnits.toFloat by 0.5f){
+                  for (i <- 0.5f to exerciseSubject.getUnits.toFloat by 0.5f) {
                     val lecture: Lecture = initExerciseLecture(groups)
                     lecture.setDuration(EDuration.UNWEEKLY)
                     result += lecture

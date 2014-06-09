@@ -34,6 +34,9 @@
     @lecture.getDocents.map(_.getLastName).mkString(", ")
     </div>
     <div> @lecture.getRoom.getHouse.getName @lecture.getRoom.getNumber </div>
+    <div> @lecture.getAlternativeLectureRooms.map{ lr=>
+       <span class="label label-warning">@lr.getHouse @lr.getNumber</span>
+    }</div>
     @if(!lecture.getNotOptimalPlaced.isEmpty && current.configuration.getString("schedule.show.outOfWishTime").getOrElse("OFF").equalsIgnoreCase("ON")) {
 
         <span class="label label-danger">@lecture.getNotOptimalPlaced</span>

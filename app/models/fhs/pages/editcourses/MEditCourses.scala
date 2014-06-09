@@ -2,7 +2,7 @@ package models.fhs.pages.editcourses
 
 import models.Transactions
 import models.persistence.participants.{Group, Course}
-import org.hibernate.criterion.{Projections, Restrictions, Order}
+import org.hibernate.criterion.{CriteriaSpecification, Projections, Restrictions, Order}
 import scala.collection.JavaConversions._
 import org.hibernate.FetchMode
 import models.persistence.subject.AbstractSubject
@@ -80,7 +80,7 @@ object MEditCourses {
   def findSubjectsWithCourse(courseId: Long): List[AbstractSubject] = {
     Transactions.hibernateAction {
       implicit s =>
-        val criterion = s.createCriteria(classOf[AbstractSubject])
+        val criterion = s.createCriteria(classOf[AbstractSubject]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
         criterion.createCriteria("courses").add(Restrictions.idEq(courseId))
         criterion.list().toList.asInstanceOf[List[AbstractSubject]]
     }

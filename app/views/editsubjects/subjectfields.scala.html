@@ -66,10 +66,18 @@
     <div class="clearfix"></div>
     <br/>
     <div class="form-group">
-        <label class="control-label" for="duration"><span class="glyphicon"></span> </label>
-        <select id="duration" name="duration">
+        <label class="control-label" for="duration">Art der Woche </label>
+        <select class="form-control" id="duration" name="duration">
             <option @if(subject.getDuration == EDuration.WEEKLY){selected} value="@EDuration.WEEKLY">Wöchentlich</option>
             <option @if(subject.getDuration == EDuration.UNWEEKLY){selected} value="@EDuration.UNWEEKLY">nicht Wöchentlich</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="alternativRooms" class="control-label">Alternativräume</label>
+        <select class="form-control" multiple title="nichts Ausgewählt" name="alternativeRooms" id="alternativRooms">
+            @for(r <- rooms){
+                <option @if(subject.getAlternativRooms.contains(r)){selected }  value="@r.getId">@r.getHouse.getName @r.getNumber </option>
+            }
         </select>
     </div>
 
@@ -261,6 +269,15 @@ data[ 'subjectId' ] = @subject.getId ;
 /** proof if checkbox is checked or not */
     data[ 'activeCheckbox' ] = $.parseJSON(data[ 'activeCheckbox' ]);
 /** make sure that arrays are arrays */
+
+
+if(data['alternativeRooms']==null){
+data['alternativeRooms']=[];
+}
+
+if ( ! $.isArray ( data[ 'alternativeRooms' ] ) ) {
+data[ 'alternativeRooms' ] =[ data[ 'alternativeRooms' ] ] ;
+}
 
 if ( ! $.isArray ( data[ 'selectCourse' ] ) ) {
 data[ 'selectCourse' ] =[ data[ 'selectCourse' ] ] ;

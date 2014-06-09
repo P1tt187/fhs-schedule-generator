@@ -218,6 +218,8 @@ object CEditSubjects extends Controller {
 
         val roomCriteriaIds = (jsVal \ "roomCriteria").as[JsArray].value.map(_.as[String].toLong).toList
 
+        val alternativRooms = findSelectedRooms((jsVal \ "alternativeRooms").as[JsArray].value.map( _.as[String].toLong).toList)
+
         val semester = (jsVal \ "semester").as[Long]
 
         val duration = EDuration.valueOf((jsVal \ "duration").as[String])
@@ -265,6 +267,9 @@ object CEditSubjects extends Controller {
         subject.setDuration(duration)
 
         initCourseValues(subject, activeCheckbox, nameInput, unitInput, selectedCourse, selectedDocents, expectedParticipants)
+        subject.setAlternativRooms(alternativRooms)
+
+        Logger.debug("alternativeRooms: " + alternativRooms)
 
         val criteriaContainer = new CriteriaContainer
         criteriaContainer.setCriterias(List[AbstractCriteria]())

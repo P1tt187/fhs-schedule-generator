@@ -149,11 +149,25 @@ object CExporter extends Controller {
 
                 }
 
+                val alternativeHour = timeSlot.getParent.getChildren.toList.asInstanceOf[List[TimeSlot]].sorted.indexOf(timeSlot)/2 + 1
+
                 Json.stringify(Json.obj(
                   "appointment" -> Json.obj(
                     "day" -> day,
                     "location" -> Json.obj(
-                      "alternative" -> Json.arr(),
+                      "alternative" -> lecture.getAlternativeLectureRooms.map {
+                        alr =>
+                          Json.obj("alterLocation" -> Json.obj(
+                            "building" -> alr.getHouse,
+                            "room" -> alr.getNumber
+                          ),
+                          "alterDay"->day,
+                          "alterTitleShort"->lecture.getShortName,
+                          "alterWeek"->lecture.getDuration.getShortName,
+                          "altereventType"->eventType,
+                            "hour"-> alternativeHour
+                          )
+                      },
                       "place" -> Json.obj(
                         "building" -> lecture.getRoom.getHouse.getName,
                         "room" -> lecture.getRoom.getNumber

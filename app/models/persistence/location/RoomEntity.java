@@ -117,6 +117,13 @@ public class RoomEntity extends AbstractEntity implements Comparable<RoomEntity>
     }
 
 
+    public LectureRoom roomEntity2LectureRoom(){
+        LectureRoom lectureRoom = new LectureRoom();
+        lectureRoom.setHouse(this.house.getName());
+        lectureRoom.setNumber(this.number);
+        return lectureRoom;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

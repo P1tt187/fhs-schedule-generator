@@ -5,6 +5,7 @@ import models.persistence.criteria.CriteriaContainer;
 import models.persistence.docents.LectureDocent;
 import models.persistence.enumerations.EDuration;
 import models.persistence.enumerations.ELectureKind;
+import models.persistence.location.LectureRoom;
 import models.persistence.location.RoomEntity;
 import models.persistence.participants.LectureParticipant;
 import models.persistence.participants.Participant;
@@ -14,6 +15,7 @@ import org.hibernate.annotations.FetchMode;
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -93,6 +95,14 @@ public class Lecture extends AbstractLecture {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<LectureParticipant> lectureParticipants;
 
+    /** alternative rooms of this lecture*/
+    @Transient
+    private List<RoomEntity> alternativeRooms;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "TBLLECTURE_ALTERNATIVE_ROOMS")
+    private Set<LectureRoom> alternativeLectureRooms;
+
     /**
      * this is just for debugging
      * <p>
@@ -101,6 +111,22 @@ public class Lecture extends AbstractLecture {
      */
     @Transient
     private String notOptimalPlaced = "";
+
+    public List<RoomEntity> getAlternativeRooms() {
+        return alternativeRooms;
+    }
+
+    public void setAlternativeRooms(List<RoomEntity> alternativeRooms) {
+        this.alternativeRooms = alternativeRooms;
+    }
+
+    public Set<LectureRoom> getAlternativeLectureRooms() {
+        return alternativeLectureRooms;
+    }
+
+    public void setAlternativeLectureRooms(Set<LectureRoom> alternativeLectureRooms) {
+        this.alternativeLectureRooms = alternativeLectureRooms;
+    }
 
     public Set<LectureParticipant> getLectureParticipants() {
         return lectureParticipants;
@@ -246,6 +272,7 @@ public class Lecture extends AbstractLecture {
     public Set<RoomEntity> getRooms() {
         return new HashSet<RoomEntity>() {{
             add(room);
+            addAll(alternativeRooms);
         }};
     }
 

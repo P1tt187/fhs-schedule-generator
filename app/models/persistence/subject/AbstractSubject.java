@@ -8,11 +8,13 @@ import models.persistence.Semester;
 import models.persistence.criteria.CriteriaContainer;
 import models.persistence.docents.Docent;
 import models.persistence.enumerations.EDuration;
+import models.persistence.location.RoomEntity;
 import models.persistence.participants.Course;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,6 +90,19 @@ public abstract class AbstractSubject extends AbstractEntity {
     @Column(name = "duration")
     @Enumerated(EnumType.STRING)
     private EDuration duration;
+
+    /** alternative rooms for this subject  */
+    @Fetch(FetchMode.SUBSELECT)
+    @ManyToMany(targetEntity = RoomEntity.class, fetch = FetchType.EAGER)
+    private List<RoomEntity> alternativRooms;
+
+    public List<RoomEntity> getAlternativRooms() {
+        return alternativRooms;
+    }
+
+    public void setAlternativRooms(List<RoomEntity> alternativRooms) {
+        this.alternativRooms = alternativRooms;
+    }
 
     public EDuration getDuration() {
         return duration;
