@@ -50,6 +50,23 @@
         </select>
     </div>
     <div class="clearfix"></div>
+    <br/>
+    <div class="form-group">
+        <button id="submitBtn" class="form-control btn btn-success" type="submit" role="button"> <span class="glyphicon glyphicon-ok"></span> </button>
+    </div>
+    <div class="form-group">
+        <button id="resetBtn" class="form-control btn btn-danger" type="reset" role="button"><span class="glyphicon glyphicon-remove"></span> </button>
+    </div>
+
+</form>
+    @if(flash.get("submitResult").getOrElse("").equals("true")){
+        <div class="alert alert-success"> <span class="glyphicon glyphicon-thumbs-up"></span> Erfolg </div>
+    }
+    @if(flash.get("submitResult").getOrElse("").equals("false")){
+        <div class="alert alert-danger"> <span class="glyphicon glyphicon-thumbs-down"></span> Fehler </div>
+    }
+    <div class="clearfix"></div>
+    <br/>
     <div id="timeCrits" class="small">
      <div class="form-inline">
 
@@ -104,23 +121,33 @@
                             <td>
                                 @if(!allTimeSlots.find(slot=> range.compare(slot) == 0 && slot.getParent.getSortIndex == day._1.toInt).isEmpty){
 
-                                <form class="subform form-inline">
+                                <form class="subform form-inline @{
+                                    if(wishes.isEmpty){
+                                        ""
+                                    }else {
+                                        EDocentTimeKind.valueOf( wishes.head.timeKind) match {
+                                            case EDocentTimeKind.WISH => "bg-success"
+                                            case EDocentTimeKind.AVAILABLE => "bg-warning"
+                                        }
+
+                                    }
+                                }">
                                 <div class="form-group">
                                     <div class="radio">
                                     <label >
-                                      <input class="form-control" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.WISH" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.WISH.name())){checked} >
+                                      <input class="form-control wish" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.WISH" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.WISH.name())){checked} >
                                         Wunsch
                                     </label>
                                     </div>
                                     <div class="radio">
                                     <label>
-                                        <input class="form-control" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.AVAILABLE" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.AVAILABLE.name())){checked}>
+                                        <input class="form-control avail" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.AVAILABLE" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.AVAILABLE.name())){checked}>
                                         Kann
                                     </label>
                                         </div>
                                     <div class="radio">
                                        <label>
-                                        <input class="form-control" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,N" @if(wishes.isEmpty){checked} >
+                                        <input class="form-control unavail" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,N" @if(wishes.isEmpty){checked} >
                                         N
                                     </label>
                                     </div>
@@ -156,30 +183,28 @@
 
 
     </div>
-    <br />
-    <!--div class="form-group">
-        <button type="button" id="addTimeCrit" class="btn btn-sm btn-warning" role="button"><span class="glyphicon glyphicon-plus"></span> </button>
-    </div -->
+
     <div class="clearfix"></div>
     <br />
-    <div class="form-group">
-        <div class="form-group">
-            <button class="form-control btn btn-success" type="submit"> <span class="glyphicon glyphicon-ok"></span> </button>
-        </div>
-        <div class="form-group">
-            <button class="form-control btn btn-danger" type="reset"><span class="glyphicon glyphicon-remove"></span> </button>
-        </div>
-    </div>
 
-</form>
-    @if(flash.get("submitResult").getOrElse("").equals("true")){
-    <div class="alert alert-success"> <span class="glyphicon glyphicon-thumbs-up"></span> Erfolg </div>
-    }
-   @if(flash.get("submitResult").getOrElse("").equals("false")){
-    <div class="alert alert-danger"> <span class="glyphicon glyphicon-thumbs-down"></span> Fehler </div>
-   }
+
+
+
+
 <script >
+
+
  initSelect();
+
+$('.wish' ).on('click', function(){
+    $(this ).parents('form' ).removeClass('bg-success' ).removeClass('bg-warning' ).addClass('bg-success');
+});
+ $('.avail' ).on('click', function(){
+    $(this ).parents('form' ).removeClass('bg-success' ).removeClass('bg-warning' ).addClass('bg-warning');
+});
+ $('.unavail' ).on('click', function(){
+    $(this ).parents('form' ).removeClass('bg-success' ).removeClass('bg-warning' );
+});
 
 $('#@existingDocentForm("lastName").id').attr('required','required');
 
@@ -195,10 +220,10 @@ var postData = $ ( this ).serializeObject() ;
      timeslotBuffer.push ( subFormData )
      }
     });
-
+/*
     if(postData['timerange' ].indexOf('N')==-1) {
     timeslotBuffer.push ( { "timerange" : postData[ 'timerange' ], "duration" : postData[ 'duration' ] } ) ;
-    }
+    }*/
 postData['timeslots'] = timeslotBuffer ;
 
 var postUrl = "@routes.CEditDocents.editDocent";

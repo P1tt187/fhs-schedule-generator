@@ -17,11 +17,11 @@
     </div>
 
     <div id="unitInputDiv" class="form-group">
-        <label for="unitInput" class="control-label">Einheiten</label>
+        <label for="unitInput" class="control-label">Einheiten (Zeitslots)</label>
         <input class="form-control" id="unitInput" name="unitInput" type="number" placeholder="einheiten" value="@subject.getUnits" step="0.5" min="0.5" required>
     </div>
     <div class="form-group">
-        <button id="cloneSubjectBtn" type="button" class="btn btn-warning"><span class="glyphicon glyphicon-repeat"></span> </button>
+        <button id="cloneSubjectBtn" type="button" class="btn btn-warning"><span class="glyphicon glyphicon glyphicon-file"></span> </button>
     </div>
     <div class="form-group">
         <button id="deleteSubjectModalBtn" type="button" class="btn btn-danger @if(subject.getId == -1l){hidden} " data-toggle="modal" data-target=".delete-subject"><span class="glyphicon glyphicon-trash"></span> </button>
@@ -72,14 +72,7 @@
             <option @if(subject.getDuration == EDuration.UNWEEKLY){selected} value="@EDuration.UNWEEKLY">nicht Wöchentlich</option>
         </select>
     </div>
-    <div class="form-group">
-        <label for="alternativRooms" class="control-label">Alternativräume</label>
-        <select class="form-control" multiple title="nichts Ausgewählt" name="alternativeRooms" id="alternativRooms">
-            @for(r <- rooms){
-                <option @if(subject.getAlternativRooms.contains(r)){selected }  value="@r.getId">@r.getHouse.getName @r.getNumber </option>
-            }
-        </select>
-    </div>
+
 
     <div id="courses" class="form-group">
         <label class="control-label" for="selectCourse">Kurse</label>
@@ -104,21 +97,29 @@
     </div>
 
     <div class="clearfix"></div>
-    <div>
-        <h4> Synonyme </h4>
-        <button id="addSynonymBtn" type="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-plus"></span> </button>
-        <div id="synonymContainer">
-        @for(course<-subject.getSubjectSynonyms.keySet().toList.sorted){
-            <div class="synonymForm" >
-            @synonyms(course, subject.getSubjectSynonyms.get(course))
+    <div class="col-md-6">
+        <div class="panel panel-info" >
+            <div class="panel-heading"><h4 class="panel-title"> Synonyme (Optional)</h4></div>
+            <div class="panel-body">
+            <button id="addSynonymBtn" type="button" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-plus"></span> </button>
+                <div id="synonymContainer">
+                @for(course<-subject.getSubjectSynonyms.keySet().toList.sorted){
+                    <div class="synonymForm" >
+                    @synonyms(course, subject.getSubjectSynonyms.get(course))
+                    </div>
+                }
+                </div>
             </div>
-        }
         </div>
     </div>
-
+<div class="col-md-6">
     <div class="panel panel-info">
+        <div class="panel-heading">
+          <h4 class="panel-title">  Einschränkungen (Optional) </h4>
+        </div>
+        <div class="panel-body">
         <fieldset >
-            <legend > Einschränkungen (Optional) </legend>
+
             <div class="form-group">
                 <label class="control-label">Raumeigenschaften</label>
                 @for(attr<-MRoomdefintion.ATTRIBUTES){
@@ -147,6 +148,9 @@
                 </select>
             </div>
             <div class="form-group">
+                oder
+            </div>
+            <div class="form-group">
                 <label for="roomCriteria" class="control-label">Räume</label>
                 <select class="form-control" id="roomCriteria" name="roomCriteria" multiple title="keine Einschränkung" data-selected-text-format="count>4">
                     @for(r<-rooms){
@@ -162,9 +166,18 @@
                     }
                 </select>
             </div>
+            <div class="form-group">
+                <label for="alternativRooms" class="control-label">Zusatzräume</label>
+                <select class="form-control" multiple title="nichts Ausgewählt" name="alternativeRooms" id="alternativRooms">
+                @for(r <- rooms){
+                    <option @if(subject.getAlternativRooms.contains(r)){selected }  value="@r.getId">@r.getHouse.getName @r.getNumber </option>
+                }
+                </select>
+            </div>
         </fieldset>
+        </div>
     </div>
-
+</div>
     <div class="clearfix"></div>
     <div class="form-group">
         <label class="control-label" >Für den Plan Berücksichtigen</label>

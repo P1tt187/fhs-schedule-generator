@@ -48,7 +48,11 @@
         var getDocentFields = function ( ) {
         appendHTML ( '/docentFields/' + $ ( '#selectDocent' ).val ( ), '#docentFields' ) ;
         } ;
-        getDocentFields ( ) ;
+            $(window ).on('load', function(){
+            getDocentFields ( ) ;
+            });
+
+
         $ ( '#selectDocent' ).on ( 'change', getDocentFields ) ;
 
 
