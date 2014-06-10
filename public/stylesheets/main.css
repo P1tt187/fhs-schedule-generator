@@ -70,3 +70,7 @@ ul.nav li.dropdown:hover > ul.dropdown-submenu {
     vertical-align: middle;
     text-align: center;
 }
+
+.radioSpacing{
+    margin-right: 10px;
+}

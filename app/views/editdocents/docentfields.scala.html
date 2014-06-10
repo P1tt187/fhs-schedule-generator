@@ -49,22 +49,10 @@
         }
         </select>
     </div>
-    <div class="clearfix"></div>
-    <br/>
-    <div class="form-group">
-        <button id="submitBtn" class="form-control btn btn-success" type="submit" role="button"> <span class="glyphicon glyphicon-ok"></span> </button>
-    </div>
-    <div class="form-group">
-        <button id="resetBtn" class="form-control btn btn-danger" type="reset" role="button"><span class="glyphicon glyphicon-remove"></span> </button>
-    </div>
+
 
 </form>
-    @if(flash.get("submitResult").getOrElse("").equals("true")){
-        <div class="alert alert-success"> <span class="glyphicon glyphicon-thumbs-up"></span> Erfolg </div>
-    }
-    @if(flash.get("submitResult").getOrElse("").equals("false")){
-        <div class="alert alert-danger"> <span class="glyphicon glyphicon-thumbs-down"></span> Fehler </div>
-    }
+
     <div class="clearfix"></div>
     <br/>
     <div id="timeCrits" class="small">
@@ -73,8 +61,8 @@
         <div class="form-group">
            <strong> Bedeutung:</strong>
             <ul class="list-unstyled">
-                <li><strong>Wunsch</strong> - ich möchte zu dieser Zeit eingeteilt werden</li>
-                <li><strong>Kann</strong> - ich stehe zur Verfügung, aber nur wenn es sein muss</li>
+                <li><strong>W</strong> - ich möchte zu dieser Zeit eingeteilt werden</li>
+                <li><strong>K</strong> - ich stehe zur Verfügung, aber nur wenn es sein muss</li>
                 <li><strong>N</strong> - nicht verfügbar</li>
             </ul>
         </div>
@@ -118,9 +106,8 @@
                         </td>
                         @for(day <- days) {
                             @defining(existingTimeWishes.filter(w=> range.compare(w)==0 && w.weekday == day._1.toInt)){ wishes=>
-                            <td>
+                            <td >
                                 @if(!allTimeSlots.find(slot=> range.compare(slot) == 0 && slot.getParent.getSortIndex == day._1.toInt).isEmpty){
-
                                 <form class="subform form-inline @{
                                     if(wishes.isEmpty){
                                         ""
@@ -132,20 +119,21 @@
 
                                     }
                                 }">
+                               <div class="container center-block ">
                                 <div class="form-group">
-                                    <div class="radio">
+                                    <div class="radio radioSpacing" >
                                     <label >
                                       <input class="form-control wish" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.WISH" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.WISH.name())){checked} >
-                                        Wunsch
+                                        W
                                     </label>
                                     </div>
-                                    <div class="radio">
+                                    <div class="radio radioSpacing">
                                     <label>
                                         <input class="form-control avail" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.AVAILABLE" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.AVAILABLE.name())){checked}>
-                                        Kann
+                                        K
                                     </label>
                                         </div>
-                                    <div class="radio">
+                                    <div class="radio radioSpacing">
                                        <label>
                                         <input class="form-control unavail" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,N" @if(wishes.isEmpty){checked} >
                                         N
@@ -159,18 +147,20 @@
                                         <input class="form-control" name="duration" type="radio" value="@EDuration.WEEKLY" @if(wishes.isEmpty || wishes.head.duration.equals(EDuration.WEEKLY.name())){checked}> w
                                     </label>
                                      </div>
-                                    <div class="radio">
+                                    <div class="radio radioSpacing">
                                     <label>
                                         <input class="form-control" name="duration" type="radio" value="@EDuration.EVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.EVEN.name())){checked}> g
                                     </label>
                                      </div>
-                                    <div class="radio">
+                                    <div class="radio radioSpacing">
                                     <label>
                                         <input class="form-control" name="duration" type="radio" value="@EDuration.UNEVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.UNEVEN.name())){checked}> ug
                                     </label>
                                     </div>
                                 </div>
+                               </div>
                                 </form>
+
                                 }
                             </td>
                             }
@@ -185,8 +175,23 @@
     </div>
 
     <div class="clearfix"></div>
+    <br/>
+    <div class="form-inline">
+        <div class="form-group">
+            <button id="submitBtn" class="form-control btn btn-success" type="button" role="button"> <span class="glyphicon glyphicon-ok"></span> </button>
+        </div>
+        <div class="form-group">
+            <button id="resetBtn" class="form-control btn btn-danger" type="button" role="button"><span class="glyphicon glyphicon-remove"></span> </button>
+        </div>
+    </div>
+    <div class="clearfix"></div>
     <br />
-
+    @if(flash.get("submitResult").getOrElse("").equals("true")){
+        <div class="alert alert-success"> <span class="glyphicon glyphicon-thumbs-up"></span> Erfolg </div>
+    }
+    @if(flash.get("submitResult").getOrElse("").equals("false")){
+        <div class="alert alert-danger"> <span class="glyphicon glyphicon-thumbs-down"></span> Fehler </div>
+    }
 
 
 
@@ -195,6 +200,14 @@
 
 
  initSelect();
+
+ $('#submitBtn' ).click(function(){
+     $('#editDocentForm' ).submit();
+ });
+
+ $('#resetBtn' ).click(function(){
+ getDocentFields ( ) ;
+ });
 
 $('.wish' ).on('click', function(){
     $(this ).parents('form' ).removeClass('bg-success' ).removeClass('bg-warning' ).addClass('bg-success');
