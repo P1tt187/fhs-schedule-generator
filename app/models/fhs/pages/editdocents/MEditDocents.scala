@@ -1,17 +1,18 @@
 package models.fhs.pages.editdocents
 
-import models.persistence.criteria._
 import models.Transactions
-import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
-import org.hibernate.FetchMode
 import models.fhs.pages.JavaList
-import scala.collection.JavaConversions._
-import models.persistence.location.{RoomEntity, HouseEntity}
-import models.persistence.template.WeekdayTemplate
-import models.persistence.enumerations.{EDocentTimeKind, EDuration}
 import models.fhs.pages.roomdefinition.MRoomdefintion
-import models.persistence.subject.AbstractSubject
+import models.persistence.criteria._
 import models.persistence.docents.Docent
+import models.persistence.enumerations.{EDocentTimeKind, EDuration}
+import models.persistence.location.{HouseEntity, RoomEntity}
+import models.persistence.subject.AbstractSubject
+import models.persistence.template.WeekdayTemplate
+import org.hibernate.FetchMode
+import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
+
+import scala.collection.JavaConversions._
 
 
 /**
@@ -105,6 +106,7 @@ object MEditDocents {
     val docent = findDocentById(mDocent.id)
 
     docent.setLastName(mDocent.lastName)
+    docent.setComments(mDocent.comments)
     val oldCriteriaContainer = docent.getCriteriaContainer
     val newCriteriaContainer = new CriteriaContainer
     newCriteriaContainer.setCriterias(List[AbstractCriteria]())
@@ -141,14 +143,19 @@ object MEditDocents {
     newCriteriaContainer.setCriterias(newCriteriaContainer.getCriterias ++ houseCriterias)
 
     if (!mDocent.roomAttr.isEmpty) {
-      val roomAttrCriteria = new RoomCriteria
+
 
       val attributes = mDocent.roomAttr.map {
         attribute =>
-          MRoomdefintion.findOrCreateRoomAttribute(attribute)
+          val roomCriteria = new RoomCriteria
+          val attr=  MRoomdefintion.findOrCreateRoomAttribute(attribute)
+          roomCriteria.setRoomAttributes(List(attr))
+          roomCriteria
       }
-      roomAttrCriteria.setRoomAttributes(attributes)
-      newCriteriaContainer.setCriterias(newCriteriaContainer.getCriterias :+ roomAttrCriteria)
+
+
+
+      newCriteriaContainer.setCriterias(newCriteriaContainer.getCriterias ++ attributes)
     }
     val roomCriterias = mDocent.roomCrit.map {
       crit =>
@@ -193,13 +200,13 @@ object MEditDocents {
         rCrit.getRoom.getId.toLong
     }
 
-    MExistingDocent(docent.getId, docent.getLastName, convertedTimeslotCriterias, houseCriterias, roomAttributes, roomCrits)
+    MExistingDocent(docent.getId, docent.getLastName,docent.getComments, convertedTimeslotCriterias, houseCriterias, roomAttributes, roomCrits)
   }
 }
 
 case class MDocent(lastName: String)
 
-case class MExistingDocent(id: Long, lastName: String, timeslots: List[MDocentTimeWhish], houseCriterias: List[Long], roomAttr: List[String], roomCrit: List[Long])
+case class MExistingDocent(id: Long, lastName: String,comments:String, timeslots: List[MDocentTimeWhish], houseCriterias: List[Long], roomAttr: List[String], roomCrit: List[Long])
 
 case class MDocentTimeWhish(timeKind: String, duration:String, weekday: Int, startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)
 

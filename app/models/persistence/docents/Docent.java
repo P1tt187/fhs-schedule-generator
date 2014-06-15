@@ -20,6 +20,18 @@ public class Docent extends AbstractEntity implements Comparable<Docent> {
     @Column(name = "LASTNAME", nullable = false)
     private String lastName;
 
+    /** docents can tell their wishes to the admin by fill out comment field */
+    @Column(name="COMMENTS")
+    private String comments;
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
     public String getLastName() {
         return lastName;
     }
@@ -49,6 +61,7 @@ public class Docent extends AbstractEntity implements Comparable<Docent> {
 
         Docent docent = (Docent) o;
 
+        if (comments != null ? !comments.equals(docent.comments) : docent.comments != null) return false;
         if (lastName != null ? !lastName.equals(docent.lastName) : docent.lastName != null) return false;
 
         return true;
@@ -56,7 +69,9 @@ public class Docent extends AbstractEntity implements Comparable<Docent> {
 
     @Override
     public int hashCode() {
-        return lastName != null ? lastName.hashCode() : 0;
+        int result = lastName != null ? lastName.hashCode() : 0;
+        result = 31 * result + (comments != null ? comments.hashCode() : 0);
+        return result;
     }
 
     @Override

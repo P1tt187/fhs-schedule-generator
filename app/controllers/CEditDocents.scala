@@ -1,16 +1,15 @@
 package controllers
 
-import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.json._
-
-import views.html.editdocents._
-import models.fhs.pages.editdocents._
 import models.fhs.pages.editdocents.MEditDocents._
-import play.api.Logger
-import models.fhs.pages.timeslot.MTimeslotDisplay
+import models.fhs.pages.editdocents._
 import models.fhs.pages.generator.MGenerator
+import models.fhs.pages.timeslot.MTimeslotDisplay
+import play.api.Logger
+import play.api.data.Forms._
+import play.api.data._
+import play.api.libs.json._
+import play.api.mvc._
+import views.html.editdocents._
 
 /**
  * @author fabian 
@@ -28,6 +27,7 @@ object CEditDocents extends Controller {
     mapping(
       "id" -> longNumber,
       "lastName" -> nonEmptyText(minLength = 3),
+      "comments" ->text,
       "timeslots" -> list(
         mapping(
           "timeKind" ->nonEmptyText,
@@ -85,6 +85,7 @@ object CEditDocents extends Controller {
       val houseCriterias = (jsVal \ existingDocentForm("houseCriterias").name).as[JsArray].value.map(_.as[String].toLong).toList
       val roomAttr = (jsVal \ existingDocentForm("roomAttr").name).as[JsArray].value.map(_.as[String]).toList
       val roomCrit = (jsVal \ existingDocentForm("roomCrit").name).as[JsArray].value.map(_.as[String].toLong).toList
+      val comments = (jsVal \ existingDocentForm("comments").name).as[String].trim
       val timeslots = (jsVal \ "timeslots").as[JsArray].value.par.map{
         slot=>
           val rangeString = (slot \ "timerange").as[String].split(",")
@@ -112,7 +113,7 @@ object CEditDocents extends Controller {
       }
 
 
-      val mDocent = MExistingDocent(id,lastName,timeslots,houseCriterias,roomAttr,roomCrit)
+      val mDocent = MExistingDocent(id,lastName, comments,timeslots,houseCriterias,roomAttr,roomCrit)
 
       Logger.debug(mDocent.toString)
 

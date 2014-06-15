@@ -1,16 +1,13 @@
 @(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.generator.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate])(implicit flash:Flash)
 
 @import models.fhs.pages.editdocents._
-@import models.persistence.enumerations._
-
-
 @import models.fhs.pages.roomdefinition._
-
-@import helper._
-@import helper.twitterBootstrap._
+@import models.persistence.enumerations._
+@import views.html.helper._
+@import views.html.helper.twitterBootstrap._
 
     @defaultDocent = @{
-        MExistingDocent(-1, "", List[MDocentTimeWhish](), List[Long](), List[String](), List[Long]())
+        MExistingDocent(-1, "","", List[MDocentTimeWhish](), List[Long](), List[String](), List[Long]())
     }
 
 <form id="editDocentForm" class="form-inline">
@@ -23,7 +20,7 @@
     <br/>
     <div class="form-group">
         <label class="control-label" for="favoriteFacility">Bevorzugte Gebäude</label>
-        <select multiple id="favoriteFacility" name="houseCriterias" title="nichts ausgewählt">
+        <select class="form-control" multiple id="favoriteFacility" name="houseCriterias" title="nichts ausgewählt">
 
         @for(h <- houses) {
             @defining(existingDocentForm.value.getOrElse( defaultDocent).houseCriterias.count(houseId => houseId.equals(h.getId)) > 0) { isSelected =>
@@ -34,7 +31,7 @@
     </div>
     <div class="form-group">
         <label for="favoriteRooms" class="control-label">Bevorzugte Räume</label>
-        <select multiple id="favoriteRooms" name="roomCrit" data-selected-text-format="count>4" title="nichts ausgewählt">
+        <select class="form-control" multiple id="favoriteRooms" name="roomCrit" data-selected-text-format="count>4" title="nichts ausgewählt">
         @for(r <- rooms) {
             @defining(existingDocentForm.value.getOrElse(defaultDocent).roomCrit.count(_ == r.getId) > 0) { isSelected =>
                 <option value="@r.getId" @if(isSelected) { selected }>@r.getHouse.getName @r.getNumber </option>
@@ -44,7 +41,7 @@
     </div>
     <div class="form-group">
         <label class="control-label" for="favoriteAttributes">Bevorzugte Ausstattung</label>
-        <select id="favoriteAttributes" name="roomAttr" multiple title="nichts ausgewählt">
+        <select class="form-control" id="favoriteAttributes" name="roomAttr" multiple title="nichts ausgewählt">
         @for(attr <- MRoomdefintion.ATTRIBUTES) {
             @defining(existingDocentForm.value.getOrElse(defaultDocent).roomAttr.count(_ == attr)>0) { isSelected =>
                 <option @if(isSelected){selected } value="@attr">@attr</option>
@@ -52,7 +49,12 @@
         }
         </select>
     </div>
+    <div class="clearfix"></div>
 
+    <div class="form-group">
+        <label class="control-label" for="comments" >Anmerkungen</label>
+        <textarea id="comments" class="form-control" cols="80" rows="3" name="@existingDocentForm("comments").name"> @if(existingDocentForm.value.getOrElse(defaultDocent).comments!=null){@existingDocentForm.value.getOrElse(defaultDocent).comments} </textarea>
+    </div>
 
 </form>
 

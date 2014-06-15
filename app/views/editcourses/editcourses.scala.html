@@ -1,7 +1,7 @@
 @(message: String, courses: List[models.persistence.participants.Course], courseForm:Form[fhs.pages.editcourses.MCourse])(implicit flash: Flash)
 
-@import helper._
-@import helper.twitterBootstrap._
+@import views.html.helper._
+@import views.html.helper.twitterBootstrap._
 
 @main(message, CEditCourses.NAV) {
 
@@ -24,12 +24,16 @@
 
     <div class="row-fluid">
         <div class="col-md-9">
-            <label for="courseSelect" class="control-label">Kurs Auswählen</label>
-            <select id="courseSelect">
-            @for(course <- courses) {
-                <option value="@course.getId">@course.getShortName</option>
-            }
-            </select>
+            <div class="form-inline">
+                <div class="form-group">
+                    <label for="courseSelect" class="control-label">Kurs Auswählen</label>
+                    <select id="courseSelect" class="form-control">
+                    @for(course <- courses) {
+                        <option value="@course.getId">@course.getShortName</option>
+                    }
+                    </select>
+                </div>
+            </div>
         </div>
     </div>
 <div class="clearfix"></div>
