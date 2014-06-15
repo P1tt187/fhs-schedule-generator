@@ -40,7 +40,7 @@ public class CriteriaContainer extends AbstractEntity {
         return criterias.stream().parallel().mapToLong(c -> {
             Long ret = 0l;
             if (!(c instanceof RoomCriteria)) {
-                return ret;
+                return 1l;
             }
             RoomCriteria rc = (RoomCriteria) c;
             if (rc.getRoom() != null) {
