@@ -1,7 +1,7 @@
-@(message: String, semesters: List[models.persistence.Semester], docents:List[models.persistence.docents.Docent], courses:List[models.persistence.participants.Course], semesterForm:Form[models.fhs.pages.editsubjects.MSemester])
+@(message: String, semesters: List[models.persistence.Semester], docents:List[models.persistence.docents.Docent], courses:List[models.persistence.participants.Course], semesterForm:Form[models.fhs.pages.editsubjects.MSemester])(implicit session:Session)
 
-@import helper._
-@import helper.twitterBootstrap._
+@import views.html.helper._
+@import views.html.helper.twitterBootstrap._
 
 @main(message, CEditSubjects.NAV) {
     <div class="page-header">

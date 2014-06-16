@@ -1,28 +1,30 @@
 package controllers
 
-import play.api.mvc._
-import views.html.exporter._
-import models.Transactions
-import models.persistence.location.{RoomAttributesEntity, HouseEntity}
-import org.hibernate.FetchMode
-import models.fhs.pages.JavaList
-import models.persistence.subject.AbstractSubject
-import models.export.JsonContainer
+import java.net.URI
+import java.nio.charset.Charset
+import java.nio.file._
+
 import com.fasterxml.jackson.databind.ObjectMapper
-import models.persistence.template.WeekdayTemplate
-import scala.collection.JavaConversions._
-import models.persistence.criteria.TimeSlotCriteria
-import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
+import models.Transactions
+import models.export.JsonContainer
+import models.fhs.pages.JavaList
 import models.fhs.pages.exporter.MExporter._
 import models.fhs.pages.generator.MGenerator._
-import java.nio.file._
+import models.persistence.criteria.TimeSlotCriteria
+import models.persistence.enumerations.ELectureKind
+import models.persistence.lecture.Lecture
+import models.persistence.location.{HouseEntity, RoomAttributesEntity}
 import models.persistence.participants.Course
 import models.persistence.scheduletree.{TimeSlot, Weekday}
-import models.persistence.lecture.Lecture
-import models.persistence.enumerations.ELectureKind
+import models.persistence.subject.AbstractSubject
+import models.persistence.template.WeekdayTemplate
+import org.hibernate.FetchMode
+import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
 import play.api.libs.json._
-import java.nio.charset.Charset
-import java.net.URI
+import play.api.mvc._
+import views.html.exporter._
+
+import scala.collection.JavaConversions._
 
 
 /**
@@ -34,6 +36,8 @@ object CExporter extends Controller {
   val NAV = "Exporter"
 
   def page = Action {
+    implicit request=>
+
     import models.fhs.pages.exporter.MExporter._
     Ok(exporter("Expotieren/Importieren", findSemesters))
   }

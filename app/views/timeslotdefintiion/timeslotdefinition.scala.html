@@ -1,8 +1,8 @@
-@(message: String, errorIds: List[String], timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: Seq[(String, String)], timeslots: List[models.persistence.template.TimeSlotTemplate], timeRanges: List[models.fhs.pages.generator.TimeRange])
+@(message: String, errorIds: List[String], timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: Seq[(String, String)], timeslots: List[models.persistence.template.TimeSlotTemplate], timeRanges: List[models.fhs.pages.generator.TimeRange])(implicit session:Session)
 
 
-@import helper._
-@import helper.twitterBootstrap._
+@import views.html.helper._
+@import views.html.helper.twitterBootstrap._
 
 
     @errorWeekdaySelect = @{

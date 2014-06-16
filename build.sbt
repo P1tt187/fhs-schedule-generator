@@ -12,7 +12,10 @@ libraryDependencies ++= Seq(
   "org.hibernate" % "hibernate-core" % "4.2.3.Final",
   "org.hibernate" % "hibernate-entitymanager" % "4.2.3.Final",
   "mysql" % "mysql-connector-java" % "5.1.21",
-  "uk.com.robust-it" % "cloning" % "1.9.0"
+  "uk.com.robust-it" % "cloning" % "1.9.0",
+  "com.decodified" %% "scala-ssh" % "0.6.4",
+  "org.bouncycastle" % "bcprov-jdk16" % "1.46",
+  "com.jcraft" % "jzlib" % "1.1.3"
 )
 
 

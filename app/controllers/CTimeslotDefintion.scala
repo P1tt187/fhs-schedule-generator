@@ -1,20 +1,16 @@
 package controllers
 
-import play.api.mvc._
-import play.api._
-
-import play.api.data._
-import play.api.data.Forms._
-
-import play.db.jpa._
-
-import models.fhs.pages.timeslot.{MTimeslotDisplay, MTimeslotDefine}
-
 import models.Transactions
-import org.hibernate.criterion.Restrictions
-import models.persistence.template.{TimeSlotTemplate, WeekdayTemplate}
-import views.html.timeslotdefintiion._
 import models.fhs.pages.generator.MGenerator
+import models.fhs.pages.timeslot.{MTimeslotDefine, MTimeslotDisplay}
+import models.persistence.template.{TimeSlotTemplate, WeekdayTemplate}
+import org.hibernate.criterion.Restrictions
+import play.api._
+import play.api.data.Forms._
+import play.api.data._
+import play.api.mvc._
+import play.db.jpa._
+import views.html.timeslotdefintiion._
 
 
 /**
@@ -41,6 +37,8 @@ object CTimeslotDefintion extends Controller {
   @Transactional(readOnly = true)
   def page =
     Action {
+      implicit request=>
+
       val allTimeSlots = MTimeslotDisplay.findAllTimeslots
       val timeRanges = MGenerator.findTimeRanges(allTimeSlots)
       Ok(timeslotdefinition("Timeslots", List[String](), timeslotForm, WEEKDAYS, allTimeSlots, timeRanges))

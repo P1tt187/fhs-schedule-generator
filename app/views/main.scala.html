@@ -1,4 +1,7 @@
-@(title: String, nav: String)(content: Html)
+@(title: String, nav: String)(content: Html)(implicit session:Session)
+
+@import views.html.helper._
+
 <!DOCTYPE html>
 
 <html lang="en">
@@ -42,17 +45,40 @@
                     <a class="navbar-brand" href="@routes.CIndex.index"> Schedule Generator</a>
                 </div>
                 <div class="collapse navbar-collapse navbar-inverse-collapse ">
+                @if(session.get(CIndex.CURRENT_USER).getOrElse("-1")!="-1") {
                     <ul class="nav navbar-nav nav-tabs navbar-collapse " >
                     @sidebar(nav)
                     </ul>
+                }
+                    @if(session.get(CIndex.CURRENT_USER).getOrElse("-1")=="-1"){
+                        @form(action=routes.CIndex.doLogin, 'class->"navbar-form pull-right"){
+                           <input class="form-control input-sm" placeholder="Nutzer" type="text" name="@CIndex.loginForm("username").name" >
+                           <input class="form-control input-sm" placeholder="Passwort" type="password" name="@CIndex.loginForm("password").name" >
+                               <button type="submit" class="btn btn-sm btn-success navbar-btn"><span class="glyphicon glyphicon-log-in"></span> </button>
+                        }
+                    } else {
+                        <ul class="nav navbar-nav navbar-collapse pull-right list-inline">
+                            <li role="presentation">
+                                <a>
+                               @session(CIndex.CURRENT_USER)
+                                </a>
+                            </li>
+                            <li>
+                                <form class="navbar-form" action="@routes.CIndex.doLogout" method="post">
+                                    <button type="submit" class="btn btn-danger navbar-btn btn-sm"><span class="glyphicon glyphicon-log-out"></span> </button>
+                                </form>
+                            </li>
+                        </ul>
+                    }
                 </div>
             </nav>
             <div class="container-fluid" id="mainContainer">
                 <div class="row-fluid">
-
+                @if(session.get(CIndex.CURRENT_USER).getOrElse("-1")!="-1") {
                     <div class="column col-md-12 ">
                         <article class=" " role="main"> @content </article>
                     </div>
+                }
                 </div>
             </div>
 

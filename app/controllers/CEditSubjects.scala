@@ -1,30 +1,27 @@
 package controllers
 
-import play.api.libs.json._
-import models.fhs.pages.editsubjects.MEditSubjects._
-import views.html.editsubjects._
-import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
-import play.api.cache.Cache
-import play.api.Play.current
+import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
 import models.Transactions
-import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCriteria}
-import models.persistence.enumerations.EDuration
-import models.persistence.participants.Course
-import models.persistence.location.{RoomEntity, RoomAttributesEntity, HouseEntity}
-import scala.concurrent.duration._
-import scala.collection.JavaConversions._
-import models.persistence.docents.Docent
-import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
-
-import play.api.mvc._
-import play.api._
-
-import play.api.data._
-import play.api.data.Forms._
-
+import models.fhs.pages.editsubjects.MEditSubjects._
 import models.fhs.pages.editsubjects.MSemester
-import play.api.libs.json.JsArray
 import models.persistence.Semester
+import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCriteria}
+import models.persistence.docents.Docent
+import models.persistence.enumerations.EDuration
+import models.persistence.location.{HouseEntity, RoomAttributesEntity, RoomEntity}
+import models.persistence.participants.Course
+import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
+import play.api.Play.current
+import play.api._
+import play.api.cache.Cache
+import play.api.data.Forms._
+import play.api.data._
+import play.api.libs.json.{JsArray, _}
+import play.api.mvc._
+import views.html.editsubjects._
+
+import scala.collection.JavaConversions._
+import scala.concurrent.duration._
 
 
 /**
@@ -142,7 +139,7 @@ object CEditSubjects extends Controller {
         idString
       }
 
-      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim()))).withSession("subjectFields" -> selectedSubject)
+      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim()))).withSession(session + ("subjectFields" -> selectedSubject))
 
   }
 

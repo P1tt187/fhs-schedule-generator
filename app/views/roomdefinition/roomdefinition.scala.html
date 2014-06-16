@@ -1,10 +1,9 @@
-@(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion], weekdays: Seq[(String, String)], existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay])
+@(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion], weekdays: Seq[(String, String)], existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay])(implicit session:Session)
 
 @import models.fhs.pages.roomdefinition._
 @import models.persistence.enumerations.EDuration
-
-@import helper._
-@import helper.twitterBootstrap._
+@import views.html.helper._
+@import views.html.helper.twitterBootstrap._
 
 
 @main(title, CRoomDefinition.NAV) {

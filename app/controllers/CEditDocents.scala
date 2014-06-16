@@ -71,7 +71,8 @@ object CEditDocents extends Controller {
       val docent = findDocentById(id)
 
       val (allTimeSlots,timeRanges) = timeRange
-      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(),timeRanges, allTimeSlots).toString().trim))).withSession("docentName" -> docent.getLastName)
+      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(),timeRanges, allTimeSlots).toString().trim)))
+        .withSession(session + ("docentName" -> docent.getLastName))
   }
 
   def editDocent = Action(parse.json) {
@@ -125,8 +126,9 @@ object CEditDocents extends Controller {
   }
 
   def deleteDocent(id: Long) = Action {
+    implicit request=>
     val (docentName, connectedSubjects) = removeDocent(id)
-    Redirect(routes.CEditDocents.page).flashing("connectedSubjects" -> connectedSubjects.mkString(" "), "docentName" -> docentName).withSession("docentName" -> docentName)
+    Redirect(routes.CEditDocents.page).flashing("connectedSubjects" -> connectedSubjects.mkString(" "), "docentName" -> docentName).withSession(session + ("docentName" -> docentName))
   }
 
   def saveNewDocent = Action {

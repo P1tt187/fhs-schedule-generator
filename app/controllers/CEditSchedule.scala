@@ -1,28 +1,25 @@
 package controllers
 
-import play.api.mvc._
-import play.api.libs.json._
-import views.html.editschedule.{editschedule, showSchedule}
-import models.fhs.pages.editschedule.MEditSchedule._
+import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
 import models.Transactions
-import models.persistence.template.TimeSlotTemplate
-import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
 import models.fhs.pages._
-import models.fhs.pages.generator.MGenerator._
-import scala.collection.JavaConversions._
-import models.persistence.scheduletree.{TimeSlot, Weekday}
-import play.api.cache.Cache
-import play.api.Play.current
-import scala.concurrent.duration._
-import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
-import models.persistence.lecture.{Lecture, AbstractLecture}
-import models.persistence.enumerations.EDuration
-import models.persistence.location.RoomEntity
+import models.fhs.pages.editschedule.MEditSchedule._
+import models.fhs.pages.generator.MGenerator.{findCourses, findSemesterById, _}
 import models.fhs.pages.generator.TimeRange
+import models.persistence.enumerations.EDuration
+import models.persistence.lecture.{AbstractLecture, Lecture}
+import models.persistence.location.RoomEntity
+import models.persistence.scheduletree.{TimeSlot, Weekday}
+import models.persistence.template.TimeSlotTemplate
+import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
+import play.api.Play.current
+import play.api.cache.Cache
+import play.api.libs.json.{JsArray, _}
+import play.api.mvc._
+import views.html.editschedule.{editschedule, showSchedule}
 
-import play.api.libs.json.JsArray
-import models.fhs.pages.generator.MGenerator.findSemesterById
-import models.fhs.pages.generator.MGenerator.findCourses
+import scala.collection.JavaConversions._
+import scala.concurrent.duration._
 
 /**
  * @author fabian 
@@ -41,6 +38,7 @@ object CEditSchedule extends Controller {
 
 
   def findAndSendSchedule(semesterId: Long) = Action {
+    implicit request=>
 
     val timeslotTemplates = Transactions.hibernateAction {
       implicit session =>
@@ -74,7 +72,8 @@ object CEditSchedule extends Controller {
     val timeSlots = schedule.getRoot.getChildren.flatMap {
       case wd: Weekday => wd.getChildren.toList.asInstanceOf[List[TimeSlot]]
     }.toList
-    Ok(Json.obj("htmlresult" -> showSchedule("", timeRanges, timeSlots, rooms,courses,docents, semesterId).toString().trim)).withSession("editschedule" -> semesterId.toString)
+    Ok(Json.obj("htmlresult" -> showSchedule("", timeRanges, timeSlots, rooms,courses,docents, semesterId).toString().trim))
+      .withSession(session + ("editschedule" -> semesterId.toString))
   }
 
   def saveEditedSchedule = Action(parse.json) {

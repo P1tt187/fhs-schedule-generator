@@ -1,20 +1,21 @@
 package controllers
 
-import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
-import models.fhs.pages.roomdefinition.{MTtimeslotCritDefine, MRoomdefintion}
-import play.api.Logger
-import models.persistence.criteria.CriteriaContainer
 import java.util
+
 import models._
-import models.persistence.criteria.{AbstractCriteria, TimeSlotCriteria}
+import models.fhs.pages.roomdefinition.{MRoomdefintion, MTtimeslotCritDefine}
+import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, TimeSlotCriteria}
 import models.persistence.enumerations.EDuration
 import models.persistence.location.RoomEntity
-import scala.collection.JavaConversions._
-import views.html.roomdefinition._
-import play.api.libs.json._
 import org.hibernate.criterion.Restrictions
+import play.api.Logger
+import play.api.data.Forms._
+import play.api.data._
+import play.api.libs.json._
+import play.api.mvc._
+import views.html.roomdefinition._
+
+import scala.collection.JavaConversions._
 
 
 
@@ -46,7 +47,7 @@ object CRoomDefinition extends Controller {
   )
 
   def page = Action {
-
+implicit request=>
     val rooms = MRoomdefintion.findAllRooms()
 
     Ok(roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS, rooms))
@@ -60,6 +61,7 @@ object CRoomDefinition extends Controller {
 
 
   def editRoom(id: Long) = Action {
+    implicit request=>
 
     val room = MRoomdefintion.findMRoomDefinitionById(id)
     Logger.debug("edit room - " + room)

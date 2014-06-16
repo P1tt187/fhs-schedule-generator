@@ -4,6 +4,9 @@
 
 # Home page
 GET         /                                                                                         controllers.CIndex.index
+POST        /loginUser                                                                                controllers.CIndex.doLogin
+POST        /logoutUser                                                                               controllers.CIndex.doLogout
+
 GET         /defineTimeslots                                                                          controllers.CTimeslotDefintion.page
 POST        /submitTimeslot                                                                           controllers.CTimeslotDefintion.submit
 GET         /deleteTimeslot/:id                                                                       controllers.CTimeslotDefintion.delete(id:Long)

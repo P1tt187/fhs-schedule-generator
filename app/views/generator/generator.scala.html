@@ -1,10 +1,9 @@
-@(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm], courses:List[models.persistence.participants.Course] , docents:List[persistence.docents.Docent])(implicit flash: Flash)
-@import models.persistence.enumerations.EDuration
-
-
+@(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm], courses:List[models.persistence.participants.Course] , docents:List[persistence.docents.Docent])(implicit flash: Flash, session:Session)
 @import java.util.Calendar
-@import helper._
-@import helper.twitterBootstrap._
+
+@import models.persistence.enumerations.EDuration
+@import views.html.helper._
+@import views.html.helper.twitterBootstrap._
 
     @main(message, CGenerate.NAV) {
 

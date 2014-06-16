@@ -1,4 +1,4 @@
-@(message:String, semesters:List[persistence.Semester])
+@(message:String, semesters:List[persistence.Semester])(implicit session:Session)
 
 @main(message,CExporter.NAV){
 <div class="page-header">

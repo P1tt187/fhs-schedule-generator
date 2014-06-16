@@ -1,41 +1,36 @@
 package controllers
 
-import play.api.mvc._
-import views.html.generator._
-import play.api.libs.json._
-import akka.util.Timeout
-import scala.concurrent.duration._
-import models.fhs.pages.generator.MGenerator._
-import play.api.data._
-import play.api.data.Forms._
-import scala.concurrent.Future
-import logic.generator.schedulegenerator._
+import java.util.{Calendar, UUID}
 
-import play.api.libs.concurrent.Akka
 import akka.actor.{PoisonPill, Props}
-import play.api.Play.current
-import play.api.libs.concurrent.Execution.Implicits._
 import akka.pattern.ask
-import models.persistence.Schedule
-import play.api.Logger
-import models.fhs.pages.JavaList
-import models.persistence.scheduletree.TimeSlot
-import scala.collection.JavaConversions._
+import akka.util.Timeout
+import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
+import logic.generator.lecturegenerator.{GenerateLectures, LectureAnswer, LectureGeneratorActor}
+import logic.generator.schedulegenerator.{GenerateSchedule, InplacebleSchedule, ScheduleAnswer, _}
 import models.Transactions
+import models.fhs.pages.JavaList
+import models.fhs.pages.generator.GeneratorForm
+import models.fhs.pages.generator.MGenerator._
+import models.persistence.Schedule
+import models.persistence.lecture.Lecture
+import models.persistence.scheduletree.TimeSlot
 import models.persistence.template.TimeSlotTemplate
 import org.hibernate.criterion.CriteriaSpecification
-import java.util.{UUID, Calendar}
-import models.persistence.lecture.Lecture
-import logic.generator.lecturegenerator.LectureGeneratorActor
+import play.api.Logger
+import play.api.Play.current
+import play.api.data.Forms._
+import play.api.data._
+import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits._
+import play.api.libs.json._
+import play.api.mvc._
+import views.html.generator._
+
+import scala.collection.JavaConversions._
 import scala.collection.mutable.Buffer
-import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
-import logic.generator.lecturegenerator.GenerateLectures
-import models.fhs.pages.generator.GeneratorForm
-import logic.generator.schedulegenerator.ScheduleAnswer
-import scala.Some
-import logic.generator.schedulegenerator.GenerateSchedule
-import logic.generator.schedulegenerator.InplacebleSchedule
-import logic.generator.lecturegenerator.LectureAnswer
+import scala.concurrent.Future
+import scala.concurrent.duration._
 
 /**
  * @author fabian 
@@ -83,11 +78,12 @@ object CGenerate extends Controller {
       val parts = request.session.get("lastchoosen").getOrElse("-1,2,10,10,50").split(",").toSeq
 
       Logger.debug("lastChoosen " + parts)
+      Logger.debug("" +(session + ("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(","))))
       schedule = findScheduleForSemester(findSemesterById(id))
       hasError = false
       actorFinished = true
 
-      Redirect(routes.CGenerate.page()).withSession("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(","))
+      Redirect(routes.CGenerate.page()).withSession( session + ("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(",")))
   }
 
   def page() = Action {
@@ -117,7 +113,7 @@ object CGenerate extends Controller {
         case None => form.fill(GeneratorForm(-1, 2, 10, 10, 50))
       }
 
-      Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses(), findDocents())(flashing))
+      Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses(), findDocents())(flashing,request.session))
   }
 
   def saveSchedule() = Action {
@@ -132,9 +128,9 @@ object CGenerate extends Controller {
   }
 
   def switchSchedule(idString: String) = Action {
-
+  implicit request=>
     schedule = schedules(schedules.keySet.find(_.toString.equals(idString)).get)
-    Redirect(routes.CGenerate.page()).withSession("selectedSchedule" -> idString)
+    Redirect(routes.CGenerate.page()).withSession(session + ("selectedSchedule" -> idString))
   }
 
   def sendSchedule(courseId: Long, docentId: Long, filterDuration: String) = Action {
@@ -247,7 +243,7 @@ object CGenerate extends Controller {
           //Logger.debug(findActiveSubjectsBySemesterId(result.id).mkString("\n") )
 
           Redirect(routes.CGenerate.page()).flashing("startpolling" -> "true", "generating" -> "disabled")
-            .withSession("lastchoosen" -> Seq(result.id, result.threads, result.time, result.randomRatio, result.maxIterationDeep).mkString(","))
+            .withSession(session + ("lastchoosen" -> Seq(result.id, result.threads, result.time, result.randomRatio, result.maxIterationDeep).mkString(",")))
         }
 
       )
