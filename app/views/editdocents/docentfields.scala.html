@@ -53,7 +53,7 @@
 
     <div class="form-group">
         <label class="control-label" for="comments" >Anmerkungen</label>
-        <textarea id="comments" class="form-control" cols="80" rows="3" name="@existingDocentForm("comments").name"> @if(existingDocentForm.value.getOrElse(defaultDocent).comments!=null){@existingDocentForm.value.getOrElse(defaultDocent).comments} </textarea>
+        <textarea id="comments" class="form-control" cols="80" rows="3" name="@existingDocentForm("comments").name">@if(existingDocentForm.value.getOrElse(defaultDocent).comments!=null){@existingDocentForm.value.getOrElse(defaultDocent).comments}</textarea>
     </div>
 
 </form>

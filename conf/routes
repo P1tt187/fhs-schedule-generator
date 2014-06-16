@@ -55,7 +55,6 @@ GET         /exportSchedule/:semesterId                                         
 GET         /editDocents                                                                              controllers.CEditDocents.page
 POST        /addNewDocent                                                                             controllers.CEditDocents.saveNewDocent
 GET         /docentFields/:id                                                                         controllers.CEditDocents.sendDocentFields(id:Long)
-GET         /timeCritFields/:index                                                                    controllers.CEditDocents.sendTimeCritFields(index:Int)
 POST        /saveEditedDocentData                                                                     controllers.CEditDocents.editDocent
 GET         /deleteDocent/:id                                                                         controllers.CEditDocents.deleteDocent(id:Long)
 

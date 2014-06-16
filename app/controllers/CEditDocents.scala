@@ -58,9 +58,7 @@ object CEditDocents extends Controller {
       Ok(editDocents("Dozenten", newDocentForm, findAllDocents()))
   }
 
-  def sendTimeCritFields(index: Int) = Action {
-    Ok(Json.stringify(Json.obj("htmlresult" -> timeCritFields(index, existingDocentForm).toString())))
-  }
+
 
   private def timeRange = {
     val allTimeSlots = MTimeslotDisplay.findAllTimeslots
@@ -73,7 +71,7 @@ object CEditDocents extends Controller {
       val docent = findDocentById(id)
 
       val (allTimeSlots,timeRanges) = timeRange
-      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(),timeRanges, allTimeSlots).toString()))).withSession("docentName" -> docent.getLastName)
+      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(),timeRanges, allTimeSlots).toString().trim))).withSession("docentName" -> docent.getLastName)
   }
 
   def editDocent = Action(parse.json) {
