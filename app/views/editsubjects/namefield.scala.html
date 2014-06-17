@@ -8,9 +8,9 @@
         Bezeichnung
         </label>
         <select class="form-control" id="nameField" title="Bezeichnung">
-            @for(element <- lectureNames) {
+            @lectureNames.par.map { element =>
                 <option @if(element.id == session.get("subjectFields").getOrElse("-1").toLong){selected} value="@element.id">@element.name ( @element.participants )</option>
-            }
+            }.toList
         </select>
         </div>
         <div class="form-group">
