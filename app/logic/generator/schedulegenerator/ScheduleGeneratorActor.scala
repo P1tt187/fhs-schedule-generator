@@ -1,27 +1,29 @@
 package logic.generator.schedulegenerator
 
-import akka.actor.{PoisonPill, Props, Actor}
-import akka.util.Timeout
-import scala.concurrent.duration._
-import akka.pattern.ask
-import scala.concurrent.Await
-import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
-import scala.concurrent.ExecutionContext.Implicits.global
-import play.api.Logger
-import models.persistence.Schedule
-import java.util.Calendar
-import logic.generator.schedulerater.{RateAnswer, ScheduleRateActor, Rate}
 import java.math.BigInteger
-import models.persistence.enumerations.EDuration
+import java.util.Calendar
+
+import akka.actor.{Actor, PoisonPill, Props}
+import akka.pattern.ask
+import akka.util.Timeout
+import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
 import logic.generator.schedulerater.rater.ERaters
-import scala.annotation.tailrec
-import scala.util.Random
+import logic.generator.schedulerater.{Rate, RateAnswer, ScheduleRateActor}
 import models.Transactions
-import models.persistence.docents.Docent
-import scala.collection.JavaConversions._
-import models.persistence.template.TimeSlotTemplate
+import models.persistence.Schedule
 import models.persistence.criteria.DocentTimeWish
+import models.persistence.docents.Docent
+import models.persistence.enumerations.EDuration
 import models.persistence.lecture.Lecture
+import models.persistence.template.TimeSlotTemplate
+import play.api.Logger
+
+import scala.annotation.tailrec
+import scala.collection.JavaConversions._
+import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.util.Random
 
 
 /**
@@ -82,6 +84,7 @@ class ScheduleGeneratorActor extends Actor {
 
       def generate(iterationDeep: Int) {
 
+        /** proof if we are finished */
         if (Calendar.getInstance.after(endTime)) {
           optimalSchedule match {
             case Some(schedule) =>
@@ -95,7 +98,7 @@ class ScheduleGeneratorActor extends Actor {
           }
           return
         }
-
+        /** generate new schedule */
         val scheduleFuture = context.actorOf(Props[ScheduleGeneratorSlave]) ? SlaveGenerate(lectures)
 
         scheduleFuture.onSuccess {
@@ -184,7 +187,7 @@ class ScheduleGeneratorActor extends Actor {
             } else {
               val numberOfLectures = lectures.map {
                 l =>
-                  if (!l.getDocents.find(_.compareTo(d)==0).isEmpty) {
+                  if (!l.getDocents.find(_.compareTo(d) == 0).isEmpty) {
                     l.getDuration match {
                       case EDuration.WEEKLY => 2
                       case EDuration.UNWEEKLY => 1

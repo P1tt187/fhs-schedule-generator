@@ -158,7 +158,6 @@ public class RoomEntity extends AbstractEntity implements Comparable<RoomEntity>
         sb.append(", number='").append(number).append('\'');
         sb.append(", house=").append(house);
         sb.append(", roomAttributes=").append(roomAttributes);
-        sb.append(", criteriaContainer=").append(criteriaContainer);
         sb.append('}');
         return sb.toString();
     }

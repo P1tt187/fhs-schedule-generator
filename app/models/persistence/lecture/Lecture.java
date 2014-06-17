@@ -339,7 +339,6 @@ public class Lecture extends AbstractLecture {
         sb.append(", docents=").append(docents);
         sb.append(", room=").append(room);
         sb.append(", duration=").append(duration);
-        sb.append(", criteriaContainer=").append(criteriaContainer);
         sb.append('}');
         return sb.toString();
     }
