@@ -64,7 +64,7 @@ object CIndex extends Controller {
 
             results.right.toOption match {
               case None =>
-                BadRequest(views.html.index.index("Home")).withSession(session + WRONG_LOGIN -> "true")
+                Redirect(routes.CIndex.index()).withSession(session + (WRONG_LOGIN -> "true"))
               case Some(resultString) =>
                 Logger.debug("loginresult: " + resultString)
                 val isAdmin = MIndex.ADMINS.contains(user)
