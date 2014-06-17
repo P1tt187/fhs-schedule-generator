@@ -22,6 +22,9 @@ libraryDependencies ++= Seq(
 
 scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitConversions")
 
+javaOptions ++=Seq("-Dhttp.port=disabled","-Dhttps.port=9443","-Dhttps.keyStore=/opt/sgd/sslkeystore","-Dhttps.keyStorePassword=sgenerator")
+
+
 lazy val root = (project in file(".")).addPlugins(PlayScala).addPlugins(SbtWeb)
 
 

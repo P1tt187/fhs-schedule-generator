@@ -4,6 +4,7 @@ import models.fhs.pages.editdocents.MEditDocents._
 import models.fhs.pages.editdocents._
 import models.fhs.pages.generator.MGenerator
 import models.fhs.pages.timeslot.MTimeslotDisplay
+import models.persistence.docents.Docent
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
@@ -27,11 +28,12 @@ object CEditDocents extends Controller {
     mapping(
       "id" -> longNumber,
       "lastName" -> nonEmptyText(minLength = 3),
-      "comments" ->text,
+      "userId" -> text,
+      "comments" -> text,
       "timeslots" -> list(
         mapping(
-          "timeKind" ->nonEmptyText,
-         "duration"->nonEmptyText,
+          "timeKind" -> nonEmptyText,
+          "duration" -> nonEmptyText,
           "weekday" -> number,
           "startHour" -> number,
           "startMinute" -> number,
@@ -54,24 +56,33 @@ object CEditDocents extends Controller {
 
   def page = Action {
     implicit request =>
+      val allDocents = findAllDocents()
+      var docentList: List[Docent] = null
+      if (!session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
+        docentList = allDocents.filter(d => session.get(CIndex.CURRENT_USER).getOrElse("").equals(d.getUserId))
+        if (docentList.isEmpty) {
+          docentList = allDocents.filter(d => session.get(CIndex.CURRENT_USER).getOrElse("").equalsIgnoreCase(d.getLastName))
+        }
+      } else {
+        docentList = allDocents
+      }
 
-      Ok(editDocents("Dozenten", newDocentForm, findAllDocents()))
+      Ok(editDocents("Dozenten", newDocentForm, docentList))
   }
-
 
 
   private def timeRange = {
     val allTimeSlots = MTimeslotDisplay.findAllTimeslots
     val timeRanges = MGenerator.findTimeRanges(allTimeSlots)
-    (allTimeSlots,timeRanges)
+    (allTimeSlots, timeRanges)
   }
 
   def sendDocentFields(id: Long) = Action {
     implicit request =>
       val docent = findDocentById(id)
 
-      val (allTimeSlots,timeRanges) = timeRange
-      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(),timeRanges, allTimeSlots).toString().trim)))
+      val (allTimeSlots, timeRanges) = timeRange
+      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots).toString().trim)))
         .withSession(session + ("docentName" -> docent.getLastName))
   }
 
@@ -85,8 +96,9 @@ object CEditDocents extends Controller {
       val roomAttr = (jsVal \ existingDocentForm("roomAttr").name).as[JsArray].value.map(_.as[String]).toList
       val roomCrit = (jsVal \ existingDocentForm("roomCrit").name).as[JsArray].value.map(_.as[String].toLong).toList
       val comments = (jsVal \ existingDocentForm("comments").name).as[String].trim
-      val timeslots = (jsVal \ "timeslots").as[JsArray].value.par.map{
-        slot=>
+      val userId = (jsVal \ existingDocentForm("userId").name).as[String].trim
+      val timeslots = (jsVal \ "timeslots").as[JsArray].value.par.map {
+        slot =>
           val rangeString = (slot \ "timerange").as[String].split(",")
 
           val startTime = rangeString(0).split("-")
@@ -104,36 +116,36 @@ object CEditDocents extends Controller {
 
           val duration = (slot \ "duration").as[String].trim
 
-          MDocentTimeWhish(timeKind,duration,weekday,startHour,startMinute,stopHour,stopMinute)
-      }.toList.filter{
+          MDocentTimeWhish(timeKind, duration, weekday, startHour, startMinute, stopHour, stopMinute)
+      }.toList.filter {
         case w =>
-         // Logger.debug("" + !w.timeKind.equalsIgnoreCase("n"))
+          // Logger.debug("" + !w.timeKind.equalsIgnoreCase("n"))
           !w.timeKind.equalsIgnoreCase("n")
       }
 
 
-      val mDocent = MExistingDocent(id,lastName, comments,timeslots,houseCriterias,roomAttr,roomCrit)
+      val mDocent = MExistingDocent(id, lastName, userId, comments, timeslots, houseCriterias, roomAttr, roomCrit)
 
       Logger.debug(mDocent.toString)
 
       val docent = persistEditedDocent(mDocent)
       val flashing = flash +("submitResult", "true")
-      val (allTimeSlots,timeRanges) = timeRange
+      val (allTimeSlots, timeRanges) = timeRange
 
-      Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(),  timeRanges, allTimeSlots)(flashing).toString))
+      Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots)(flashing, session).toString))
 
 
   }
 
   def deleteDocent(id: Long) = Action {
-    implicit request=>
-    val (docentName, connectedSubjects) = removeDocent(id)
-    Redirect(routes.CEditDocents.page).flashing("connectedSubjects" -> connectedSubjects.mkString(" "), "docentName" -> docentName).withSession(session + ("docentName" -> docentName))
+    implicit request =>
+      val (docentName, connectedSubjects) = removeDocent(id)
+      Redirect(routes.CEditDocents.page).flashing("connectedSubjects" -> connectedSubjects.mkString(" "), "docentName" -> docentName).withSession(session + ("docentName" -> docentName))
   }
 
   def saveNewDocent = Action {
     implicit request =>
-    //Logger.debug("add docent header: " + request.headers)
+      //Logger.debug("add docent header: " + request.headers)
       val docentResult = newDocentForm.bindFromRequest
 
       docentResult.fold(

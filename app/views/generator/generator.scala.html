@@ -18,13 +18,13 @@
                         <label class="control-label" for="refreshBtn">Letzten Plan laden</label>
                         <button id="refreshBtn" type="button" class="@flash.get("generating").getOrElse("")  btn btn-sm btn-info"> <span class="glyphicon glyphicon-refresh"></span> </button>
                     </div>
-
-                <fieldset id="generatorFieldset" @flash.get("generating").getOrElse("") >
+                @if(session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
+                    <fieldset id="generatorFieldset" @flash.get("generating").getOrElse("") >
                     @inputText(formGenerator("time"), '_label -> "Wie lange (Minuten)", '_class -> "form-group", '_help -> "")
-                    @inputText(formGenerator("threads"), '_label->"Wieviele Threads?" , '_class -> "form-group", '_help -> "")
+                    @inputText(formGenerator("threads"), '_label -> "Wieviele Threads?", '_class -> "form-group", '_help -> "")
                     <div class="clearfix"></div>
-                    @inputText(formGenerator("randomRatio"), '_label->"Würfelstärke", '_class -> "form-group", '_help -> "")
-                    @inputText(formGenerator("maxIterationDeep"), '_label->"Maximale Iterationstiefe", '_class -> "form-group",'_help -> "")
+                    @inputText(formGenerator("randomRatio"), '_label -> "Würfelstärke", '_class -> "form-group", '_help -> "")
+                    @inputText(formGenerator("maxIterationDeep"), '_label -> "Maximale Iterationstiefe", '_class -> "form-group", '_help -> "")
                     <div class="clearfix"></div>
                     <div class="form-group">
                         <button id="submitGenerating" class="btn btn-warning form-control" role="button" type="submit"><span class="glyphicon glyphicon-play"></span> </button>
@@ -32,7 +32,8 @@
                     <div class="form-group">
                         <button id="saveSchedule" class="btn btn-success form-control disabled" role="button" type="button"> <span class="glyphicon glyphicon-floppy-open"></span> </button>
                     </div>
-                </fieldset>
+                    </fieldset>
+                }
             }
             </div>
         </div>

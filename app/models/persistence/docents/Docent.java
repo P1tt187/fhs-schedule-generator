@@ -24,6 +24,18 @@ public class Docent extends AbstractEntity implements Comparable<Docent> {
     @Column(name="COMMENTS")
     private String comments;
 
+    /** needed if docent name differs with loginname */
+    @Column(name="USERID")
+    private String userId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public String getComments() {
         return comments;
     }

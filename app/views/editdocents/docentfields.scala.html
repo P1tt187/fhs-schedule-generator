@@ -1,4 +1,4 @@
-@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.generator.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate])(implicit flash:Flash)
+@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.generator.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate])(implicit flash:Flash,session:Session)
 
 @import models.fhs.pages.editdocents._
 @import models.fhs.pages.roomdefinition._
@@ -7,16 +7,20 @@
 @import views.html.helper.twitterBootstrap._
 
     @defaultDocent = @{
-        MExistingDocent(-1, "","", List[MDocentTimeWhish](), List[Long](), List[String](), List[Long]())
+        MExistingDocent(-1, "","","", List[MDocentTimeWhish](), List[Long](), List[String](), List[Long]())
     }
 
 <form id="editDocentForm" class="form-inline">
 
     @inputText(existingDocentForm("id"), '_class -> "hidden")
-    @inputText(existingDocentForm("lastName"), '_label -> "Nachname", '_class -> "form-group", '_help -> "",'_id->"lastNameContainer")
-    <div class="form-group">
-        <a class="btn btn-danger btn-sm" role="button" href="@routes.CEditDocents.deleteDocent(existingDocentForm.value.getOrElse(defaultDocent).id) "><span class="glyphicon glyphicon-trash"></span> </a>
-    </div>
+    @inputText(existingDocentForm("lastName"), '_label -> "Nachname", '_class -> "form-group", '_help -> "Nachname des Dozenten",'_id->"lastNameContainer")
+    @inputText(existingDocentForm("userId"), '_label -> "Nutzerid", '_class -> "form-group", '_help -> "falls Anmeldename nicht mit Nachname übereinstimmt")
+    <button type="submit" class="hidden"></button>
+    @if(session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
+        <div class="form-group">
+            <a class="btn btn-danger btn-sm" role="button" href="@routes.CEditDocents.deleteDocent(existingDocentForm.value.getOrElse(defaultDocent).id) "><span class="glyphicon glyphicon-trash"></span> </a>
+        </div>
+    }
     <br/>
     <div class="form-group">
         <label class="control-label" for="favoriteFacility">Bevorzugte Gebäude</label>

@@ -21,6 +21,8 @@ object CIndex extends Controller {
 
   val CURRENT_USER = "currentUser"
 
+  val IS_ADMIN = "isAdmin"
+
   val loginForm = Form(
     mapping(
       "username" -> nonEmptyText,
@@ -31,61 +33,61 @@ object CIndex extends Controller {
   def index =
     Action {
       implicit request =>
-      Ok(views.html.index.index("Home"))
+        Ok(views.html.index.index("Home"))
     }
 
-  def doLogin=Action{
-    implicit request=>
+  def doLogin() = Action {
+    implicit request =>
 
-     val result = loginForm.bindFromRequest()
-     result.fold(
-     error=>{
-       BadRequest(views.html.index.index("Home")).withSession(session + WRONG_LOGIN->"true")
-     },
-     mUser=>{
-       val user = mUser.username
-       val password = mUser.password
+      val result = loginForm.bindFromRequest()
+      result.fold(
+        error => {
+          BadRequest(views.html.index.index("Home")).withSession(session + WRONG_LOGIN -> "true")
+        },
+        mUser => {
+          val user = mUser.username
+          val password = mUser.password
 
-       try {
-         val results = SSH(host=MIndex.SSH_SERVER, configProvider = HostConfig(
-         login = PasswordLogin(user,password),
-         hostName = MIndex.SSH_SERVER,
-         port= MIndex.SSH_PORT ,
-         hostKeyVerifier = HostKeyVerifiers.DontVerify
-         )){
-           client=>
-             client.exec("groups").right.map{ result=>
-               result.stdOutAsString()
-             }
-         }
-
-
-         results.right.toOption match {
-           case None =>
-             BadRequest(views.html.index.index("Home")).withSession(session + WRONG_LOGIN->"true")
-           case Some(resultString)=>
-             Logger.debug("loginresult: " + resultString)
-             Redirect(routes.CIndex.index()).withSession( session + WRONG_LOGIN->"false", CURRENT_USER -> mUser.username )
-         }
+          try {
+            val results = SSH(host = MIndex.SSH_SERVER, configProvider = HostConfig(
+              login = PasswordLogin(user, password),
+              hostName = MIndex.SSH_SERVER,
+              port = MIndex.SSH_PORT,
+              hostKeyVerifier = HostKeyVerifiers.DontVerify
+            )) {
+              client =>
+                client.exec("groups").right.map { result =>
+                  result.stdOutAsString()
+                }
+            }
 
 
+            results.right.toOption match {
+              case None =>
+                BadRequest(views.html.index.index("Home")).withSession(session + WRONG_LOGIN -> "true")
+              case Some(resultString) =>
+                Logger.debug("loginresult: " + resultString)
+                val isAdmin = MIndex.ADMINS.contains(user)
+
+                Redirect(routes.CIndex.index()).withSession(session + (WRONG_LOGIN -> "false") + (CURRENT_USER -> mUser.username) + (IS_ADMIN -> isAdmin.toString))
+            }
 
 
-       }
-       catch {
-         case e:Exception=>
-           Logger.debug("error on login",e)
-           BadRequest(views.html.index.index("Home")).withSession(session + WRONG_LOGIN->"true")
-       }
+          }
+          catch {
+            case e: Exception =>
+              Logger.debug("error on login", e)
+              BadRequest(views.html.index.index("Home")).withSession(session + (WRONG_LOGIN -> "true"))
+          }
 
 
-     }
-     )
+        }
+      )
 
   }
 
-  def doLogout =Action{
-    implicit request=>
+  def doLogout() = Action {
+    implicit request =>
       Redirect(routes.CIndex.index()).withNewSession
   }
 

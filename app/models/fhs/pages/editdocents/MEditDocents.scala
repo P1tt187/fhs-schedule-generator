@@ -106,6 +106,7 @@ object MEditDocents {
     val docent = findDocentById(mDocent.id)
 
     docent.setLastName(mDocent.lastName)
+    docent.setUserId(mDocent.userId)
     docent.setComments(mDocent.comments)
     val oldCriteriaContainer = docent.getCriteriaContainer
     val newCriteriaContainer = new CriteriaContainer
@@ -200,13 +201,13 @@ object MEditDocents {
         rCrit.getRoom.getId.toLong
     }
 
-    MExistingDocent(docent.getId, docent.getLastName,docent.getComments, convertedTimeslotCriterias, houseCriterias, roomAttributes, roomCrits)
+    MExistingDocent(docent.getId, docent.getLastName,docent.getUserId,docent.getComments, convertedTimeslotCriterias, houseCriterias, roomAttributes, roomCrits)
   }
 }
 
 case class MDocent(lastName: String)
 
-case class MExistingDocent(id: Long, lastName: String,comments:String, timeslots: List[MDocentTimeWhish], houseCriterias: List[Long], roomAttr: List[String], roomCrit: List[Long])
+case class MExistingDocent(id: Long, lastName: String,userId:String,comments:String, timeslots: List[MDocentTimeWhish], houseCriterias: List[Long], roomAttr: List[String], roomCrit: List[Long])
 
 case class MDocentTimeWhish(timeKind: String, duration:String, weekday: Int, startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)
 

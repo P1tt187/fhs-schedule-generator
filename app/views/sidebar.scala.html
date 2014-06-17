@@ -1,12 +1,16 @@
-@(nav: String)(implicit session:Session)
+@(nav: String)(implicit session: Session)
 
     @navList = @{
         List(
             (CEditSubjects.NAV, routes.CEditSubjects.page, "Fächer Editieren"),
-            (CEditCourses.NAV, routes.CEditCourses.page, "Kurse & Gruppen"),
+            (CEditCourses.NAV, routes.CEditCourses.page, "Kurse & Gruppen")
+
+        )
+    }
+
+    @docentMenu = @{
+        List(
             (CEditDocents.NAV, routes.CEditDocents.page, "Dozenten")
-
-
         )
     }
 
@@ -26,38 +30,57 @@
 
     @scheduleList = @{
         List(
-            (CGenerate.NAV, routes.CGenerate.page, "Generator"),
-            (CEditSchedule.NAV,routes.CEditSchedule.page,"Stundenplan bearbeiten")
+            (CEditSchedule.NAV, routes.CEditSchedule.page, "Stundenplan bearbeiten")
         )
     }
 
-<li role="presentation" class="dropdown @if(!exportList.find{case (n,_,_) => nav == n}.isEmpty){ active }">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Im-/Exporter <b class="caret"></b></a>
-    <ul class="dropdown-menu">
-    @for(element <- exportList) {
-        <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+    @scheduleDocentList = @{
+        List(
+            (CGenerate.NAV, routes.CGenerate.page, "Generator")
+        )
     }
-    </ul>
-</li>
 
-<li role="presentation" class="dropdown @if(!baseDataList.find{case (n,_,_) => nav == n}.isEmpty){ active } ">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Stammdaten <b class="caret"></b></a>
-    <ul class="dropdown-menu">
-    @for(element <- baseDataList) {
-        <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
-    }
-    </ul>
-</li>
+    @if(session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
 
-@for(element <- navList) {
-    <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
-}
+        <li role="presentation" class="dropdown @if(!exportList.find { case (n, _, _) => nav == n}.isEmpty) { active }">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Im-/Exporter <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+            @for(element <- exportList) {
+                <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+            }
+            </ul>
+        </li>
 
-    <li role="presentation" class="dropdown @if(!scheduleList.find{case (n,_,_) => nav == n}.isEmpty){ active }">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Stundenplan <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-        @for(element <- scheduleList) {
+        <li role="presentation" class="dropdown @if(!baseDataList.find { case (n, _, _) => nav == n}.isEmpty) { active } ">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Stammdaten <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+            @for(element <- baseDataList) {
+                <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+            }
+            </ul>
+        </li>
+
+        @for(element <- navList) {
             <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
         }
+    }
+
+    @for(element <- docentMenu) {
+        <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+    }
+
+    <li role="presentation" class="dropdown @if(!(scheduleList ++ scheduleDocentList).find { case (n, _, _) => nav == n}.isEmpty) { active }">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Stundenplan <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+
+            @for(element <- scheduleDocentList) {
+                <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+            }
+            @if(session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
+                @for(element <- scheduleList) {
+                    <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+                }
+            }
+
         </ul>
     </li>
