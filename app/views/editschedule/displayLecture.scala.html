@@ -1,8 +1,7 @@
 @(lecture: models.persistence.lecture.Lecture, allRooms:List[persistence.location.RoomEntity])
 
 
-@import models.persistence.enumerations.ELectureKind
-@import models.persistence.enumerations.EDuration
+@import models.persistence.enumerations.{EDuration, ELectureKind}
 @import play.api.Play.current
 
 
@@ -50,7 +49,7 @@
     <div class="form-inline">
         @if(lecture.getDuration != EDuration.WEEKLY) {
             <div class="form-group">
-                <button id="durationSwitcher@lecture.getId" role="button" type="button" class=" btn btn-sm btn-info form-control"><span class="glyphicon glyphicon-transfer"></span> </button>
+                <button title="Umschalten g/ug" id="durationSwitcher@lecture.getId" role="button" type="button" class=" btn btn-sm btn-info form-control"><span class="glyphicon glyphicon-transfer"></span> </button>
             </div>
         }
         <div class="form-group">

@@ -1,11 +1,9 @@
 @(lectureType: String, subject: models.persistence.subject.AbstractSubject, docents: List[models.persistence.docents.Docent], courses: List[models.persistence.participants.Course], houses:List[models.persistence.location.HouseEntity], rooms:List[models.persistence.location.RoomEntity])
 
-@import models.persistence.criteria.RoomCriteria
 @import models.fhs.pages.roomdefinition.MRoomdefintion
-
-@import models.persistence.subject.ExerciseSubject
-@import models.persistence.criteria.TimeSlotCriteria
+@import models.persistence.criteria.{RoomCriteria, TimeSlotCriteria}
 @import models.persistence.enumerations.EDuration
+@import models.persistence.subject.ExerciseSubject
 
 
 
@@ -26,7 +24,7 @@
         <input class="form-control" id="unitInput" name="unitInput" type="number" placeholder="einheiten" value="@subject.getUnits" step="0.5" min="0.5" required>
     </div>
     <div class="form-group">
-        <button id="cloneSubjectBtn" type="button" class="btn btn-warning"><span class="glyphicon glyphicon glyphicon-file"></span> </button>
+        <button title="Veranstaltung Kopieren" id="cloneSubjectBtn" type="button" class="btn btn-warning"><span class="glyphicon glyphicon glyphicon-file"></span> </button>
     </div>
     <div class="form-group">
         <button id="deleteSubjectModalBtn" type="button" class="btn btn-danger @if(subject.getId == -1l){hidden} " data-toggle="modal" data-target=".delete-subject"><span class="glyphicon glyphicon-trash"></span> </button>
@@ -111,7 +109,7 @@
                 <div id="synonymContainer">
                 @for(course<-subject.getSubjectSynonyms.keySet().toList.sorted){
                     <div class="synonymForm" >
-                    @synonyms(course, subject.getSubjectSynonyms.get(course))
+                    @synonyms(course, subject.getSubjectSynonyms.get(course), subject.getShortCuts.getOrDefault(course,""))
                     </div>
                 }
                 </div>
@@ -219,7 +217,7 @@
 <div id="result" ></div>
 
 <span id="synonymTemplate" class="sr-only">
-@synonyms("","")
+@synonyms("","","")
 </span>
 
 <script type="text/javascript">
@@ -312,11 +310,13 @@ return ;
 
         var c = $(value ).find('input[name=courseShortName]' ).val();
         var s = $(value ).find('input[name=synonym]' ).val();
+        var sc = $(value ).find('input[name=shortCut]' ).val();
         console.log(c);
 
         var synonymObject={
         courseShortName:c,
-        synonym:s
+        synonym:s,
+        shortCut:sc
         };
 
 

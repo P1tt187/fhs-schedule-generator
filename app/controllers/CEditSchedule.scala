@@ -14,7 +14,7 @@ import models.persistence.template.TimeSlotTemplate
 import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
 import play.api.Play.current
 import play.api.cache.Cache
-import play.api.libs.json.{JsArray, _}
+import play.api.libs.json._
 import play.api.mvc._
 import views.html.editschedule.{editschedule, showSchedule}
 
@@ -38,42 +38,42 @@ object CEditSchedule extends Controller {
 
 
   def findAndSendSchedule(semesterId: Long) = Action {
-    implicit request=>
+    implicit request =>
 
-    val timeslotTemplates = Transactions.hibernateAction {
-      implicit session =>
-        session.createCriteria(classOf[TimeSlotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeSlotTemplate]].toList.sorted
-    }
+      val timeslotTemplates = Transactions.hibernateAction {
+        implicit session =>
+          session.createCriteria(classOf[TimeSlotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeSlotTemplate]].toList.sorted
+      }
 
-    val rooms = Cache.getOrElse("rooms") {
-      val room = findAllRooms
-      Cache.set("rooms", room, expiration = TIME_TO_LIFE)
-      room
-    }
+      val rooms = Cache.getOrElse("rooms") {
+        val room = findAllRooms
+        Cache.set("rooms", room, expiration = TIME_TO_LIFE)
+        room
+      }
 
-    val docents = Cache.getOrElse("docents") {
-      val docent = findDocents()
-      Cache.set("docents", docent, expiration = TIME_TO_LIFE)
-      docent
-    }
+      val docents = Cache.getOrElse("docents") {
+        val docent = findDocents()
+        Cache.set("docents", docent, expiration = TIME_TO_LIFE)
+        docent
+      }
 
 
-    val courses = Cache.getOrElse("courses") {
-      val course = findCourses()
-      Cache.set("courses", course, expiration = TIME_TO_LIFE)
-      course
-    }
+      val courses = Cache.getOrElse("courses") {
+        val course = findCourses()
+        Cache.set("courses", course, expiration = TIME_TO_LIFE)
+        course
+      }
 
-    val semester = findSemesterById(semesterId)
+      val semester = findSemesterById(semesterId)
 
-    val timeRanges = findTimeRanges(timeslotTemplates)
-    val schedule = findScheduleForSemester(semester)
+      val timeRanges = findTimeRanges(timeslotTemplates)
+      val schedule = findScheduleForSemester(semester)
 
-    val timeSlots = schedule.getRoot.getChildren.flatMap {
-      case wd: Weekday => wd.getChildren.toList.asInstanceOf[List[TimeSlot]]
-    }.toList
-    Ok(Json.obj("htmlresult" -> showSchedule("", timeRanges, timeSlots, rooms,courses,docents, semesterId).toString().trim))
-      .withSession(session + ("editschedule" -> semesterId.toString))
+      val timeSlots = schedule.getRoot.getChildren.flatMap {
+        case wd: Weekday => wd.getChildren.toList.asInstanceOf[List[TimeSlot]]
+      }.toList
+      Ok(Json.obj("htmlresult" -> showSchedule("", timeRanges, timeSlots, rooms, courses, docents, semesterId).toString().trim))
+        .withSession(session + ("editschedule" -> semesterId.toString))
   }
 
   def saveEditedSchedule = Action(parse.json) {

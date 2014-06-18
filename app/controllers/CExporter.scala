@@ -166,7 +166,7 @@ object CExporter extends Controller {
                             "room" -> alr.getNumber
                           ),
                           "alterDay"->day,
-                          "alterTitleShort"->lecture.getShortName,
+                          "alterTitleShort"->lecture.getShortName(course.getShortName),
                           "alterWeek"->lecture.getDuration.getShortName,
                           "altereventType"->eventType,
                             "hour"-> alternativeHour
@@ -196,7 +196,7 @@ object CExporter extends Controller {
                     }
                   ,
                   "titleLong" -> lecture.getName.replaceAll("Ä", "AE").replaceAll("Ö", "OE").replaceAll("Ü", "UE"),
-                  "titleShort" -> lecture.getShortName
+                  "titleShort" -> lecture.getShortName(course.getShortName)
                 )
                 )
             }

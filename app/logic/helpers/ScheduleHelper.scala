@@ -1,13 +1,14 @@
 package logic.helpers
 
+import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
 import models.persistence.Schedule
+import models.persistence.docents.Docent
+import models.persistence.enumerations.EDuration
+import models.persistence.lecture.Lecture
 import models.persistence.participants.Course
 import models.persistence.scheduletree._
+
 import scala.collection.JavaConversions._
-import models.persistence.docents.Docent
-import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
-import models.persistence.lecture.Lecture
-import models.persistence.enumerations.EDuration
 
 /**
  * @author fabian 
@@ -33,7 +34,7 @@ object ScheduleHelper {
             }.map {
               case lecture: Lecture =>
                 val copyLecture = cloner.deepClone(lecture)
-                copyLecture.setName(lecture.getLectureSynonyms.getOrDefault(course.getShortName, lecture.getName))
+                copyLecture.setName(lecture.getLectureSynonyms.getOrDefault(course.getShortName, lecture.getLectureSynonyms.getOrDefault("*",lecture.getName)))
                 copyLecture
               case p => p
             }

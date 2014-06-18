@@ -1,13 +1,17 @@
-@(key: String, value: String)
+@(key: String, value: String, shortCut:String)
 
 
 <div class='form-group'>
-    <label class='control-label'>Kursname</label>
+    <label class='control-label'>Kursname ('*' für alle kurse) </label>
     <input class="form-control" required name='courseShortName' value='@key'>
 </div>
 <div class='form-group'>
     <label class='control-label'>Bezeichnung</label>
     <input class='form-control' required name='synonym' value='@value'>
+</div>
+<div class='form-group'>
+    <label class='control-label'>Abkürzung</label>
+    <input class='form-control' type="text" name='shortCut' value='@shortCut'>
 </div>
 <div class='form-group'>
     <button type='button' class='form-control btn btn-danger removeSynonymButton'> <span class='glyphicon glyphicon-minus'></span> </button>

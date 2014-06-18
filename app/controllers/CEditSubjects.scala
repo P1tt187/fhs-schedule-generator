@@ -16,7 +16,7 @@ import play.api._
 import play.api.cache.Cache
 import play.api.data.Forms._
 import play.api.data._
-import play.api.libs.json.{JsArray, _}
+import play.api.libs.json._
 import play.api.mvc._
 import views.html.editsubjects._
 
@@ -226,6 +226,11 @@ object CEditSubjects extends Controller {
             ((js\ "courseShortName").as[String], (js \"synonym").as[String])
         }.toMap
 
+        val shortCuts = (jsVal \ "synonyms").as[JsArray].value.map{
+          js=>
+            ((js\ "courseShortName").as[String], (js \"shortCut").as[String])
+        }.toMap
+
         val selectedCourse = findCourses(selectedCourseIds).toSet
 
         val selectedDocents = findDocents(selectDocentsIds).toSet
@@ -271,6 +276,7 @@ object CEditSubjects extends Controller {
         initCourseValues(subject, activeCheckbox, nameInput, unitInput, selectedCourse, selectedDocents, expectedParticipants)
         subject.setAlternativRooms(alternativRooms)
         subject.setSubjectSynonyms(synonyms)
+        subject.setShortCuts(shortCuts)
 
         Logger.debug("alternativeRooms: " + alternativRooms)
 

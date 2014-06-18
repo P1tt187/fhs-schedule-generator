@@ -1,6 +1,5 @@
 @(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], allRooms:List[persistence.location.RoomEntity], allCourses:List[persistence.participants.Course], allDocents:List[persistence.docents.Docent], semesterId:Long)
 @import models.persistence.enumerations.EDuration
-
 @import models.persistence.scheduletree.Weekday
 
 <div class="page-header">
@@ -66,10 +65,10 @@
              </div>
         </div>
         <div class="form-group">
-            <button class="btn btn-sm btn-success savebtn form-control"> <span class="glyphicon glyphicon-floppy-disk"></span> </button>
+            <button title="neuen Plan speichern" class="btn btn-sm btn-success savebtn form-control"> <span class="glyphicon glyphicon-floppy-disk"></span> </button>
         </div>
         <div class="form-group">
-            <a href="@routes.CEditSchedule.page()" class="btn btn-sm btn-danger form-control"> <span class="glyphicon glyphicon-remove"></span> </a>
+            <a title="Abbrechen" href="@routes.CEditSchedule.page()" class="btn btn-sm btn-danger form-control"> <span class="glyphicon glyphicon-remove"></span> </a>
         </div>
     </div>
     <br/>

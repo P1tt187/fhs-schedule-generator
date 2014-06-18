@@ -63,6 +63,16 @@ public abstract class AbstractSubject extends AbstractEntity {
     @CollectionTable(name = "TBLSYNONYMS")
     private Map<String, String> subjectSynonyms;
 
+    /**
+     * shortcut for the subject
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @MapKeyColumn(name = "COURSE")
+    @Column(name = "SHORTCUT")
+    @CollectionTable(name = "TBLSUBJECT_TBLSHORTCUT")
+    private Map<String, String> shortCuts;
+
 
     /**
      * the courses
@@ -86,15 +96,27 @@ public abstract class AbstractSubject extends AbstractEntity {
     @Column(name = "EXPECTED_PARTICIPANTS")
     private Integer expectedParticipants;
 
-    /** if duration is not weekly the system will try to split the units */
+    /**
+     * if duration is not weekly the system will try to split the units
+     */
     @Column(name = "duration")
     @Enumerated(EnumType.STRING)
     private EDuration duration;
 
-    /** alternative rooms for this subject  */
+    /**
+     * alternative rooms for this subject
+     */
     @Fetch(FetchMode.SUBSELECT)
     @ManyToMany(targetEntity = RoomEntity.class, fetch = FetchType.EAGER)
     private List<RoomEntity> alternativRooms;
+
+    public Map<String, String> getShortCuts() {
+        return shortCuts;
+    }
+
+    public void setShortCuts(Map<String, String> shortCuts) {
+        this.shortCuts = shortCuts;
+    }
 
     public List<RoomEntity> getAlternativRooms() {
         return alternativRooms;

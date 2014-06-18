@@ -1,7 +1,5 @@
 @(title: String, nav: String)(content: Html)(implicit session:Session)
 
-@import views.html.helper._
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -83,9 +81,11 @@
                 }
 
                 @if(session.get(CIndex.CURRENT_USER).getOrElse("-1")!="-1") {
-                    <div class="column col-md-12 ">
-                        <article class=" " role="main"> @content </article>
-                    </div>
+                    @if(session.get(CIndex.IS_DOCENT).getOrElse("false").toBoolean || session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
+                        <div class="column col-md-12 ">
+                            <article class=" " role="main"> @content </article>
+                        </div>
+                    }
                 }
                 </div>
             </div>

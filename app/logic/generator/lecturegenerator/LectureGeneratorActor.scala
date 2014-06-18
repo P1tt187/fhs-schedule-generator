@@ -1,22 +1,24 @@
 package logic.generator.lecturegenerator
 
-import akka.actor.Actor
-import models.persistence.lecture.Lecture
-import scala.collection.mutable
-import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
-import models.persistence.participants.{LectureParticipant, Group, Participant}
-import models.persistence.enumerations.{ELectureKind, EDuration}
-import play.api.Logger
-import models.Transactions
-import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
-import models.fhs.pages.JavaList
-import exceptions.NoGroupFoundException
-import scala.util.Random
-import org.hibernate.FetchMode
 import java.math.BigInteger
-import com.rits.cloning.{ObjenesisInstantiationStrategy, Cloner}
-import scala.collection.JavaConversions._
+
+import akka.actor.Actor
+import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
+import exceptions.NoGroupFoundException
+import models.Transactions
+import models.fhs.pages.JavaList
+import models.persistence.enumerations.{EDuration, ELectureKind}
+import models.persistence.lecture.Lecture
 import models.persistence.location.LectureRoom
+import models.persistence.participants.{Group, LectureParticipant, Participant}
+import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
+import org.hibernate.FetchMode
+import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
+import play.api.Logger
+
+import scala.collection.JavaConversions._
+import scala.collection.mutable
+import scala.util.Random
 
 /**
  * @author fabian 
@@ -56,6 +58,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setName(lectureSubject.getName)
                 lecture.setCriteriaContainer(subject.getCriteriaContainer)
                 lecture.setLectureSynonyms(cloner.deepClone(lectureSubject.getSubjectSynonyms))
+                lecture.setShortCuts(cloner.deepClone(lectureSubject.getShortCuts))
                 lecture.setKind(ELectureKind.LECTURE)
                 lecture.setExpectedParticipants(lectureSubject.getExpectedParticipants)
                 lecture.setDifficultLevel(BigInteger.valueOf(lectureSubject.getUnits.toLong))
@@ -111,6 +114,7 @@ class LectureGeneratorActor extends Actor {
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(exerciseSubject.getName)
                 lecture.setLectureSynonyms(cloner.deepClone(exerciseSubject.getSubjectSynonyms))
+                lecture.setShortCuts(cloner.deepClone(exerciseSubject.getShortCuts))
                 lecture.setKind(ELectureKind.EXERCISE)
                 lecture.setExpectedParticipants(exerciseSubject.getExpectedParticipants)
                 lecture.setDifficultLevel(BigInteger.valueOf(exerciseSubject.getUnits.toLong))

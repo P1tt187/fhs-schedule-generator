@@ -74,6 +74,17 @@ public class Lecture extends AbstractLecture {
     @CollectionTable(name = "TBLLECTURE_SYNONYMS")
     private Map<String, String> lectureSynonyms;
 
+
+    /**
+     * shortcut for the Lecture
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    @MapKeyColumn(name = "COURSE")
+    @Column(name = "SHORTCUT")
+    @CollectionTable(name = "TBLLECTURE_TBLSHORTCUT")
+    private Map<String, String> shortCuts;
+
     /**
      * kind of this lecture
      */
@@ -111,6 +122,14 @@ public class Lecture extends AbstractLecture {
      */
     @Transient
     private String notOptimalPlaced = "";
+
+    public Map<String, String> getShortCuts() {
+        return shortCuts;
+    }
+
+    public void setShortCuts(Map<String, String> shortCuts) {
+        this.shortCuts = shortCuts;
+    }
 
     public List<RoomEntity> getAlternativeRooms() {
         return alternativeRooms;
@@ -274,6 +293,10 @@ public class Lecture extends AbstractLecture {
             add(room);
             addAll(alternativeRooms);
         }};
+    }
+
+    public String getShortName(String courseName){
+        return shortCuts.getOrDefault(courseName,shortCuts.getOrDefault("*",getShortName()));
     }
 
     @JsonIgnore

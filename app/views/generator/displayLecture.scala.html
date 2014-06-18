@@ -1,8 +1,7 @@
 @(lecture: models.persistence.lecture.Lecture)
 
 
-@import models.persistence.enumerations.ELectureKind
-@import models.persistence.enumerations.EDuration
+@import models.persistence.enumerations.{EDuration, ELectureKind}
 @import play.api.Play.current
 
 
@@ -14,7 +13,7 @@
         case other => "bg-danger " + other
     }
 }" >
-    <div class=""> <strong>  @lecture.getShortName </strong></div>
+    <div class=""> <strong>  @lecture.getShortName("*") </strong></div>
     <div class="pull-right">
         <span class="glyphicon @{
             lecture.getKind match {

@@ -64,23 +64,26 @@
             <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
         }
     }
-
-    @for(element <- docentMenu) {
-        <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+    @if(session.get(CIndex.IS_DOCENT).getOrElse("false").toBoolean || session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
+        @for(element <- docentMenu) {
+            <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+        }
     }
+    @if(session.get(CIndex.IS_DOCENT).getOrElse("false").toBoolean || session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
+        <li role="presentation" class="dropdown @if(!(scheduleList ++ scheduleDocentList).find { case (n, _, _) => nav == n}.isEmpty) { active }">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Stundenplan <span class="caret"></span></a>
+            <ul class="dropdown-menu">
 
-    <li role="presentation" class="dropdown @if(!(scheduleList ++ scheduleDocentList).find { case (n, _, _) => nav == n}.isEmpty) { active }">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Stundenplan <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-
-            @for(element <- scheduleDocentList) {
-                <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
-            }
-            @if(session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
-                @for(element <- scheduleList) {
+                @for(element <- scheduleDocentList) {
                     <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
                 }
-            }
 
-        </ul>
-    </li>
+                @if(session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
+                    @for(element <- scheduleList) {
+                        <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
+                    }
+                }
+
+            </ul>
+        </li>
+    }
