@@ -69,11 +69,12 @@ object CIndex extends Controller {
                 Redirect(routes.CIndex.index()).withSession(session + (WRONG_LOGIN -> "true"))
               case Some(resultString) =>
                 Logger.debug("loginresult: " + resultString)
-                val isDocent = resultString.contains(MIndex.DOCENT_GROUP)
+
+                val isDocent = !resultString.trim.split(" ").find(_.equals(MIndex.DOCENT_GROUP)).isEmpty
                 val isAdmin = MIndex.ADMINS.contains(user)
 
                 Redirect(routes.CIndex.index()).withSession(session +
-                  (WRONG_LOGIN -> "false") + (CURRENT_USER -> mUser.username) + (IS_ADMIN -> isAdmin.toString) + (IS_DOCENT -> isAdmin.toString))
+                  (WRONG_LOGIN -> "false") + (CURRENT_USER -> mUser.username) + (IS_ADMIN -> isAdmin.toString) + (IS_DOCENT -> isDocent.toString))
             }
 
 

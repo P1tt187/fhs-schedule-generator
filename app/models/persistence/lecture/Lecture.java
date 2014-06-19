@@ -106,7 +106,9 @@ public class Lecture extends AbstractLecture {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<LectureParticipant> lectureParticipants;
 
-    /** alternative rooms of this lecture*/
+    /**
+     * alternative rooms of this lecture
+     */
     @Transient
     private List<RoomEntity> alternativeRooms;
 
@@ -254,6 +256,7 @@ public class Lecture extends AbstractLecture {
     public void setRoom(RoomEntity room) {
         this.room = room;
     }
+
     @Override
     public EDuration getDuration() {
         return duration;
@@ -295,8 +298,16 @@ public class Lecture extends AbstractLecture {
         }};
     }
 
-    public String getShortName(String courseName){
-        return shortCuts.getOrDefault(courseName,shortCuts.getOrDefault("*",getShortName()));
+    public String getShortName(String courseName) {
+
+        String shortName = shortCuts.get(courseName);
+
+        if (shortName == null || shortName.isEmpty()) {
+            shortName = shortCuts.getOrDefault("*", getShortName());
+            shortName = shortName.isEmpty() ? getShortName() : shortName;
+        }
+
+        return shortName;
     }
 
     @JsonIgnore
@@ -317,7 +328,7 @@ public class Lecture extends AbstractLecture {
             }
         }
 
-        return sb.toString().replaceAll("  ","").replaceAll("AE", "Ä").replaceAll("OE", "Ö").replaceAll("UE", "Ü").trim();
+        return sb.toString().replaceAll("  ", "").replaceAll("AE", "Ä").replaceAll("OE", "Ö").replaceAll("UE", "Ü").trim();
         //return sb.toString().replaceAll("Ä","AE").replaceAll("Ö","OE").replaceAll("Ü","UE").trim();
     }
 
