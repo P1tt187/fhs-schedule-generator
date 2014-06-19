@@ -24,6 +24,10 @@ object CEditDocents extends Controller {
     mapping("lastName" -> nonEmptyText(minLength = 3))(MDocent.apply)(MDocent.unapply)
   )
 
+  val expireDateForm: Form[MExpireDate]=Form(
+  mapping("date"->date("dd.MM.yyyy") )(MExpireDate.apply)(MExpireDate.unapply)
+  )
+
   val existingDocentForm: Form[MExistingDocent] = Form(
     mapping(
       "id" -> longNumber,
@@ -67,7 +71,7 @@ object CEditDocents extends Controller {
         docentList = allDocents
       }
 
-      Ok(editDocents("Dozenten", newDocentForm, docentList))
+      Ok(editDocents("Dozenten", newDocentForm,expireDateForm, docentList))
   }
 
 
@@ -150,7 +154,7 @@ object CEditDocents extends Controller {
 
       docentResult.fold(
         errors => {
-          BadRequest(editDocents("Dozenten", errors, findAllDocents()))
+          BadRequest(editDocents("Dozenten", errors,expireDateForm, findAllDocents()))
         },
         mDocent => {
           persistNewDocent(docentResult.get)

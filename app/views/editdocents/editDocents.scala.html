@@ -1,4 +1,4 @@
-@(title: String, newDocentsForm: Form[models.fhs.pages.editdocents.MDocent], existingDocents: List[models.persistence.docents.Docent])(implicit flash: Flash, session:Session)
+@(title: String, newDocentsForm: Form[models.fhs.pages.editdocents.MDocent],expireDateForm:Form[fhs.pages.editdocents.MExpireDate], existingDocents: List[models.persistence.docents.Docent])(implicit flash: Flash, session:Session)
 
 
 @import views.html.helper._
@@ -22,6 +22,9 @@
                 <button class="btn btn-success" type="submit" role="button"><span class="glyphicon glyphicon-plus"></span> </button>
             </div>
         }
+        <form class="form-inline">
+            @inputDate(expireDateForm("date"),'_class->"form-group",'_label->"Stichtag")
+        </form>
     }
         <div class="page-header">
             <h1>Dozent Bearbeiten</h1>

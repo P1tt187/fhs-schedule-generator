@@ -1,5 +1,7 @@
 package models.fhs.pages.editdocents
 
+import java.util.{Date, Calendar}
+
 import models.Transactions
 import models.fhs.pages.JavaList
 import models.fhs.pages.roomdefinition.MRoomdefintion
@@ -206,6 +208,8 @@ object MEditDocents {
 }
 
 case class MDocent(lastName: String)
+
+case class MExpireDate(date:Date)
 
 case class MExistingDocent(id: Long, lastName: String,userId:String,comments:String, timeslots: List[MDocentTimeWhish], houseCriterias: List[Long], roomAttr: List[String], roomCrit: List[Long])
 

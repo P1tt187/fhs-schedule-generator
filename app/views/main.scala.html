@@ -14,15 +14,15 @@
         <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-theme.min.css")">
         <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-select.min.css")">
-        <!--link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-multiselect.css")"-->
+        <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/datepicker.css")"
 
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
 
 
         <script src="@routes.Assets.at("javascripts/jquery-2.1.0.min.js")" type="text/javascript"></script>
-            <!--script src="@routes.Assets.at("javascripts/jquery-1.9.0.min.js")" type="text/javascript"></script-->
+         <script src="@routes.Assets.at("javascripts/bootstrap-datepicker.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
-        <!--script src="@routes.Assets.at("javascripts/bootstrap-multiselect.js")" type="text/javascript"></script-->
+        <script src="@routes.Assets.at("javascripts/modernizr.custom.60350.js")" type="text/javascript"></script>
 
         <script src="@routes.Assets.at("javascripts/bootstrap-select.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/bootstrap.file-input.js")" type="text/javascript"></script>
@@ -129,7 +129,14 @@
         'style' : 'btn btn-primary btn-sm'
         } ).addClass('form-control') ;
 
+
+
         $ ( "input[type='file']" ).bootstrapFileInput ( ) ;
+            if(!Modernizr.inputtypes.date) {
+            $ ( "input[type='date']" ).datepicker ( {
+            format : "dd.mm.yyyy"
+            } ) ;
+            }
         $("input" ).addClass('form-control');
         } ;
 
