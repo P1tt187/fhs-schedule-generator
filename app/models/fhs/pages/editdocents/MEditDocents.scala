@@ -5,6 +5,7 @@ import java.util.{Date, Calendar}
 import models.Transactions
 import models.fhs.pages.JavaList
 import models.fhs.pages.roomdefinition.MRoomdefintion
+import models.persistence.TimewishExpireDate
 import models.persistence.criteria._
 import models.persistence.docents.Docent
 import models.persistence.enumerations.{EDocentTimeKind, EDuration}
@@ -204,6 +205,37 @@ object MEditDocents {
     }
 
     MExistingDocent(docent.getId, docent.getLastName,docent.getUserId,docent.getComments, convertedTimeslotCriterias, houseCriterias, roomAttributes, roomCrits)
+  }
+
+  def findExpireDate()={
+    Transactions.hibernateAction{
+      implicit s=>
+        s.createCriteria(classOf[TimewishExpireDate]).uniqueResult().asInstanceOf[TimewishExpireDate]
+    }
+  }
+
+  def persistExpireDate(ted:TimewishExpireDate){
+    val oldExpireDate = findExpireDate()
+    Transactions.hibernateAction{
+      implicit s=>
+        if(oldExpireDate!=null){
+          s.saveOrUpdate(oldExpireDate)
+          s.delete(oldExpireDate)
+        }
+        s.saveOrUpdate(ted)
+    }
+  }
+
+  implicit def timeWishExpireDate2MExpireDate(ted:TimewishExpireDate):MExpireDate={
+    MExpireDate(ted.getExpiredate.getTime)
+  }
+
+  implicit def mExpireDate2TimewishExpireDate(med:MExpireDate):TimewishExpireDate={
+    val result = new TimewishExpireDate
+    val date = Calendar.getInstance()
+    date.setTime(med.date)
+    result.setExpiredate(date)
+    result
   }
 }
 

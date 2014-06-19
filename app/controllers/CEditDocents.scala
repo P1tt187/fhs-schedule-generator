@@ -58,20 +58,34 @@ object CEditDocents extends Controller {
     )(MExistingDocent.apply)(MExistingDocent.unapply)
   )
 
+  private def getDocentList(implicit request:Request[AnyContent])= {
+    val allDocents = findAllDocents()
+
+    /** docents will only see their own stuff */
+    var docentList: List[Docent] = null
+    if (!session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
+      docentList = allDocents.filter(d => session.get(CIndex.CURRENT_USER).getOrElse("").equals(d.getUserId))
+      if (docentList.isEmpty) {
+        docentList = allDocents.filter(d => session.get(CIndex.CURRENT_USER).getOrElse("").equalsIgnoreCase(d.getLastName))
+      }
+    } else {
+      docentList = allDocents
+    }
+    docentList
+  }
+
   def page = Action {
     implicit request =>
-      val allDocents = findAllDocents()
-      var docentList: List[Docent] = null
-      if (!session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
-        docentList = allDocents.filter(d => session.get(CIndex.CURRENT_USER).getOrElse("").equals(d.getUserId))
-        if (docentList.isEmpty) {
-          docentList = allDocents.filter(d => session.get(CIndex.CURRENT_USER).getOrElse("").equalsIgnoreCase(d.getLastName))
-        }
-      } else {
-        docentList = allDocents
+
+      val docentList= getDocentList
+      val expireDate = findExpireDate()
+      val currentExpireDateForm= if(expireDate!=null){
+        expireDateForm.fill(expireDate)
+      }else {
+        expireDateForm
       }
 
-      Ok(editDocents("Dozenten", newDocentForm,expireDateForm, docentList))
+      Ok(editDocents("Dozenten", newDocentForm,currentExpireDateForm, docentList))
   }
 
 
@@ -85,8 +99,16 @@ object CEditDocents extends Controller {
     implicit request =>
       val docent = findDocentById(id)
 
+
+      val timeWishExpireDate = findExpireDate()
+      val expireDate = if(timeWishExpireDate!=null){
+        timeWishExpireDate.getExpiredate
+      }else {
+        null
+      }
+
       val (allTimeSlots, timeRanges) = timeRange
-      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots).toString().trim)))
+      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots,expireDate).toString().trim)))
         .withSession(session + ("docentName" -> docent.getLastName))
   }
 
@@ -135,11 +157,31 @@ object CEditDocents extends Controller {
       val docent = persistEditedDocent(mDocent)
       val flashing = flash +("submitResult", "true")
       val (allTimeSlots, timeRanges) = timeRange
+      val timeWishExpireDate = findExpireDate()
+      val expireDate = if(timeWishExpireDate!=null){
+        timeWishExpireDate.getExpiredate
+      }else {
+        null
+      }
 
-      Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots)(flashing, session).toString))
+      Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots,expireDate)(flashing, session).toString))
 
 
   }
+
+def saveExpireDate =Action{
+  implicit request=>
+    val result = expireDateForm.bindFromRequest()
+    result.fold(
+    error=> {
+      BadRequest(editDocents("Dozenten", newDocentForm,error, getDocentList))
+    },
+    mExpireDate =>{
+      persistExpireDate(mExpireDate)
+      Redirect(routes.CEditDocents.page)
+    }
+    )
+}
 
   def deleteDocent(id: Long) = Action {
     implicit request =>

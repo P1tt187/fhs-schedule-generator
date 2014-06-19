@@ -1,10 +1,15 @@
-@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.generator.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate])(implicit flash:Flash,session:Session)
+@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.generator.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate],expireDate:java.util.Calendar)(implicit flash:Flash,session:Session)
 
 @import models.fhs.pages.editdocents._
 @import models.fhs.pages.roomdefinition._
 @import models.persistence.enumerations._
 @import views.html.helper._
 @import views.html.helper.twitterBootstrap._
+@import java.util.Calendar
+
+    @disableTimeWishFields = @{
+        expireDate!=null&& Calendar.getInstance().after(expireDate)&& !session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean
+    }
 
     @defaultDocent = @{
         MExistingDocent(-1, "","","", List[MDocentTimeWhish](), List[Long](), List[String](), List[Long]())
@@ -129,44 +134,46 @@
                                     }
                                 }">
                                <div class="container center-block ">
-                                <div class="form-group">
-                                    <div class="radio radioSpacing" >
-                                    <label >
-                                      <input class="form-control wish" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.WISH" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.WISH.name())){checked} >
-                                        W
-                                    </label>
-                                    </div>
-                                    <div class="radio radioSpacing">
-                                    <label>
-                                        <input class="form-control avail" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.AVAILABLE" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.AVAILABLE.name())){checked}>
-                                        K
-                                    </label>
+                                   <fieldset @if(disableTimeWishFields){disabled} >
+                                        <div class="form-group">
+                                            <div class="radio radioSpacing" >
+                                            <label >
+                                              <input class="form-control wish" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.WISH" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.WISH.name())){checked} >
+                                                W
+                                            </label>
+                                            </div>
+                                            <div class="radio radioSpacing">
+                                            <label>
+                                                <input class="form-control avail" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDocentTimeKind.AVAILABLE" @if(!wishes.isEmpty && wishes.head.timeKind.equals(EDocentTimeKind.AVAILABLE.name())){checked}>
+                                                K
+                                            </label>
+                                                </div>
+                                            <div class="radio radioSpacing">
+                                               <label>
+                                                <input class="form-control unavail" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,N" @if(wishes.isEmpty){checked} >
+                                                N
+                                            </label>
+                                            </div>
                                         </div>
-                                    <div class="radio radioSpacing">
-                                       <label>
-                                        <input class="form-control unavail" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,N" @if(wishes.isEmpty){checked} >
-                                        N
-                                    </label>
-                                    </div>
-                                </div>
-                                <div class="clearfix"></div>
-                                <div class="form-group" >
-                                    <div class="radio">
-                                    <label>
-                                        <input class="form-control" name="duration" type="radio" value="@EDuration.WEEKLY" @if(wishes.isEmpty || wishes.head.duration.equals(EDuration.WEEKLY.name())){checked}> w
-                                    </label>
-                                     </div>
-                                    <div class="radio radioSpacing">
-                                    <label>
-                                        <input class="form-control" name="duration" type="radio" value="@EDuration.EVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.EVEN.name())){checked}> g
-                                    </label>
-                                     </div>
-                                    <div class="radio radioSpacing">
-                                    <label>
-                                        <input class="form-control" name="duration" type="radio" value="@EDuration.UNEVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.UNEVEN.name())){checked}> ug
-                                    </label>
-                                    </div>
-                                </div>
+                                        <div class="clearfix"></div>
+                                        <div class="form-group" >
+                                            <div class="radio">
+                                            <label>
+                                                <input class="form-control" name="duration" type="radio" value="@EDuration.WEEKLY" @if(wishes.isEmpty || wishes.head.duration.equals(EDuration.WEEKLY.name())){checked}> w
+                                            </label>
+                                             </div>
+                                            <div class="radio radioSpacing">
+                                            <label>
+                                                <input class="form-control" name="duration" type="radio" value="@EDuration.EVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.EVEN.name())){checked}> g
+                                            </label>
+                                             </div>
+                                            <div class="radio radioSpacing">
+                                            <label>
+                                                <input class="form-control" name="duration" type="radio" value="@EDuration.UNEVEN" @if(!wishes.isEmpty && wishes.head.duration.equals(EDuration.UNEVEN.name())){checked}> ug
+                                            </label>
+                                            </div>
+                                        </div>
+                                   </fieldset>
                                </div>
                                 </form>
 

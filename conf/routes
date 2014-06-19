@@ -60,6 +60,8 @@ POST        /addNewDocent                                                       
 GET         /docentFields/:id                                                                         controllers.CEditDocents.sendDocentFields(id:Long)
 POST        /saveEditedDocentData                                                                     controllers.CEditDocents.editDocent
 GET         /deleteDocent/:id                                                                         controllers.CEditDocents.deleteDocent(id:Long)
+POST        /editExpireDate                                                                           controllers.CEditDocents.saveExpireDate
+
 
 GET         /editSchedule                                                                             controllers.CEditSchedule.page()
 GET         /sendEditableSchedule/:semesterId                                                         controllers.CEditSchedule.findAndSendSchedule(semesterId:Long)
