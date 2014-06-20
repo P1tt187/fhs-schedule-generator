@@ -1,18 +1,19 @@
 package logic.generator.schedulegenerator.placingprocessor
 
 import models.persistence.criteria.{DocentTimeWish, TimeSlotCriteria}
-import models.persistence.scheduletree.TimeSlot
-import models.persistence.location.RoomEntity
-import models.persistence.lecture.Lecture
-import scala.collection.JavaConversions._
 import models.persistence.enumerations.EDocentTimeKind
+import models.persistence.lecture.Lecture
+import models.persistence.location.RoomEntity
+import models.persistence.scheduletree.TimeSlot
+
 import scala.annotation.tailrec
+import scala.collection.JavaConversions._
 
 /**
  * @author fabian 
  *         on 29.04.14.
  */
-class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity]) extends PlacingProcessor {
+class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria],lectureTimeCriterias:List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity]) extends PlacingProcessor {
   override def doPlacing(lecture: Lecture): Boolean = {
     val timeWishes = lecture.getDocents.flatMap {
       docent =>
@@ -37,6 +38,8 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], av
     val slot = timeSlots.head
 
     val notInTimeCriteria = !availableTimeSlotCriterias.isEmpty && availableTimeSlotCriterias.count(slot.isInTimeSlotCriteria) == 0
+
+    val notInLectureTimeCriteria = !lectureTimeCriterias.isEmpty && lectureTimeCriterias.count(slot.isInTimeSlotCriteria) == 0
 
     val equivalent = findEquivalent(slot, allTimeslots)
 
@@ -66,7 +69,7 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], av
 
     val noRoom = rooms.isEmpty
 
-    if (notInTimeCriteria || equivalentNotAvailable || noRoom || alternativeRoomsNotAvailable) {
+    if (notInTimeCriteria || notInLectureTimeCriteria || equivalentNotAvailable || noRoom || alternativeRoomsNotAvailable) {
       place(lecture, timeSlots.tail)
     } else {
       lecture.setRoom(rooms.head)

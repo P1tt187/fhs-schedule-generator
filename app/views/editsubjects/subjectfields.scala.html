@@ -6,7 +6,6 @@
 @import models.persistence.subject.ExerciseSubject
 
 
-
 <form role="form" id="subjectForm" class="form-inline">
 
     <div class="panel panel-success">
@@ -182,6 +181,24 @@
         </div>
     </div>
 </div>
+    <div class="col-md-3">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h4 class="panel-title">Platziere zu festem Zeitpunkt</h4>
+            </div>
+            <div class="panel-body">
+                <button type="button" id="addTcritBtn" class="btn btn-success btn-sm"> <span class="glyphicon glyphicon-plus"></span> </button>
+                <div id="timeCritContainer">
+                @for(tcrit<-subject.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).map{ case tc:TimeSlotCriteria=>tc}){
+                    <div class="timeCritsForm panel panel-info">
+                        @timecrits(tcrit.getStartHour,tcrit.getStartMinute,tcrit.getStopHour,tcrit.getStopMinute,tcrit.getWeekday.getSortIndex, tcrit.getDuration)
+                    </div>
+                }
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="clearfix"></div>
     <div class="form-group">
         <label class="control-label" >Für den Plan Berücksichtigen</label>
@@ -220,14 +237,22 @@
 @synonyms("",subject.getName,"")
 </span>
 
+<span id="tcritTemplate" class="sr-only">
+@timecrits(0,0,0,0,1,EDuration.WEEKLY)
+</span>
+
 <script type="text/javascript">
-
-
 
     $('#addSynonymBtn' ).on('click', function(){
         var addString = "<div class='synonymForm'>" + $('#synonymTemplate' ).html() + "</div>" ;
 
         $('#synonymContainer' ).append(addString);
+    });
+
+    $('#addTcritBtn' ).on('click',function(){
+       var addString = "<div class='timeCritsForm panel panel-info'> " + $('#tcritTemplate' ).html() + "</div>";
+       $('#timeCritContainer' ).append(addString);
+        initSelect();
     });
 
     $('#deleteSubjectModalBtn' ).on('click', function(){
@@ -323,10 +348,30 @@ return ;
         synonymBuffer.push(synonymObject);
     });
 
+    var timeCritBuffer = [];
+    $('.timeCritsForm' ).each(function(index,value){
+        var startH = $(value ).find('select[name=startHour]' ).val();
+        var startM = $(value ).find('select[name=startMinute]' ).val();
+        var stopH = $(value ).find('select[name=stopHour]' ).val();
+        var stopM = $(value ).find('select[name=stopMinute]' ).val();
+        var dur = $(value ).find('select[name=tcritDuration]' ).val();
+        var wd = $(value ).find('select[name=weekday]' ).val();
+        timeCritBuffer.push(
+        {
+            startHour: Number(startH),
+            startMinute:Number(startM),
+            stopHour:Number(stopH),
+            stopMinute:Number(stopM),
+            duration:dur,
+            weekday:Number(wd)
+        });
+    });
+
 var data = $ ( '#subjectForm' ).serializeObject ( ) ;
 data[ 'subjectType' ] = '  @lectureType '.trim();
 data[ 'subjectId' ] = @subject.getId ;
 data[ 'synonyms' ] = synonymBuffer;
+data[ 'timecriterias' ] = timeCritBuffer;
 
 /** proof if checkbox is checked or not */
     data[ 'activeCheckbox' ] = $.parseJSON(data[ 'activeCheckbox' ]);

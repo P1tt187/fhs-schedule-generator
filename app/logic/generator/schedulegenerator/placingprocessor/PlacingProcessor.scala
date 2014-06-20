@@ -29,6 +29,10 @@ trait PlacingProcessor {
     }
   }
 
+  protected def getTimeCritsForLecture(lecture:Lecture)={
+    lecture.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).map{case tsc:TimeSlotCriteria=>tsc}.toList
+  }
+
   protected def timeSlotContainsParticipants(timeslot: TimeSlot, participants: Set[Participant]): Boolean = {
 
     @tailrec

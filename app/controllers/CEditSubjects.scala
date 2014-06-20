@@ -5,12 +5,14 @@ import models.Transactions
 import models.fhs.pages.editsubjects.MEditSubjects._
 import models.fhs.pages.editsubjects.MSemester
 import models.persistence.Semester
-import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCriteria}
+import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCriteria, TimeSlotCriteria}
 import models.persistence.docents.Docent
 import models.persistence.enumerations.EDuration
 import models.persistence.location.{HouseEntity, RoomAttributesEntity, RoomEntity}
 import models.persistence.participants.Course
 import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
+import models.persistence.template.WeekdayTemplate
+import org.hibernate.criterion.Restrictions
 import play.api.Play.current
 import play.api._
 import play.api.cache.Cache
@@ -215,20 +217,51 @@ object CEditSubjects extends Controller {
 
         val roomCriteriaIds = (jsVal \ "roomCriteria").as[JsArray].value.map(_.as[String].toLong).toList
 
-        val alternativRooms = findSelectedRooms((jsVal \ "alternativeRooms").as[JsArray].value.map( _.as[String].toLong).toList)
+        val timeCriterias = (jsVal \ "timecriterias").as[JsArray].value.map { js =>
+          Logger.debug("" + js)
+
+          val startHour = (js \ "startHour").as[Int]
+          val startMinute = (js \ "startMinute").as[Int]
+          val stopHour = (js \ "stopHour").as[Int]
+          val stopMinute = (js \ "stopMinute").as[Int]
+          val duration = EDuration.valueOf((js \ "duration").as[String])
+          val sortIndex = (js \ "weekday").as[Int]
+
+          val dbResult = Transactions.hibernateAction {
+            implicit session =>
+              session.createCriteria(classOf[WeekdayTemplate]).add(Restrictions.eq("sortIndex", sortIndex)).uniqueResult().asInstanceOf[WeekdayTemplate]
+          }
+
+          val day = if (dbResult == null) {
+            val theDay = WeekdayTemplate.createWeekdayFromSortIndex(sortIndex)
+            Transactions {
+              implicit emf =>
+                emf.persist(theDay)
+            }
+            theDay
+          } else {
+            dbResult
+          }
+
+
+          val timeCrit = new TimeSlotCriteria(startHour, startMinute, stopHour, stopMinute, day, duration)
+          timeCrit
+        }
+
+        val alternativRooms = findSelectedRooms((jsVal \ "alternativeRooms").as[JsArray].value.map(_.as[String].toLong).toList)
 
         val semester = (jsVal \ "semester").as[Long]
 
         val duration = EDuration.valueOf((jsVal \ "duration").as[String])
 
-        val synonyms = (jsVal \ "synonyms").as[JsArray].value.map{
-          js=>
-            ((js\ "courseShortName").as[String], (js \"synonym").as[String])
+        val synonyms = (jsVal \ "synonyms").as[JsArray].value.map {
+          js =>
+            ((js \ "courseShortName").as[String], (js \ "synonym").as[String])
         }.toMap
 
-        val shortCuts = (jsVal \ "synonyms").as[JsArray].value.map{
-          js=>
-            ((js\ "courseShortName").as[String], (js \"shortCut").as[String])
+        val shortCuts = (jsVal \ "synonyms").as[JsArray].value.map {
+          js =>
+            ((js \ "courseShortName").as[String], (js \ "shortCut").as[String])
         }.toMap
 
         val selectedCourse = findCourses(selectedCourseIds).toSet
@@ -292,6 +325,8 @@ object CEditSubjects extends Controller {
         setHouseCriterias(selectedHouses, criteriaContainer)
 
         setRoomCriterias(selectedRooms, criteriaContainer)
+
+        criteriaContainer.setCriterias(criteriaContainer.getCriterias ++ timeCriterias)
 
         subject.setCriteriaContainer(criteriaContainer)
 

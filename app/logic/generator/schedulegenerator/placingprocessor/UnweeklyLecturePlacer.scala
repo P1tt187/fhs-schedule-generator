@@ -1,18 +1,19 @@
 package logic.generator.schedulegenerator.placingprocessor
 
-import models.persistence.scheduletree.TimeSlot
-import models.persistence.location.RoomEntity
 import models.persistence.criteria.{DocentTimeWish, TimeSlotCriteria}
-import models.persistence.lecture.Lecture
-import scala.collection.JavaConversions._
 import models.persistence.enumerations.EDocentTimeKind
+import models.persistence.lecture.Lecture
+import models.persistence.location.RoomEntity
+import models.persistence.scheduletree.TimeSlot
+
 import scala.annotation.tailrec
+import scala.collection.JavaConversions._
 
 /**
  * @author fabian 
  *         on 29.04.14.
  */
-class UnweeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity]) extends PlacingProcessor {
+class UnweeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], lectureTimeCriterias: List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity]) extends PlacingProcessor {
   override def doPlacing(lecture: Lecture): Boolean = {
 
     val timeWishes = lecture.getDocents.flatMap {
@@ -27,7 +28,7 @@ class UnweeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], 
     place(lecture, availableTimeSlots.sortBy {
       slot =>
         val equivalent = findEquivalent(slot, allTimeslots)
-        (timeWishes.find(slot.isInTimeSlotCriteria(_)).isEmpty,slot.isUnpopular, equivalent.getLectures.find(_.getDocents.containsAll(lecture.getDocents)).isEmpty, !(timeSlotContainsParticipants(equivalent, lecture.getParticipants.toSet) || equivalent.getLectures.find(_.getParticipants.containsAll(lecture.getParticipants)).isEmpty))
+        (timeWishes.find(slot.isInTimeSlotCriteria(_)).isEmpty, slot.isUnpopular, equivalent.getLectures.find(_.getDocents.containsAll(lecture.getDocents)).isEmpty, !(timeSlotContainsParticipants(equivalent, lecture.getParticipants.toSet) || equivalent.getLectures.find(_.getParticipants.containsAll(lecture.getParticipants)).isEmpty))
     })
   }
 
@@ -42,6 +43,8 @@ class UnweeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], 
     val slot = timeSlots.head
 
     val notInTimeCriteria = !availableTimeSlotCriterias.isEmpty && availableTimeSlotCriterias.count(slot.isInTimeSlotCriteria) == 0
+
+    val notInLectureTimeCriteria = !lectureTimeCriterias.isEmpty && lectureTimeCriterias.count(slot.isInTimeSlotCriteria) == 0
 
     val roomCriterias = getRoomCriteriasFromDocents(lecture.getDocents.toList)
 
@@ -60,12 +63,12 @@ class UnweeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], 
 
     rooms = rooms.diff(lecture.getAlternativeRooms)
 
-    if (!roomCriterias.isEmpty && roomsInCriteria(rooms,roomCriterias)) {
+    if (!roomCriterias.isEmpty && roomsInCriteria(rooms, roomCriterias)) {
       rooms = sortRoomsByCriteria(rooms, roomCriterias)
     }
 
     val noRoom = rooms.isEmpty
-    if (notInTimeCriteria || noRoom || alternativeRoomsNotAvailable) {
+    if (notInTimeCriteria || notInLectureTimeCriteria || noRoom || alternativeRoomsNotAvailable) {
       place(lecture, timeSlots.tail)
     } else {
       lecture.setRoom(rooms.head)

@@ -23,12 +23,19 @@
             </div>
         }
         @form(action=routes.CEditDocents.saveExpireDate,'class->"form-inline") {
-            @inputDate(expireDateForm("date"), '_class -> "form-group", '_label -> "Stichtag")
             <div class="form-group">
-               <button type="submit" class="btn btn-success btn-sm form-control"> <span class="glyphicon glyphicon-ok"></span> </button>
+                <label class="control-label" for="@expireDateForm("date").id">Stichtag</label>
+                <input id="@expireDateForm("date").id" name="@expireDateForm("date").name" type="date" value="@expireDateForm("date").value.getOrElse("")" pattern="dd.mm.yyyy" >
+                <span class="help-block">format:yyyy-mm-dd</span>
+                @if(expireDateForm("date").hasErrors) {
+                    <span class="help-block">@expireDateForm("date").error.getOrElse("")</span>
+                }
             </div>
             <div class="form-group">
-                <button type="reset" class="btn btn-danger btn-sm form-control"> <span class="glyphicon glyphicon-remove"></span> </button>
+               <button type="submit" class="btn btn-success btn-sm "> <span class="glyphicon glyphicon-ok"></span> </button>
+            </div>
+            <div class="form-group">
+                <button type="reset" class="btn btn-danger btn-sm "> <span class="glyphicon glyphicon-remove"></span> </button>
             </div>
         }
     }
