@@ -1,6 +1,7 @@
 package logic.generator.lecturegenerator
 
 import java.math.BigInteger
+import java.util
 
 import akka.actor.Actor
 import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
@@ -57,8 +58,8 @@ class LectureGeneratorActor extends Actor {
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(lectureSubject.getName)
                 lecture.setCriteriaContainer(subject.getCriteriaContainer)
-                lecture.setLectureSynonyms(cloner.deepClone(lectureSubject.getSubjectSynonyms))
-                lecture.setShortCuts(cloner.deepClone(lectureSubject.getShortCuts))
+                lecture.setLectureSynonyms( new util.HashMap[String,String](lectureSubject.getSubjectSynonyms))
+                lecture.setShortCuts(new util.HashMap[String,String](lectureSubject.getShortCuts))
                 lecture.setKind(ELectureKind.LECTURE)
                 lecture.setExpectedParticipants(lectureSubject.getExpectedParticipants)
                 lecture.setDifficultLevel(BigInteger.valueOf(lectureSubject.getUnits.toLong))
@@ -113,8 +114,8 @@ class LectureGeneratorActor extends Actor {
                 lecture.setCriteriaContainer(exerciseSubject.getCriteriaContainer)
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(exerciseSubject.getName)
-                lecture.setLectureSynonyms(cloner.deepClone(exerciseSubject.getSubjectSynonyms))
-                lecture.setShortCuts(cloner.deepClone(exerciseSubject.getShortCuts))
+                lecture.setLectureSynonyms(new util.HashMap[String,String](exerciseSubject.getSubjectSynonyms))
+                lecture.setShortCuts(new util.HashMap[String,String](exerciseSubject.getShortCuts))
                 lecture.setKind(ELectureKind.EXERCISE)
                 lecture.setExpectedParticipants(exerciseSubject.getExpectedParticipants)
                 lecture.setDifficultLevel(BigInteger.valueOf(exerciseSubject.getUnits.toLong))
