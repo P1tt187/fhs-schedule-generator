@@ -332,16 +332,14 @@ object CEditSubjects extends Controller {
 
         Logger.debug("save subject " + subject.getId)
 
-        Transactions {
-          implicit entityManager =>
-            if (subject.getId == null) {
-              entityManager.merge(subject)
-            } else {
-
-              val attachedObject = entityManager.merge(oldCriteriaContainer)
-              entityManager.remove(attachedObject)
-              entityManager.merge(subject)
+        Transactions.hibernateAction{
+          implicit s=>
+            if(subject.getId!=null){
+              s.saveOrUpdate(oldCriteriaContainer)
+              s.delete(oldCriteriaContainer)
             }
+            s.saveOrUpdate(subject.getSemester)
+            s.saveOrUpdate(subject)
         }
 
         Ok(Json.stringify(Json.obj("result" -> "succsess")))
