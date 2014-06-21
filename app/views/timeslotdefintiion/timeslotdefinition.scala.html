@@ -40,13 +40,13 @@
                     </div>
                     <div class="clearfix"></div>
                     <div class="col-md-3">
-                    <h4>Beginn:</h4>
+                    <h4>Von:</h4>
 
                     @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
                     @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
                     </div>
                     <div class="col-md-3">
-                    <h4>Ende:</h4>
+                    <h4>Bis:</h4>
 
                     @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group  ", '_label -> "Stunde", '_help -> "")
                     @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group  ", '_label -> "Minute", '_help -> "")

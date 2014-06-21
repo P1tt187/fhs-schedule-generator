@@ -52,12 +52,12 @@
                                     $('#@criteriaFields.id' ).remove();
                                     });
                                     </script>
-                                    <h4>Beginn:</h4>
+                                    <h4>Von:</h4>
 
                                     @select(criteriaFields("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
                                     @select(criteriaFields("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
 
-                                    <h4>Ende:</h4>
+                                    <h4>Bis:</h4>
 
                                     @select(criteriaFields("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
                                     @select(criteriaFields("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group", '_label -> "Minute", '_help -> "")

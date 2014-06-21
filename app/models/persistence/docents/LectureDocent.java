@@ -22,12 +22,26 @@ public class LectureDocent implements Comparable<Docent> {
     @Column(name = "LASTNAME", nullable = false)
     private String lastName;
 
+    /**
+     * userid can also stored in the displayed schedule
+     */
+    @Column(name = "USERID")
+    private String userId;
+
     public String getLastName() {
         return lastName;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public CriteriaContainer getCriteriaContainer() {
@@ -41,8 +55,9 @@ public class LectureDocent implements Comparable<Docent> {
     public LectureDocent() {
     }
 
-    public LectureDocent(String lastName, CriteriaContainer criteriaContainer) {
+    public LectureDocent(String lastName, String userId, CriteriaContainer criteriaContainer) {
         this.lastName = lastName;
+        this.userId = userId;
         this.criteriaContainer = criteriaContainer;
     }
 
@@ -55,7 +70,30 @@ public class LectureDocent implements Comparable<Docent> {
 
     @Override
     public int compareTo(Docent that) {
-        return this.lastName.compareTo(that.getLastName());
+
+        int ret = this.lastName.compareTo(that.getLastName());
+        if (ret != 0) {
+            return ret;
+        }
+        if (userId == null && that.getUserId() == null) {
+            return 0;
+        }
+        if (userId == null && that.getUserId() != null) {
+            return -1;
+        }
+        if (userId != null && that.getUserId() == null) {
+            return 1;
+        }
+        return this.userId.compareTo(that.getUserId());
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("LectureDocent{");
+        sb.append("lastName='").append(lastName).append('\'');
+        sb.append(", userId='").append(userId).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 
     @Override

@@ -20,12 +20,16 @@ public class Docent extends AbstractEntity implements Comparable<Docent> {
     @Column(name = "LASTNAME", nullable = false)
     private String lastName;
 
-    /** docents can tell their wishes to the admin by fill out comment field */
-    @Column(name="COMMENTS")
+    /**
+     * docents can tell their wishes to the admin by fill out comment field
+     */
+    @Column(name = "COMMENTS")
     private String comments;
 
-    /** needed if docent name differs with loginname */
-    @Column(name="USERID")
+    /**
+     * needed if docent name differs with loginname
+     */
+    @Column(name = "USERID")
     private String userId;
 
     public String getUserId() {
@@ -95,7 +99,7 @@ public class Docent extends AbstractEntity implements Comparable<Docent> {
 
 
     public LectureDocent docent2LectureDocent() {
-        return new LectureDocent(lastName, criteriaContainer);
+        return new LectureDocent(lastName, userId, criteriaContainer);
     }
 
     @Override

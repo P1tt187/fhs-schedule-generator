@@ -1,4 +1,5 @@
 @(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.generator.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate],expireDate:java.util.Calendar)(implicit flash:Flash,session:Session)
+@import java.text.SimpleDateFormat
 
 @import models.fhs.pages.editdocents._
 @import models.fhs.pages.roomdefinition._
@@ -69,6 +70,11 @@
 
     <div class="clearfix"></div>
     <br/>
+
+    @if(expireDate!=null){
+     <span class="text-danger"> <strong >Stichtag: @{ new SimpleDateFormat("dd.MM.yyyy").format(expireDate.getTime) }</strong> </span>
+    }
+
     <div id="timeCrits" class="small">
      <div class="form-inline">
 

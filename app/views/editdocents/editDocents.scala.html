@@ -25,7 +25,7 @@
         @form(action=routes.CEditDocents.saveExpireDate,'class->"form-inline") {
             <div class="form-group">
                 <label class="control-label" for="@expireDateForm("date").id">Stichtag</label>
-                <input id="@expireDateForm("date").id" name="@expireDateForm("date").name" type="date" value="@expireDateForm("date").value.getOrElse("")" pattern="dd.mm.yyyy" >
+                <input id="@expireDateForm("date").id" name="@expireDateForm("date").name" type="date" value="@expireDateForm("date").value.getOrElse("")"  >
                 <span class="help-block">format:yyyy-mm-dd</span>
                 @if(expireDateForm("date").hasErrors) {
                     <span class="help-block">@expireDateForm("date").error.getOrElse("")</span>

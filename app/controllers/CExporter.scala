@@ -36,10 +36,10 @@ object CExporter extends Controller {
   val NAV = "Exporter"
 
   def page = Action {
-    implicit request=>
+    implicit request =>
 
-    import models.fhs.pages.exporter.MExporter._
-    Ok(exporter("Expotieren/Importieren", findSemesters))
+      import models.fhs.pages.exporter.MExporter._
+      Ok(exporter("Expotieren/Importieren", findSemesters))
   }
 
   def export = Action {
@@ -153,7 +153,7 @@ object CExporter extends Controller {
 
                 }
 
-                val alternativeHour = timeSlot.getParent.getChildren.toList.asInstanceOf[List[TimeSlot]].sorted.indexOf(timeSlot)/2 + 1
+                val alternativeHour = timeSlot.getParent.getChildren.toList.asInstanceOf[List[TimeSlot]].sorted.indexOf(timeSlot) / 2 + 1
 
                 Json.stringify(Json.obj(
                   "appointment" -> Json.obj(
@@ -165,11 +165,11 @@ object CExporter extends Controller {
                             "building" -> alr.getHouse,
                             "room" -> alr.getNumber
                           ),
-                          "alterDay"->day,
-                          "alterTitleShort"->lecture.getShortName(course.getShortName),
-                          "alterWeek"->lecture.getDuration.getShortName,
-                          "altereventType"->eventType,
-                            "hour"-> alternativeHour
+                            "alterDay" -> day,
+                            "alterTitleShort" -> lecture.getShortName(course.getShortName),
+                            "alterWeek" -> lecture.getDuration.getShortName,
+                            "altereventType" -> eventType,
+                            "hour" -> alternativeHour
                           )
                       },
                       "place" -> Json.obj(
@@ -190,12 +190,17 @@ object CExporter extends Controller {
                   "member" ->
                     lecture.getDocents.map {
                       d =>
-                        Json.obj("fhs_id" -> "",
+                        val fhs_id = if (d.getUserId != null) {
+                          d.getUserId
+                        } else {
+                          ""
+                        }
+                        Json.obj("fhs_id" -> fhs_id,
                           "name" -> d.getLastName
                         )
                     }
                   ,
-                  "titleLong" -> lecture.getName.replaceAll("Ä", "AE").replaceAll("Ö", "OE").replaceAll("Ü", "UE"),
+                  "titleLong" -> lecture.getName.replaceAll("AE", "Ä").replaceAll("OE", "Ö").replaceAll("UE", "Ü"),
                   "titleShort" -> lecture.getShortName(course.getShortName)
                 )
                 )
