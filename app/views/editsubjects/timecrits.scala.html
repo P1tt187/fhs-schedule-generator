@@ -21,40 +21,50 @@
 <div class='form-group'>
     <button type='button' class='btn-sm btn btn-danger removeTimeCritBtn'> <span class='glyphicon glyphicon-minus'></span> </button>
 </div>
-<h5 class="h5">Start</h5>
-<div class="form-group">
-    <label class="control-label">Stunde</label>
-    <select class="form-control" name="startHour">
-        @for(index<- 0 to 23){
-            <option value="@index" @if(startHour == index){selected } > @index.formatted("%02d") </option>
-        }
-    </select>
-</div>
-<div class="form-group">
-    <label class="control-label">Minute</label>
-    <select class="form-control" name="startMinute">
-        @for(index<- 0 to 59 by 5){
-        <option value="@index" @if(index == startMinute){selected }> @index.formatted("%02d") </option>
-        }
-    </select>
-</div>
-<h5 class="h5">Stop</h5>
-<div class="form-group">
-    <label class="control-label">Stunde</label>
-    <select class="form-control" name="stopHour">
-    @for(index<- 0 to 23){
-        <option value="@index" @if(stopHour == index){selected } > @index.formatted("%02d") </option>
-    }
-    </select>
-</div>
-<div class="form-group">
-    <label class="control-label">Minute</label>
-    <select class="form-control" name="stopMinute">
-    @for(index<- 0 to 59 by 5){
-        <option value="@index" @if(index == stopMinute){selected }> @index.formatted("%02d") </option>
-    }
-    </select>
-</div>
+    <div class="clearfix"></div>
+    <div class="form-group">
+        <fieldset>
+        <legend class="control-label">Start</legend>
+        <div class="form-group">
+            <label class="control-label">Stunde</label>
+            <select class="form-control" name="startHour">
+                @for(index<- 0 to 23){
+                    <option value="@index" @if(startHour == index){selected } > @index.formatted("%02d") </option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Minute</label>
+            <select class="form-control" name="startMinute">
+                @for(index<- 0 to 59 by 5){
+                <option value="@index" @if(index == startMinute){selected }> @index.formatted("%02d") </option>
+                }
+            </select>
+        </div>
+        </fieldset>
+    </div>
+
+    <div class="form-group">
+        <fieldset>
+        <legend class="control-label">Stop</legend>
+        <div class="form-group">
+            <label class="control-label">Stunde</label>
+            <select class="form-control" name="stopHour">
+            @for(index<- 0 to 23){
+                <option value="@index" @if(stopHour == index){selected } > @index.formatted("%02d") </option>
+            }
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Minute</label>
+            <select class="form-control" name="stopMinute">
+            @for(index<- 0 to 59 by 5){
+                <option value="@index" @if(index == stopMinute){selected }> @index.formatted("%02d") </option>
+            }
+            </select>
+        </div>
+        </fieldset>
+    </div>
 <script>
 $ ( '.removeTimeCritBtn' ).on ( 'click', function ( ) {
 console.log ( 'remove  pressed' ) ;

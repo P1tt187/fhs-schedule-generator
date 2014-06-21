@@ -20,36 +20,39 @@
             <div class="col-md-5">
             @form(action = routes.CTimeslotDefintion.submit, 'class -> " form-inline ") {
                 <fieldset>
-
-                    <h4>Wochentage:</h4>
-
-                    <div class='form-group @if(errorWeekdaySelect) {alert alert-danger}'>
+                    <div class="col-md-6">
+                    <div class='form-group @if(errorWeekdaySelect) { has-error }'>
                         <label class="control-label" for="weekdays" style="display : block ;">
-                        @if(errorWeekdaySelect) {
-                            Mindestens ein Wochentag <strong>muss</strong> ausgewählt sein!
-                        }
+                            Wochentage
                         </label>
                         <select class=" @if(errorWeekdaySelect) {has-error}" id="weekdays" name="weekdays[]" multiple title="nichts Ausgewählt">
                         @for(dayname <- weekdays) {
-                            <option class="@if(errorWeekdaySelect) {alert alert-danger}" value="@dayname._1" @if(timeslotForm("weekdays").value.getOrElse("").equals(dayname._1)) {selected }>@dayname._2 </option>
+                            <option class="@if(errorWeekdaySelect) {has-error}" value="@dayname._1" @if(timeslotForm("weekdays").value.getOrElse("").equals(dayname._1)) {selected }>@dayname._2 </option>
                         }
                         </select>
+                        <span class="help-block">
+                        @if(errorWeekdaySelect) {
+                            Mindestens ein Wochentag <strong>muss</strong> ausgewählt sein!
+                        }</span>
                     </div>
 
                     @checkbox(timeslotForm("unpopular"),'_class -> "form-group",'_label -> "bei Studenten unbeliebt", '_help ->"")
-
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="col-md-3">
                     <h4>Beginn:</h4>
 
                     @select(timeslotForm("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
                     @select(timeslotForm("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
-
+                    </div>
+                    <div class="col-md-3">
                     <h4>Ende:</h4>
 
                     @select(timeslotForm("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group  ", '_label -> "Stunde", '_help -> "")
                     @select(timeslotForm("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group  ", '_label -> "Minute", '_help -> "")
+                    </div>
 
-
-                    <br/>
+                    <div class="clearfix"></div>
 
                     <div class="form-group " style="margin-top : 1%">
                         <span class=" btn-group span4"><button type="submit" class="form-control btn btn-success " ><span class="glyphicon glyphicon-ok-sign"></span></button> </span>

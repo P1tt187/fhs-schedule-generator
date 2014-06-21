@@ -37,9 +37,9 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria],lec
     }
     val slot = timeSlots.head
 
-    val notInTimeCriteria = !availableTimeSlotCriterias.isEmpty && availableTimeSlotCriterias.count(slot.isInTimeSlotCriteria) == 0
+    val notInTimeCriteria = availableTimeSlotCriterias.nonEmpty && availableTimeSlotCriterias.count(slot.isInTimeSlotCriteria) == 0
 
-    val notInLectureTimeCriteria = !lectureTimeCriterias.isEmpty && lectureTimeCriterias.count(slot.isInTimeSlotCriteria) == 0
+    val notInLectureTimeCriteria = lectureTimeCriterias.nonEmpty && lectureTimeCriterias.count(slot.isInTimeSlotCriteria) == 0
 
     val equivalent = findEquivalent(slot, allTimeslots)
 
@@ -63,7 +63,7 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria],lec
 
     rooms = rooms.diff(lecture.getAlternativeRooms)
 
-    if (!roomCriterias.isEmpty && roomsInCriteria(rooms, roomCriterias)) {
+    if (roomCriterias.nonEmpty && roomsInCriteria(rooms, roomCriterias)) {
       rooms = sortRoomsByCriteria(rooms, roomCriterias)
     }
 
