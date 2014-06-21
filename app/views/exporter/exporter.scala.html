@@ -1,45 +1,48 @@
-@(message:String, semesters:List[persistence.Semester])(implicit session:Session)
+@(message: String, semesters: List[persistence.Semester])(implicit session: Session)
 
-@main(message,CExporter.NAV){
-<div class="page-header">
-    <h1>Daten Exportieren</h1>
-</div>
+    @main(message, CExporter.NAV) {
 
-    <a class="btn btn-primary" href="@routes.CExporter.export">Download</a>
+        @if(session.get(CIndex.IS_DEVELOPER).getOrElse("false").toBoolean) {
+            <div class="page-header">
+                <h1>Daten Exportieren</h1>
+            </div>
 
-    <div class="page-header">
-        <h1>Daten Importieren</h1>
-    </div>
+            <a class="btn btn-primary" href="@routes.CExporter.export">Download</a>
 
-    @helper.form(action = routes.CExporter.uploadFile, 'enctype -> "multipart/form-data", 'class -> "form-inline") {
-        <div class="form-group">
-            <input id="uploadBtn" class="btn btn-info " type="file" name="fileUpload" title="Datei Auswählen" accept="application/json, .json">
+            <div class="page-header">
+                <h1>Daten Importieren</h1>
+            </div>
+
+            @helper.form(action = routes.CExporter.uploadFile, 'enctype -> "multipart/form-data", 'class -> "form-inline") {
+                <div class="form-group">
+                    <input id="uploadBtn" class="btn btn-info " type="file" name="fileUpload" title="Datei Auswählen" accept="application/json, .json">
+                </div>
+                <div class="form-group">
+                    <input class=" form-control btn btn-success" type="submit" value="Upload">
+                </div>
+            }
+        }
+        <div class="page-header">
+            <h1> Stundenplan Exportieren </h1>
         </div>
-        <div class="form-group">
-            <input class=" form-control btn btn-success" type="submit" value="Upload">
-        </div>
-    }
-    <div class="page-header">
-        <h1> Stundenplan Exportieren </h1>
-    </div>
-    <div class="form-inline">
-        <div class="form-group">
-            <select class="form-control" id="selectSemester">
-                @for(semester<-semesters){
+        <div class="form-inline">
+            <div class="form-group">
+                <select class="form-control" id="selectSemester">
+                @for(semester <- semesters) {
                     <option value="@semester.getId">@semester.getName</option>
                 }
-            </select>
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="button" class="btn btn-primary" id="downloadScheduleBtn" ><span class="glyphicon glyphicon-download"></span> </button>
+            </div>
+
+            <script>
+            $ ( '#downloadScheduleBtn' ).on ( 'click', function ( ) {
+            $ ( location ).attr ( 'href', 'exportSchedule/' + $ ( '#selectSemester' ).val ( ) ) ;
+            } ) ;
+
+            </script>
+
         </div>
-        <div class="form-group">
-            <button type="button" class="btn btn-primary" id="downloadScheduleBtn" ><span class="glyphicon glyphicon-download"></span> </button>
-        </div>
-
-        <script>
-            $('#downloadScheduleBtn' ).on('click',function(){
-            $(location).attr('href','exportSchedule/' + $('#selectSemester' ).val());
-            });
-
-        </script>
-
-    </div>
-}
+    }

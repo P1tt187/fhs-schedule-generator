@@ -12,6 +12,7 @@ object MIndex {
   lazy val SSH_PORT= current.configuration.getString("ssh.port").getOrElse("22").toInt
   lazy val ADMINS = current.configuration.getString("administrator").getOrElse("").split(",").toList
   lazy val DOCENT_GROUP = current.configuration.getString("docentGroup").getOrElse("docents")
+  lazy val DEVELOPERS = current.configuration.getString("developer").getOrElse("").split(",")
 
 }
 

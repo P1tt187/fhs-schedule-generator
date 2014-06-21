@@ -25,6 +25,8 @@ object CIndex extends Controller {
 
   val IS_DOCENT="isDocent"
 
+  val IS_DEVELOPER="isDeveloper"
+
   val loginForm = Form(
     mapping(
       "username" -> nonEmptyText,
@@ -70,11 +72,12 @@ object CIndex extends Controller {
               case Some(resultString) =>
                 Logger.debug("loginresult: " + resultString)
 
-                val isDocent = !resultString.trim.split(" ").find(_.equals(MIndex.DOCENT_GROUP)).isEmpty
+                val isDocent = resultString.trim.split(" ").find(_.equals(MIndex.DOCENT_GROUP)).nonEmpty
                 val isAdmin = MIndex.ADMINS.contains(user)
+                val isDeveloper=MIndex.DEVELOPERS.contains(user)
 
                 Redirect(routes.CIndex.index()).withSession(session +
-                  (WRONG_LOGIN -> "false") + (CURRENT_USER -> mUser.username) + (IS_ADMIN -> isAdmin.toString) + (IS_DOCENT -> isDocent.toString))
+                  (WRONG_LOGIN -> "false") + (CURRENT_USER -> mUser.username) + (IS_ADMIN -> isAdmin.toString) + (IS_DOCENT -> isDocent.toString) + (IS_DEVELOPER -> isDeveloper.toString))
             }
 
 
