@@ -1,5 +1,10 @@
 package logic.generator.schedulegenerator.placingprocessor
 
+import java.util
+
+import exceptions.{DocentsNotAtSameTimeAvailableException, NoRoomException}
+import models.persistence.criteria.DocentTimeWish
+import models.persistence.docents.{LectureDocent, Docent}
 import models.persistence.enumerations.EDuration
 import models.persistence.lecture.Lecture
 import models.persistence.location.RoomEntity
@@ -7,6 +12,7 @@ import models.persistence.scheduletree.TimeSlot
 
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
+
 
 /**
  * @author fabian 
@@ -42,6 +48,18 @@ class GenericPlacer(allLectures: List[Lecture], allTimeslots: List[TimeSlot], al
     val availableTimeSlots = findPossibleTimeSlots(allTimeslots, lecture)
     val lectureTimeslotCriterias = getTimeCritsForLecture(lecture)
 
+    if (availableRooms.isEmpty) {
+      val ex = new NoRoomException("no room for lecture " + lecture.getName + " " + lecture.getDocents.mkString(", "))
+      ex.setLecture(lecture)
+      throw ex
+    }
+
+    val areThereDocentTimeWishes = lecture.getDocents.find{ d=> d.getCriteriaContainer.getCriterias.find(_.isInstanceOf[DocentTimeWish]).nonEmpty }.nonEmpty
+    if(availableTimeSlotCriterias.isEmpty && areThereDocentTimeWishes){
+      val ex  = new DocentsNotAtSameTimeAvailableException("Docents not at the same time available " + lecture.getDocents.map(_.getLastName).mkString(", "))
+      ex.setDocents(lecture.getDocents.toList)
+      throw ex
+    }
 
     val result = lecture.getDuration match {
       case EDuration.WEEKLY =>

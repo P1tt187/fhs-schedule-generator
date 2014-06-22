@@ -6,8 +6,11 @@ import akka.actor.{PoisonPill, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
+import exceptions.{DocentsNotAtSameTimeAvailableException, NoRoomException, NoGroupFoundException}
+import exceptions.errortypes.EErrorType
+import exceptions.errortypes.EErrorType._
 import logic.generator.lecturegenerator.{GenerateLectures, LectureAnswer, LectureGeneratorActor}
-import logic.generator.schedulegenerator.{GenerateSchedule, InplacebleSchedule, ScheduleAnswer, _}
+import logic.generator.schedulegenerator._
 import models.Transactions
 import models.fhs.pages.JavaList
 import models.fhs.pages.generator.GeneratorForm
@@ -26,8 +29,10 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json._
 import play.api.mvc._
 import views.html.generator._
+import views.html.generator.errorpages._
 
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 import scala.collection.mutable.Buffer
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -48,8 +53,6 @@ object CGenerate extends Controller {
 
   private var end: Calendar = null
 
-  private var hasError = false
-
   private var errorList: List[Lecture] = null
 
   private lazy val schedules = scala.collection.mutable.Map[UUID, Schedule]()
@@ -58,7 +61,7 @@ object CGenerate extends Controller {
 
   private var errorMessage: String = null
 
-  private var docentWishTimeError = false
+  private var errorType: EErrorType = NONE
 
 
   val form: Form[GeneratorForm] = Form(
@@ -78,12 +81,12 @@ object CGenerate extends Controller {
       val parts = request.session.get("lastchoosen").getOrElse("-1,2,10,10,50").split(",").toSeq
 
       Logger.debug("lastChoosen " + parts)
-      Logger.debug("" +(session + ("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(","))))
+      Logger.debug("" + (session + ("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(","))))
       schedule = findScheduleForSemester(findSemesterById(id))
-      hasError = false
+      errorType = NONE
       actorFinished = true
 
-      Redirect(routes.CGenerate.page()).withSession( session + ("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(",")))
+      Redirect(routes.CGenerate.page()).withSession(session + ("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(",")))
   }
 
   def page() = Action {
@@ -113,7 +116,7 @@ object CGenerate extends Controller {
         case None => form.fill(GeneratorForm(-1, 2, 10, 10, 50))
       }
 
-      Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses(), findDocents())(flashing,request.session))
+      Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses(), findDocents())(flashing, request.session))
   }
 
   def saveSchedule() = Action {
@@ -123,46 +126,55 @@ object CGenerate extends Controller {
   def finished = Action {
 
 
-    val json = Json.stringify(Json.obj("result" -> actorFinished, "error" -> hasError))
+    val json = Json.stringify(Json.obj("result" -> actorFinished, "error" -> (errorType != NONE)))
     Ok(json)
   }
 
   def switchSchedule(idString: String) = Action {
-  implicit request=>
-    schedule = schedules(schedules.keySet.find(_.toString.equals(idString)).get)
-    Redirect(routes.CGenerate.page()).withSession(session + ("selectedSchedule" -> idString))
+    implicit request =>
+      schedule = schedules(schedules.keySet.find(_.toString.equals(idString)).get)
+      Redirect(routes.CGenerate.page()).withSession(session + ("selectedSchedule" -> idString))
   }
 
   def sendSchedule(courseId: Long, docentId: Long, filterDuration: String) = Action {
     implicit request =>
 
-      if (hasError) {
-        if (docentWishTimeError) {
+      errorType match {
+
+        case TIMEWISH_NOT_MATCH =>
           Ok(Json.stringify(Json.obj("htmlresult" -> docentWishTimeErrorPage(errorMessage).toString())))
-        } else {
+
+        case INPLACEBLE_SCHEDULE =>
           Ok(Json.stringify(Json.obj("htmlresult" -> errorpage(errorList).toString())))
-        }
-      } else {
+        case NO_GROUP_TYPE=>
+          Ok(Json.stringify(Json.obj("htmlresult"->grouptypeError(errorMessage).toString())))
+        case NO_ROOM_FOR_LECTURE=>
+          Ok(Json.stringify(Json.obj("htmlresult"->noRoomError(errorMessage).toString())))
 
-        val timeslotsAll = if (schedule == null) {
-          List[TimeSlot]()
-        } else {
-          collectTimeslotsFromSchedule(schedule)
-        }
-        val timeslotTemplates = Transactions.hibernateAction {
-          implicit session =>
-            session.createCriteria(classOf[TimeSlotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeSlotTemplate]].toList.sorted
-        }
+        case DOCENTS_NOT_AT_SAME_TIME_AVAILABLE =>
+          Ok(Json.stringify(Json.obj("htmlresult"->docentsNotAtSameTimeAvailable(errorMessage).toString())))
+        case NONE =>
 
-        val timeRanges = findTimeRanges(timeslotTemplates)
 
-        val filteredPage = if (courseId == -1 && docentId == -1 && filterDuration.equals("-1")) {
-          showSchedule("Alle Kurse", timeRanges, timeslotsAll, schedule.getRate, schedules.toMap).toString()
-        } else {
-          val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId), filterDuration)
-          showSchedule(courseName, timeRanges, timeslots, schedule.getRate, schedules.toMap).toString()
-        }
-        Ok(Json.stringify(Json.obj("htmlresult" -> filteredPage)))
+          val timeslotsAll = if (schedule == null) {
+            List[TimeSlot]()
+          } else {
+            collectTimeslotsFromSchedule(schedule)
+          }
+          val timeslotTemplates = Transactions.hibernateAction {
+            implicit session =>
+              session.createCriteria(classOf[TimeSlotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeSlotTemplate]].toList.sorted
+          }
+
+          val timeRanges = findTimeRanges(timeslotTemplates)
+
+          val filteredPage = if (courseId == -1 && docentId == -1 && filterDuration.equals("-1")) {
+            showSchedule("Alle Kurse", timeRanges, timeslotsAll, schedule.getRate, schedules.toMap).toString()
+          } else {
+            val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId), filterDuration)
+            showSchedule(courseName, timeRanges, timeslots, schedule.getRate, schedules.toMap).toString()
+          }
+          Ok(Json.stringify(Json.obj("htmlresult" -> filteredPage)))
       }
   }
 
@@ -176,8 +188,7 @@ object CGenerate extends Controller {
         },
         result => {
           actorFinished = false
-          hasError = false
-          docentWishTimeError = false
+          errorType = NONE
           schedule = null
           schedules.clear()
           scheduleFutures.clear()
@@ -222,22 +233,48 @@ object CGenerate extends Controller {
                       Logger.debug("created in " + (finishTime.getTimeInMillis - startTime.getTimeInMillis) + "ms")
 
                     case InplacebleSchedule(lectures) => errorList = lectures
-                      hasError = true
+                      errorType = INPLACEBLE_SCHEDULE
                       actorFinished = true
                     case TimeWishNotMatch(docents) =>
-                      hasError = true
-                      docentWishTimeError = true
-                      errorMessage = docents.map( _.getLastName ).sorted.mkString(",")
+                      errorType = TIMEWISH_NOT_MATCH
+                      errorMessage = docents.map(_.getLastName).sorted.mkString(",")
                       actorFinished = true
                   }
 
                   scheduleFuture.onFailure {
+                    case e:NoRoomException=>
+                    errorType=NO_ROOM_FOR_LECTURE
+
+                      val sb = new mutable.StringBuilder()
+
+                      sb append e.getLecture.getName
+                      sb append "\n"
+                      sb append e.getLecture.getParticipants.map(_.getCourse.getShortName).mkString(" ")
+                      sb append "\n"
+                      sb append e.getLecture.calculateNumberOfParticipants()
+
+                      errorMessage = sb.toString()
+
+                      actorFinished=true
+                    case e: DocentsNotAtSameTimeAvailableException=>
+                      errorType= DOCENTS_NOT_AT_SAME_TIME_AVAILABLE
+
+                      errorMessage = e.getDocents.map(_.getLastName).mkString(",")
+                      actorFinished = true
                     case e: Exception =>
+                      actorFinished=true
                       generatorActor ! PoisonPill
                       end = null
 
                   }
               }
+          }
+
+          lectureFuture.onFailure{
+            case ex:NoGroupFoundException=>
+              errorType = NO_GROUP_TYPE
+              errorMessage = ex.getGroupType
+              actorFinished=true
           }
           end = endTime
           //Logger.debug(findActiveSubjectsBySemesterId(result.id).mkString("\n") )

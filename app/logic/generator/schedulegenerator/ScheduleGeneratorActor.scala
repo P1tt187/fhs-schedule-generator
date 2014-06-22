@@ -153,6 +153,11 @@ class ScheduleGeneratorActor extends Actor {
           case _ =>
 
         }
+        scheduleFuture.onFailure {
+          case e: Exception =>
+            theSender ! akka.actor.Status.Failure(e)
+            stopPlacing=true
+        }
       }
 
       generate(0)

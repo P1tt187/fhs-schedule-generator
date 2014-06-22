@@ -25,4 +25,14 @@ public class NoGroupFoundException extends Exception {
     public NoGroupFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
+    /** group type that causes the error */
+    private String groupType;
+
+    public String getGroupType() {
+        return groupType;
+    }
+
+    public void setGroupType(String groupType) {
+        this.groupType = groupType;
+    }
 }

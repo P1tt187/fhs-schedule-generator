@@ -30,7 +30,9 @@ class ScheduleGeneratorSlave extends Actor {
         placeLectures(lectures.sortBy(l => (l.getDifficulty.multiply(BigInteger.valueOf(-1)), l.getName)))
       }
       catch {
-        case e: Exception => Logger.error("error", e)
+        case e: Exception =>
+          sender() ! akka.actor.Status.Failure(e)
+          Logger.error("error", e)
       }
 
     case _ =>

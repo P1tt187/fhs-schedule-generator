@@ -1,0 +1,9 @@
+@(message:String)
+<div class="alert alert-danger">
+    Fehler: Die Folgenden Dozenten sind nicht zum selben Zeitpunkt verfügbar:
+    <ol>
+        @for(d<- message.split(",")){
+            <li>@d</li>
+        }
+    </ol>
+</div>
