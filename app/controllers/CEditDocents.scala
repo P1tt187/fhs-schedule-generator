@@ -21,7 +21,10 @@ object CEditDocents extends Controller {
   val NAV = "DOCENTS"
 
   val newDocentForm: Form[MDocent] = Form(
-    mapping("lastName" -> nonEmptyText(minLength = 3))(MDocent.apply)(MDocent.unapply)
+    mapping(
+      "lastName" -> nonEmptyText(minLength = 3),
+      "userId" -> text
+    )(MDocent.apply)(MDocent.unapply)
   )
 
   val expireDateForm: Form[MExpireDate] = Form(

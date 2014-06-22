@@ -27,6 +27,7 @@ object MEditDocents {
     val docent = new Docent
 
     docent.setLastName(mDocent.lastName)
+    docent.setUserId(mDocent.userId)
 
     docent.setCriteriaContainer(new CriteriaContainer)
 
@@ -239,7 +240,7 @@ object MEditDocents {
   }
 }
 
-case class MDocent(lastName: String)
+case class MDocent(lastName: String, userId:String)
 
 case class MExpireDate(date:Date)
 
