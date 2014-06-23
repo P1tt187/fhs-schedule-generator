@@ -52,13 +52,13 @@
                     </ul>
                 }
                     @if(session.get(CIndex.CURRENT_USER).getOrElse("-1")=="-1"){
-                        @form(action=routes.CIndex.doLogin, 'class->"navbar-form pull-right"){
+                        @form(action=routes.CIndex.doLogin, 'class->"navbar-form navbar-right"){
                            <input class="form-control input-sm" placeholder="Nutzer" type="text" name="@CIndex.loginForm("username").name" >
                            <input class="form-control input-sm" placeholder="Passwort" type="password" name="@CIndex.loginForm("password").name" >
                                <button type="submit" class="btn btn-sm btn-success navbar-btn"><span class="glyphicon glyphicon-log-in"></span> </button>
                         }
                     } else {
-                        <ul class="nav navbar-nav navbar-collapse pull-right list-inline">
+                        <ul class="nav navbar-nav navbar-collapse navbar-inverse-collapse navbar-right list-inline">
                             <li role="presentation">
                                 <a>
                                @session(CIndex.CURRENT_USER)
@@ -97,14 +97,32 @@
 
         <footer id="footer">
             <div class="container text-muted" >
+<ul class="list-unstyled list-inline">
+    <li>
+        <a href="http://www.playframework.com">www.playframework.com</a>
+    </li>
+    <li>
+        <a href="https://github.com/sirthias/scala-ssh">scala-ssh</a>
+    </li>
+    <li>
+        <a href="http://getbootstrap.com/">twitter brootstrap</a>
+    </li>
+    <li>
+        <a href="http://silviomoreto.github.io/bootstrap-select/">Bootstrap-select</a>
+    </li>
+    <li>
+        <a href="http://gregpike.net/demos/bootstrap-file-input/demo.html">bootstrap-file-input</a>
+    </li>
+    <li>
+        <a href="http://www.eyecon.ro/bootstrap-datepicker/">bootstrap-datepicker</a>
+    </li>
+    <li>
+        <a href="http://farhadi.ir/projects/html5sortable/">html5sortable</a>
+    </li>
+</ul>
 
-                    <a href="http://www.playframework.com">www.playframework.com</a> <br/>
-                    <a href="https://github.com/sirthias/scala-ssh">scala-ssh</a> <br/>
-                    <a href="http://getbootstrap.com/">twitter brootstrap</a> <br/>
-                    <a href="http://silviomoreto.github.io/bootstrap-select/">Bootstrap-select</a> <br/>
-                    <a href="http://gregpike.net/demos/bootstrap-file-input/demo.html">bootstrap-file-input</a> <br/>
-                    <a href="http://www.eyecon.ro/bootstrap-datepicker/">bootstrap-datepicker</a><br/>
-                    <a href="http://farhadi.ir/projects/html5sortable/">html5sortable</a>
+
+
 
             </div>
         </footer>
