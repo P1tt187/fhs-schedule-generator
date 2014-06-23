@@ -9,10 +9,10 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class LectureRoom {
 
-    @Column(name="HOUSE")
+    @Column(name = "HOUSE")
     private String house;
 
-    @Column(name="NUMBER")
+    @Column(name = "NUMBER")
     private String number;
 
     public String getHouse() {
@@ -49,5 +49,21 @@ public class LectureRoom {
         int result = house != null ? house.hashCode() : 0;
         result = 31 * result + (number != null ? number.hashCode() : 0);
         return result;
+    }
+
+    public int compareTo(RoomEntity roomEntity) {
+        int ret = house.compareTo(roomEntity.getHouse().getName());
+        if (ret != 0) {
+            return ret;
+        }
+        return number.compareTo(roomEntity.getNumber());
+    }
+
+    public int compareTo(LectureRoom that) {
+        int ret = this.house.compareTo(that.house);
+        if (ret != 0) {
+            return ret;
+        }
+        return this.number.compareTo(that.number);
     }
 }

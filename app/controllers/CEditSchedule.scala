@@ -12,6 +12,7 @@ import models.persistence.location.RoomEntity
 import models.persistence.scheduletree.{TimeSlot, Weekday}
 import models.persistence.template.TimeSlotTemplate
 import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
+import play.api.Logger
 import play.api.Play.current
 import play.api.cache.Cache
 import play.api.libs.json._
@@ -72,7 +73,7 @@ object CEditSchedule extends Controller {
       val timeSlots = schedule.getRoot.getChildren.flatMap {
         case wd: Weekday => wd.getChildren.toList.asInstanceOf[List[TimeSlot]]
       }.toList
-      Ok(Json.obj("htmlresult" -> showSchedule("", timeRanges, timeSlots, rooms, courses, docents, semesterId).toString().trim))
+      Ok(Json.obj("htmlresult" -> showSchedule(schedule.getSemester.getName, timeRanges, timeSlots, rooms, courses, docents, semesterId).toString().trim))
         .withSession(session + ("editschedule" -> semesterId.toString))
   }
 
@@ -140,10 +141,27 @@ object CEditSchedule extends Controller {
       }
 
 
+      val invalidTimeSlots = validateSchedule(newSchedule)
+
+      if(invalidTimeSlots.isEmpty) {
+        persistSchedule(newSchedule)
+        Logger.debug("new Schedule is valid");
+        Ok(Json.stringify( Json.obj("isValid" -> true)))
+      } else {
 
 
-      persistSchedule(newSchedule)
-
-      Ok(Json.obj("restult" -> "Ok"))
+        val jsonResponse = invalidTimeSlots.map{
+          ts=>
+            Json.obj(
+            "startHour"->ts.getStartHour.toInt,
+            "startMinute"->ts.getStartMinute.toInt,
+            "stopHour"->ts.getStopHour.toInt,
+            "stopMinute"->ts.getStopMinute.toInt,
+            "day"->ts.getParent.asInstanceOf[Weekday].getSortIndex.toInt
+            )
+        }
+        Logger.debug("invalid slots " + jsonResponse)
+        Ok(Json.stringify( Json.obj( "isValid"->false, "invalidSlots" ->jsonResponse ) ))
+      }
   }
 }

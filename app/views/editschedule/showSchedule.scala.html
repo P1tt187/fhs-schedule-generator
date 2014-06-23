@@ -3,7 +3,7 @@
 @import models.persistence.scheduletree.Weekday
 
 <div class="page-header">
-    <h1>@title</h1>
+    <h3>@title</h3>
 </div>
 <div class="progress progress-striped active hidden">
     <div class="progress-bar"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
@@ -196,6 +196,8 @@
     'style' : 'btn btn-primary btn-sm small smallText'
     } );
         $('.savebtn' ).on('click', function(){
+            $('.bg-danger' ).removeClass('bg-danger')
+
         var semester = @semesterId ;
         var lectureBuffer = [];
 
@@ -223,10 +225,30 @@
     contentType : "application/json; charset=utf-8",
     url : "  @routes.CEditSchedule.saveEditedSchedule",
     success:function(response){
-        console.log(response);
+        console.log(JSON.stringify( response));
+    $('.progress' ).addClass('hidden');
+
+        if(response.isValid){
         $('.resultError' ).addClass('hidden');
         $('.resultSuccsess' ).removeClass('hidden');
-        $(location ).attr('href','@routes.CEditSchedule.page()');
+            $(location ).attr('href','@routes.CEditSchedule.page()');
+        }
+        else{
+
+        response.invalidSlots.forEach(
+        function(slot ){
+            $('.connected' ).each(function(index,value){
+                var metaData = $(value ).data('metainfo');
+                if( slot['startHour']==metaData['startHour'] && slot['startMinute']==metaData['startMinute'] && slot['stopHour']==metaData['stopHour'] && slot['stopMinute']==metaData['stopMinute'] && slot['day']==metaData['day']){
+
+                $(value ).addClass('bg-danger');
+                }
+            });
+        }
+        );
+
+
+        }
         },
     error:function(response){
         console.log(response);

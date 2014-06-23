@@ -1,22 +1,22 @@
 package models.fhs.pages.generator
 
 import models.Transactions
-import org.hibernate.criterion._
-import scala.collection.JavaConversions._
-import models.persistence.{Schedule, Semester}
-import models.persistence.subject.AbstractSubject
 import models.fhs.pages.JavaList
-import models.persistence.template.TimeSlotTemplate
-import scala.annotation.tailrec
-import models.persistence.scheduletree.{Weekday, TimeSlot}
-import models.persistence.participants.Course
-import scala.Some
-import org.hibernate.FetchMode
-import play.api.Logger
+import models.fhs.pages.editdocents.MDocentTimeWhish
 import models.persistence.docents.Docent
 import models.persistence.enumerations.EDuration
-import models.fhs.pages.editdocents.MDocentTimeWhish
+import models.persistence.lecture.Lecture
+import models.persistence.participants.Course
+import models.persistence.scheduletree.{TimeSlot, Weekday}
+import models.persistence.subject.AbstractSubject
+import models.persistence.template.TimeSlotTemplate
+import models.persistence.{Schedule, Semester}
+import org.hibernate.FetchMode
+import org.hibernate.criterion._
+import play.api.Logger
 
+import scala.annotation.tailrec
+import scala.collection.JavaConversions._
 
 /**
  * @author fabian 
@@ -24,7 +24,7 @@ import models.fhs.pages.editdocents.MDocentTimeWhish
  */
 object MGenerator {
 
-  def filterScheduleWithCourseAndDocent(schedule: Schedule, course: Course, docent: Docent, durationStr:String) = {
+  def filterScheduleWithCourseAndDocent(schedule: Schedule, course: Course, docent: Docent, durationStr: String) = {
 
     val resultString = new StringBuffer()
 
@@ -43,7 +43,7 @@ object MGenerator {
       filteredSchedule
     }
 
-    filteredSchedule = if(!durationStr.equals("-1")){
+    filteredSchedule = if (!durationStr.equals("-1")) {
       val duration = EDuration.valueOf(durationStr)
       filteredSchedule.filter(duration)
     } else {
@@ -103,7 +103,7 @@ object MGenerator {
 
 
   @tailrec
-  def findTimeRanges(timeslotTemplate: List[TimeSlotTemplate], timeRanges: List[TimeRange]=List[TimeRange]()): List[TimeRange] = {
+  def findTimeRanges(timeslotTemplate: List[TimeSlotTemplate], timeRanges: List[TimeRange] = List[TimeRange]()): List[TimeRange] = {
     timeslotTemplate.headOption match {
       case None => timeRanges
       case Some(timeslot) =>
@@ -147,6 +147,42 @@ object MGenerator {
     }
   }
 
+  def validateSchedule(schedule: Schedule) = {
+
+
+    val allTimeSlots = schedule.getRoot.getChildren.flatMap {
+      wd => wd.getChildren.map {
+        case ts: TimeSlot => ts
+      }
+    }
+
+    val invalidTimeSlots = allTimeSlots.filter {
+      ts =>
+        val docents = ts.getLectures.flatMap(_.getDocents).toSet
+        val rooms = ts.getLectures.map { case l: Lecture => l.getRoom}.toSet
+
+        val docentCounts = docents.map {
+          d =>
+            ts.getLectures.count(_.getDocents.contains(d))
+        }
+
+        val roomCounts = rooms.map {
+          r =>
+            ts.getLectures.count { case l: Lecture => l.getRoom.equals(r)}
+        }
+
+
+        /** each docent can only one time in a timeslot*/
+        val docentInvalid = docentCounts.find(_ > 1).nonEmpty
+        /** each room can only one time in a timeslot */
+        val roomInvalid = roomCounts.find(_ > 1).nonEmpty
+
+        docentInvalid || roomInvalid
+    }.toList
+
+    invalidTimeSlots
+  }
+
   def persistSchedule(schedule: Schedule): Boolean = {
     if (schedule == null) {
       return false
@@ -175,7 +211,7 @@ object MGenerator {
 
 object TimeRange {
 
-  implicit val TimeRangeOrdering = Ordering.by( (range:TimeRange)=> (range.startHour,range.startMinute,range.startHour,range.stopMinute) )
+  implicit val TimeRangeOrdering = Ordering.by((range: TimeRange) => (range.startHour, range.startMinute, range.startHour, range.stopMinute))
 }
 
 case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int) extends Ordered[TimeSlot] {
@@ -197,7 +233,7 @@ case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute
     stopMinute.compareTo(that.getStopMinute)
   }
 
-  def compare(that:TimeSlotTemplate):Int = {
+  def compare(that: TimeSlotTemplate): Int = {
     if (startHour.compareTo(that.getStartHour) != 0) {
       return startHour.compareTo(that.getStartHour)
     }
@@ -211,7 +247,7 @@ case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute
     stopMinute.compareTo(that.getStopMinute)
   }
 
-  def compare(that:MDocentTimeWhish):Int = {
+  def compare(that: MDocentTimeWhish): Int = {
     if (startHour.compareTo(that.startHour) != 0) {
       return startHour.compareTo(that.startHour)
     }
