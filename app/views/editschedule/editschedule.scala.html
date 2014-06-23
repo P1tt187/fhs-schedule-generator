@@ -37,7 +37,11 @@
            appendHTML("/sendEditableSchedule/" + $('#selectSemester' ).val(), "#scheduleContainer" );
 
         };
-        changeScheduleContainer();
+            $(window ).on('load' , function(){
+            changeScheduleContainer();
+            } ) ;
+
+
         $('#selectSemester' ).on('change', changeScheduleContainer);
     </script>
 }

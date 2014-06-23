@@ -156,7 +156,7 @@ object MGenerator {
       }
     }
 
-    val invalidTimeSlots = allTimeSlots.filter {
+    val invalidTimeSlots = allTimeSlots.par.filter {
       ts =>
         val docents = ts.getLectures.flatMap(_.getDocents).toSet
         val rooms = ts.getLectures.map { case l: Lecture => l.getRoom}.toSet

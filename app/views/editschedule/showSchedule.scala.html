@@ -137,7 +137,7 @@
     </div>
     <div class="clearfix"></div>
     <div class="col-md-5 resultSuccsess hidden alert alert-success alert-dismissable">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span>  </div>
-    <div class="col-md-5 resultError hidden alert alert-dange alert-dismissabler">Fehler <span class="glyphicon glyphicon-thumbs-down"></span>  </div>
+    <div class="col-md-5 resultError hidden alert alert-danger alert-dismissabler">Fehler <span class="glyphicon glyphicon-thumbs-down"></span>  </div>
 
     <script>
 
@@ -229,24 +229,25 @@
     $('.progress' ).addClass('hidden');
 
         if(response.isValid){
-        $('.resultError' ).addClass('hidden');
-        $('.resultSuccsess' ).removeClass('hidden');
+            $('.resultError' ).addClass('hidden');
+            $('.resultSuccsess' ).removeClass('hidden');
             $(location ).attr('href','@routes.CEditSchedule.page()');
         }
         else{
 
-        response.invalidSlots.forEach(
-        function(slot ){
-            $('.connected' ).each(function(index,value){
-                var metaData = $(value ).data('metainfo');
-                if( slot['startHour']==metaData['startHour'] && slot['startMinute']==metaData['startMinute'] && slot['stopHour']==metaData['stopHour'] && slot['stopMinute']==metaData['stopMinute'] && slot['day']==metaData['day']){
+            response.invalidSlots.forEach(
+            function(slot ){
+                $('.connected' ).each(function(index,value){
+                    var metaData = $(value ).data('metainfo');
+                    if( slot['startHour']==metaData['startHour'] && slot['startMinute']==metaData['startMinute'] && slot['stopHour']==metaData['stopHour'] && slot['stopMinute']==metaData['stopMinute'] && slot['day']==metaData['day']){
 
-                $(value ).addClass('bg-danger');
-                }
-            });
-        }
-        );
-
+                    $(value ).addClass('bg-danger');
+                    }
+                });
+            }
+            );
+            $('.resultError' ).removeClass('hidden');
+            $('.resultSuccsess' ).addClass('hidden');
 
         }
         },
