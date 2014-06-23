@@ -169,10 +169,10 @@ object CGenerate extends Controller {
           val timeRanges = findTimeRanges(timeslotTemplates)
 
           val filteredPage = if (courseId == -1 && docentId == -1 && filterDuration.equals("-1")) {
-            showSchedule("Alle Kurse", timeRanges, timeslotsAll, schedule.getRate, schedules.toMap).toString()
+            showSchedule("Alle Kurse", timeRanges, timeslotsAll, schedule.getRate, schedules.toMap, schedule.getSemester).toString()
           } else {
             val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId), filterDuration)
-            showSchedule(courseName, timeRanges, timeslots, schedule.getRate, schedules.toMap).toString()
+            showSchedule(courseName, timeRanges, timeslots, schedule.getRate, schedules.toMap, schedule.getSemester).toString()
           }
           Ok(Json.stringify(Json.obj("htmlresult" -> filteredPage)))
       }

@@ -1,4 +1,4 @@
-@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], rate:Int, alternatives:Map[java.util.UUID,persistence.Schedule])(implicit session:Session)
+@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], rate:Int, alternatives:Map[java.util.UUID,persistence.Schedule],semester:models.persistence.Semester)(implicit session:Session)
 
 @import models.persistence.scheduletree.Weekday
 @import models.persistence.enumerations.EDuration
@@ -60,6 +60,7 @@
 
 <div class="table-responsive">
     <table class="table table-bordered table-striped table-condensed">
+        <caption class="caption"> <h3> @semester.getName </h3></caption>
         <thead>
             <th class="text-info text-center" >Uhrzeit</th>
 
@@ -85,10 +86,12 @@
                     <td >
                         <table style="width: 100%">
                             <thead>
+                                <tr>
                                 <th>
                                 </th>
                                 <th >
                                 </th>
+                                </tr>
                             </thead>
                             <tbody>
                     @defining(timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt)){ relevantSlots=>
