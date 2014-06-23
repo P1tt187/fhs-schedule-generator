@@ -2,7 +2,7 @@ package logic.generator.schedulegenerator.placingprocessor
 
 import models.persistence.scheduletree.TimeSlot
 import models.persistence.lecture.{AbstractLecture, Lecture}
-import models.persistence.location.RoomEntity
+import models.persistence.location.{LectureRoom, RoomEntity}
 import scala.annotation.tailrec
 import models.persistence.criteria.{DocentTimeWish, RoomCriteria, TimeSlotCriteria}
 import scala.collection.JavaConversions._
@@ -255,6 +255,10 @@ trait PlacingProcessor {
       room =>
         isRoomInCriteria(room, roomCriterias)
     }.isEmpty
+  }
+
+  implicit def convertRoomEntityToLecturRoom(roomEntity:RoomEntity):LectureRoom={
+    roomEntity.roomEntity2LectureRoom()
   }
 
 }

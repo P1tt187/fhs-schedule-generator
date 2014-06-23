@@ -55,7 +55,7 @@
         <div class="form-group">
             <select name="room" class="form-control editRoom" >
             @for(room<-allRooms){
-                <option  @if(room.equals(lecture.getRoom)){selected } value="@room.getId">@room.getHouse.getName @room.getNumber </option>
+                <option  @if(lecture.getLectureRoom.compareTo(room)==0){selected } value="@room.getId">@room.getHouse.getName @room.getNumber </option>
             }
 
             </select>

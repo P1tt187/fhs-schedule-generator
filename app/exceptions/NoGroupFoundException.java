@@ -1,5 +1,8 @@
 package exceptions;
 
+
+import models.persistence.subject.ExerciseSubject;
+
 /**
  * @author fabian
  *         on 21.03.14.
@@ -34,5 +37,16 @@ public class NoGroupFoundException extends Exception {
 
     public void setGroupType(String groupType) {
         this.groupType = groupType;
+    }
+
+    /** the subject that causes the error*/
+    private ExerciseSubject subject;
+
+    public ExerciseSubject getSubject() {
+        return subject;
+    }
+
+    public void setSubject(ExerciseSubject subject) {
+        this.subject = subject;
     }
 }

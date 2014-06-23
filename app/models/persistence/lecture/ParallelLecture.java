@@ -2,6 +2,7 @@ package models.persistence.lecture;
 
 import models.persistence.docents.LectureDocent;
 import models.persistence.enumerations.EDuration;
+import models.persistence.location.LectureRoom;
 import models.persistence.location.RoomEntity;
 import models.persistence.participants.LectureParticipant;
 import models.persistence.participants.Participant;
@@ -54,7 +55,7 @@ public class ParallelLecture extends AbstractLecture {
 
     @Override
     public Set<LectureParticipant> getLectureParticipants() {
-        return lectures.stream().flatMap(l-> l.getLectureParticipants().stream() ).collect(Collectors.toSet());
+        return lectures.stream().flatMap(l -> l.getLectureParticipants().stream()).collect(Collectors.toSet());
     }
 
     @Override
@@ -63,10 +64,19 @@ public class ParallelLecture extends AbstractLecture {
     }
 
     @Override
-    public Set<RoomEntity> getRooms() {
-        return new HashSet<RoomEntity>() {{
+    public Set<LectureRoom> getRooms() {
+        return new HashSet<LectureRoom>() {{
             for (Lecture l : lectures) {
-                add(l.getRoom());
+                addAll(l.getRooms());
+            }
+        }};
+    }
+
+    @Override
+    public Set<RoomEntity> getRoomEntitys(){
+        return new HashSet<RoomEntity>(){{
+            for(Lecture l : lectures){
+                addAll(l.getRoomEntitys());
             }
         }};
     }

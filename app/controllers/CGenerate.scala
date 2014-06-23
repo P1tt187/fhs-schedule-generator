@@ -273,7 +273,7 @@ object CGenerate extends Controller {
           lectureFuture.onFailure{
             case ex:NoGroupFoundException=>
               errorType = NO_GROUP_TYPE
-              errorMessage = ex.getGroupType
+              errorMessage = ex.getGroupType + " " + ex.getSubject.getName
               actorFinished=true
           }
           end = endTime

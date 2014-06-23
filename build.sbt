@@ -8,6 +8,7 @@ libraryDependencies ++= Seq(
   javaJpa,
   javaWs,
   cache,
+  filters,
   "org.webjars" % "bootstrap" % "3.0.0",
   "org.hibernate" % "hibernate-core" % "4.2.3.Final",
   "org.hibernate" % "hibernate-entitymanager" % "4.2.3.Final",

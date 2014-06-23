@@ -75,10 +75,10 @@ public class LectureDocent implements Comparable<Docent> {
         if (ret != 0) {
             return ret;
         }
-        if (userId == null && that.getUserId() == null) {
+        if (userId == null && (that.getUserId() == null || that.getUserId().isEmpty())) {
             return 0;
         }
-        if (userId == null && that.getUserId() != null) {
+        if (userId == null && that.getUserId() != null && !that.getUserId().isEmpty()) {
             return -1;
         }
         if (userId != null && that.getUserId() == null) {

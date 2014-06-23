@@ -101,6 +101,7 @@ class LectureGeneratorActor extends Actor {
               if (!multipleCourseGroups.map(_.isEmpty).forall(result => !result)) {
                 val e = new NoGroupFoundException("No group found for type: " + exerciseSubject.getGroupType + " " + exerciseSubject.getCourses.map(_.getShortName))
                 e.setGroupType(exerciseSubject.getGroupType)
+                e.setSubject(exerciseSubject)
                 Logger.error("error", e)
                 sender ! akka.actor.Status.Failure(e)
                 throw e

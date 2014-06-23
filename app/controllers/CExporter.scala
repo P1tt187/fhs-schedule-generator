@@ -173,8 +173,8 @@ object CExporter extends Controller {
                           )
                       },
                       "place" -> Json.obj(
-                        "building" -> lecture.getRoom.getHouse.getName,
-                        "room" -> lecture.getRoom.getNumber
+                        "building" -> lecture.getLectureRoom.getHouse,
+                        "room" -> lecture.getLectureRoom.getNumber
                       )
                     ),
                     "time" -> timeSlotToString(timeSlot),

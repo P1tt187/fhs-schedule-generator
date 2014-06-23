@@ -159,7 +159,7 @@ object MGenerator {
     val invalidTimeSlots = allTimeSlots.par.filter {
       ts =>
         val docents = ts.getLectures.flatMap(_.getDocents).toSet
-        val rooms = ts.getLectures.map { case l: Lecture => l.getRoom}.toSet
+        val rooms = ts.getLectures.flatMap { case l: Lecture => l.getRooms}.toSet
 
         val docentCounts = docents.map {
           d =>
@@ -168,7 +168,7 @@ object MGenerator {
 
         val roomCounts = rooms.map {
           r =>
-            ts.getLectures.count { case l: Lecture => l.getRoom.equals(r)}
+            ts.getLectures.count { case l: Lecture => l.getRooms.contains(r)}
         }
 
 

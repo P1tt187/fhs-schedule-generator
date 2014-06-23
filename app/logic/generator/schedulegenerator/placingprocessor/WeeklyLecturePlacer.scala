@@ -47,7 +47,7 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria],lec
 
     val roomCriterias = getRoomCriteriasFromDocents(lecture.getDocents.toList)
 
-    val timeSlotRooms = slot.getLectures.flatMap(_.getRooms) ++ equivalent.getLectures.flatMap(_.getRooms)
+    val timeSlotRooms = slot.getLectures.flatMap(_.getRoomEntitys) ++ equivalent.getLectures.flatMap(_.getRoomEntitys)
 
     var rooms = availableRooms.diff(timeSlotRooms).filter(r => isRoomAvailableInTimeSlot(r, slot) && isRoomAvailableInTimeSlot(r, equivalent)).sortBy(_.getCapacity)
 
@@ -72,7 +72,9 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria],lec
     if (notInTimeCriteria || notInLectureTimeCriteria || equivalentNotAvailable || noRoom || alternativeRoomsNotAvailable) {
       place(lecture, timeSlots.tail)
     } else {
-      lecture.setRoom(rooms.head)
+      val room = rooms.head
+      lecture.setRoom(room)
+      lecture.setLectureRoom(room)
       slot.setLectures(slot.getLectures :+ lecture)
       equivalent.setLectures(equivalent.getLectures :+ lecture)
       true

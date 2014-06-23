@@ -125,6 +125,7 @@ object CEditSchedule extends Controller {
           lecture.setId(null)
           lecture.setDuration(duration)
           lecture.setRoom(room)
+          lecture.setLectureRoom(room.roomEntity2LectureRoom())
 
           val timeRange = TimeRange(startHour, startMinute, stopHour, stopMinute)
 

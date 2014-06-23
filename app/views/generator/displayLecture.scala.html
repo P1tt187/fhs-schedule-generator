@@ -32,7 +32,7 @@
     <div class="pull-right">
     @lecture.getDocents.map(_.getLastName).mkString(", ")
     </div>
-    <div> @lecture.getRoom.getHouse.getName @lecture.getRoom.getNumber </div>
+    <div> @lecture.getLectureRoom.getHouse @lecture.getLectureRoom.getNumber </div>
     <div> @lecture.getAlternativeLectureRooms.map{ lr=>
        <span class="label label-warning">@lr.getHouse @lr.getNumber</span>
     }</div>

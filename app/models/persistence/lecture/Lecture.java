@@ -48,8 +48,11 @@ public class Lecture extends AbstractLecture {
     /**
      * room for this lecture
      */
-    @ManyToOne(targetEntity = RoomEntity.class)
+    @Transient
     private RoomEntity room;
+
+    /** Lecture room is needed to avoid dependency wo roomentity in database */
+    private LectureRoom lectureRoom;
 
     /**
      * duration of this lecture
@@ -290,10 +293,26 @@ public class Lecture extends AbstractLecture {
         this.docents = docent;
     }
 
+    public LectureRoom getLectureRoom() {
+        return lectureRoom;
+    }
+
+    public void setLectureRoom(LectureRoom lectureRoom) {
+        this.lectureRoom = lectureRoom;
+    }
+
     @Override
-    public Set<RoomEntity> getRooms() {
-        return new HashSet<RoomEntity>() {{
-            add(room);
+    public Set<LectureRoom> getRooms() {
+        return new HashSet<LectureRoom>() {{
+            add(lectureRoom);
+            addAll(alternativeLectureRooms);
+        }};
+    }
+
+    @Override
+    public Set<RoomEntity> getRoomEntitys(){
+        return new HashSet<RoomEntity>(){{
+           add(room);
             addAll(alternativeRooms);
         }};
     }
