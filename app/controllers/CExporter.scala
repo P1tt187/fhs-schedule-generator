@@ -240,6 +240,9 @@ object CExporter extends Controller {
 
         importCommands = importCommands :+ "mongoimport --db spirit_news --collection entrys --type csv --file entrys.csv --fieldFile entrysFields.txt"
 
+        importCommands = importCommands :+ "rm *.txt"
+        importCommands = importCommands :+ "rm *.csv"
+
         Files.write(importScriptFile, importCommands, Charset.forName("UTF-8"), StandardOpenOption.WRITE)
 
         Files.newDirectoryStream(path).foreach {
