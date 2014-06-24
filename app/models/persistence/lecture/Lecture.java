@@ -364,6 +364,7 @@ public class Lecture extends AbstractLecture {
         if (lectureParticipants != null ? !(lectureParticipants.containsAll(lecture.lectureParticipants) && lectureParticipants.size() == lecture.lectureParticipants.size()) : lecture.lectureParticipants != null)
             return false;
 
+        if (lectureRoom != null ? !lectureRoom.equals(lecture.lectureRoom) : lecture.lectureRoom != null) return false;
         if (difficultLevel != null ? !difficultLevel.equals(lecture.difficultLevel) : lecture.difficultLevel != null)
             return false;
         return !(expectedParticipants != null ? !expectedParticipants.equals(lecture.expectedParticipants) : lecture.expectedParticipants != null);
@@ -377,6 +378,7 @@ public class Lecture extends AbstractLecture {
         result = 31 * result + (docents != null ? docents.hashCode() : 0);
         result = 31 * result + (duration != null ? duration.hashCode() : 0);
         result = 31 * result + (kind != null ? kind.hashCode() : 0);
+        result = 31 * result + (lectureRoom != null ? lectureRoom.hashCode() : 0);
         result = 31 * result + (expectedParticipants != null ? expectedParticipants.hashCode() : 0);
         result = 31 * result + (difficultLevel != null ? difficultLevel.hashCode() : 0);
         return result;
@@ -390,7 +392,7 @@ public class Lecture extends AbstractLecture {
         sb.append(", expectedParticipants=").append(expectedParticipants);
         sb.append(", participants=").append(participants);
         sb.append(", docents=").append(docents);
-        sb.append(", room=").append(room);
+        sb.append(", room=").append(lectureRoom);
         sb.append(", duration=").append(duration);
         sb.append('}');
         return sb.toString();

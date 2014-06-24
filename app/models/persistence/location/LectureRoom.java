@@ -66,4 +66,13 @@ public class LectureRoom {
         }
         return this.number.compareTo(that.number);
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("LectureRoom{");
+        sb.append("house='").append(house).append('\'');
+        sb.append(", number='").append(number).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }
