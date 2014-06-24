@@ -132,78 +132,80 @@ object CExporter extends Controller {
                 }
             }.toSet
 
-            val plan = allLectures.map {
+            val plan = allLectures.flatMap {
               case lecture: Lecture =>
 
-                val timeSlot = allTimeSlots.filter(_.getLectures.contains(lecture)).head
-                val day = weekDays(timeSlot.getParent.asInstanceOf[Weekday].getSortIndex)
-                val eventType = lecture.getKind match {
-                  case ELectureKind.LECTURE => "Vorlesung"
-                  case ELectureKind.EXERCISE => "Uebung"
-                }
+                val timeSlots = allTimeSlots.filter(_.getLectures.contains(lecture))
+                timeSlots.map { timeSlot =>
+                  val day = weekDays(timeSlot.getParent.asInstanceOf[Weekday].getSortIndex)
+                  val eventType = lecture.getKind match {
+                    case ELectureKind.LECTURE => "Vorlesung"
+                    case ELectureKind.EXERCISE => "Uebung"
+                  }
 
-                val group = lecture.getKind match {
-                  case ELectureKind.LECTURE => ""
-                  case ELectureKind.EXERCISE => val g = lecture.getLectureParticipants.find(_.getCourseName.equals(course.getShortName)).get
-                    if (g.isIgnoreGroupIndex == true) {
-                      ""
-                    } else {
-                      g.getGroupIndex.toString
-                    }
+                  val group = lecture.getKind match {
+                    case ELectureKind.LECTURE => ""
+                    case ELectureKind.EXERCISE => val g = lecture.getLectureParticipants.find(_.getCourseName.equals(course.getShortName)).get
+                      if (g.isIgnoreGroupIndex == true) {
+                        ""
+                      } else {
+                        g.getGroupIndex.toString
+                      }
 
-                }
+                  }
+                  /** Spirit hour is not hour of day, it is index of the timeslot per day */
+                  val alternativeHour = timeSlot.getParent.getChildren.toList.asInstanceOf[List[TimeSlot]].sorted.indexOf(timeSlot) / 2 + 1
 
-                val alternativeHour = timeSlot.getParent.getChildren.toList.asInstanceOf[List[TimeSlot]].sorted.indexOf(timeSlot) / 2 + 1
-
-                Json.stringify(Json.obj(
-                  "appointment" -> Json.obj(
-                    "day" -> day,
-                    "location" -> Json.obj(
-                      "alternative" -> lecture.getAlternativeLectureRooms.map {
-                        alr =>
-                          Json.obj("alterLocation" -> Json.obj(
-                            "building" -> alr.getHouse,
-                            "room" -> alr.getNumber
-                          ),
-                            "alterDay" -> day,
-                            "alterTitleShort" -> lecture.getShortName(course.getShortName),
-                            "alterWeek" -> lecture.getDuration.getShortName,
-                            "altereventType" -> eventType,
-                            "hour" -> alternativeHour
-                          )
-                      },
-                      "place" -> Json.obj(
-                        "building" -> lecture.getLectureRoom.getHouse,
-                        "room" -> lecture.getLectureRoom.getNumber
-                      )
-                    ),
-                    "time" -> timeSlotToString(timeSlot),
-                    "week" -> lecture.getDuration.getShortName
-                  ),
-                  "className" -> course.getShortName.toLowerCase,
-                  "eventType" -> eventType,
-                  "group" -> (if (group.isEmpty) {
-                    group
-                  } else {
-                    " " + group
-                  }),
-                  "member" ->
-                    lecture.getDocents.map {
-                      d =>
-                        val fhs_id = if (d.getUserId != null) {
-                          d.getUserId
-                        } else {
-                          ""
-                        }
-                        Json.obj("fhs_id" -> fhs_id,
-                          "name" -> d.getLastName
+                  Json.stringify(Json.obj(
+                    "appointment" -> Json.obj(
+                      "day" -> day,
+                      "location" -> Json.obj(
+                        "alternative" -> lecture.getAlternativeLectureRooms.map {
+                          alr =>
+                            Json.obj("alterLocation" -> Json.obj(
+                              "building" -> alr.getHouse,
+                              "room" -> alr.getNumber
+                            ),
+                              "alterDay" -> day,
+                              "alterTitleShort" -> lecture.getShortName(course.getShortName),
+                              "alterWeek" -> lecture.getDuration.getShortName,
+                              "altereventType" -> eventType,
+                              "hour" -> alternativeHour
+                            )
+                        },
+                        "place" -> Json.obj(
+                          "building" -> lecture.getLectureRoom.getHouse,
+                          "room" -> lecture.getLectureRoom.getNumber
                         )
-                    }
-                  ,
-                  "titleLong" -> lecture.getName.replaceAll("AE", "Ä").replaceAll("OE", "Ö").replaceAll("UE", "Ü"),
-                  "titleShort" -> lecture.getShortName(course.getShortName)
-                )
-                )
+                      ),
+                      "time" -> timeSlotToString(timeSlot),
+                      "week" -> lecture.getDuration.getShortName
+                    ),
+                    "className" -> course.getShortName.toLowerCase,
+                    "eventType" -> eventType,
+                    "group" -> (if (group.isEmpty) {
+                      group
+                    } else {
+                      " " + group
+                    }),
+                    "member" ->
+                      lecture.getDocents.map {
+                        d =>
+                          val fhs_id = if (d.getUserId != null) {
+                            d.getUserId
+                          } else {
+                            ""
+                          }
+                          Json.obj("fhs_id" -> fhs_id,
+                            "name" -> d.getLastName
+                          )
+                      }
+                    ,
+                    "titleLong" -> lecture.getName.replaceAll("AE", "Ä").replaceAll("OE", "Ö").replaceAll("UE", "Ü"),
+                    "titleShort" -> lecture.getShortName(course.getShortName)
+                  )
+                  )
+                }
             }
             val content = List("[" + plan.mkString(",") + "]")
 
