@@ -1,10 +1,7 @@
 package logic.generator.schedulegenerator.placingprocessor
 
-import java.util
-
 import exceptions.{DocentsNotAtSameTimeAvailableException, NoRoomException}
 import models.persistence.criteria.DocentTimeWish
-import models.persistence.docents.{LectureDocent, Docent}
 import models.persistence.enumerations.EDuration
 import models.persistence.lecture.Lecture
 import models.persistence.location.RoomEntity
@@ -43,6 +40,7 @@ class GenericPlacer(allLectures: List[Lecture], allTimeslots: List[TimeSlot], al
   override def doPlacing(lecture: Lecture): Boolean = {
 
     val availableRooms = filterRoomsForLecture(lecture, allRooms)
+    val classRooms = getClassRooms(lecture)
     val availableTimeSlotCriterias = filterTimeWishes(lecture.getDocents.toSet).toList
     //val availableTimeSlots = Random.shuffle(findPossibleTimeSlots(allTimeslots, lecture))
     val availableTimeSlots = findPossibleTimeSlots(allTimeslots, lecture)
@@ -63,9 +61,9 @@ class GenericPlacer(allLectures: List[Lecture], allTimeslots: List[TimeSlot], al
 
     val result = lecture.getDuration match {
       case EDuration.WEEKLY =>
-        new WeeklyLecturePlacer(availableTimeSlotCriterias, lectureTimeslotCriterias, availableTimeSlots, allTimeslots, availableRooms).doPlacing(lecture)
+        new WeeklyLecturePlacer(availableTimeSlotCriterias, lectureTimeslotCriterias, availableTimeSlots, allTimeslots, availableRooms,classRooms).doPlacing(lecture)
       case EDuration.UNWEEKLY =>
-        new UnweeklyLecturePlacer(availableTimeSlotCriterias, lectureTimeslotCriterias, availableTimeSlots, allTimeslots, availableRooms).doPlacing(lecture)
+        new UnweeklyLecturePlacer(availableTimeSlotCriterias, lectureTimeslotCriterias, availableTimeSlots, allTimeslots, availableRooms,classRooms).doPlacing(lecture)
       case _ => false
     }
 

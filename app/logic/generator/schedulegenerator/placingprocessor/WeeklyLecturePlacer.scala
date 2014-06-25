@@ -3,7 +3,7 @@ package logic.generator.schedulegenerator.placingprocessor
 import models.persistence.criteria.{DocentTimeWish, TimeSlotCriteria}
 import models.persistence.enumerations.EDocentTimeKind
 import models.persistence.lecture.Lecture
-import models.persistence.location.RoomEntity
+import models.persistence.location.{LectureRoom, RoomEntity}
 import models.persistence.scheduletree.TimeSlot
 
 import scala.annotation.tailrec
@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
  * @author fabian 
  *         on 29.04.14.
  */
-class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], lectureTimeCriterias: List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity]) extends PlacingProcessor {
+class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], lectureTimeCriterias: List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity], classRooms:List[LectureRoom]) extends PlacingProcessor {
   override def doPlacing(lecture: Lecture): Boolean = {
     val timeWishes = lecture.getDocents.flatMap {
       docent =>
@@ -49,7 +49,6 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], le
 
     val timeSlotRooms = slot.getLectures.flatMap(_.getRoomEntitys) ++ equivalent.getLectures.flatMap(_.getRoomEntitys)
 
-    val classRooms = getClassRooms(lecture)
 
     var rooms = availableRooms.diff(timeSlotRooms).filter(r => isRoomAvailableInTimeSlot(r, slot) && isRoomAvailableInTimeSlot(r, equivalent)).sortBy(_.getCapacity)
 
