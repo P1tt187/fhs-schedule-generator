@@ -1,5 +1,6 @@
 package models.persistence.participants;
 
+import models.persistence.location.LectureRoom;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -12,17 +13,39 @@ import java.util.List;
 @Entity
 @Table(name = "TBLCOURSE")
 public class Course extends Participant {
-
+    /**
+     * full name
+     * e.g. Bachelor Informatik
+     */
     @Column(name = "FULLNAME", nullable = false)
     private String fullName;
-
+    /**
+     * short name of this course
+     * e.g. BAI1
+     */
     @Column(name = "SHORTNAME", nullable = false)
     private String shortName;
 
+    /**
+     * exersize groups
+     */
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, targetEntity = Group.class, fetch = FetchType.LAZY)
     @OrderBy("groupIndex")
     private List<Group> groups;
+
+    /**
+     * preferd room for this course
+     */
+    private LectureRoom classRoom;
+
+    public LectureRoom getClassRoom() {
+        return classRoom;
+    }
+
+    public void setClassRoom(LectureRoom classRoom) {
+        this.classRoom = classRoom;
+    }
 
     public String getFullName() {
         return fullName;

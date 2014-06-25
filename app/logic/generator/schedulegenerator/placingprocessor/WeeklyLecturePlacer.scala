@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
  * @author fabian 
  *         on 29.04.14.
  */
-class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria],lectureTimeCriterias:List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity]) extends PlacingProcessor {
+class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], lectureTimeCriterias: List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity]) extends PlacingProcessor {
   override def doPlacing(lecture: Lecture): Boolean = {
     val timeWishes = lecture.getDocents.flatMap {
       docent =>
@@ -45,9 +45,11 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria],lec
 
     val equivalentNotAvailable = !availableTimeSlots.contains(equivalent)
 
-    val roomCriterias = getRoomCriteriasFromDocents(lecture.getDocents.toList)
+    val docentRoomCriterias = getRoomCriteriasFromDocents(lecture.getDocents.toList)
 
     val timeSlotRooms = slot.getLectures.flatMap(_.getRoomEntitys) ++ equivalent.getLectures.flatMap(_.getRoomEntitys)
+
+    val classRooms = getClassRooms(lecture)
 
     var rooms = availableRooms.diff(timeSlotRooms).filter(r => isRoomAvailableInTimeSlot(r, slot) && isRoomAvailableInTimeSlot(r, equivalent)).sortBy(_.getCapacity)
 
@@ -63,8 +65,10 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria],lec
 
     rooms = rooms.diff(lecture.getAlternativeRooms)
 
-    if (roomCriterias.nonEmpty && roomsInCriteria(rooms, roomCriterias)) {
-      rooms = sortRoomsByCriteria(rooms, roomCriterias)
+    rooms = sortRoomsWithClassRooms(rooms,classRooms)
+
+    if (docentRoomCriterias.nonEmpty && roomsInCriteria(rooms, docentRoomCriterias)) {
+      rooms = sortRoomsByCriteria(rooms, docentRoomCriterias)
     }
 
     val noRoom = rooms.isEmpty

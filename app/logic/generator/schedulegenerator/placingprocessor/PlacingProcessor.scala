@@ -1,15 +1,16 @@
 package logic.generator.schedulegenerator.placingprocessor
 
-import models.persistence.scheduletree.TimeSlot
+import models.persistence.criteria.{DocentTimeWish, RoomCriteria, TimeSlotCriteria}
+import models.persistence.docents.LectureDocent
+import models.persistence.enumerations.EDuration
 import models.persistence.lecture.{AbstractLecture, Lecture}
 import models.persistence.location.{LectureRoom, RoomEntity}
+import models.persistence.participants.{Course, Group, Participant}
+import models.persistence.scheduletree.TimeSlot
+
 import scala.annotation.tailrec
-import models.persistence.criteria.{DocentTimeWish, RoomCriteria, TimeSlotCriteria}
 import scala.collection.JavaConversions._
 import scala.collection.mutable
-import models.persistence.participants.{Course, Group, Participant}
-import models.persistence.enumerations.EDuration
-import models.persistence.docents.LectureDocent
 
 /**
  * @author fabian 
@@ -29,8 +30,8 @@ trait PlacingProcessor {
     }
   }
 
-  protected def getTimeCritsForLecture(lecture:Lecture)={
-    lecture.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).map{case tsc:TimeSlotCriteria=>tsc}.toList
+  protected def getTimeCritsForLecture(lecture: Lecture) = {
+    lecture.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).map { case tsc: TimeSlotCriteria => tsc}.toList
   }
 
   protected def timeSlotContainsParticipants(timeslot: TimeSlot, participants: Set[Participant]): Boolean = {
@@ -257,8 +258,28 @@ trait PlacingProcessor {
     }.isEmpty
   }
 
-  implicit def convertRoomEntityToLecturRoom(roomEntity:RoomEntity):LectureRoom={
-    roomEntity.roomEntity2LectureRoom()
+  protected def getClassRooms(lecture: Lecture) = {
+    lecture.getParticipants.map { participant =>
+      if (participant.getCourse.getClassRoom != null) {
+        Some(participant.getCourse.getClassRoom)
+      } else {
+        None
+      }
+
+    }.filter(_.nonEmpty).map {
+      case Some(room) => room
+      case None => null
+    }.toList
   }
 
+  protected def sortRoomsWithClassRooms(rooms: List[RoomEntity], classRooms: List[LectureRoom]) = {
+    /**
+     * if classroom is available make it the first element
+     */
+    rooms.sortBy(r => (classRooms.find(_.compareTo(r) == 0).isEmpty, r.getCapacity))
+  }
+
+  implicit def convertRoomEntityToLecturRoom(roomEntity: RoomEntity): LectureRoom = {
+    roomEntity.roomEntity2LectureRoom()
+  }
 }

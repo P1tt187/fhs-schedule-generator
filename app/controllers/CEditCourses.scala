@@ -36,7 +36,7 @@ object CEditCourses extends Controller {
 
 
   def getCourseFields(courseId: Long) = Action {
-    Ok(Json.stringify(Json.obj("htmlresult" -> courseFields(findCourse(courseId)).toString())))
+    Ok(Json.stringify(Json.obj("htmlresult" -> courseFields(findCourse(courseId),findRooms).toString())))
   }
 
   def addCourse = Action {
@@ -85,6 +85,14 @@ object CEditCourses extends Controller {
         course.setFullName((jsVal \ "courseName").as[String])
         course.setShortName((jsVal \ "courseShortName").as[String])
         course.setSize((jsVal \ "courseSize").as[String].toInt)
+        val classRoomId = (jsVal \ "classRoom").as[String].toLong
+        val classRoom = if(classRoomId != -1l){
+          findRoom(classRoomId)
+        } else {
+          null
+        }
+
+        course.setClassRoom(classRoom)
 
         updateCourse(course)
         Ok(Json.stringify(Json.obj("result" -> "success")))

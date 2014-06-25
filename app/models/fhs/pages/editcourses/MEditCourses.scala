@@ -1,11 +1,13 @@
 package models.fhs.pages.editcourses
 
 import models.Transactions
-import models.persistence.participants.{Group, Course}
-import org.hibernate.criterion.{CriteriaSpecification, Projections, Restrictions, Order}
-import scala.collection.JavaConversions._
-import org.hibernate.FetchMode
+import models.persistence.location.RoomEntity
+import models.persistence.participants.{Course, Group}
 import models.persistence.subject.AbstractSubject
+import org.hibernate.FetchMode
+import org.hibernate.criterion.{CriteriaSpecification, Order, Projections, Restrictions}
+
+import scala.collection.JavaConversions._
 
 
 /**
@@ -90,6 +92,28 @@ object MEditCourses {
     Transactions.hibernateAction {
       implicit s =>
         s.delete(s.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).uniqueResult())
+    }
+  }
+
+  def findRooms() = {
+    Transactions.hibernateAction {
+      implicit s =>
+        s.createCriteria(classOf[RoomEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().toList.asInstanceOf[List[RoomEntity]]
+    }
+  }
+
+  def findRoom(id: Long) = {
+    Transactions.hibernateAction {
+      implicit s =>
+        s.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
+    }
+  }
+
+  implicit def roomEntity2LectureRoom(roomEntity: RoomEntity) = {
+    if (roomEntity == null) {
+      null
+    } else {
+      roomEntity.roomEntity2LectureRoom()
     }
   }
 
