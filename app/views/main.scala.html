@@ -1,7 +1,6 @@
 @(title: String, nav: String)(content: Html)(implicit session:Session)
 
 @import views.html.helper._
-@import views.html.helper.twitterBootstrap._
 
 <!DOCTYPE html>
 
@@ -17,6 +16,21 @@
         <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/datepicker.css")">
 
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+
+        <!--[if lt IE 7]>
+        <script src="@routes.Assets.at("javascripts/IE7.js")" type="text/javascript"></script>
+
+        <![endif]-->
+
+        <!--[if lt IE 8]>
+        <script src="@routes.Assets.at("javascripts/IE8.js")" type="text/javascript"></script>
+
+        <![endif]-->
+
+        <!--[if lt IE 9]>
+        <script src="@routes.Assets.at("javascripts/IE9.js")" type="text/javascript"></script>
+
+        <![endif]-->
 
 
         <script src="@routes.Assets.at("javascripts/jquery-2.1.0.min.js")" type="text/javascript"></script>
@@ -118,6 +132,12 @@
                     </li>
                     <li>
                         <a href="http://farhadi.ir/projects/html5sortable/">html5sortable</a>
+                    </li>
+                    <li>
+                        <a href="http://modernizr.com/">modernizr</a>
+                    </li>
+                    <li>
+                        <a href="https://code.google.com/p/ie7-js/"> ie7-js </a>
                     </li>
                 </ul>
             </div>
