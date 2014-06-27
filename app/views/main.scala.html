@@ -8,6 +8,7 @@
     <head>
         <title>@title</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
         <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/bootstrap.min.css")">
         <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-theme.min.css")">
@@ -17,23 +18,19 @@
 
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
 
-        <!--[if lt IE 7]>
-        <script src="@routes.Assets.at("javascripts/IE7.js")" type="text/javascript"></script>
-
-        <![endif]-->
-
-        <!--[if lt IE 8]>
-        <script src="@routes.Assets.at("javascripts/IE8.js")" type="text/javascript"></script>
-
-        <![endif]-->
-
         <!--[if lt IE 9]>
         <script src="@routes.Assets.at("javascripts/IE9.js")" type="text/javascript"></script>
 
         <![endif]-->
 
+        <!--[IF IE]>
+        <script src="@routes.Assets.at("javascripts/jquery-1.11.1.min.js")" type="text/javascript"></script>
+        <![ENDIF]-->
 
+        <!--[IF !IE] -->
         <script src="@routes.Assets.at("javascripts/jquery-2.1.0.min.js")" type="text/javascript"></script>
+        <!--<![ENDIF]-->
+
          <script src="@routes.Assets.at("javascripts/bootstrap-datepicker.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/bootstrap.min.js")" type="text/javascript"></script>
         <script src="@routes.Assets.at("javascripts/modernizr.custom.60350.js")" type="text/javascript"></script>
