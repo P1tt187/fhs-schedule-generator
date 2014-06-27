@@ -13,7 +13,7 @@ import scala.collection.JavaConversions._
  * @author fabian 
  *         on 29.04.14.
  */
-class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], lectureTimeCriterias: List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity], classRooms:List[LectureRoom]) extends PlacingProcessor {
+class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], lectureTimeCriterias: List[TimeSlotCriteria], availableTimeSlots: List[TimeSlot], allTimeslots: List[TimeSlot], availableRooms: List[RoomEntity], classRooms: List[LectureRoom]) extends PlacingProcessor {
   override def doPlacing(lecture: Lecture): Boolean = {
     val timeWishes = lecture.getDocents.flatMap {
       docent =>
@@ -47,24 +47,24 @@ class WeeklyLecturePlacer(availableTimeSlotCriterias: List[TimeSlotCriteria], le
 
     val docentRoomCriterias = getRoomCriteriasFromDocents(lecture.getDocents.toList)
 
-    val timeSlotRooms = slot.getLectures.flatMap(_.getRoomEntitys) ++ equivalent.getLectures.flatMap(_.getRoomEntitys)
+    val timeSlotRooms = (slot.getLectures.flatMap(_.getRoomEntitys) ++ equivalent.getLectures.flatMap(_.getRoomEntitys)).toList
 
 
     var rooms = availableRooms.diff(timeSlotRooms).filter(r => isRoomAvailableInTimeSlot(r, slot) && isRoomAvailableInTimeSlot(r, equivalent)).sortBy(_.getCapacity)
 
+    /** if all alternative rooms are not available the lecture cannot be placed */
+    val alternativeRoomsNotAvailable = isAlternativeRoomsNotAvailable(lecture.getAlternativeRooms.toList, timeSlotRooms)
 
-    var alternativeRoomsNotAvailable = false
 
-    lecture.getAlternativeRooms.foreach {
-      room =>
-        if (timeSlotRooms.contains(room)) {
-          alternativeRoomsNotAvailable = true
-        }
-    }
+    /**
+     * filter unavailable alternatives
+     * convert roomentitys to lecture rooms
+     */
+    lecture.setAlternativeLectureRooms(Set[LectureRoom]() ++ lecture.getAlternativeRooms.diff(timeSlotRooms).map(_.roomEntity2LectureRoom()))
 
     rooms = rooms.diff(lecture.getAlternativeRooms)
 
-    rooms = sortRoomsWithClassRooms(rooms,classRooms)
+    rooms = sortRoomsWithClassRooms(rooms, classRooms)
 
     if (docentRoomCriterias.nonEmpty && roomsInCriteria(rooms, docentRoomCriterias)) {
       rooms = sortRoomsByCriteria(rooms, docentRoomCriterias)

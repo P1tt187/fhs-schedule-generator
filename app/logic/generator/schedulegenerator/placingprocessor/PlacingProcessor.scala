@@ -51,7 +51,7 @@ trait PlacingProcessor {
           if (containsInParentGroup(group, existingGroups) || containsInSubGroups(group, existingGroups) || participantsContainsOtherGroupType(group, existingGroups)) {
             return true
           }
-        case course: Course => if (!existingParticipant.filter(_.getCourse.equals(course)).isEmpty) {
+        case course: Course => if (existingParticipant.filter(_.getCourse.equals(course)).nonEmpty) {
           return true
         }
       }
@@ -104,7 +104,7 @@ trait PlacingProcessor {
       return false
     }
 
-    !group.getSubGroups.find(subgroup => containsInSubGroups(subgroup, participants)).isEmpty
+    group.getSubGroups.find(subgroup => containsInSubGroups(subgroup, participants)).nonEmpty
   }
 
   protected def timeSlotContainsDocents(timeslot: TimeSlot, docents: Set[LectureDocent]): Boolean = {
@@ -232,12 +232,12 @@ trait PlacingProcessor {
   protected def sortRoomsByCriteria(rooms: List[RoomEntity], roomCriterias: List[RoomCriteria]): List[RoomEntity] = {
     rooms.sortBy {
       room =>
-        (isRoomInCriteria(room, roomCriterias), room.getCapacity)
+        (!isRoomInCriteria(room, roomCriterias), room.getCapacity)
     }
   }
 
   private def isRoomInCriteria(room: RoomEntity, roomCriterias: List[RoomCriteria]): Boolean = {
-    !roomCriterias.par.find {
+    roomCriterias.par.find {
       rc =>
         if (rc.getHouse != null && rc.getHouse.equals(room.getHouse)) {
           true
@@ -248,16 +248,29 @@ trait PlacingProcessor {
         } else {
           false
         }
-    }.isEmpty
+    }.nonEmpty
   }
 
   protected def roomsInCriteria(rooms: List[RoomEntity], roomCriterias: List[RoomCriteria]): Boolean = {
-    !rooms.par.find {
+    rooms.par.find {
       room =>
         isRoomInCriteria(room, roomCriterias)
-    }.isEmpty
+    }.nonEmpty
   }
 
+  protected def isAlternativeRoomsNotAvailable( rooms:List[RoomEntity], timeSlotRooms:List[RoomEntity] )={
+    val availabilities = rooms.map {
+      room =>
+        timeSlotRooms.contains(room)
+    }.toSet.toList.sorted
+    
+    if (availabilities.isEmpty) {
+      false
+    } else {
+      availabilities.head
+    }
+  }
+  
   protected def getClassRooms(lecture: Lecture) = {
     lecture.getParticipants.map { participant =>
       if (participant.getCourse.getClassRoom != null) {
