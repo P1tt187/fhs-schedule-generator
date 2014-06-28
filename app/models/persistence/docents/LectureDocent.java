@@ -70,21 +70,7 @@ public class LectureDocent implements Comparable<Docent> {
 
     @Override
     public int compareTo(Docent that) {
-
-        int ret = this.lastName.compareTo(that.getLastName());
-        if (ret != 0) {
-            return ret;
-        }
-        if (userId == null && (that.getUserId() == null || that.getUserId().isEmpty())) {
-            return 0;
-        }
-        if (userId == null && that.getUserId() != null && !that.getUserId().isEmpty()) {
-            return -1;
-        }
-        if (userId != null && that.getUserId() == null) {
-            return 1;
-        }
-        return this.userId.compareTo(that.getUserId());
+        return this.getLastName().compareTo(that.getLastName());
     }
 
     @Override
