@@ -203,10 +203,12 @@
                             }.sortBy(_._1)) { days =>
                                 <table class="table table-bordered table-striped table-hover table-condensed text-center" >
                                     <thead>
+                                        <tr>
                                         <th class="text-info text-center" >Uhrzeit</th>
                                         @for(day <- days) {
                                             <th class="text-info text-center" > @day._2</th>
                                         }
+                                        </tr>
                                     </thead>
                                     <tbody>
                                         @for(range <- MRoomdefintion.findTimeRanges(roomEntity.timeCriterias).sorted){

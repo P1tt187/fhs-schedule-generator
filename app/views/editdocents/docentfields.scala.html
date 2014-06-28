@@ -100,6 +100,7 @@
         <div class="table-responsive">
             <table class="table table-bordered table-striped table-condensed">
                 <thead>
+                    <tr>
                     <th class="text-center text-info" >Uhrzeit</th>
 
                     @existingTimeWishes= @{
@@ -117,6 +118,7 @@
                     @for(day <- days) {
                         <th class="text-info text-center" > @day._2</th>
                     }
+                    </tr>
                 </thead>
                 <tbody>
                 @for(range<-timeRanges.sorted){
