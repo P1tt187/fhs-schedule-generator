@@ -23,7 +23,7 @@ object CBLAFileUpload extends Controller {
 
   val NAV = "PLFILEUPLOAD"
 
-  implicit val timeout = Timeout(30 seconds)
+  implicit val timeout = Timeout(5 minutes)
   private var result: Future[Any] = null
   private var actorFinished = false
   private var error = false

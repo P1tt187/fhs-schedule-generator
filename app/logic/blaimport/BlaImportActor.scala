@@ -24,10 +24,11 @@ class BlaImportActor extends Actor {
   type CourseOfStudies = String
   type ShortCourseName = String
   type SubjectName = String
+  type CourseSize = Int
 
   private var shortcut = Map[CourseOfStudies, ShortCourseName]()
   private var shortcutReverse = Map[ShortCourseName, CourseOfStudies]()
-  private var subjectNames = Map[CourseOfStudies, Set[SubjectName]]()
+  private var courses = Map[ShortCourseName, CourseSize]()
   private var subjectMetaInformation = Map[SubjectName, SubjectMetaInformation]()
 
   private var semester: Semester = null
@@ -39,15 +40,15 @@ class BlaImportActor extends Actor {
       try {
         shortcut = shortcut.empty
         shortcutReverse = shortcutReverse.empty
-        subjectNames = subjectNames.empty
+        courses = courses.empty
         subjectMetaInformation = subjectMetaInformation.empty
 
 
         parseFile(file)
         sender() ! ImportFinished
       }
-      catch{
-        case ex:Exception => sender() ! ImportFailure(ex)
+      catch {
+        case ex: Exception => sender() ! ImportFailure(ex)
       }
     case unkownCommand => throw new IllegalArgumentException("unknown command " + unkownCommand)
   }
@@ -68,10 +69,18 @@ class BlaImportActor extends Actor {
         Logger.debug("shortname - " + shortName + " " + shortName.substring(0, shortName.length - 1))
         course.setFullName(shortcutReverse(shortName.substring(0, shortName.length - 1)))
         course.setGroups(new util.LinkedList[Group]())
-        course.setSize(0)
+        course.setSize(courses(shortName))
         Transactions {
           implicit entityManager =>
             entityManager.persist(course)
+        }
+      }
+      //Logger.debug("shortName: " + shortName + " courseSize: " + courses(shortName))
+      if (course.getSize != courses.getOrElse(shortName,1)) {
+        Transactions.hibernateAction {
+          implicit s =>
+            course.setSize( courses.getOrElse(shortName, 1 ).toInt)
+            s.saveOrUpdate(course)
         }
       }
 
@@ -170,7 +179,7 @@ class BlaImportActor extends Actor {
       abstractSubject.setSemester(semester)
       Transactions {
         implicit entityManager =>
-            entityManager.merge(abstractSubject)
+          entityManager.merge(abstractSubject)
       }
     }
 
@@ -196,23 +205,24 @@ class BlaImportActor extends Actor {
           }
         }
         Logger.debug("semester: " + semester)
-      } else if (line.startsWith("kstudiengang_fächer_planen(")) {
-        val course = line.substring(line.indexOf("(\"") + 2, line.indexOf("\",["))
-        Logger.debug("course: " + course)
-
-        val subjects = line.substring(line.indexOf(",[") + 2, line.indexOf("])")).replace("\"", "").split(",")
-
-        //subjects.foreach(s => Logger.debug("subject: " + s))
-
-        val existingSubjects = subjectNames.getOrElse(course, Set[SubjectName]())
-        subjectNames += course -> (existingSubjects ++ subjects)
-
       } else if (line.startsWith("kstudiengang_abk(")) {
         val parts = line.substring(line.indexOf("(\"") + 1).replace("\"", "").split(",")
 
         shortcut += parts(0) -> parts(1).toUpperCase
         shortcutReverse += parts(1).toUpperCase -> parts(0)
       }
+      else if (line.startsWith("kstudiengang_semester_studenten")) {
+        val parts = line.substring(line.indexOf("(\"") + 1).replace("\"", "").replace(")", "").split(",")
+
+        val courseName = parts(0)
+        val semesterNumber = parts(1)
+        val numberOfStudents = parts(2).toInt
+
+        val shortName = (shortcut(courseName).toUpperCase + semesterNumber).trim
+
+        courses += shortName -> numberOfStudents
+      }
+
     }
     scanner.close()
 
@@ -227,7 +237,7 @@ class BlaImportActor extends Actor {
         if (line.startsWith("klv(")) {
           val part = line.substring(4).replace("\"", "").split(",")
           val course = part(0)
-          val subjectName = part(1).replaceAll("AE","Ä").replaceAll("OE","Ö").replaceAll("UE","Ü").trim()
+          val subjectName = part(1).replaceAll("AE", "Ä").replaceAll("OE", "Ö").replaceAll("UE", "Ü").trim()
           //val lehrveranstaltungSchluessel = part(2)
           val semester = part(3)
           val docent = part(4)
@@ -257,8 +267,8 @@ class BlaImportActor extends Actor {
             if (!connectedParticipants.startsWith("BA") && !connectedParticipants.startsWith("MA")) {
               connectedParticipants = "BA" + connectedParticipants
             }
-            if(!connectedParticipants.matches("^[a-zA-Z]+\\d$")){
-              connectedParticipants+=metaInfo.semesterValue.head
+            if (!connectedParticipants.matches("^[a-zA-Z]+\\d$")) {
+              connectedParticipants += metaInfo.semesterValue.head
             }
 
 
@@ -313,7 +323,7 @@ class BlaImportActor extends Actor {
             }
 
             val courses = if (areSemesterValuesConsistent(semesterValues)) {
-            //  Logger.debug("subjectname - " + subjectName)
+              //  Logger.debug("subjectname - " + subjectName)
               courseShortName.map(e => findCourse(e)).toSet
 
             } else {
@@ -352,7 +362,7 @@ class BlaImportActor extends Actor {
       implicit session =>
         session.createCriteria(classOf[AbstractSubject]).add(Restrictions.eq("semester", semester)).list().asInstanceOf[util.List[AbstractSubject]]
     }
-    Logger.debug(result.mkString("\n"))
+    // Logger.debug(result.mkString("\n"))
 
 
     /* Logger.debug(subjectNames.mkString("\n"))
