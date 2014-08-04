@@ -263,15 +263,17 @@ class BlaImportActor extends Actor {
 
             val metaInfo = subjectMetaInformation(subjectName)
 
+			/** the BA or MA part is missing, example: gemeinsam mit I4 */
             var connectedParticipants = part(4).substring("gemeinsam mit ".length).toUpperCase.trim
             if (!connectedParticipants.startsWith("BA") && !connectedParticipants.startsWith("MA")) {
               connectedParticipants = "BA" + connectedParticipants
             }
+            /** used when semestervalue is missing, example: BAI but expected is BAI2 */
             if (!connectedParticipants.matches("^[a-zA-Z]+\\d$")) {
               connectedParticipants += metaInfo.semesterValue.head
             }
 
-
+			/** the subject has a diffrent name */
             if (connectedParticipants.contains("(")) {
               val synonym = connectedParticipants.substring(connectedParticipants.indexOf("(") + 1, connectedParticipants.indexOf(")")).trim
               connectedParticipants = connectedParticipants.substring(0, connectedParticipants.indexOf("(") - 1).trim
