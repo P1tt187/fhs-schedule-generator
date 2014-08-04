@@ -148,10 +148,10 @@
             </div>
         </footer>
 
-        <script type="text/javascript">
+        <script >
 
         var initSelect = function ( ) {
-
+        $ ( "input" ).addClass ( 'form-control' ) ;
         $ ( "select" ).each ( function ( index, value ) {
         if ( $ ( value ).parents ( '.sr-only' ).length == 0 ) {
         $ ( value ).attr ( 'data-live-search', true ).addClass ( 'form-control' ).selectpicker ( {
@@ -160,7 +160,7 @@
         } ).addClass ( 'form-control' ) ;
         }
 
-        $ ( "input[type='file']" ).bootstrapFileInput ( ) ;
+
         if ( ! Modernizr.inputtypes.date ) {
         $ ( "input[type='date']" ).datepicker ( {
         format : "yyyy-mm-dd"
@@ -172,12 +172,13 @@
         }
         } ) ;
 
-        $ ( "input" ).addClass ( 'form-control' ) ;
+
         } ;
 
         $ ( window ).on ( 'load', function ( ) {
 
         initSelect ( ) ;
+        $ ( "input[type='file']" ).bootstrapFileInput ( ) ;
         } ) ;
 
         $ ( ".dropdown-submenu" ).on ( "mouseover", function ( e ) {
