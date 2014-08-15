@@ -2,9 +2,9 @@
 // Comment to get more information during initialization
 logLevel := Level.Warn
 
-lazy val root = Project("plugins", file(".")).dependsOn(plugin)
+//lazy val root = Project("plugins", file(".")).dependsOn(plugin)
 
-lazy val plugin = file("../").getCanonicalFile.toURI
+//lazy val plugin = file("../").getCanonicalFile.toURI
 
 resolvers ++= Seq(
   Resolver.mavenLocal,
@@ -17,8 +17,12 @@ resolvers ++= Seq(
 
 
 // Use the Play sbt plugin for Play projects
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3-SNAPSHOT")
+//addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3-SNAPSHOT")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.0-M2a")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.0-M2b")
+
+//addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.0-M2b")
+
+// The Play plugin
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.3")
+

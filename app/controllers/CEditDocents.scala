@@ -63,6 +63,7 @@ object CEditDocents extends Controller {
 
   private def getDocentList(implicit request: Request[AnyContent]) = {
     val allDocents = findAllDocents()
+    val session = request.session
 
     /** docents will only see their own stuff */
     var docentList: List[Docent] = null
@@ -101,7 +102,7 @@ object CEditDocents extends Controller {
   def sendDocentFields(id: Long) = Action {
     implicit request =>
       val docent = findDocentById(id)
-
+      val session = request.session
 
       val timeWishExpireDate = findExpireDate()
       val expireDate = if (timeWishExpireDate != null) {
@@ -117,6 +118,7 @@ object CEditDocents extends Controller {
 
   def editDocent = Action(parse.json) {
     implicit request =>
+      val session = request.session
       val jsVal = request.body
 
       val lastName = (jsVal \ existingDocentForm("lastName").name).as[String]
@@ -158,7 +160,7 @@ object CEditDocents extends Controller {
       Logger.debug(mDocent.toString)
 
       val docent = persistEditedDocent(mDocent)
-      val flashing = flash +("submitResult", "true")
+      val flashing = request.flash +("submitResult", "true")
       val (allTimeSlots, timeRanges) = timeRange
       val timeWishExpireDate = findExpireDate()
       val expireDate = if (timeWishExpireDate != null) {
@@ -193,6 +195,7 @@ object CEditDocents extends Controller {
 
   def deleteDocent(id: Long) = Action {
     implicit request =>
+      val session = request.session
       val (docentName, connectedSubjects) = removeDocent(id)
       Redirect(routes.CEditDocents.page).flashing("connectedSubjects" -> connectedSubjects.mkString(" "), "docentName" -> docentName).withSession(session + ("docentName" -> docentName))
   }

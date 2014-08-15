@@ -1,12 +1,11 @@
 @(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.generator.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate],expireDate:java.util.Calendar)(implicit flash:Flash,session:Session)
 @import java.text.SimpleDateFormat
+@import java.util.Calendar
 
 @import models.fhs.pages.editdocents._
 @import models.fhs.pages.roomdefinition._
 @import models.persistence.enumerations._
 @import views.html.helper._
-@import views.html.helper.twitterBootstrap._
-@import java.util.Calendar
 
     @disableTimeWishFields = @{
         expireDate!=null&& Calendar.getInstance().after(expireDate)&& !session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean

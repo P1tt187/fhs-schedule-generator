@@ -6,9 +6,9 @@ import akka.actor.{PoisonPill, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
-import exceptions.{DocentsNotAtSameTimeAvailableException, NoRoomException, NoGroupFoundException}
 import exceptions.errortypes.EErrorType
 import exceptions.errortypes.EErrorType._
+import exceptions.{DocentsNotAtSameTimeAvailableException, NoGroupFoundException, NoRoomException}
 import logic.generator.lecturegenerator.{GenerateLectures, LectureAnswer, LectureGeneratorActor}
 import logic.generator.schedulegenerator._
 import models.Transactions
@@ -81,21 +81,21 @@ object CGenerate extends Controller {
       val parts = request.session.get("lastchoosen").getOrElse("-1,2,10,10,50").split(",").toSeq
 
       Logger.debug("lastChoosen " + parts)
-      Logger.debug("" + (session + ("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(","))))
+      Logger.debug("" + (request.session + ("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(","))))
       schedule = findScheduleForSemester(findSemesterById(id))
       errorType = NONE
       actorFinished = true
 
-      Redirect(routes.CGenerate.page()).withSession(session + ("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(",")))
+      Redirect(routes.CGenerate.page()).withSession(request.session + ("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(",")))
   }
 
   def page() = Action {
     implicit request =>
 
       var flashing = if (schedule != null) {
-        flash +("startpolling", "true")
+        request.flash +("startpolling", "true")
       } else {
-        flash
+        request.flash
       }
 
       flashing = if (end != null) {
@@ -133,7 +133,7 @@ object CGenerate extends Controller {
   def switchSchedule(idString: String) = Action {
     implicit request =>
       schedule = schedules(schedules.keySet.find(_.toString.equals(idString)).get)
-      Redirect(routes.CGenerate.page()).withSession(session + ("selectedSchedule" -> idString))
+      Redirect(routes.CGenerate.page()).withSession(request.session + ("selectedSchedule" -> idString))
   }
 
   def sendSchedule(courseId: Long, docentId: Long, filterDuration: String) = Action {
@@ -280,7 +280,7 @@ object CGenerate extends Controller {
           //Logger.debug(findActiveSubjectsBySemesterId(result.id).mkString("\n") )
 
           Redirect(routes.CGenerate.page()).flashing("startpolling" -> "true", "generating" -> "disabled")
-            .withSession(session + ("lastchoosen" -> Seq(result.id, result.threads, result.time, result.randomRatio, result.maxIterationDeep).mkString(",")))
+            .withSession(request.session + ("lastchoosen" -> Seq(result.id, result.threads, result.time, result.randomRatio, result.maxIterationDeep).mkString(",")))
         }
 
       )

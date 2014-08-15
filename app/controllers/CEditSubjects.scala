@@ -141,7 +141,7 @@ object CEditSubjects extends Controller {
         idString
       }
 
-      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim()))).withSession(session + ("subjectFields" -> selectedSubject))
+      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim()))).withSession(request.session + ("subjectFields" -> selectedSubject))
 
   }
 

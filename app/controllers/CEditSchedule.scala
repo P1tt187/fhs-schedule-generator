@@ -41,6 +41,7 @@ object CEditSchedule extends Controller {
   def findAndSendSchedule(semesterId: Long) = Action {
     implicit request =>
 
+
       val timeslotTemplates = Transactions.hibernateAction {
         implicit session =>
           session.createCriteria(classOf[TimeSlotTemplate]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[TimeSlotTemplate]].toList.sorted
@@ -73,6 +74,8 @@ object CEditSchedule extends Controller {
       val timeSlots = schedule.getRoot.getChildren.flatMap {
         case wd: Weekday => wd.getChildren.toList.asInstanceOf[List[TimeSlot]]
       }.toList
+
+      val session = request.session
       Ok(Json.obj("htmlresult" -> showSchedule(schedule.getSemester.getName, timeRanges, timeSlots, rooms, courses, docents, semesterId).toString().trim))
         .withSession(session + ("editschedule" -> semesterId.toString))
   }

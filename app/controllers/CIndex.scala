@@ -43,6 +43,7 @@ object CIndex extends Controller {
   def doLogin() = Action {
     implicit request =>
 
+      val session = request.session
       val result = loginForm.bindFromRequest()
       result.fold(
         error => {
