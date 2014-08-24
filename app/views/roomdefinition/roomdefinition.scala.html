@@ -1,10 +1,18 @@
-@(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion], weekdays: Seq[(String, String)], existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay])(implicit session:Session)
+@(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion], weekdays: Seq[(String, String)], existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay], allTimeSlots : List[persistence.template.TimeSlotTemplate], timeRanges: List[fhs.pages.generator.TimeRange] )(implicit session:Session)
 
 @import models.fhs.pages.roomdefinition._
 @import models.persistence.enumerations.EDuration
 @import views.html.helper._
 
+@defaultRoom = @{MRoomdefintion(None,0,"","",List[String](),List[MTtimeslotCritDefine]())}
 
+@days= @{
+    CTimeslotDefintion.WEEKDAYS.filterNot{
+        case (sortIndexString,dayname)=>
+            val sortIndex=sortIndexString.toInt
+            allTimeSlots.find(_.getParent.getSortIndex == sortIndex).isEmpty
+    }.sortBy(_._1)
+}
 
 @main(title, CRoomDefinition.NAV) {
 
@@ -15,7 +23,7 @@
     <div class="clearfix">
         <div class="row-fluid">
             <div class="col-md-5">
-                @form(action = routes.CRoomDefinition.submitRoom, 'class -> " form-inline") {
+                <form class="form-inline" id="roomForm">
 
                     <fieldset>
 
@@ -24,7 +32,7 @@
                         @inputText(roomDefForm("house"), '_class -> "form-group ", '_label -> "Haus", '_help -> "Gebäude")
 
                         @inputText(roomDefForm("number"), '_class -> "form-group ", '_label -> "Nummer", '_help -> "Raumnummer")
-                        <br/>
+
                         @inputText(roomDefForm("capacity"), '_class -> "form-group ", '_label -> "Kapazität", '_help -> "Wieviele Personen?")
                         <br/>
 
@@ -32,63 +40,17 @@
                             <label class="control-label" for="attributes" style="display : block ;">
                                 Eigenschaften
                             </label>
-                            <select class="form-control" id="attributes" name="attributes[]" multiple title="nichts Ausgewählt">
+                            <select class="form-control" id="attributes" name="attributes" multiple title="nichts Ausgewählt">
                             @for(attr <- MRoomdefintion.ATTRIBUTES) {
                                 <option value="@attr" @if(roomDefForm.value.getOrElse(MRoomdefintion(None,0,"","",List[String](),List[MTtimeslotCritDefine]())).attributes.contains(attr)){selected} >@attr</option>
                             }
                             </select>
                         </div>
-                    </fieldset>
-                    <fieldset>
-                        <div id="timeslotcrit" >
-                        @repeat(roomDefForm("timeCriterias"), min = 0) { criteriaFields =>
-                            <div class="panel panel-info container-fluid" id="@criteriaFields.id">
-                                <div class="row-fluid">
-                                    <div class="pull-right">
-                                        <button id="remove_@criteriaFields.id" role="button" type="button" class="btn btn-danger"> <span class="glyphicon glyphicon-minus"></span> </button>
-                                    </div>
-                                    <script>
-                                    $('#remove_@criteriaFields.id').on('click', function(){
-                                    $('#@criteriaFields.id' ).remove();
-                                    });
-                                    </script>
-                                    <h4>Von:</h4>
-
-                                    @select(criteriaFields("startHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
-                                    @select(criteriaFields("startMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Minute", '_help -> "")
-
-                                    <h4>Bis:</h4>
-
-                                    @select(criteriaFields("stopHour"), (0 to 23).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group ", '_label -> "Stunde", '_help -> "")
-                                    @select(criteriaFields("stopMinute"), (0 to 59 by 5).toSeq.map(i => (i.toString, i.formatted("%02d"))), '_class -> "form-group", '_label -> "Minute", '_help -> "")
-
-                                    <br/>
-                                    @repeat(criteriaFields("weekdays"), min = 0) { weekday =>
-                                        @defining(weekdays.find(p => p._1.equals(weekday.value.get)).get) { day =>
-                                            <div class='form-group span6'>
-                                                <label class="control-label" for="weekdays@criteriaFields.id" style="display: block">
-                                                    Wochentage</label>
-                                                <select class="form-control" id="weekdays@criteriaFields.id" name="@(criteriaFields.name + ".weekdays[]")" multiple title="nichts Ausgewählt">
-                                                @for(dayname <- weekdays) {
-                                                    <option class="" value="@dayname._1" @if(day._1.equals(dayname._1)) {selected }>@dayname._2 </option>
-                                                }
-                                                </select>
-                                            </div>
-                                        }
-
-                                    }
-
-
-                                    @select(criteriaFields("duration"), Seq((EDuration.WEEKLY.name(), "Wöchentlich"), (EDuration.EVEN.name(), "Gerade Wochen"), (EDuration.UNEVEN.name(), "Ungerade Wochen")), '_class -> "form-group", '_label -> "Wochen")
-
-                                </div>
-                            </div>
-
-                        }
+                        <div class="form-group checkbox">
+                            <label  class="control-label" >
+                            <input class="form-control" id="tcritsEnabled" type="checkbox"  /> Eingeschränkte Verfügbarkeit
+                            </label>
                         </div>
-                        <label for="addTcrit" class="control-label" >Eingeschränkte Verfügbarkeit </label>
-                        <button role="button" type="button" id="addTcrit" class="btn btn-warning btn-sm span1" ><span class="glyphicon glyphicon-plus"></span> </button>
-                       @* <button id="removeCritButton" role="button" type="button" class="btn btn-danger btn-sm span1" ><span class="glyphicon glyphicon-minus"></span> </button> *@
                     </fieldset>
                     <fieldset style="margin-top : 1%">
                         <div class="form-group ">
@@ -100,37 +62,228 @@
                             </span>
                         </div>
                     </fieldset>
-                }
+                </form>
+                <br>
+                    <fieldset>
+                        <div id="timeslotcrit" class="hidden">
+
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    Legende:
+                                </div>
+                                <div class="form-group">
+                                    <div class="showcase panel-info">
+                                        <div class="bg-info showcase-content">w</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="showcase">
+                                        <div class=" bg-warning showcase-content">g</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="showcase">
+                                        <div class="bg-primary showcase-content">ug</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        @defining(roomDefForm.value.getOrElse(defaultRoom).timeCriterias) { existingTimeCriterias =>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-striped table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center text-info" >Uhrzeit</th>
 
 
+                                            @for(day <- days) {
+                                                <th class="text-info text-center" > @day._2</th>
+                                            }
+                                        </tr>
+
+                                    </thead>
+                                    <tbody>
+                                    @for(range<-timeRanges.sorted){
+                                        <tr>
+                                            <td class="text-center"  style="vertical-align: middle; width : 8% ; ">
+                                            @range.toString
+                                            </td>
+                                            @for(day <- days) {
+                                            <td>
+                                                @if(!allTimeSlots.find(slot=> range.compare(slot) == 0 && slot.getParent.getSortIndex == day._1.toInt).isEmpty) {
+                                                    @defining(existingTimeCriterias.find( tc=> range.compare(tc) ==0 && tc.weekdays.contains(day._1.toInt) )) { matchingCrit =>
+                                                        <form class="subform form-inline @if(matchingCrit.nonEmpty){ @{ EDuration.valueOf(matchingCrit.get.duration) match {
+                                                            case EDuration.EVEN => "bg-warning"
+                                                            case EDuration.UNEVEN => "bg-primary"
+                                                            case EDuration.WEEKLY => "bg-info"
+                                                            case _ => "bg-danger"
+
+                                                        }
+                                                        } } "  >
+                                                            <div class="container center-block ">
+                                                                <div class="form-group" >
+                                                                    <div class="radio">
+                                                                        <label>
+                                                                            <input class="form-control weekly" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDuration.WEEKLY" @if(matchingCrit.nonEmpty && matchingCrit.get.duration.equalsIgnoreCase(EDuration.WEEKLY.name())){checked}> w
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="radio">
+                                                                        <label>
+                                                                            <input class="form-control even" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDuration.EVEN" @if(matchingCrit.nonEmpty && matchingCrit.get.duration.equalsIgnoreCase(EDuration.EVEN.name())){checked}> g
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="radio">
+                                                                        <label>
+                                                                            <input class="form-control uneven" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDuration.UNEVEN" @if(matchingCrit.nonEmpty && matchingCrit.get.duration.equalsIgnoreCase(EDuration.UNEVEN.name())){checked}> ug
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="radio">
+                                                                        <label>
+                                                                            <input class="form-control unavailable" name="timerange" type="radio" value="unavailable" @if(matchingCrit.isEmpty){checked}> N
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                        </form>
+                                                    }
+                                                }
+                                            </td>
+                                            }
+
+                                        </tr>
+                                    }
+                                    </tbody>
+                          </table>
+
+                        }
+                        </div>
+                            </div>
+
+                    </fieldset>
+
+
+                <div class="col-md-5 resultError hidden alert alert-danger alert-dismissable">Fehler <span class="glyphicon glyphicon-thumbs-down"></span>  </div>
 
                 <script type="text/javascript">
 
 
-                var i = @roomDefForm.value.getOrElse(MRoomdefintion(None,0,"","",List[String](),List[MTtimeslotCritDefine]())).timeCriterias.size ;
+                var i = @roomDefForm.value.getOrElse(defaultRoom).timeCriterias.size ;
 
-
-
-                var addTimeslotCritInput = function ( ) {
-                $.getJSON ( '/roomcritfields/' + i, function ( data ) {
-                $ ( '#timeslotcrit' ).append ( data.htmlresult ) ;
-                initSelect ( ) ;
-                i ++ ;
-                } ) ;
-                } ;
-
-                var removeTimeCritInput = function ( ) {
-                if ( i > 0 ) {
-                i -- ;
-                $ ( "#timeCriterias_" + i ).remove ( ) ;
+                if(i>0){
+                $('#timeslotcrit' ).removeClass('hidden');
+                    $('#tcritsEnabled' ).attr('checked','checked');
                 }
 
+                    /**register event handlers to change background in table*/
+                    $('.weekly' ).on('click', function(){
+                        $(this ).parents('form' ).removeClass('bg-primary').removeClass('bg-warning' ).addClass('bg-info');
+                    });
+                    $('.even' ).on('click', function(){
+                    $(this ).parents('form' ).removeClass('bg-primary').removeClass('bg-info' ).addClass('bg-warning');
+                    });
+                    $('.uneven' ).on('click', function(){
+                    $(this ).parents('form' ).removeClass('bg-info').removeClass('bg-warning' ).addClass('bg-primary');
+                    });
+                    $('.unavailable' ).on('click', function(){
+                    $(this ).parents('form' ).removeClass('bg-primary').removeClass('bg-warning' ).removeClass('bg-info');
+                    });
+
+                    /** enable the checkbox if there are timecrits */
+                $('#tcritsEnabled' ).on ( 'change', function(){
+                    if($(this ).is(':checked')){
+                    $('#timeslotcrit' ).removeClass('hidden');
+                    } else {
+                    $('#timeslotcrit' ).addClass('hidden');
+                    }
+
+                } ) ;
 
 
-                } ;
-                $ ( '#removeCritButton' ).on ( 'click', removeTimeCritInput ) ;
-                $ ( '#addTcrit' ).on ( 'click', addTimeslotCritInput ) ;
+                    /**submit the data*/
+                $('#roomForm' ).on('submit', function(e){
+                e.preventDefault();
+                    var formData = $(this ).serializeObject();
+                    var timeCrits = [];
+                    if($('#tcritsEnabled' ).is(':checked')){
+                    $('.subform' ).each(function(index, value){
+                        var subFormData = $(value ).serializeObject();
+                        if(subFormData['timerange' ].indexOf('unavailable')==-1){
+                            var splittedData = subFormData['timerange' ].split(',');
+                            var startRange = splittedData[0].split('-');
+                            var startHour = Number(startRange[0]);
+                            var startMinute = Number(startRange[1]);
 
+                            var stopRange = splittedData[1].split('-');
+                            var stopHour = Number(stopRange[0]);
+                            var stopMinute = Number(stopRange[1]);
+
+                            var dayIndex = [Number(splittedData[2])];
+                            var duration = splittedData[3];
+
+                            var timeCrit = {
+                            "startHour":startHour,
+                            "startMinutes":startMinute,
+                            "stopHour":stopHour,
+                            "stopMinutes": stopMinute,
+                            "weekdays": dayIndex,
+                            "duration": duration
+                            };
+                            timeCrits.push(timeCrit);
+                        }
+                    });
+                    }
+
+                formData['timeCriterias']=timeCrits;
+                formData['capacity'] = Number(formData['capacity']);
+                if(formData['id' ]===''){
+                formData['id' ] = null;
+                } else {
+                formData['id' ]=Number(formData['id' ]);
+                }
+                /** make sure that arrays are arrays */
+
+                if(formData['attributes']==null){
+                formData['attributes']=[];
+                }
+
+                if ( ! $.isArray ( formData[ 'attributes' ] ) ) {
+                formData[ 'attributes' ] =[ formData[ 'attributes' ] ] ;
+                }
+
+                    var postUrl  = "@routes.CRoomDefinition.submitRoom()";
+
+                var Form = this;
+                console.log(JSON.stringify(formData));
+                $.ajax ( {
+                url : postUrl,
+                type : "POST",
+                data :JSON.stringify(formData),
+                dataType : "json",
+                context : Form,
+                cache:false,
+                contentType : "application/json; charset=utf-8",
+                success : function ( data) {
+                    console.log(JSON.stringify(data));
+                $ ( location ).attr('href', '@routes.CRoomDefinition.page') ;
+                }
+                } )
+                .error(function(errorThrown){
+                    console.log(errorThrown);
+                    var error = $.parseJSON(errorThrown.responseText );
+                    if(error['invalid']===true){
+                    //$('html').html(error['result'].replace(/<html>(.*)<\/html>/, "$1"));
+                    var newDoc = document.open("text/html", "replace");
+                    newDoc.write(error['result']);
+                    newDoc.close();
+
+                    return;
+                    }
+
+                    $ ( '.resultError' ).empty ( ).removeClass('hidden').html ( '<span class="glyphicon glyphicon-thumbs-down" />' + JSON.stringify(errorThrown)  );
+                    }) ;
+                });
 
                 </script>
 
@@ -140,7 +293,7 @@
         <div class="row-fluid ">
             <div class="col-md-7">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover table-condensed" style="text-align : center">
+                    <table class="table table-striped table-hover table-condensed text-center" >
                         <thead>
                             <tr class="text-info">
                                 <th>Haus</th>

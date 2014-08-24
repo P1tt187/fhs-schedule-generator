@@ -1,17 +1,18 @@
 package models.fhs.pages.editsubjects
 
 import models.Transactions
-import scala.collection.JavaConversions._
-import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
-import org.hibernate.criterion.{Order, CriteriaSpecification, Restrictions}
-import models.persistence.{Schedule, Semester}
-import models.persistence.participants.Course
-import models.persistence.location.{RoomEntity, HouseEntity, RoomAttributesEntity}
-import org.hibernate.FetchMode
-import models.persistence.criteria.{AbstractCriteria, CriteriaContainer}
-import play.api.Logger
-import models.persistence.docents.Docent
 import models.fhs.pages.JavaList
+import models.persistence.criteria.{AbstractCriteria, CriteriaContainer}
+import models.persistence.docents.Docent
+import models.persistence.location.{HouseEntity, RoomAttributesEntity, RoomEntity}
+import models.persistence.participants.Course
+import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
+import models.persistence.{Schedule, Semester}
+import org.hibernate.FetchMode
+import org.hibernate.criterion.{CriteriaSpecification, Order, Restrictions}
+import play.api.Logger
+
+import scala.collection.JavaConversions._
 
 /**
  * @author fabian 
@@ -72,6 +73,9 @@ object MEditSubjects {
         val criterion = session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name"))
 
         criterion.setFetchMode("criteriaContainer", FetchMode.SELECT)
+          .setFetchMode("subjectSynonyms",FetchMode.SELECT)
+          .setFetchMode("shortCuts", FetchMode.SELECT)
+        .setFetchMode("alternativRooms",FetchMode.SELECT)
         if (filterDocentId != -1) {
           criterion.createCriteria("docents").setFetchMode("criteriaContainer", FetchMode.SELECT).add(Restrictions.idEq(filterDocentId))
         }
@@ -95,6 +99,11 @@ object MEditSubjects {
     Transactions.hibernateAction {
       implicit session =>
         val criterion = session.createCriteria(classOf[ExerciseSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name"))
+
+        criterion.setFetchMode("criteriaContainer", FetchMode.SELECT)
+          .setFetchMode("subjectSynonyms",FetchMode.SELECT)
+          .setFetchMode("shortCuts", FetchMode.SELECT)
+          .setFetchMode("alternativRooms",FetchMode.SELECT)
 
         if (filterDocentId != -1) {
           criterion.createCriteria("docents").setFetchMode("criteriaContainer", FetchMode.SELECT).add(Restrictions.idEq(filterDocentId))

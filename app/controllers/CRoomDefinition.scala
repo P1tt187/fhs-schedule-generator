@@ -3,7 +3,9 @@ package controllers
 import java.util
 
 import models._
+import models.fhs.pages.generator.MGenerator
 import models.fhs.pages.roomdefinition.{MRoomdefintion, MTtimeslotCritDefine}
+import models.fhs.pages.timeslot.MTimeslotDisplay
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, TimeSlotCriteria}
 import models.persistence.enumerations.EDuration
 import models.persistence.location.RoomEntity
@@ -16,7 +18,6 @@ import play.api.mvc._
 import views.html.roomdefinition._
 
 import scala.collection.JavaConversions._
-
 
 
 /**
@@ -46,11 +47,20 @@ object CRoomDefinition extends Controller {
     )(MRoomdefintion.apply)(MRoomdefintion.unapply)
   )
 
-  def page = Action {
-implicit request=>
-    val rooms = MRoomdefintion.findAllRooms()
 
-    Ok(roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS, rooms))
+  private def timeRange = {
+    val allTimeSlots = MTimeslotDisplay.findAllTimeslots
+    val timeRanges = MGenerator.findTimeRanges(allTimeSlots)
+    (allTimeSlots, timeRanges)
+  }
+
+  def page = Action {
+    implicit request =>
+      val rooms = MRoomdefintion.findAllRooms()
+
+      val (allTimeStots, timeRanges) = timeRange
+
+      Ok(roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS, rooms, allTimeStots, timeRanges))
   }
 
   def getCriteriaFields(index: Int) = Action {
@@ -61,13 +71,15 @@ implicit request=>
 
 
   def editRoom(id: Long) = Action {
-    implicit request=>
+    implicit request =>
 
-    val room = MRoomdefintion.findMRoomDefinitionById(id)
-    Logger.debug("edit room - " + room)
+      val room = MRoomdefintion.findMRoomDefinitionById(id)
+      Logger.debug("edit room - " + room)
 
-    val filledForm = roomDefForm.fill(room)
-    Ok(roomdefinition("Räume", filledForm, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms()))
+      val (allTimeStots, timeRanges) = timeRange
+
+      val filledForm = roomDefForm.fill(room)
+      Ok(roomdefinition("Räume", filledForm, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms(), allTimeStots, timeRanges))
   }
 
   def deleteRoom(id: Long) = Action {
@@ -86,14 +98,22 @@ implicit request=>
 
   }
 
-  def submitRoom = Action {
+  def submitRoom = Action(parse.tolerantJson) {
     implicit request =>
 
+      val json = request.body
+
+      val roomDefinition = json.as[MRoomdefintion]
+
+
       //Logger.debug("submitRoom - " + request.body)
-      val roomResult = roomDefForm.bindFromRequest
+      val roomResult = roomDefForm.fillAndValidate(roomDefinition)
 
       roomResult.fold(
-        errors => BadRequest(roomdefinition("Räume", errors, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms())),
+        errors => {
+          val (allTimeStots, timeRanges) = timeRange
+          BadRequest(Json.stringify(Json.obj("invalid" -> true, "result" -> roomdefinition("Räume", errors, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms(), allTimeStots, timeRanges).toString())))
+        },
         room => {
           Logger.info("submit room - " + room.timeCriterias.toString)
           val roomAttributes = room.attributes map MRoomdefintion.findOrCreateRoomAttribute
@@ -146,14 +166,14 @@ implicit request=>
           Transactions {
             implicit entitiManager =>
 
-            /*  if (roomDO.getId == null) {
-                entitiManager.persist(roomDO)
-              } else {*/
-                entitiManager.merge(roomDO)
-              //}
+              /*  if (roomDO.getId == null) {
+                  entitiManager.persist(roomDO)
+                } else {*/
+              entitiManager.merge(roomDO)
+            //}
           }
 
-          Redirect(routes.CRoomDefinition.page)
+          Ok(Json.stringify(Json.obj("invalid" -> false, "result" -> "ok")))
         }
       )
 

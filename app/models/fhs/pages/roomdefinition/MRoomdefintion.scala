@@ -1,15 +1,17 @@
 package models.fhs.pages.roomdefinition
 
 import models.Transactions
-import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
-import models.persistence.template.WeekdayTemplate
 import models.fhs.pages.timeslot.MTimeslotDisplay
-import scala.collection.JavaConversions._
 import models.persistence.criteria.TimeSlotCriteria
 import models.persistence.location.{HouseEntity, RoomAttributesEntity, RoomEntity}
+import models.persistence.template.WeekdayTemplate
 import org.hibernate.FetchMode
+import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
 import play.api.Play.current
+import play.api.libs.json.Json
+
 import scala.annotation.tailrec
+import scala.collection.JavaConversions._
 
 /**
  * @author fabian
@@ -42,6 +44,9 @@ object TimeCritTimeRange {
 }
 
 object MRoomdefintion {
+
+  implicit val roomdefinitionFormat = Json.format[MRoomdefintion]
+
   /**
    * predefinded constants for the attribute
    */

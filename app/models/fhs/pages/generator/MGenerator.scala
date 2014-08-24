@@ -3,6 +3,7 @@ package models.fhs.pages.generator
 import models.Transactions
 import models.fhs.pages.JavaList
 import models.fhs.pages.editdocents.MDocentTimeWhish
+import models.fhs.pages.roomdefinition.MTtimeslotCritDefine
 import models.persistence.docents.Docent
 import models.persistence.enumerations.EDuration
 import models.persistence.lecture.Lecture
@@ -259,6 +260,20 @@ case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute
     }
 
     stopMinute.compareTo(that.stopMinute)
+  }
+
+  def compare(that: MTtimeslotCritDefine): Int = {
+    if (startHour.compareTo(that.startHour) != 0) {
+      return startHour.compareTo(that.startHour)
+    }
+    if (startMinute.compareTo(that.startMinutes) != 0) {
+      return startMinute.compareTo(that.startMinutes)
+    }
+    if (stopHour.compareTo(that.stopHour) != 0) {
+      return stopHour.compareTo(that.stopHour)
+    }
+
+    stopMinute.compareTo(that.stopMinutes)
   }
 }
 
