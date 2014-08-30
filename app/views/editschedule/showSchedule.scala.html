@@ -267,25 +267,42 @@
 
     //assistent stuff
     $('.listElement' ).mousedown(function(){
-        var currentData = $(this ).children('.lectureform' ).serializeObject();
+        var currentData = $(this ).find('.lectureform' ).serializeObject();
 
         $('.connected' ).each(function(index, element){
-            var collision = false;
+            this.collision = false;
+            var self=this;
 
             var childs = $(element ).find('.lectureform');
-            console.log(childs.length);
+
         childs.each(function(i,theForm){
                 var formData = $(theForm ).serializeObject();
+                //console.log(JSON.stringify(formData));
+                var collisionDuration = currentData['duration']==formData['duration']|| currentData['duration']=='@EDuration.WEEKLY' || formData['duration']=='@EDuration.WEEKLY';
+                var collisionDocent = false;
 
-                var collisionDuration = currentData['duration']==formData['duration']||formData['duration']=='@EDuration.WEEKLY';
-                var collisionDocent = $(currentData['docents' ] ).not(formData['docents'] ).length==0 ||  $(formData['docents' ] ).not( currentData['docents'] ).length==0;
+                if(! $.isArray(currentData['docents' ])){
+                currentData['docents' ]=[currentData['docents' ]];
+                }
+                if(! $.isArray(formData['docents' ])){
+                formData['docents' ]=[formData['docents' ]];
+                }
+
+                currentData['docents' ].forEach(function(d){
+                    if( $.inArray(d,formData['docents' ])!=-1){
+                        collisionDocent = true;
+                    }
+                });
+
+                //$(currentData['docents' ] ).not(formData['docents'] ).length==0 ||  $(formData['docents' ] ).not( currentData['docents'] ).length==0;
                 var collisionRoom = currentData['room' ] == formData['room'];
-                if(collisionDuration && ( collisionRoom)){
-                collision = true;
+                //console.log('current room: ' +currentData['room' ] + " formRoom: " + formData['room']);
+                if( collisionDuration && (collisionRoom||collisionDocent)){
+                self.collision = true;
                 }
             });
 
-            if(!collision){
+            if(!this.collision){
             $(element ).addClass('bg-success');
             }
 
