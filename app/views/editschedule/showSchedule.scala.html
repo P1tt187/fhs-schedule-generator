@@ -267,6 +267,7 @@
 
     //assistent stuff
     $('.listElement' ).mousedown(function(){
+    $('.bg-success' ).removeClass('bg-success');
         var currentData = $(this ).find('.lectureform' ).serializeObject();
 
         $('.connected' ).each(function(index, element){
