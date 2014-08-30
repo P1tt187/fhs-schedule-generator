@@ -272,17 +272,15 @@
         $('.connected' ).each(function(index, element){
             var collision = false;
 
-            var childs = $(element ).children();
+            var childs = $(element ).find('.lectureform');
             console.log(childs.length);
         childs.each(function(i,theForm){
-            console.log(i);
-
                 var formData = $(theForm ).serializeObject();
 
                 var collisionDuration = currentData['duration']==formData['duration']||formData['duration']=='@EDuration.WEEKLY';
                 var collisionDocent = $(currentData['docents' ] ).not(formData['docents'] ).length==0 ||  $(formData['docents' ] ).not( currentData['docents'] ).length==0;
                 var collisionRoom = currentData['room' ] == formData['room'];
-                if(collisionDuration && (collisionDocent || collisionRoom)){
+                if(collisionDuration && ( collisionRoom)){
                 collision = true;
                 }
             });
