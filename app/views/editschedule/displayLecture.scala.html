@@ -45,6 +45,11 @@
 
     <form class="lectureform">
     <input class="hidden disabled" type="number" name="lectureId" value="@lecture.getId">
+    <select class="hidden disabled" name="docents" multiple>
+       @for(docent<-lecture.getDocents){
+          <option selected value="@docent.getLastName">@docent.getLastName</option>
+         }
+    </select>
     <input name="duration" id="duration@lecture.getId" type="text" value="@lecture.getDuration" class="hidden disabled">
     <div class="form-inline">
         @if(lecture.getDuration != EDuration.WEEKLY) {

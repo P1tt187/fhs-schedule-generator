@@ -106,7 +106,7 @@
                                 @if(!timeSlotsInRange.isEmpty) {
                                     <ul class="connected list-unstyled list-inline table-bordered" data-metainfo='{ "startHour":@range.startHour,"startMinute":@range.startMinute,"stopHour":@range.stopHour,"stopMinute":@range.stopMinute, "day":@day._1}' style="height : 100% ; min-height : 30px">
                                     @for(lecture <- lectures.sortBy{l=> ( if(l.getDuration == EDuration.WEEKLY){0}else{ -timeSlotsInRange.map(_.getLectures.count(_.getDocents.contains(l.getDocents.head))).sum}, l.getDocents.head.getLastName)}) {
-                                        <li class="" style="min-width : 170px ; max-width : 220px">
+                                        <li class="listElement" style="min-width : 170px ; max-width : 220px">
                                             <div class="panel panel-info small smallText" >
                                             @displayAbstractLecture(lecture, allRooms)
                                             </div>
@@ -264,4 +264,37 @@
 
    });
     $('#activityContainer' ).addClass('hidden');
+
+    //assistent stuff
+    $('.listElement' ).mousedown(function(){
+        var currentData = $(this ).children('.lectureform' ).serializeObject();
+
+        $('.connected' ).each(function(index, element){
+            var collision = false;
+
+            var childs = $(element ).children();
+            console.log(childs.length);
+        childs.each(function(i,theForm){
+            console.log(i);
+
+                var formData = $(theForm ).serializeObject();
+
+                var collisionDuration = currentData['duration']==formData['duration']||formData['duration']=='@EDuration.WEEKLY';
+                var collisionDocent = $(currentData['docents' ] ).not(formData['docents'] ).length==0 ||  $(formData['docents' ] ).not( currentData['docents'] ).length==0;
+                var collisionRoom = currentData['room' ] == formData['room'];
+                if(collisionDuration && (collisionDocent || collisionRoom)){
+                collision = true;
+                }
+            });
+
+            if(!collision){
+            $(element ).addClass('bg-success');
+            }
+
+        });
+
+    } ).mouseup(function(){
+        $('.bg-success' ).removeClass('bg-success');
+    });
+
     </script>
