@@ -6,6 +6,10 @@ appendHTML = function (url, appendContainer) {
     });
 };
 
+var wrapArray= function(value){
+    return $.isArray(value)?value:[value];
+}
+
 /** prevent stupid IE behaviour */
 if (!window.console) window.console = {};
 if (!window.console.log) window.console.log = function () { };
