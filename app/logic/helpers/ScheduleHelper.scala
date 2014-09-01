@@ -5,6 +5,7 @@ import models.persistence.Schedule
 import models.persistence.docents.Docent
 import models.persistence.enumerations.EDuration
 import models.persistence.lecture.Lecture
+import models.persistence.location.RoomEntity
 import models.persistence.participants.Course
 import models.persistence.scheduletree._
 
@@ -92,7 +93,50 @@ object ScheduleHelper {
 
             val theLectures = ts.getLectures.filter {
               lecture =>
-                !lecture.getDocents.find(_.compareTo(docent) == 0).isEmpty
+                lecture.getDocents.find(_.compareTo(docent) == 0).nonEmpty
+            }
+
+            val newTs = ts match {
+              case _: EvenTimeSlot =>
+                new EvenTimeSlot(ts.getStartHour, ts.getStartMinute, ts.getStopHour, ts.getStopMinute, ts.isUnpopular)
+              case _: UnevenTimeSlot =>
+                new UnevenTimeSlot(ts.getStartHour, ts.getStartMinute, ts.getStopHour, ts.getStopMinute, ts.isUnpopular)
+            }
+            newTs.setLectures(theLectures)
+            (weekday.getSortIndex, newTs)
+        }
+
+        lectures.foreach {
+          case (sortIndex, ts) =>
+            val copyDay = copyRoot.getChildren.filter {
+              case day: Weekday => day.getSortIndex.equals(sortIndex)
+            }.head
+            ts.setParent(copyDay)
+            copyDay.setChildren(copyDay.getChildren :+ ts)
+        }
+
+    }
+
+    val copySchedule = new Schedule
+    copySchedule.setRoot(copyRoot)
+    copySchedule.setRate(schedule.getRate)
+    copySchedule
+  }
+
+  def filterRoom(schedule: Schedule, room: RoomEntity) = {
+    val copyRoot = new Root
+    initRoot(schedule, copyRoot)
+
+    val lectureRoom = room.roomEntity2LectureRoom()
+
+    schedule.getRoot.getChildren.foreach {
+      case weekday: Weekday =>
+        val lectures = weekday.getChildren.map {
+          case ts: TimeSlot =>
+
+            val theLectures = ts.getLectures.filter {
+              lecture =>
+                lecture.getRooms.find(_.compareTo(lectureRoom) == 0).nonEmpty
             }
 
             val newTs = ts match {

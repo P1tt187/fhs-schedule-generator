@@ -116,7 +116,7 @@ object CGenerate extends Controller {
         case None => form.fill(GeneratorForm(-1, 2, 10, 10, 50))
       }
 
-      Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses(), findDocents())(flashing, request.session))
+      Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses(), findDocents(), findRooms())(flashing, request.session))
   }
 
   def saveSchedule() = Action {
@@ -136,7 +136,7 @@ object CGenerate extends Controller {
       Redirect(routes.CGenerate.page()).withSession(request.session + ("selectedSchedule" -> idString))
   }
 
-  def sendSchedule(courseId: Long, docentId: Long, filterDuration: String) = Action {
+  def sendSchedule(courseId: Long, docentId: Long, filterDuration: String, roomId: Long) = Action {
     implicit request =>
 
       errorType match {
@@ -146,13 +146,13 @@ object CGenerate extends Controller {
 
         case INPLACEBLE_SCHEDULE =>
           Ok(Json.stringify(Json.obj("htmlresult" -> errorpage(errorList).toString())))
-        case NO_GROUP_TYPE=>
-          Ok(Json.stringify(Json.obj("htmlresult"->grouptypeError(errorMessage).toString())))
-        case NO_ROOM_FOR_LECTURE=>
-          Ok(Json.stringify(Json.obj("htmlresult"->noRoomError(errorMessage).toString())))
+        case NO_GROUP_TYPE =>
+          Ok(Json.stringify(Json.obj("htmlresult" -> grouptypeError(errorMessage).toString())))
+        case NO_ROOM_FOR_LECTURE =>
+          Ok(Json.stringify(Json.obj("htmlresult" -> noRoomError(errorMessage).toString())))
 
         case DOCENTS_NOT_AT_SAME_TIME_AVAILABLE =>
-          Ok(Json.stringify(Json.obj("htmlresult"->docentsNotAtSameTimeAvailable(errorMessage).toString())))
+          Ok(Json.stringify(Json.obj("htmlresult" -> docentsNotAtSameTimeAvailable(errorMessage).toString())))
         case NONE =>
 
 
@@ -168,10 +168,10 @@ object CGenerate extends Controller {
 
           val timeRanges = findTimeRanges(timeslotTemplates)
 
-          val filteredPage = if (courseId == -1 && docentId == -1 && filterDuration.equals("-1")) {
+          val filteredPage = if (courseId == -1 && docentId == -1 && filterDuration.equals("-1") && roomId == -1) {
             showSchedule("Alle Kurse", timeRanges, timeslotsAll, schedule.getRate, schedules.toMap, schedule.getSemester).toString()
           } else {
-            val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId), filterDuration)
+            val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId), filterDuration, findRoom(roomId))
             showSchedule(courseName, timeRanges, timeslots, schedule.getRate, schedules.toMap, schedule.getSemester).toString()
           }
           Ok(Json.stringify(Json.obj("htmlresult" -> filteredPage)))
@@ -184,7 +184,7 @@ object CGenerate extends Controller {
       val generatorFormResult = form.bindFromRequest()
       generatorFormResult.fold(
         errors => {
-          BadRequest(generator("Generator", findSemesters(), errors, findCourses(), findDocents()))
+          BadRequest(generator("Generator", findSemesters(), errors, findCourses(), findDocents(), findRooms()))
         },
         result => {
           actorFinished = false
@@ -242,8 +242,8 @@ object CGenerate extends Controller {
                   }
 
                   scheduleFuture.onFailure {
-                    case e:NoRoomException=>
-                    errorType=NO_ROOM_FOR_LECTURE
+                    case e: NoRoomException =>
+                      errorType = NO_ROOM_FOR_LECTURE
 
                       val sb = new mutable.StringBuilder()
 
@@ -255,14 +255,14 @@ object CGenerate extends Controller {
 
                       errorMessage = sb.toString()
 
-                      actorFinished=true
-                    case e: DocentsNotAtSameTimeAvailableException=>
-                      errorType= DOCENTS_NOT_AT_SAME_TIME_AVAILABLE
+                      actorFinished = true
+                    case e: DocentsNotAtSameTimeAvailableException =>
+                      errorType = DOCENTS_NOT_AT_SAME_TIME_AVAILABLE
 
                       errorMessage = e.getDocents.map(_.getLastName).mkString(",")
                       actorFinished = true
                     case e: Exception =>
-                      actorFinished=true
+                      actorFinished = true
                       generatorActor ! PoisonPill
                       end = null
 
@@ -270,11 +270,11 @@ object CGenerate extends Controller {
               }
           }
 
-          lectureFuture.onFailure{
-            case ex:NoGroupFoundException=>
+          lectureFuture.onFailure {
+            case ex: NoGroupFoundException =>
               errorType = NO_GROUP_TYPE
               errorMessage = ex.getGroupType + " " + ex.getSubject.getName
-              actorFinished=true
+              actorFinished = true
           }
           end = endTime
           //Logger.debug(findActiveSubjectsBySemesterId(result.id).mkString("\n") )

@@ -7,6 +7,7 @@ import models.fhs.pages.roomdefinition.MTtimeslotCritDefine
 import models.persistence.docents.Docent
 import models.persistence.enumerations.EDuration
 import models.persistence.lecture.Lecture
+import models.persistence.location.RoomEntity
 import models.persistence.participants.Course
 import models.persistence.scheduletree.{TimeSlot, Weekday}
 import models.persistence.subject.AbstractSubject
@@ -25,7 +26,7 @@ import scala.collection.JavaConversions._
  */
 object MGenerator {
 
-  def filterScheduleWithCourseAndDocent(schedule: Schedule, course: Course, docent: Docent, durationStr: String) = {
+  def filterScheduleWithCourseAndDocent(schedule: Schedule, course: Course, docent: Docent, durationStr: String, room: RoomEntity) = {
 
     val resultString = new StringBuffer()
 
@@ -39,7 +40,15 @@ object MGenerator {
 
     filteredSchedule = if (docent != null) {
       resultString.append(docent.getLastName)
+      resultString.append(" ")
       filteredSchedule.filter(docent)
+    } else {
+      filteredSchedule
+    }
+
+    filteredSchedule = if(room!=null){
+      resultString.append(room.getHouse.getName).append(" ").append(room.getNumber)
+      filteredSchedule.filter(room)
     } else {
       filteredSchedule
     }
@@ -82,6 +91,24 @@ object MGenerator {
     Transactions.hibernateAction {
       implicit session =>
         session.createCriteria(classOf[Semester]).addOrder(Order.desc("name")).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[Semester]].toList
+    }
+  }
+
+  def findRooms() = {
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[RoomEntity]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).list().asInstanceOf[JavaList[RoomEntity]].toList
+    }
+  }
+
+  def findRoom(roomId: Long): RoomEntity = {
+    if (roomId == -1l) {
+      return null
+    }
+
+    Transactions.hibernateAction {
+      implicit session =>
+        session.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(roomId)).uniqueResult().asInstanceOf[RoomEntity]
     }
   }
 
@@ -173,7 +200,7 @@ object MGenerator {
         }
 
 
-        /** each docent can only one time in a timeslot*/
+        /** each docent can only one time in a timeslot */
         val docentInvalid = docentCounts.find(_ > 1).nonEmpty
         /** each room can only one time in a timeslot */
         val roomInvalid = roomCounts.find(_ > 1).nonEmpty

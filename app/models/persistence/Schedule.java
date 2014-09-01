@@ -3,6 +3,7 @@ package models.persistence;
 import logic.helpers.ScheduleHelper;
 import models.persistence.docents.Docent;
 import models.persistence.enumerations.EDuration;
+import models.persistence.location.RoomEntity;
 import models.persistence.participants.Course;
 import models.persistence.scheduletree.Root;
 
@@ -22,7 +23,7 @@ public class Schedule extends AbstractEntity {
     @Column(name = "RATE", nullable = false)
     private Integer rate;
 
-    @Column(name="RATE_SUM")
+    @Column(name = "RATE_SUM")
     private Integer rateSum;
 
     public Integer getRateSum() {
@@ -99,5 +100,9 @@ public class Schedule extends AbstractEntity {
 
     public Schedule filter(EDuration duration) {
         return ScheduleHelper.filterDuration(this, duration);
+    }
+
+    public Schedule filter(RoomEntity room) {
+        return ScheduleHelper.filterRoom(this, room);
     }
 }

@@ -1,4 +1,5 @@
-@(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm], courses:List[models.persistence.participants.Course] , docents:List[persistence.docents.Docent])(implicit flash: Flash, session:Session)
+@(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm], courses:List[models.persistence.participants.Course] , docents:List[persistence.docents.Docent], rooms:List[persistence.location.RoomEntity])(implicit flash: Flash, session:Session)
+
 @import java.util.Calendar
 
 @import models.persistence.enumerations.EDuration
@@ -87,6 +88,15 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label class="control-label">Raum</label>
+                            <select class="form-control" id="selectRoomFilter">
+                                <option value="-1">alle Räume</option>
+                                @for(r <- rooms){
+                                    <option value="@r.getId">@r.getHouse.getName @r.getNumber</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="selectDuration" class="control-label">Art der Woche</label>
                             <select class="form-control" id="selectDuration">
                                 <option value="-1">alles</option>
@@ -111,13 +121,14 @@
                 var w = @{ Calendar.getInstance().getTimeInMillis - flash.get("startTime").getOrElse(Calendar.getInstance().getTimeInMillis.toString).toLong  };
 
                 var showSchedule = function(){
-                $.getJSON("generatorGetSchedule/" + $('#selectCourseFilter').val() + "/" + $('#selectDocentFilter' ).val() + "/" + $('#selectDuration' ).val(), function(data){
+                $.getJSON("generatorGetSchedule/" + $('#selectCourseFilter').val() + "/" + $('#selectDocentFilter' ).val() + "/" + $('#selectDuration' ).val() + "/" + $('#selectRoomFilter' ).val(), function(data){
                 $('#scheduleTableContainer' ).empty().append(data.htmlresult);
                   });
                 };
             $('#selectCourseFilter' ).on('change',showSchedule);
             $('#selectDocentFilter' ).on('change',showSchedule);
             $('#selectDuration').on('change',showSchedule);
+            $('#selectRoomFilter').on('change',showSchedule);
 
             var changeProgressBar = function ( ) {
             $ ( '.progress-bar' ).removeClass ( 'progress-bar-warning' ).addClass ( 'progress-bar-success' ) ;

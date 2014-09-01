@@ -45,7 +45,7 @@ POST        /deleteCourse:courseId                                              
 GET         /generator                                                                                controllers.CGenerate.page()
 POST        /generatorAction                                                                          controllers.CGenerate.generatorAction
 GET         /generatorFinished                                                                        controllers.CGenerate.finished
-GET         /generatorGetSchedule/:filterCourse/:filterDocent/:filterDuration                         controllers.CGenerate.sendSchedule(filterCourse:Long, filterDocent:Long, filterDuration)
+GET         /generatorGetSchedule/:filterCourse/:filterDocent/:filterDuration/:filterRoom                         controllers.CGenerate.sendSchedule(filterCourse:Long, filterDocent:Long, filterDuration,filterRoom:Long)
 POST        /saveSchedule                                                                             controllers.CGenerate.saveSchedule()
 GET         /loadSchedule/:id                                                                         controllers.CGenerate.loadScheduleForSemester(id:Long)
 GET         /switchSchedule/:idString                                                                 controllers.CGenerate.switchSchedule(idString )
