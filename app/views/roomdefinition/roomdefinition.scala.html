@@ -338,7 +338,7 @@
             </div>
                <!-- display availability -->
                 @for(roomEntity <- existingRooms.filterNot(_.timeCriterias.isEmpty).sortBy(r =>(r.house,r.number))) {
-                    <div class="col-md-5">
+                    <div class="col-md-6">
                     <div class="panel panel-info">
                         <div class="panel-heading">
                             <h3 class="panel-title">
