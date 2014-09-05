@@ -3,12 +3,13 @@
 @import java.util.Calendar
 
 @import models.fhs.pages.editdocents._
+
 @import models.fhs.pages.roomdefinition._
 @import models.persistence.enumerations._
 @import views.html.helper._
 
     @disableTimeWishFields = @{
-        expireDate!=null&& Calendar.getInstance().after(expireDate)&& !session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean
+        expireDate!=null&& Calendar.getInstance().after(expireDate)&& !session.get(IS_ADMIN).getOrElse("false").toBoolean
     }
 
     @defaultDocent = @{
@@ -21,7 +22,7 @@
     @inputText(existingDocentForm("lastName"), '_label -> "Nachname", '_class -> "form-group", '_help -> "Nachname des Dozenten",'_id->"lastNameContainer")
     @inputText(existingDocentForm("userId"), '_label -> "Nutzerid", '_class -> "form-group", '_help -> "falls Anmeldename nicht mit Nachname übereinstimmt")
     <button type="submit" class="hidden"></button>
-    @if(session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
+    @if(session.get(IS_ADMIN).getOrElse("false").toBoolean) {
         <div class="form-group">
             <a class="btn btn-danger btn-sm" role="button" href="@routes.CEditDocents.deleteDocent(existingDocentForm.value.getOrElse(defaultDocent).id) "><span class="glyphicon glyphicon-trash"></span> </a>
         </div>

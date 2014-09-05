@@ -67,10 +67,10 @@ object CEditDocents extends Controller {
 
     /** docents will only see their own stuff */
     var docentList: List[Docent] = null
-    if (!session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
-      docentList = allDocents.filter(d => session.get(CIndex.CURRENT_USER).getOrElse("").equals(d.getUserId))
+    if (!session.get(IS_ADMIN).getOrElse("false").toBoolean) {
+      docentList = allDocents.filter(d => session.get(CURRENT_USER).getOrElse("").equals(d.getUserId))
       if (docentList.isEmpty) {
-        docentList = allDocents.filter(d => session.get(CIndex.CURRENT_USER).getOrElse("").equalsIgnoreCase(d.getLastName))
+        docentList = allDocents.filter(d => session.get(CURRENT_USER).getOrElse("").equalsIgnoreCase(d.getLastName))
       }
     } else {
       docentList = allDocents

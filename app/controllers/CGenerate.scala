@@ -43,7 +43,7 @@ import scala.concurrent.duration._
  */
 object CGenerate extends Controller {
 
-  private var schedule: Schedule = null
+  private lazy val schedule = scala.collection.mutable.Map[UserName,Schedule]()
 
   private var startTime: Calendar = null
 
@@ -82,7 +82,7 @@ object CGenerate extends Controller {
 
       Logger.debug("lastChoosen " + parts)
       Logger.debug("" + (request.session + ("lastchoosen" -> (Seq(id.toString) ++ parts.subList(1, parts.size)).mkString(","))))
-      schedule = findScheduleForSemester(findSemesterById(id))
+      schedule += request.session(CURRENT_USER) -> findScheduleForSemester(findSemesterById(id))
       errorType = NONE
       actorFinished = true
 
@@ -92,7 +92,7 @@ object CGenerate extends Controller {
   def page() = Action {
     implicit request =>
 
-      var flashing = if (schedule != null) {
+      var flashing = if (schedule.getOrElse(request.session.get(CURRENT_USER).getOrElse(""),null) != null) {
         request.flash +("startpolling", "true")
       } else {
         request.flash
@@ -120,7 +120,8 @@ object CGenerate extends Controller {
   }
 
   def saveSchedule() = Action {
-    Ok(Json.stringify(Json.obj("result" -> persistSchedule(schedule))))
+    implicit request=>
+    Ok(Json.stringify(Json.obj("result" -> persistSchedule(schedule(request.session(CURRENT_USER))))))
   }
 
   def finished = Action {
@@ -132,7 +133,7 @@ object CGenerate extends Controller {
 
   def switchSchedule(idString: String) = Action {
     implicit request =>
-      schedule = schedules(schedules.keySet.find(_.toString.equals(idString)).get)
+      schedule += request.session(CURRENT_USER) -> schedules(schedules.keySet.find(_.toString.equals(idString)).get)
       Redirect(routes.CGenerate.page()).withSession(request.session + ("selectedSchedule" -> idString))
   }
 
@@ -155,11 +156,12 @@ object CGenerate extends Controller {
           Ok(Json.stringify(Json.obj("htmlresult" -> docentsNotAtSameTimeAvailable(errorMessage).toString())))
         case NONE =>
 
+          val currentSchedule = schedule.getOrElse(request.session(CURRENT_USER),null)
 
-          val timeslotsAll = if (schedule == null) {
+          val timeslotsAll = if (currentSchedule == null) {
             List[TimeSlot]()
           } else {
-            collectTimeslotsFromSchedule(schedule)
+            collectTimeslotsFromSchedule(currentSchedule)
           }
           val timeslotTemplates = Transactions.hibernateAction {
             implicit session =>
@@ -169,10 +171,10 @@ object CGenerate extends Controller {
           val timeRanges = findTimeRanges(timeslotTemplates)
 
           val filteredPage = if (courseId == -1 && docentId == -1 && filterDuration.equals("-1") && roomId == -1) {
-            showSchedule("Alle Kurse", timeRanges, timeslotsAll, schedule.getRate, schedules.toMap, schedule.getSemester).toString()
+            showSchedule("Alle Kurse", timeRanges, timeslotsAll, currentSchedule.getRate, schedules.toMap, currentSchedule.getSemester).toString()
           } else {
-            val (courseName, timeslots) = filterScheduleWithCourseAndDocent(schedule, findCourse(courseId), findDocent(docentId), filterDuration, findRoom(roomId))
-            showSchedule(courseName, timeRanges, timeslots, schedule.getRate, schedules.toMap, schedule.getSemester).toString()
+            val (courseName, timeslots) = filterScheduleWithCourseAndDocent(currentSchedule, findCourse(courseId), findDocent(docentId), filterDuration, findRoom(roomId))
+            showSchedule(courseName, timeRanges, timeslots, currentSchedule.getRate, schedules.toMap, currentSchedule.getSemester).toString()
           }
           Ok(Json.stringify(Json.obj("htmlresult" -> filteredPage)))
       }
@@ -189,7 +191,7 @@ object CGenerate extends Controller {
         result => {
           actorFinished = false
           errorType = NONE
-          schedule = null
+          schedule.clear()
           schedules.clear()
           scheduleFutures.clear()
 
@@ -225,7 +227,7 @@ object CGenerate extends Controller {
                       actorFinished = completetList.size == 1 && completetList.head
 
                       if (actorFinished) {
-                        schedule = schedules.values.toList.sortBy(s => (s.getRate.toInt, s.getRateSum)).head
+                        schedule += request.session(CURRENT_USER) -> schedules.values.toList.sortBy(s => (s.getRate.toInt, s.getRateSum)).head
                       }
 
                       finishTime = Calendar.getInstance()

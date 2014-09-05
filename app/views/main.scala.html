@@ -67,12 +67,12 @@
                     <a class="navbar-brand" href="@routes.CIndex.index"> Schedule Generator</a>
                 </div>
                 <div class="collapse navbar-collapse navbar-inverse-collapse ">
-                    @if(session.get(CIndex.CURRENT_USER).getOrElse("-1") != "-1") {
+                    @if(session.get(CURRENT_USER).getOrElse("-1") != "-1") {
                         <ul class="nav navbar-nav nav-tabs navbar-collapse " >
                         @sidebar(nav)
                         </ul>
                     }
-                    @if(session.get(CIndex.CURRENT_USER).getOrElse("-1") == "-1") {
+                    @if(session.get(CURRENT_USER).getOrElse("-1") == "-1") {
                         @form(action = routes.CIndex.doLogin, 'class -> "navbar-form navbar-right") {
                             <input class="form-control input-sm" placeholder="Nutzer" type="text" name="@CIndex.loginForm("username").name" >
                             <input class="form-control input-sm" placeholder="Passwort" type="password" name="@CIndex.loginForm("password").name" >
@@ -82,7 +82,7 @@
                         <ul class="nav navbar-nav navbar-collapse navbar-inverse-collapse navbar-right list-inline">
                             <li role="presentation">
                                 <a>
-                                @session(CIndex.CURRENT_USER)
+                                @session(CURRENT_USER)
                                 </a>
                             </li>
                             <li>
@@ -96,7 +96,7 @@
             </nav>
             <div class="container-fluid" id="mainContainer">
                 <div class="row-fluid">
-                    @if(session.get(CIndex.WRONG_LOGIN).getOrElse("false").toBoolean) {
+                    @if(session.get(WRONG_LOGIN).getOrElse("false").toBoolean) {
                         <div class=" col-md-5 alert alert-danger">
                             <article role="main">
                                 Falsche Nutzername oder Passwort <span class="glyphicon glyphicon-thumbs-down" ></span>
@@ -104,8 +104,8 @@
                         </div>
                     }
 
-                    @if(session.get(CIndex.CURRENT_USER).getOrElse("-1") != "-1") {
-                        @if(session.get(CIndex.IS_DOCENT).getOrElse("false").toBoolean || session.get(CIndex.IS_ADMIN).getOrElse("false").toBoolean) {
+                    @if(session.get(CURRENT_USER).getOrElse("-1") != "-1") {
+                        @if(session.get(IS_DOCENT).getOrElse("false").toBoolean || session.get(IS_ADMIN).getOrElse("false").toBoolean) {
                             <div class="column col-md-12 ">
                                 <article class=" " role="main"> @content </article>
                             </div>

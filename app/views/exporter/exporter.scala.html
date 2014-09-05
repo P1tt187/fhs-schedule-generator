@@ -2,7 +2,7 @@
 
     @main(message, CExporter.NAV) {
 
-        @if(session.get(CIndex.IS_DEVELOPER).getOrElse("false").toBoolean) {
+        @if(session.get(IS_DEVELOPER).getOrElse("false").toBoolean) {
             <div class="page-header">
                 <h1>Daten Exportieren</h1>
             </div>
