@@ -1,5 +1,7 @@
 package models.fhs.pages.exporter
 
+import org.hibernate.FetchMode
+
 import scala.collection.JavaConversions._
 import models.Transactions
 import models.persistence.{Schedule, Semester}
@@ -15,7 +17,7 @@ object MExporter {
   def findSemesters:List[Semester] = {
     Transactions.hibernateAction{
       implicit s=>
-        s.createCriteria(classOf[Schedule]).list().asInstanceOf[JavaList[Schedule]].toList.map(_.getSemester).toSet.toList
+        s.createCriteria(classOf[Schedule]).setFetchMode("root",FetchMode.SELECT).list().asInstanceOf[JavaList[Schedule]].toList.map(_.getSemester).toSet.toList
     }
   }
 
