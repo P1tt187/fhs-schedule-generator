@@ -2,6 +2,7 @@ package models.fhs.pages.editschedule
 
 import models.Transactions
 import models.persistence.Schedule
+import org.hibernate.FetchMode
 import scala.collection.JavaConversions._
 import models.persistence.location.RoomEntity
 import org.hibernate.criterion.CriteriaSpecification
@@ -15,7 +16,7 @@ object MEditSchedule {
   def findSemestersWithSchedule = {
     Transactions.hibernateAction{
       implicit s=>
-        val schedules = s.createCriteria(classOf[Schedule]).list().toList.asInstanceOf[List[Schedule]]
+        val schedules = s.createCriteria(classOf[Schedule]).setFetchMode("root",FetchMode.SELECT).list().toList.asInstanceOf[List[Schedule]]
         schedules.map(_.getSemester).toSet
     }
   }
