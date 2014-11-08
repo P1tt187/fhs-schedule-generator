@@ -236,14 +236,14 @@ object CExporter extends Controller {
 
         /** the longest command includs the --drop command */
 
-        importCommands = "#!/bin/bash" :: "echo \"\" > ./entrycountersFields.txt" :: "echo \"\" > ./entrysFields.txt" :: "mongoexport --db spirit_news --collection entrycounters --fieldFile entrycountersFields.txt --csv -o entrycounters.csv" :: "mongoexport --db spirit_news --collection entrys --fieldFile entrysFields.txt --csv -o entrys.csv" :: importCommands
+        importCommands = "#!/bin/bash" ::  "mongoexport --db spirit_news --collection entrycounters -o entrycounters.json" :: "mongoexport --db spirit_news --collection entrys -o entrys.json" :: importCommands
 
-        importCommands = importCommands :+ "mongoimport --db spirit_news --collection entrycounters --type csv --file entrycounters.csv --fieldFile entrycountersFields.txt"
+        importCommands = importCommands :+ "mongoimport --db spirit_news --collection entrycounters --type json --file entrycounters.json"
 
-        importCommands = importCommands :+ "mongoimport --db spirit_news --collection entrys --type csv --file entrys.csv --fieldFile entrysFields.txt"
+        importCommands = importCommands :+ "mongoimport --db spirit_news --collection entrys --type json --file entrys.json"
 
-        importCommands = importCommands :+ "rm *.txt"
-        importCommands = importCommands :+ "rm *.csv"
+        importCommands = importCommands :+ "rm entr*.json"
+
 
         Files.write(importScriptFile, importCommands, Charset.forName("UTF-8"), StandardOpenOption.WRITE)
 
