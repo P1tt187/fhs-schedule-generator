@@ -70,7 +70,7 @@ object MEditSubjects {
 
     Transactions.hibernateAction {
       implicit session =>
-        val criterion = session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name"))
+        val criterion = session.createCriteria(classOf[LectureSubject]).add(Restrictions.eq("semester", semesterDO)).addOrder(Order.asc("name"))
 
         criterion.setFetchMode("criteriaContainer", FetchMode.SELECT)
           .setFetchMode("subjectSynonyms",FetchMode.SELECT)
@@ -98,7 +98,7 @@ object MEditSubjects {
 
     Transactions.hibernateAction {
       implicit session =>
-        val criterion = session.createCriteria(classOf[ExerciseSubject]).add(Restrictions.eq("semester", semesterDO)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).addOrder(Order.asc("name"))
+        val criterion = session.createCriteria(classOf[ExerciseSubject]).add(Restrictions.eq("semester", semesterDO)).addOrder(Order.asc("name"))
 
         criterion.setFetchMode("criteriaContainer", FetchMode.SELECT)
           .setFetchMode("subjectSynonyms",FetchMode.SELECT)
