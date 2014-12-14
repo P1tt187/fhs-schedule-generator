@@ -81,7 +81,7 @@ object MEditSubjects {
         }
 
         if (filterCourseId != -1) {
-          criterion.createCriteria("courses").add(Restrictions.idEq(filterCourseId))
+          criterion.createCriteria("courses").add(Restrictions.idEq(filterCourseId)).setFetchMode("students",FetchMode.SELECT)
         }
 
         if (!filterActive.equals("-1")) {
@@ -110,7 +110,7 @@ object MEditSubjects {
         }
 
         if (filterCourseId != -1) {
-          criterion.createCriteria("courses").add(Restrictions.idEq(filterCourseId))
+          criterion.createCriteria("courses").add(Restrictions.idEq(filterCourseId)).setFetchMode("students", FetchMode.SELECT)
         }
 
         if (!filterActive.equals("-1")) {
@@ -170,7 +170,7 @@ object MEditSubjects {
   def findCourses() = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[Course]).addOrder(Order.asc("shortName")).list().asInstanceOf[java.util.List[Course]].toList
+        session.createCriteria(classOf[Course]).setFetchMode("students",FetchMode.SELECT).addOrder(Order.asc("shortName")).list().asInstanceOf[java.util.List[Course]].toList
     }
   }
 

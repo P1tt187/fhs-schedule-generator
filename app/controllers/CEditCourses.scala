@@ -36,7 +36,9 @@ object CEditCourses extends Controller {
 
 
   def getCourseFields(courseId: Long) = Action {
-    Ok(Json.stringify(Json.obj("htmlresult" -> courseFields(findCourse(courseId),findRooms).toString())))
+    implicit request=>
+      val session = request.session+((NAV + ".edidcourse") -> courseId.toString)
+      Ok(Json.stringify(Json.obj("htmlresult" -> courseFields(findCourse(courseId),findRooms).toString()))).withSession(session)
   }
 
   def addCourse = Action {
@@ -115,10 +117,10 @@ object CEditCourses extends Controller {
         val result = (1 to groupCount).map { i =>
           val group = new Group
           group.setGroupType(groupType)
-          group.setParent(null)
+
           group.setCourse(course)
           group.setSize(course.getSize / groupCount)
-          group.setSubGroups(List[Group]())
+
           group.setGroupIndex(numberOfExistingGroups + i)
           group.setIgnoreGroupIndex(false)
 
@@ -149,55 +151,7 @@ object CEditCourses extends Controller {
       }
   }
 
-  def saveSubGroupData = Action(parse.json) {
-    implicit request =>
-      try {
-        val jsVal = request.body
-        val parent = findGroup((jsVal \ "groupId").as[Long])
-        val groupType = (jsVal \ "addSubGroupTypeName").as[String]
-        val groupCount = (jsVal \ "addSubGroupCount").as[Int]
-        val numberOfExistingGroups = getGroupCount(groupType, parent.getCourse)
 
-        val result = (1 to groupCount).map { i =>
-          val group = new Group
-          group.setGroupType(groupType)
-          group.setParent(parent)
-          group.setCourse(parent.getCourse)
-          group.setSize(parent.getSize / groupCount)
-          group.setSubGroups(List[Group]())
-          group.setGroupIndex(i)
-          group.setIgnoreGroupIndex(false)
-
-          group.setGroupIndex(numberOfExistingGroups + i)
-
-          if (i == groupCount) {
-            group.setSize(parent.getSize / groupCount + parent.getSize % groupCount)
-          }
-
-          parent.setSubGroups(parent.getSubGroups :+ group)
-
-          Logger.debug("saveSubGroupData " + group)
-          Logger.debug("parent " + parent.getSubGroups)
-
-
-          Transactions {
-            implicit em =>
-              em.persist(group)
-              em.merge(parent)
-          }
-
-          group
-        }
-
-
-
-        Ok(Json.stringify(Json.obj("htmlresult" -> result.map(g => groupFields(g).toString()).foldLeft("")(_ + _))))
-      }
-      catch {
-        case ex: Exception => Logger.error("saveGroupData", ex)
-          BadRequest(ex.getMessage)
-      }
-  }
 
   def updateGroup = Action(parse.json) {
     implicit request =>
@@ -205,14 +159,13 @@ object CEditCourses extends Controller {
         val jsVal = request.body
 
         val group = findGroup((jsVal \ "groupId").as[Long])
-        val size = (jsVal \ "groupsize").as[Int]
 
         val groupType = (jsVal \ "grouptype").as[String]
 
         val ignoreGroupIndex = (jsVal \ "ignoreGroupIndex").as[Boolean]
 
         group.setGroupType(groupType)
-        group.setSize(size)
+
         group.setIgnoreGroupIndex(ignoreGroupIndex)
 
         Transactions {
@@ -228,6 +181,7 @@ object CEditCourses extends Controller {
       }
   }
 
+
   def deleteGroup(groupId: Long) = Action {
     try {
 
@@ -239,6 +193,21 @@ object CEditCourses extends Controller {
       case ex: Exception => Logger.error("saveGroupData", ex)
         BadRequest(ex.getMessage)
     }
+  }
+
+
+  def generateStudentsForCourse(courseId:Long)= Action{
+    val course = findCourse(courseId)
+
+    deleteStudentsFromCourse(course)
+    createStudentsForCourse(course)
+
+    Redirect(routes.CEditCourses.page())
+  }
+
+  def getStudentFields(courseId:Long) = Action{
+    val students = findStudentsForCourse(courseId)
+    Ok(Json.stringify(Json.obj("htmlresult"->studentFields(students).toString())))
   }
 
   def getGroup(groupId: Long) = Action {

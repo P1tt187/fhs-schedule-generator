@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import models.persistence.AbstractEntity;
 
 import javax.persistence.*;
+import java.util.Set;
 
 /**
- * Created by fabian on 29.01.14.
+ * Created by fabian
+ *      on 29.01.14.
  */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -19,6 +21,9 @@ public abstract class Participant extends AbstractEntity {
     @Column(name = "SIZE", nullable = true)
     private Integer size;
 
+    @JoinColumn(name = "fk_students")
+    @OneToMany(fetch = FetchType.EAGER,targetEntity = Student.class)
+    private Set<Student> students;
 
     public Integer getSize() {
         return size;
@@ -36,4 +41,11 @@ public abstract class Participant extends AbstractEntity {
 
     public abstract LectureParticipant participant2LectureParticipant();
 
+    public Set<Student> getStudents() {
+        return students;
+    }
+
+    public void setStudents(Set<Student> students) {
+        this.students = students;
+    }
 }

@@ -8,7 +8,8 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * Created by fabian on 29.01.14.
+ * Created by fabian
+ *      on 29.01.14.
  */
 @Entity
 @Table(name = "TBLCOURSE")
@@ -30,7 +31,7 @@ public class Course extends Participant {
      * exersize groups
      */
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(cascade = CascadeType.ALL, targetEntity = Group.class, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, targetEntity = Group.class, fetch = FetchType.LAZY, mappedBy = "course")
     @OrderBy("groupIndex")
     private List<Group> groups;
 

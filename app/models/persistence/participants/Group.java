@@ -21,22 +21,6 @@ import java.util.List;
 public class Group extends Participant implements Comparable<Group> {
 
     /**
-     * parent group
-     */
-    @JsonBackReference("subgroups")
-    @ManyToOne(targetEntity = Group.class)
-    private Group parent;
-
-    /**
-     * subgroups of this group
-     */
-    @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "parent")
-    @OrderBy("groupType, groupIndex ASC")
-    @JsonManagedReference("subgroups")
-    private List<Group> subGroups;
-
-    /**
      * parent course
      */
     @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@group-course")
@@ -94,21 +78,6 @@ public class Group extends Participant implements Comparable<Group> {
         return lp;
     }
 
-    public Group getParent() {
-        return parent;
-    }
-
-    public void setParent(Group parent) {
-        this.parent = parent;
-    }
-
-    public List<Group> getSubGroups() {
-        return subGroups;
-    }
-
-    public void setSubGroups(List<Group> subGroups) {
-        this.subGroups = subGroups;
-    }
 
     @Override
     public Course getCourse() {
@@ -130,11 +99,11 @@ public class Group extends Participant implements Comparable<Group> {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Group{");
-        sb.append("parent=").append(parent != null ? parent.getGroupType() : null);
+
         sb.append(", groupType='").append(groupType).append('\'');
         sb.append(", groupIndex=").append(groupIndex);
         sb.append(", course=").append(course.getShortName());
-        sb.append(", subGroups=").append(subGroups);
+
         sb.append('}');
         return sb.toString();
     }
@@ -174,7 +143,4 @@ public class Group extends Participant implements Comparable<Group> {
     }
 
 
-    public boolean isSubGroupOf(Group g) {
-        return parent != null && (parent.equals(g) || parent.isSubGroupOf(g));
-    }
 }

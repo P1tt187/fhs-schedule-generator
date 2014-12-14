@@ -34,18 +34,19 @@ POST        /addSemester                                                        
 GET         /editCourses                                                                              controllers.CEditCourses.page
 POST        /addCourse                                                                                controllers.CEditCourses.addCourse
 GET         /editCourses/courseFields/:courseId                                                       controllers.CEditCourses.getCourseFields(courseId:Long)
+GET         /editCourses/studentFields/:courseId                                                      controllers.CEditCourses.getStudentFields(courseId:Long)
 GET         /getGroupFields/:groupId                                                                  controllers.CEditCourses.getGroup(groupId:Long)
 GET         /deleteGroup/:groupId                                                                     controllers.CEditCourses.deleteGroup(groupId:Long)
 POST        /submitCourseData                                                                         controllers.CEditCourses.saveCourseData
 POST        /submitNewGroup                                                                           controllers.CEditCourses.saveGroupData
-POST        /submitSubGroup                                                                           controllers.CEditCourses.saveSubGroupData
+POST        /generateStudentsForCourse/:courseId                                                      controllers.CEditCourses.generateStudentsForCourse(courseId:Long)
 POST        /updateGroup                                                                              controllers.CEditCourses.updateGroup
 POST        /deleteCourse:courseId                                                                    controllers.CEditCourses.deleteCourse(courseId:Long)
 
 GET         /generator                                                                                controllers.CGenerate.page()
 POST        /generatorAction                                                                          controllers.CGenerate.generatorAction
 GET         /generatorFinished                                                                        controllers.CGenerate.finished
-GET         /generatorGetSchedule/:filterCourse/:filterDocent/:filterDuration/:filterRoom                         controllers.CGenerate.sendSchedule(filterCourse:Long, filterDocent:Long, filterDuration,filterRoom:Long)
+GET         /generatorGetSchedule/:filterCourse/:filterDocent/:filterDuration/:filterRoom             controllers.CGenerate.sendSchedule(filterCourse:Long, filterDocent:Long, filterDuration,filterRoom:Long)
 POST        /saveSchedule                                                                             controllers.CGenerate.saveSchedule()
 GET         /loadSchedule/:id                                                                         controllers.CGenerate.loadScheduleForSemester(id:Long)
 GET         /switchSchedule/:idString                                                                 controllers.CGenerate.switchSchedule(idString )

@@ -36,76 +36,21 @@ trait PlacingProcessor {
 
   protected def timeSlotContainsParticipants(timeslot: TimeSlot, participants: Set[Participant]): Boolean = {
 
-    @tailrec
-    def checkRecursive(existingParticipant: mutable.Buffer[Participant], lectureParticipant: Set[Participant]): Boolean = {
-      if (lectureParticipant.isEmpty) {
-        return false
-      }
-      if (existingParticipant.contains(lectureParticipant.head) || existingParticipant.contains(lectureParticipant.head.getCourse)) {
-        return true
-      }
-      lectureParticipant.head match {
-        case group: Group =>
-          val existingGroups = existingParticipant.filter(_.isInstanceOf[Group])
-
-          if (containsInParentGroup(group, existingGroups) || containsInSubGroups(group, existingGroups) || participantsContainsOtherGroupType(group, existingGroups)) {
-            return true
-          }
-        case course: Course => if (existingParticipant.filter(_.getCourse.equals(course)).nonEmpty) {
-          return true
-        }
-      }
-
-      checkRecursive(existingParticipant, lectureParticipant.tail)
-    }
-
     if (timeslot.getLectures.isEmpty) {
       return false
     }
+    val timeslotParticipants = timeslot.getLectures.flatMap(_.getParticipants).toSet
 
-    checkRecursive(timeslot.getLectures.flatMap(_.getParticipants), participants)
-  }
+    val timeslotStudents = timeslotParticipants.flatMap(_.getStudents).toSet
+    val lectureStudents = participants.flatMap(_.getStudents)
 
-  @tailrec
-  private def containsInParentGroup(group: Group, existingParticipants: mutable.Buffer[Participant]): Boolean = {
-
-    if (group == null) {
-      return false
-    }
-
-    if (existingParticipants.contains(group)) {
-      return true
-    }
-    containsInParentGroup(group.getParent, existingParticipants)
+    lectureStudents.find{
+      student =>
+        timeslotStudents.contains(student)
+    }.nonEmpty
   }
 
 
-  private def participantsContainsOtherGroupType(group: Group, existingParticipants: mutable.Buffer[Participant]): Boolean = {
-
-    val relevantParticipants = existingParticipants.filter(_.getCourse.equals(group.getCourse)).toList.asInstanceOf[List[Group]]
-    if (relevantParticipants.isEmpty) {
-      return false
-    }
-
-    relevantParticipants.filterNot(g => g.isSubGroupOf(group) || group.isSubGroupOf(g)).find(g => !g.getGroupType.equals(group.getGroupType)) match {
-      case Some(_) => true
-      case None => false
-    }
-
-  }
-
-  private def containsInSubGroups(group: Group, participants: mutable.Buffer[Participant]): Boolean = {
-
-    if (participants.contains(group)) {
-      return true
-    }
-
-    if (group.getSubGroups == null || group.getSubGroups.isEmpty) {
-      return false
-    }
-
-    group.getSubGroups.find(subgroup => containsInSubGroups(subgroup, participants)).nonEmpty
-  }
 
   protected def timeSlotContainsDocents(timeslot: TimeSlot, docents: Set[LectureDocent]): Boolean = {
     if (timeslot.getLectures.isEmpty) {

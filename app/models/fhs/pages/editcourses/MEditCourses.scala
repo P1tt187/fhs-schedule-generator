@@ -1,8 +1,10 @@
 package models.fhs.pages.editcourses
 
+import scala.math.Ordering._
+
 import models.Transactions
-import models.persistence.location.RoomEntity
-import models.persistence.participants.{Course, Group}
+import models.persistence.location.{LectureRoom, RoomEntity}
+import models.persistence.participants.{Student, Course, Group}
 import models.persistence.subject.AbstractSubject
 import org.hibernate.FetchMode
 import org.hibernate.criterion.{CriteriaSpecification, Order, Projections, Restrictions}
@@ -19,8 +21,9 @@ object MEditCourses {
   def findCourses() = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[Course]).addOrder(Order.asc("shortName")).list().asInstanceOf[java.util.List[Course]].toList
+        session.createCriteria(classOf[Course]).setFetchMode("students",FetchMode.SELECT).addOrder(Order.asc("shortName")).list().asInstanceOf[java.util.List[Course]].toList
     }
+
   }
 
   def findCourse(courseId: Long) = {
@@ -54,13 +57,7 @@ object MEditCourses {
           course.setGroups(course.getGroups - group)
         }
         group.setCourse(null)
-        if (group.getParent != null) {
-          val parent = group.getParent
-          parent.setSubGroups(parent.getSubGroups - group)
-          group.setParent(null)
 
-          session.saveOrUpdate(parent)
-        }
 
         session.delete(group)
         if (course != null) {
@@ -83,7 +80,7 @@ object MEditCourses {
     Transactions.hibernateAction {
       implicit s =>
         val criterion = s.createCriteria(classOf[AbstractSubject]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
-        criterion.createCriteria("courses").add(Restrictions.idEq(courseId))
+        criterion.createCriteria("courses").add(Restrictions.idEq(courseId)).setFetchMode("students",FetchMode.SELECT)
         criterion.list().toList.asInstanceOf[List[AbstractSubject]]
     }
   }
@@ -109,11 +106,48 @@ object MEditCourses {
     }
   }
 
-  implicit def roomEntity2LectureRoom(roomEntity: RoomEntity) = {
+  implicit def roomEntity2LectureRoom(roomEntity: RoomEntity): LectureRoom = {
     if (roomEntity == null) {
       null
     } else {
       roomEntity.roomEntity2LectureRoom()
+    }
+  }
+
+  def createStudentsForCourse(course: Course) = {
+    val students = (1 to course.getSize).toSet.map {
+      _: Int =>
+        new Student
+    }
+    Transactions.hibernateAction {
+      implicit s =>
+        s.saveOrUpdate(course)
+        course.setStudents(students)
+        students.foreach(s.saveOrUpdate(_))
+        s.saveOrUpdate(course)
+    }
+  }
+
+  def deleteStudentsFromCourse(course: Course): Unit = {
+    Transactions.hibernateAction {
+      implicit s =>
+        s.saveOrUpdate(course)
+        val students = course.getStudents
+        course.setStudents(Set[Student]())
+        students.foreach { student =>
+          s.saveOrUpdate(student)
+          s.delete(student)
+        }
+
+        s.saveOrUpdate(course)
+    }
+  }
+
+  def findStudentsForCourse(courseId:Long):List[Student]={
+    Transactions.hibernateAction{
+      implicit s=>
+        val course = s.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).uniqueResult().asInstanceOf[Course]
+        course.getStudents.toList
     }
   }
 

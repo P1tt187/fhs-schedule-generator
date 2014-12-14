@@ -29,33 +29,44 @@
                     <label for="courseSelect" class="control-label">Kurs Auswählen</label>
                     <select id="courseSelect" class="form-control">
                     @for(course <- courses) {
-                        <option value="@course.getId">@course.getShortName</option>
+                        <option @if(course.getId.toString.equals(session.get(CEditCourses.NAV+".edidcourse").getOrElse("-1"))){selected } value="@course.getId">@course.getShortName</option>
                     }
                     </select>
                 </div>
             </div>
         </div>
     </div>
-<div class="clearfix"></div>
+
+
+
+    <div class="clearfix"></div>
 
     <div id="courseFields"></div>
+
+    <div class="clearfix"></div>
+    <div id="studentFields"> </div>
 
 
 
 <script type="text/javascript">
-    var getCourseFields = function(){
+    var getCourseAndStudentFields = function(){
+    $.getJSON("/editCourses/studentFields/" + $('#courseSelect' ).val(), function(data){
+    $('#studentFields' ).empty( ).
+    append(data.htmlresult);
+    });
+
     $.getJSON("/editCourses/courseFields/" + $('#courseSelect' ).val(), function(data){
         $('#courseFields' ).empty().
            append(data.htmlresult);
     });
     };
 
-    $('#courseSelect' ).on('change',getCourseFields);
+    $('#courseSelect' ).on('change',getCourseAndStudentFields);
 
     $('#@courseForm("size").id' ).attr('type','number');
 
 $(window ).on('load', function(){
-getCourseFields();
+getCourseAndStudentFields();
 });
 
 </script>

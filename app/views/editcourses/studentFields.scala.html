@@ -1,0 +1,31 @@
+@(students: List[models.persistence.participants.Student])
+<br/>
+<div class="row-fluid">
+    <div class="col-md-12">
+        <div class="page-header">
+            <h3>Studenten bearbeiten</h3>
+        </div>
+    </div>
+    <ul class="list-unstyled list-inline">
+        @students.map{ s=>
+            <li>
+                <form class="studentForm form-inline">
+                    <input name="id" class="hidden" type="number" value="@s.getId">
+                    <input name="uuid" class="hidden" type="text" value="@s.getUuid">
+                    <div class="form-group">
+                       <label class=" control-label" for="firstName@s.getId">Vorname</label>
+                       <input id="firstName@s.getId" class="form-control" type="text" name="firstName" value="@s.getFirstName">
+                    </div>
+                    <div class="form-group">
+                        <label class=" control-label" for="lastName@s.getId">Nachname</label>
+                        <input id="lastName@s.getId" class="form-control" type="text" name="lastName" value="@s.getLastName">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-ok-circle"></span> </button>
+                    </div>
+                </form>
+            </li>
+        }
+
+    </ul>
+</div>
