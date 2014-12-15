@@ -143,6 +143,20 @@ object MEditCourses {
     }
   }
 
+  def findStudentById(studentId:Long): Student ={
+    Transactions.hibernateAction{
+      implicit s=>
+        s.createCriteria(classOf[Student]).add(Restrictions.idEq(studentId)).uniqueResult().asInstanceOf[Student]
+    }
+  }
+
+  def updateStudent(student:Student)={
+    Transactions.hibernateAction{
+      implicit s=>
+        s.saveOrUpdate(student)
+    }
+  }
+
   def findStudentsForCourse(courseId:Long):List[Student]={
     Transactions.hibernateAction{
       implicit s=>

@@ -205,6 +205,24 @@ object CEditCourses extends Controller {
     Redirect(routes.CEditCourses.page())
   }
 
+  def saveStudentData() = Action(parse.json){
+    implicit request=>
+      val js = request.body
+      val id = (js \ "id").as[Long]
+      val uuid = (js \ "uuid").as[String]
+      val firstName = (js\"firstName").as[String]
+      val lastName = (js \ "lastName").as[String]
+
+      val student = findStudentById(id)
+      student.setUuid(uuid)
+      student.setLastName(lastName)
+      student.setFirstName(firstName)
+
+      updateStudent(student)
+
+      Ok(Json.stringify(Json.obj("htmlresult"->"ok")))
+  }
+
   def getStudentFields(courseId:Long) = Action{
     val students = findStudentsForCourse(courseId)
     Ok(Json.stringify(Json.obj("htmlresult"->studentFields(students).toString())))

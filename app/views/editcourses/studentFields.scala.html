@@ -28,4 +28,37 @@
         }
 
     </ul>
+    <script>
+        $('.studentForm' ).on('submit', function(e){
+        e.preventDefault();
+            var formData = $(this ).serializeObject();
+            formData.id= Number(formData.id);
+        $.ajax ( {
+        cache : false,
+        type : "POST",
+        dataType : "json",
+        data : JSON.stringify ( formData ),
+        context : this,
+        contentType : "application/json; charset=utf-8",
+        url : " @routes.CEditCourses.saveStudentData ",
+        success : function ( callback ) {
+        console.log ( JSON.stringify ( callback ) ) ;
+
+        $ ( '#courseEditResult' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
+
+        },
+
+        error : function ( callback ) {
+        // error handler
+        console.log ( JSON.stringify ( callback ) ) ;
+        $ ( '#courseEditResult' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
+
+        var response = callback.responseJSON ;
+        $ ( '#' + response.result ).addClass ( 'has-error' ) ;
+
+        }
+        } ) ;
+
+        });
+    </script>
 </div>
