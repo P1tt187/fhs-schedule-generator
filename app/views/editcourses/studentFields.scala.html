@@ -33,6 +33,7 @@
         e.preventDefault();
             var formData = $(this ).serializeObject();
             formData.id= Number(formData.id);
+            var selfObject = this;
         $.ajax ( {
         cache : false,
         type : "POST",
@@ -44,8 +45,8 @@
         success : function ( callback ) {
         console.log ( JSON.stringify ( callback ) ) ;
 
-        $ ( '#courseEditResult' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
-
+        //$ ( '#courseEditResult' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
+        $(selfObject ).addClass('has-success');
         },
 
         error : function ( callback ) {
@@ -55,6 +56,7 @@
 
         var response = callback.responseJSON ;
         $ ( '#' + response.result ).addClass ( 'has-error' ) ;
+        $(selfObject ).addClass('has-error');
 
         }
         } ) ;

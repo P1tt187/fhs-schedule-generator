@@ -3,6 +3,8 @@ package models.persistence.participants;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import models.persistence.AbstractEntity;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -21,8 +23,10 @@ public abstract class Participant extends AbstractEntity {
     @Column(name = "SIZE", nullable = true)
     private Integer size;
 
+    @Fetch(FetchMode.SUBSELECT)
     @JoinColumn(name = "fk_students")
-    @OneToMany(fetch = FetchType.EAGER,targetEntity = Student.class)
+    @JoinTable(name = "TBLPARTICIPANTS_TBLSTUDENTS")
+    @ManyToMany(fetch = FetchType.EAGER,targetEntity = Student.class)
     private Set<Student> students;
 
     public Integer getSize() {

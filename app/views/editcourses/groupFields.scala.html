@@ -1,5 +1,5 @@
 @(group: models.persistence.participants.Group)
-<div class="row-fluid" id="groupContainer@group.getId">
+<div class="col-md-3" id="groupContainer@group.getId">
     <div class="panel-group" >
         <div class="panel panel-primary">
             <div class="panel-heading"><h4 class="panel-title">
@@ -33,6 +33,26 @@
                     <br/>
                     <div class="form-inline" id="result@group.getId"></div>
                     <div class="clearfix"></div>
+
+                    <table class="table table-responsive table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-info">Namen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for(student<-group.getStudents) {
+                                <tr>
+
+                                    <td>
+                                        @student.getFirstName @student.getLastName
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
                     <script type="text/javascript">
 
                     $ ( '#delete@group.getId ').on(' click ',function(e){
@@ -50,14 +70,13 @@
                     $ ( '#groupForm@group.getId ' ).on ( ' submit ', function ( e ) {
                     e.preventDefault ( ) ;
                     $ ( '.has-error' ).removeClass ( 'has-error' ) ;
-                    if ( ! $.isNumeric ( $ ( '#size@group.getId' ).val ( ) ) || Number ( $ ( '#size@group.getId' ).val ( )) > Number ($ ( '#size@group.getId' ).attr('max') )) {
+                    /*if ( ! $.isNumeric ( $ ( '#size@group.getId' ).val ( ) ) || Number ( $ ( '#size@group.getId' ).val ( )) > Number ($ ( '#size@group.getId' ).attr('max') )) {
                     $ ( '#containerSize@group.getId ' ).addClass ( ' has-error ' ) ;
                     return ;
-                    }
+                    }*/
                     var formData = $ ( '#groupForm@group.getId ' ).serializeObject ( ) ;
 
                     formData[ 'groupId' ] = @group.getId ;
-                    formData[ 'groupsize' ] = Number ( formData[ 'groupsize' ] ) ;
                     formData['ignoreGroupIndex'] = Boolean(formData['ignoreGroupIndex']) ;
 
                     $.ajax ( {

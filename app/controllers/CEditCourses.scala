@@ -1,10 +1,12 @@
 package controllers
 
+import java.util
+
 import play.api.mvc._
 import views.html.editcourses._
 import models.fhs.pages.editcourses.MEditCourses._
 import play.api.libs.json._
-import models.persistence.participants.{Course, Group}
+import models.persistence.participants.{Student, Course, Group}
 import scala.collection.JavaConversions._
 import models.Transactions
 
@@ -114,19 +116,19 @@ object CEditCourses extends Controller {
         val groupCount = (jsVal \ "addGroupCount").as[Int]
         val numberOfExistingGroups = getGroupCount(groupType, course)
 
+        val studentLists = cut(course.getStudents.toList.toSeq, groupCount).toList
+
         val result = (1 to groupCount).map { i =>
           val group = new Group
           group.setGroupType(groupType)
 
           group.setCourse(course)
-          group.setSize(course.getSize / groupCount)
+          group.setStudents(new util.HashSet[Student](studentLists(i-1)) )
+          group.setSize(group.getStudents.size())
 
           group.setGroupIndex(numberOfExistingGroups + i)
           group.setIgnoreGroupIndex(false)
 
-          if (i == groupCount) {
-            group.setSize(course.getSize / groupCount + course.getSize % groupCount)
-          }
 
           course.setGroups(course.getGroups :+ group)
 
@@ -167,6 +169,7 @@ object CEditCourses extends Controller {
         group.setGroupType(groupType)
 
         group.setIgnoreGroupIndex(ignoreGroupIndex)
+        Logger.debug("update-group: " + ignoreGroupIndex)
 
         Transactions {
           implicit em =>
@@ -203,6 +206,12 @@ object CEditCourses extends Controller {
     createStudentsForCourse(course)
 
     Redirect(routes.CEditCourses.page())
+  }
+
+  def cut[A](xs: Seq[A], n: Int) = {
+    val (quot, rem) = (xs.size / n, xs.size % n)
+    val (smaller, bigger) = xs.splitAt(xs.size - rem * (quot + 1))
+    smaller.grouped(quot) ++ bigger.grouped(quot + 1)
   }
 
   def saveStudentData() = Action(parse.json){
