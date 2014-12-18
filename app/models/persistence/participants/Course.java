@@ -32,7 +32,6 @@ public class Course extends Participant {
      */
     @Fetch(FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, targetEntity = Group.class, fetch = FetchType.LAZY, mappedBy = "course")
-    @OrderBy("groupIndex")
     private List<Group> groups;
 
     /**
