@@ -1,10 +1,9 @@
 package models.fhs.pages.editcourses
 
-import scala.math.Ordering._
-
+import controllers.CEditCourses
 import models.Transactions
 import models.persistence.location.{LectureRoom, RoomEntity}
-import models.persistence.participants.{Student, Course, Group}
+import models.persistence.participants.{Course, Group, Student}
 import models.persistence.subject.AbstractSubject
 import org.hibernate.FetchMode
 import org.hibernate.criterion.{CriteriaSpecification, Order, Projections, Restrictions}
@@ -21,7 +20,7 @@ object MEditCourses {
   def findCourses() = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[Course]).setFetchMode("students",FetchMode.SELECT).addOrder(Order.asc("shortName")).list().asInstanceOf[java.util.List[Course]].toList
+        session.createCriteria(classOf[Course]).setFetchMode("students", FetchMode.SELECT).addOrder(Order.asc("shortName")).list().asInstanceOf[java.util.List[Course]].toList
     }
 
   }
@@ -80,7 +79,7 @@ object MEditCourses {
     Transactions.hibernateAction {
       implicit s =>
         val criterion = s.createCriteria(classOf[AbstractSubject]).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY)
-        criterion.createCriteria("courses").add(Restrictions.idEq(courseId)).setFetchMode("students",FetchMode.SELECT)
+        criterion.createCriteria("courses").add(Restrictions.idEq(courseId)).setFetchMode("students", FetchMode.SELECT)
         criterion.list().toList.asInstanceOf[List[AbstractSubject]]
     }
   }
@@ -125,6 +124,21 @@ object MEditCourses {
         course.setStudents(students)
         students.foreach(s.saveOrUpdate(_))
         s.saveOrUpdate(course)
+
+        val groupTypes = course.getGroups.map(_.getGroupType).toSet
+
+        groupTypes.foreach {
+          gType =>
+            val groups = course.getGroups.filter(_.getGroupType.equals(gType))
+            val parts = CEditCourses.cut(students.toSeq, groups.size).toList
+
+            (0 to groups.size - 1).foreach {
+              i =>
+                groups(i).setStudents(new java.util.HashSet[Student](parts(i)))
+                groups(i).setSize(groups(i).getStudents.size())
+                s.saveOrUpdate(groups(i))
+            }
+        }
     }
   }
 
@@ -132,6 +146,13 @@ object MEditCourses {
     Transactions.hibernateAction {
       implicit s =>
         s.saveOrUpdate(course)
+
+        course.getGroups.foreach {
+          group =>
+            group.setStudents(Set[Student]())
+            s.saveOrUpdate(group)
+        }
+
         val students = course.getStudents
         course.setStudents(Set[Student]())
         students.foreach { student =>
@@ -143,23 +164,23 @@ object MEditCourses {
     }
   }
 
-  def findStudentById(studentId:Long): Student ={
-    Transactions.hibernateAction{
-      implicit s=>
+  def findStudentById(studentId: Long): Student = {
+    Transactions.hibernateAction {
+      implicit s =>
         s.createCriteria(classOf[Student]).add(Restrictions.idEq(studentId)).uniqueResult().asInstanceOf[Student]
     }
   }
 
-  def updateStudent(student:Student)={
-    Transactions.hibernateAction{
-      implicit s=>
+  def updateStudent(student: Student) = {
+    Transactions.hibernateAction {
+      implicit s =>
         s.saveOrUpdate(student)
     }
   }
 
-  def findStudentsForCourse(courseId:Long):List[Student]={
-    Transactions.hibernateAction{
-      implicit s=>
+  def findStudentsForCourse(courseId: Long): List[Student] = {
+    Transactions.hibernateAction {
+      implicit s =>
         val course = s.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).uniqueResult().asInstanceOf[Course]
         course.getStudents.toList
     }

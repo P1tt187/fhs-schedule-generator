@@ -208,7 +208,7 @@ console.debug ( JSON.stringify ( formData ) ) ;
 <div id="bigGroupContainer">
 
 @if(course.getGroups != null) {
-    @for(group <- course.getGroups) {
+    @for(group <- course.getGroups.toList.sortBy(g=> ( - g.getSize,g.getGroupType,g.getGroupIndex))) {
         @groupFields(group)
     }
 
