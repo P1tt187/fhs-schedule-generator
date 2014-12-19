@@ -7,8 +7,10 @@ import models.persistence.participants.{Course, Group, Student}
 import models.persistence.subject.AbstractSubject
 import org.hibernate.FetchMode
 import org.hibernate.criterion.{CriteriaSpecification, Order, Projections, Restrictions}
+import play.api.Play._
 
 import scala.collection.JavaConversions._
+import scala.util.Random
 
 
 /**
@@ -16,6 +18,9 @@ import scala.collection.JavaConversions._
  *         on 14.03.14.
  */
 object MEditCourses {
+
+  lazy val firstNames=current.configuration.getString("firstNames").getOrElse("").split(",").toList
+  lazy val lastNames=current.configuration.getString("lastNames").getOrElse("").split(",").toList
 
   def findCourses() = {
     Transactions.hibernateAction {
@@ -116,7 +121,10 @@ object MEditCourses {
   def createStudentsForCourse(course: Course) = {
     val students = (1 to course.getSize).toSet.map {
       _: Int =>
-        new Student
+      val student=  new Student
+        student.setFirstName(Random.shuffle(firstNames).head)
+        student.setLastName(Random.shuffle(lastNames).head)
+        student
     }
     Transactions.hibernateAction {
       implicit s =>
