@@ -7,7 +7,7 @@
         </div>
     </div>
     <ul class="list-unstyled list-inline">
-        @students.map{ s=>
+        @students.sortBy( s=> (if(s.getLastName!=null){s.getLastName}else{""}, if(s.getFirstName!=null){s.getFirstName}else{""} )  ).map{ s=>
             <li>
                 <form class="studentForm form-inline">
                     <input name="id" class="hidden" type="number" value="@s.getId">

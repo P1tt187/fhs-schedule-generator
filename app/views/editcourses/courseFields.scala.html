@@ -208,10 +208,13 @@ console.debug ( JSON.stringify ( formData ) ) ;
 <div id="bigGroupContainer">
 
 @if(course.getGroups != null) {
-    @for(group <- course.getGroups.toList.sortBy(g=> ( - g.getSize,g.getGroupType.charAt(0),g.getGroupType.length,g.getGroupIndex))) {
-        @groupFields(group)
+    @defining(course.getGroups.toList.groupBy(_.getGroupType)) { coursesGroups =>
+            @for(groupType<-coursesGroups.keySet.toList.sortBy( gt=> -coursesGroups(gt)(0).getSize )) {
+                @for(group <- coursesGroups(groupType).sortBy(_.getGroupIndex)) {
+                    @groupFields(group)
+                }
+            }
     }
-
 }
 
 </div>

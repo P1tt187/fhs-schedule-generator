@@ -41,7 +41,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for(student<-group.getStudents) {
+                            @for(student<-group.getStudents.toList.sortBy(_.getLastName)) {
                                 <tr>
 
                                     <td>
