@@ -1,4 +1,4 @@
-@(lectureType: String, subject: models.persistence.subject.AbstractSubject, docents: List[models.persistence.docents.Docent], courses: List[models.persistence.participants.Course], houses:List[models.persistence.location.HouseEntity], rooms:List[models.persistence.location.RoomEntity])
+@(lectureType: String, subject: models.persistence.subject.AbstractSubject, docents: List[models.persistence.docents.Docent], courses: List[models.persistence.participants.Course], houses:List[models.persistence.location.HouseEntity], rooms:List[models.persistence.location.RoomEntity], groupTypes:List[String])
 
 @import models.fhs.pages.roomdefinition.MRoomdefintion
 @import models.persistence.criteria.{RoomCriteria, TimeSlotCriteria}
@@ -61,7 +61,12 @@
     @if(lectureType.equals(CEditSubjects.EXERCISE)) {
         <div class="form-group">
             <label class="control-label" for="groupTypeInput"><br/>Gruppentyp</label>
-            <input class="form-control" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="@(subject.asInstanceOf[ExerciseSubject].getGroupType)" required>
+            <select class="form-control" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="">
+                @groupTypes.map{ gt=>
+                    <option  @if(gt.equals(subject.asInstanceOf[ExerciseSubject].getGroupType)){selected} value="@gt">@gt</option>
+                }
+            </select>
+
         </div>
     }
 

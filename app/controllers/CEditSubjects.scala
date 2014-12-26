@@ -39,6 +39,8 @@ object CEditSubjects extends Controller {
 
   val TIME_TO_LIFE = 30 seconds
 
+  type GroupType = String
+
 
   val semesterForm: Form[MSemester] = Form(
     mapping(
@@ -86,9 +88,9 @@ object CEditSubjects extends Controller {
     subjectClone.setId(-1l)
     subjectClone.setName("*" + subjectClone.getName)
 
-    val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity]) = loadCachedData()
+    val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes : List[GroupType]) = loadCachedData()
 
-    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subjectClone, docents, courses, houses, rooms).toString().trim())))
+    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subjectClone, docents, courses, houses, rooms,groupTypes).toString().trim())))
 
 
   }
@@ -133,7 +135,7 @@ object CEditSubjects extends Controller {
       }
 
 
-      val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity]) = loadCachedData()
+      val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes:List[GroupType]) = loadCachedData()
 
       val selectedSubject = if (idString == "null") {
         "-1"
@@ -141,11 +143,11 @@ object CEditSubjects extends Controller {
         idString
       }
 
-      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms).toString().trim()))).withSession(request.session + ("subjectFields" -> selectedSubject))
+      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms, groupTypes).toString().trim()))).withSession(request.session + ("subjectFields" -> selectedSubject))
 
   }
 
-  private def loadCachedData(): (List[Docent], List[Course], List[HouseEntity], List[RoomEntity]) = {
+  private def loadCachedData(): (List[Docent], List[Course], List[HouseEntity], List[RoomEntity], List[GroupType]) = {
     val docents = Cache.getOrElse("docents") {
       val docent = findDocents()
       Cache.set("docents", docent, expiration = TIME_TO_LIFE)
@@ -170,7 +172,13 @@ object CEditSubjects extends Controller {
       Cache.set("rooms", room, expiration = TIME_TO_LIFE)
       room
     }
-    (docents, courses, houses, rooms)
+
+    val groupTypes = Cache.getOrElse("groupTypes"){
+      val groupType = findGroupTypes()
+      Cache.set("groupTypes", groupType, expiration = TIME_TO_LIFE)
+      groupType
+    }
+    (docents, courses, houses, rooms, groupTypes)
   }
 
   def getNamesField(semester: Long, subjectType: String, filterDocentId: Long, filterCourseId: Long, filterActive: String) = Action {

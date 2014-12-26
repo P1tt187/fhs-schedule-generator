@@ -8,6 +8,7 @@ import models.persistence.location.{HouseEntity, RoomAttributesEntity, RoomEntit
 import models.persistence.participants.Course
 import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
 import models.persistence.{Schedule, Semester}
+import models.persistence.participants.Group
 import org.hibernate.FetchMode
 import org.hibernate.criterion.{CriteriaSpecification, Order, Restrictions}
 import play.api.Logger
@@ -61,6 +62,17 @@ object MEditSubjects {
       implicit s=>
         s.saveOrUpdate(subject)
         s.delete(subject)
+    }
+  }
+
+  def findGroupTypes()={
+    Transactions.hibernateAction{
+      implicit s=>
+        val groups = s.createCriteria(classOf[Group]).setFetchMode("students",FetchMode.SELECT).list().asInstanceOf[JavaList[Group]].toSet
+        groups.map{
+          g=>
+            g.getGroupType
+        }.toList.sorted
     }
   }
 
