@@ -70,8 +70,10 @@
 
         $('.deletebtn' ).on('click',function(e){
             var link = $(this ).data('link');
-        $.post(link ).always(function(e){
-        location.reload();
+            var self = this;
+        $.post(link ).success(function(e){
+        $(self ).parents('li' ).remove();
+            $('#courseSize' ).val($('#courseSize' ).val()-1);
         }) ;
         });
 
