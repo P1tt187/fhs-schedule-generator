@@ -14,7 +14,7 @@ import play.api._
 
 import play.api.data._
 import play.api.data.Forms._
-import models.fhs.pages.editcourses.MCourse
+import models.fhs.pages.editcourses.{MEditCourses, MCourse}
 
 /**
  * @author fabian 
@@ -232,9 +232,16 @@ object CEditCourses extends Controller {
       Ok(Json.stringify(Json.obj("htmlresult"->"ok")))
   }
 
-  def getStudentFields(courseId:Long) = Action{
+  def getStudentFields(courseId:Long) = Action {
     val students = findStudentsForCourse(courseId)
     Ok(Json.stringify(Json.obj("htmlresult"->studentFields(students).toString())))
+  }
+
+  def deleteStudent(studentId:Long) = Action {
+
+    MEditCourses.deleteStudent(studentId)
+
+    Redirect(routes.CEditCourses.page())
   }
 
   def getGroup(groupId: Long) = Action {

@@ -2,8 +2,9 @@ package models.fhs.pages.editcourses
 
 import controllers.CEditCourses
 import models.Transactions
+import models.fhs.pages.JavaList
 import models.persistence.location.{LectureRoom, RoomEntity}
-import models.persistence.participants.{Course, Group, Student}
+import models.persistence.participants.{Course, Group, Participant, Student}
 import models.persistence.subject.AbstractSubject
 import org.hibernate.FetchMode
 import org.hibernate.criterion.{CriteriaSpecification, Order, Projections, Restrictions}
@@ -19,8 +20,8 @@ import scala.util.Random
  */
 object MEditCourses {
 
-  lazy val firstNames=current.configuration.getString("firstNames").getOrElse("").split(",").toList
-  lazy val lastNames=current.configuration.getString("lastNames").getOrElse("").split(",").toList
+  lazy val firstNames = current.configuration.getString("firstNames").getOrElse("").split(",").toList
+  lazy val lastNames = current.configuration.getString("lastNames").getOrElse("").split(",").toList
 
   def findCourses() = {
     Transactions.hibernateAction {
@@ -121,7 +122,7 @@ object MEditCourses {
   def createStudentsForCourse(course: Course) = {
     val students = (1 to course.getSize).toSet.map {
       _: Int =>
-      val student=  new Student
+        val student = new Student
         student.setFirstName(Random.shuffle(firstNames).head)
         student.setLastName(Random.shuffle(lastNames).head)
         student
@@ -138,15 +139,34 @@ object MEditCourses {
         groupTypes.foreach {
           gType =>
             val groups = course.getGroups.filter(_.getGroupType.equals(gType))
-            val parts = CEditCourses.cut(students.toSeq, groups.size).toList
+            val parts = CEditCourses.cut(students.toSeq.sortBy(s => (s.getLastName, s.getFirstName)), groups.size).toList
 
             (0 to groups.size - 1).foreach {
               i =>
-                groups(i).setStudents(new java.util.HashSet[Student](parts(i)))
+                groups(i).setStudents(Set[Student]() ++ parts(i))
                 groups(i).setSize(groups(i).getStudents.size())
                 s.saveOrUpdate(groups(i))
             }
         }
+    }
+  }
+
+  def deleteStudent(studentId: Long) = {
+    Transactions.hibernateAction {
+      implicit s =>
+        val student = s.createCriteria(classOf[Student]).add(Restrictions.idEq(studentId)).uniqueResult().asInstanceOf[Student]
+        /** find all participants which contains the student */
+        val criterion = s.createCriteria(classOf[Participant])
+        criterion.createCriteria("students").add(Restrictions.idEq(studentId))
+        val participants = criterion.list().asInstanceOf[JavaList[Participant]].toList
+
+        participants.foreach {
+          p =>
+            p.setStudents(p.getStudents - student)
+            p.setSize(p.getStudents.size())
+            s.saveOrUpdate(p)
+        }
+        s.delete(student)
     }
   }
 

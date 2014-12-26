@@ -1,4 +1,5 @@
 @(students: List[models.persistence.participants.Student])
+
 <br/>
 <div class="row-fluid">
     <div class="col-md-12">
@@ -9,7 +10,8 @@
     <ul class="list-unstyled list-inline">
         @students.sortBy( s=> (if(s.getLastName!=null){s.getLastName}else{""}, if(s.getFirstName!=null){s.getFirstName}else{""} )  ).map{ s=>
             <li>
-                <form class="studentForm form-inline">
+
+                <form class="studentForm form-inline ">
                     <input name="id" class="hidden" type="number" value="@s.getId">
                     <input name="uuid" class="hidden" type="text" value="@s.getUuid">
                     <div class="form-group">
@@ -22,6 +24,9 @@
                     </div>
                     <div class="form-group">
                         <button type="submit" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-ok-circle"></span> </button>
+                    </div>
+                    <div class="form-group">
+                        <a data-link="@routes.CEditCourses.deleteStudent(s.getId)" class="deletebtn btn btn-sm btn-danger "><span class="glyphicon glyphicon-trash"></span></a>
                     </div>
                 </form>
             </li>
@@ -62,5 +67,13 @@
         } ) ;
 
         });
+
+        $('.deletebtn' ).on('click',function(e){
+            var link = $(this ).data('link');
+        $.post(link ).always(function(e){
+        location.reload();
+        }) ;
+        });
+
     </script>
 </div>

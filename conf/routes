@@ -35,6 +35,7 @@ GET         /editCourses                                                        
 POST        /addCourse                                                                                controllers.CEditCourses.addCourse
 GET         /editCourses/courseFields/:courseId                                                       controllers.CEditCourses.getCourseFields(courseId:Long)
 GET         /editCourses/studentFields/:courseId                                                      controllers.CEditCourses.getStudentFields(courseId:Long)
+POST        /editCourses/deleteStudent/:studentId                                                     controllers.CEditCourses.deleteStudent(studentId:Long)
 GET         /getGroupFields/:groupId                                                                  controllers.CEditCourses.getGroup(groupId:Long)
 GET         /deleteGroup/:groupId                                                                     controllers.CEditCourses.deleteGroup(groupId:Long)
 POST        /submitCourseData                                                                         controllers.CEditCourses.saveCourseData

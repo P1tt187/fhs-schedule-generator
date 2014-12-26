@@ -209,11 +209,12 @@ console.debug ( JSON.stringify ( formData ) ) ;
 
 @if(course.getGroups != null) {
     @defining(course.getGroups.toList.groupBy(_.getGroupType)) { coursesGroups =>
-            @for(groupType<-coursesGroups.keySet.toList.sortBy( gt=> -coursesGroups(gt)(0).getSize )) {
+            @coursesGroups.keySet.toList.sortBy( gt=> -coursesGroups(gt)(0).getSize ).par.map { groupType=>
                 @for(group <- coursesGroups(groupType).sortBy(_.getGroupIndex)) {
                     @groupFields(group)
                 }
-            }
+                <div class="clearfix"></div>
+            }.seq
     }
 }
 
