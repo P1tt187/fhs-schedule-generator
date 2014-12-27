@@ -18,6 +18,8 @@ POST        /addRoom                                                            
 GET         /removeRoom/:id                                                                           controllers.CRoomDefinition.deleteRoom(id:Long)
 
 GET         /blaimport                                                                                controllers.CBLAFileUpload.page
+POST        /blaimport/deleteOldCourse                                                                controllers.CBLAFileUpload.deleteOldCourse()
+POST        /blaimport/renameCourses                                                                  controllers.CBLAFileUpload.renameCourses()
 GET         /blaimportFinished                                                                        controllers.CBLAFileUpload.finished
 POST        /blaUpload                                                                                controllers.CBLAFileUpload.uploadFile
 GET         /blaError                                                                                 controllers.CBLAFileUpload.errorMessage

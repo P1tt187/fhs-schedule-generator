@@ -1,14 +1,12 @@
 package models.persistence.participants;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * <p> Groups are Participants for Exercise </p>
@@ -102,7 +100,7 @@ public class Group extends Participant implements Comparable<Group> {
 
         sb.append(", groupType='").append(groupType).append('\'');
         sb.append(", groupIndex=").append(groupIndex);
-        sb.append(", course=").append(course.getShortName());
+        sb.append(", course=").append(course.getShortName() != null ? course.getShortName() : "");
 
         sb.append('}');
         return sb.toString();

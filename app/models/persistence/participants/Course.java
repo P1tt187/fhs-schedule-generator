@@ -31,7 +31,7 @@ public class Course extends Participant {
      * exersize groups
      */
     @Fetch(FetchMode.SUBSELECT)
-    @OneToMany(cascade = CascadeType.ALL, targetEntity = Group.class, fetch = FetchType.LAZY, mappedBy = "course")
+    @OneToMany(cascade = CascadeType.ALL, targetEntity = Group.class, fetch = FetchType.LAZY, mappedBy = "course", orphanRemoval=true)
     private List<Group> groups;
 
     /**

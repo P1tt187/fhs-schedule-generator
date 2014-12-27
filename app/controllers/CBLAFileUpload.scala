@@ -1,19 +1,23 @@
 package controllers
 
-import play.api.mvc._
-import views.html.blaimport._
-import play.api.libs.concurrent.Akka
 import akka.actor.Props
-import play.api.Play.current
-import scala.util.{Failure, Success}
-import play.api.libs.concurrent.Execution.Implicits._
-import scala.concurrent.Future
 import akka.pattern.ask
 import akka.util.Timeout
-import scala.concurrent.duration._
-import logic.blaimport.{ImportFailure, ImportFinished, ImportFile, BlaImportActor}
+import logic.blaimport.{BlaImportActor, ImportFailure, ImportFile, ImportFinished}
+import models.fhs.pages.blaimport.{MBLAFileUpload, OldCourses}
 import play.api.Logger
+import play.api.Play.current
+import play.api.data.Forms._
+import play.api.data._
+import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json._
+import play.api.mvc._
+import views.html.blaimport._
+
+import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 /**
  * @author fabian
@@ -29,10 +33,16 @@ object CBLAFileUpload extends Controller {
   private var error = false
   private var ex: Exception = null
 
+  val removeCoursesForm = Form {
+    mapping(
+      "courseIds" -> list(longNumber(min = 0))
+    )(OldCourses.apply)(OldCourses.unapply)
+  }
+
 
   def page() = Action {
     implicit request =>
-      Ok(blaimport("Import"))
+      Ok(blaimport("Import", MBLAFileUpload.findCourses()))
   }
 
   def finished = Action {
@@ -54,7 +64,7 @@ object CBLAFileUpload extends Controller {
           import java.io.File
           val filename = file.filename
           val tmpFile = File.createTempFile(filename, "")
-          error=false;
+          error = false
 
           tmpFile.deleteOnExit()
           file.ref.moveTo(tmpFile, replace = true)
@@ -83,5 +93,25 @@ object CBLAFileUpload extends Controller {
         )
 
 
+  }
+
+  def deleteOldCourse() = Action {
+    implicit request =>
+
+      val formData = removeCoursesForm.bindFromRequest()
+
+      formData.fold(error => {
+        Redirect(routes.CBLAFileUpload.page).flashing("error" -> "nothing selected")
+      }, oldcourses => {
+        MBLAFileUpload.removeOldCourses(oldcourses.courseIds)
+        Redirect(routes.CBLAFileUpload.page).flashing("success" -> "success")
+      })
+  }
+
+  def renameCourses() = Action {
+
+    MBLAFileUpload.renameCourses()
+
+    Redirect(routes.CBLAFileUpload.page)
   }
 }
