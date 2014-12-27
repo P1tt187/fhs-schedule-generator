@@ -10,7 +10,13 @@ public enum ERaters {
     /**
      * enum constant
      */
-    WISHTIME_RATER(new WishTimeRater(), 2f),
+    WISHTIME_RATER(new WishTimeRater(), 3f),
+
+    /**
+     * enum constant
+     */
+    UNPOPULAR_DOCENT_WISHTIME_ALLOCATION(new UnpopularDocentWishTimeAllocation(),2f),
+
     /**
      * enum constant
      */
