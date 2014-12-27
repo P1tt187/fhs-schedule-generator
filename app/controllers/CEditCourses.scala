@@ -116,7 +116,7 @@ object CEditCourses extends Controller {
         val groupCount = (jsVal \ "addGroupCount").as[Int]
         val numberOfExistingGroups = getGroupCount(groupType, course)
 
-        val studentLists = cut(course.getStudents.toList.toSeq, groupCount).toList
+        val studentLists = cut(course.getStudents.toList.toSeq.sortBy(_.getLastName), groupCount).toList
 
         val result = (1 to groupCount).map { i =>
           val group = new Group

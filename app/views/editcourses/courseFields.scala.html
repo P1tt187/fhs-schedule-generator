@@ -185,7 +185,7 @@ console.log ( JSON.stringify ( callback ) ) ;
 
 $ ( '#addGroupResult' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
 
-$ ( '#bigGroupContainer' ).append ( callback.htmlresult ) ;
+$ ( '#bigGroupContainer' ).append ( '<div class="clearfix"></div>' +  callback.htmlresult ) ;
 
 },
 
