@@ -15,7 +15,7 @@
         <h4 >Schritte:</h4>
             <ol class="list-view">
                 <li role="presentation">
-                    Kurse umbenennen (Bai1 -> Bai2) <form method="post" action="@routes.CBLAFileUpload.renameCourses()">
+                  (optional)  Kurse umbenennen (Bai1 -> Bai2) <form method="post" action="@routes.CBLAFileUpload.renameCourses()">
                     <button type="submit" class="btn btn-warning"><span class="glyphicon glyphicon-arrow-right"></span>  starten</button>
                 </form>
                 </li>
@@ -54,6 +54,7 @@
                 }
                 </li>
                 <li role="presentation">
+                    (Optional)
                     <form class="form-inline" method="post" action="@routes.CBLAFileUpload.deleteOldCourse()">
                         <div class="form-group">
                             <label class="control-label" for="oldcourses">Überflüssige Kurse entfernen</label>

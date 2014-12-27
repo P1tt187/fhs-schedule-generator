@@ -13,7 +13,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "bootstrap" % "3.2.0",
   "org.hibernate" % "hibernate-core" % "4.2.3.Final",
   "org.hibernate" % "hibernate-entitymanager" % "4.2.3.Final",
-  "mysql" % "mysql-connector-java" % "5.1.21",
+  //"mysql" % "mysql-connector-java" % "5.1.21",
   "org.mariadb.jdbc" % "mariadb-java-client" % "1.1.7",
   "uk.com.robust-it" % "cloning" % "1.9.0",
   "com.decodified" %% "scala-ssh" % "0.6.4",
