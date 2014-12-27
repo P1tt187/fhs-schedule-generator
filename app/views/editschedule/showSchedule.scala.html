@@ -288,4 +288,31 @@
         $('.bg-success' ).removeClass('bg-success');
     });
 
+    $('.durationSwitcher').on('click',
+    function(){
+
+    var newDuration={};
+    var durationInput = $(this ).parents("form.lectureform" ).children('input[name=duration]');
+    var i = durationInput.val();
+
+    if(i=='@EDuration.EVEN')
+    {
+    newDuration ['bgclass']='bg-primary';
+    newDuration['duration']="@EDuration.UNEVEN" ;
+    } else
+    if(i=="@EDuration.UNEVEN")
+    {
+    newDuration ['bgclass']='bg-warning';
+    newDuration['duration']="@EDuration.EVEN";
+    }
+
+    var panel = $(this ).parents(".panel-body");
+    console.log(newDuration ['bgclass']);
+    //console.log(panel);
+
+    $(panel).removeClass('bg-primary').removeClass('bg-info').removeClass('bg-warning');
+    $(panel).addClass(newDuration ['bgclass']);
+    $(durationInput).val(newDuration.duration);
+    });
+
     </script>
