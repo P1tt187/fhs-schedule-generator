@@ -1,4 +1,5 @@
 @(students: List[models.persistence.participants.Student])
+@import models.persistence.participants.Student
 
 <br/>
 <div class="row-fluid">
@@ -7,75 +8,107 @@
             <h3>Studenten bearbeiten</h3>
         </div>
     </div>
-    <ul class="list-unstyled list-inline">
-        @students.sortBy( s=> (if(s.getLastName!=null){s.getLastName}else{""}, if(s.getFirstName!=null){s.getFirstName}else{""} )  ).map{ s=>
-            <li>
+    <div class="clearfix"></div>
+    <table class="table table-responsive table-striped table-condensed" >
+        <thead>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody >
+            @defining(if(students.isEmpty){List[Seq[Student]](Seq[Student]())}else {CEditCourses.cut(students.sortBy(s => (if(s.getLastName != null) {
+                s.getLastName
+            } else {
+                ""
+            }, if(s.getFirstName != null) {
+                s.getFirstName
+            } else {
+                ""
+            })).toSeq, if(students.size<10){1}else{3}).toList}) { studentList =>
+                @defining(studentList.maxBy(_.size).size - 1) { maxIndex =>
+                    @for(i <- 0 to maxIndex) {
+                        <tr>
+                            @defining(studentList.map(sl => sl.lift(i)).filter(_.nonEmpty).map {
+                                case Some(s) => s
+                                case None => null
+                            }.toList){ studentColumn=>
+                                @for( s<-studentColumn){
 
-                <form class="studentForm form-inline ">
-                    <input name="id" class="hidden" type="number" value="@s.getId">
-                    <input name="uuid" class="hidden" type="text" value="@s.getUuid">
-                    <div class="form-group">
-                       <label class=" control-label" for="firstName@s.getId">Vorname</label>
-                       <input id="firstName@s.getId" class="form-control" type="text" name="firstName" value="@s.getFirstName">
-                    </div>
-                    <div class="form-group">
-                        <label class=" control-label" for="lastName@s.getId">Nachname</label>
-                        <input id="lastName@s.getId" class="form-control" type="text" name="lastName" value="@s.getLastName">
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-ok-circle"></span> </button>
-                    </div>
-                    <div class="form-group">
-                        <a data-link="@routes.CEditCourses.deleteStudent(s.getId)" class="deletebtn btn btn-sm btn-danger "><span class="glyphicon glyphicon-trash"></span></a>
-                    </div>
-                </form>
-            </li>
-        }
+                            <td>
+                                <form class="studentForm form-inline ">
+                                    <input name="id" class="hidden" type="number" value="@s.getId">
+                                    <input name="uuid" class="hidden" type="text" value="@s.getUuid">
+                                    <div class="form-group">
+                                        <label class=" control-label" for="firstName@s.getId">Vorname</label>
+                                        <input id="firstName@s.getId" class="form-control" type="text" name="firstName" value="@s.getFirstName">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class=" control-label" for="lastName@s.getId">Nachname</label>
+                                        <input id="lastName@s.getId" class="form-control" type="text" name="lastName" value="@s.getLastName">
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-ok-circle"></span> </button>
+                                    </div>
+                                    <div class="form-group">
+                                        <a data-link="@routes.CEditCourses.deleteStudent(s.getId)" class="deletebtn btn btn-sm btn-danger "><span class="glyphicon glyphicon-trash"></span></a>
+                            </div>
+                            </form>
+                            </td>
 
-    </ul>
+                           }
+                            }
+                        }
+                </tr>
+                }
+            }
+
+        </tbody>
+    </table>
     <script>
-        $('.studentForm' ).on('submit', function(e){
-        e.preventDefault();
-            var formData = $(this ).serializeObject();
-            formData.id= Number(formData.id);
-            var selfObject = this;
-        $.ajax ( {
-        cache : false,
-        type : "POST",
-        dataType : "json",
-        data : JSON.stringify ( formData ),
-        context : this,
-        contentType : "application/json; charset=utf-8",
-        url : " @routes.CEditCourses.saveStudentData ",
-        success : function ( callback ) {
-        console.log ( JSON.stringify ( callback ) ) ;
+    $ ( '.studentForm' ).on ( 'submit', function ( e ) {
+    e.preventDefault ( ) ;
+    var formData = $ ( this ).serializeObject ( ) ;
+    formData.id = Number ( formData.id ) ;
+    var selfObject = this ;
+    $.ajax ( {
+    cache : false,
+    type : "POST",
+    dataType : "json",
+    data : JSON.stringify ( formData ),
+    context : this,
+    contentType : "application/json; charset=utf-8",
+    url : "  @routes.CEditCourses.saveStudentData ",
+    success : function ( callback ) {
+    console.log ( JSON.stringify ( callback ) ) ;
 
-        //$ ( '#courseEditResult' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
-        $(selfObject ).addClass('has-success');
-        },
+    //$ ( '#courseEditResult' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
+    $ ( selfObject ).addClass ( 'has-success' ) ;
+    },
 
-        error : function ( callback ) {
-        // error handler
-        console.log ( JSON.stringify ( callback ) ) ;
-        $ ( '#courseEditResult' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
+    error : function ( callback ) {
+    // error handler
+    console.log ( JSON.stringify ( callback ) ) ;
+    $ ( '#courseEditResult' ).empty ( ).append ( '<div class="alert alert-danger">Fehler <span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
 
-        var response = callback.responseJSON ;
-        $ ( '#' + response.result ).addClass ( 'has-error' ) ;
-        $(selfObject ).addClass('has-error');
+    var response = callback.responseJSON ;
+    $ ( '#' + response.result ).addClass ( 'has-error' ) ;
+    $ ( selfObject ).addClass ( 'has-error' ) ;
 
-        }
-        } ) ;
+    }
+    } ) ;
 
-        });
+    } ) ;
 
-        $('.deletebtn' ).on('click',function(e){
-            var link = $(this ).data('link');
-            var self = this;
-        $.post(link ).success(function(e){
-        $(self ).parents('li' ).remove();
-            $('#courseSize' ).val($('#courseSize' ).val()-1);
-        }) ;
-        });
+    $ ( '.deletebtn' ).on ( 'click', function ( e ) {
+    var link = $ ( this ).data ( 'link' ) ;
+    var self = this ;
+    $.post ( link ).success ( function ( e ) {
+    $ ( self ).parents ( 'li' ).remove ( ) ;
+    $ ( '#courseSize' ).val ( $ ( '#courseSize' ).val ( ) - 1 ) ;
+    } ) ;
+    } ) ;
 
     </script>
 </div>
