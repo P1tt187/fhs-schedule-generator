@@ -31,6 +31,10 @@ public enum EErrorType {
     /**
      * Enum constant
      */
-    DOCENTS_NOT_AT_SAME_TIME_AVAILABLE
+    DOCENTS_NOT_AT_SAME_TIME_AVAILABLE,
+    /**
+     * Enum constant
+     */
+    LECTURE_WITHOUT_STUDENTS
 
 }

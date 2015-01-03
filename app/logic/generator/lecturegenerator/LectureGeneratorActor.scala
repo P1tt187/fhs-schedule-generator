@@ -29,7 +29,7 @@ class LectureGeneratorActor extends Actor {
 
   private var addedLectures = 0
   private var addedExercises = 0
-  private val cloner = new Cloner(new ObjenesisInstantiationStrategy)
+
 
   override def receive = {
 

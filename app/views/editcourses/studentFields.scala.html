@@ -106,9 +106,10 @@
     var link = $ ( this ).data ( 'link' ) ;
     var self = this ;
     $.post ( link ).success ( function ( e ) {
-        var uuid = $(self ).parents('li' ).childs('input[name=uuid]' ).val();
-    $ ( self ).parents ( 'li' ).remove ( ) ;
-        $('.'+uuid ).remove();
+        var uuid = $(self ).parents('td' ).find('input[name=uuid]' ).val();
+        console.log(uuid);
+    $ ( self ).parents ( 'td' ).remove ( ) ;
+        $('.'+uuid ).html("");
     $ ( '#courseSize' ).val ( $ ( '#courseSize' ).val ( ) - 1 ) ;
     } ) ;
     } ) ;

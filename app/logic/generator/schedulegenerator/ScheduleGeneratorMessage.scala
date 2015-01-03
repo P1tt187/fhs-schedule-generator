@@ -21,6 +21,8 @@ case class ScheduleSlaveAnswer(schedule: Schedule) extends ScheduleGeneratorMess
 
 case class InplacebleSchedule(lectures:List[Lecture]) extends ScheduleGeneratorMessage
 
+case class LectureWithoutStudents(lectures:List[Lecture]) extends ScheduleGeneratorMessage
+
 case class TimeWishNotMatch(docents:List[Docent]) extends ScheduleGeneratorMessage
 
 case object PlacingFailure extends ScheduleGeneratorMessage

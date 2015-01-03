@@ -154,6 +154,8 @@ object CGenerate extends Controller {
 
         case DOCENTS_NOT_AT_SAME_TIME_AVAILABLE =>
           Ok(Json.stringify(Json.obj("htmlresult" -> docentsNotAtSameTimeAvailable(errorMessage).toString())))
+        case LECTURE_WITHOUT_STUDENTS =>
+          Ok(Json.stringify(Json.obj("htmlresult" -> errorpage(errorList).toString())))
         case NONE =>
 
           val currentSchedule = schedule.getOrElse(request.session(CURRENT_USER),null)
@@ -234,12 +236,17 @@ object CGenerate extends Controller {
                       end = null
                       Logger.debug("created in " + (finishTime.getTimeInMillis - startTime.getTimeInMillis) + "ms")
 
-                    case InplacebleSchedule(lectures) => errorList = lectures
+                    case InplacebleSchedule(lectures) =>
+                      errorList = lectures
                       errorType = INPLACEBLE_SCHEDULE
                       actorFinished = true
                     case TimeWishNotMatch(docents) =>
                       errorType = TIMEWISH_NOT_MATCH
                       errorMessage = docents.map(_.getLastName).sorted.mkString(",")
+                      actorFinished = true
+                    case LectureWithoutStudents (lectures)=>
+                      errorList = lectures
+                      errorType = LECTURE_WITHOUT_STUDENTS
                       actorFinished = true
                   }
 

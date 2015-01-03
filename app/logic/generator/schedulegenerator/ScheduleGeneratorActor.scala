@@ -73,12 +73,20 @@ class ScheduleGeneratorActor extends Actor {
 
       Logger.debug("number of lectures: " + lectures.size)
 
+      val lecturesWithoutStudents = findLecturesWithoutStudents(lectures)
+      if(lecturesWithoutStudents.nonEmpty){
+        sender() ! LectureWithoutStudents(lecturesWithoutStudents)
+        stopPlacing = true
+      }
+
       val outOfTimeDocents = findOutOfTimeDocents(lectures)
 
       if (!outOfTimeDocents.isEmpty) {
         sender() ! TimeWishNotMatch(outOfTimeDocents)
         stopPlacing = true
       }
+
+
 
       val theSender = sender()
 
@@ -167,6 +175,9 @@ class ScheduleGeneratorActor extends Actor {
     case _ =>
   }
 
+  private def findLecturesWithoutStudents(lectures:List[Lecture])={
+    lectures.filter( l=> l.getParticipants.map(_.getStudents.size()).sum == 0 )
+  }
 
   private def findOutOfTimeDocents(lectures: List[Lecture]) = {
     def compareTimeSlotTemplate(template: TimeSlotTemplate, timeWish: DocentTimeWish) = {
