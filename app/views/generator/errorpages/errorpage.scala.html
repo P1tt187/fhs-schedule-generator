@@ -12,7 +12,8 @@
                     case ELectureKind.EXERCISE => "Übung"
                     case ELectureKind.LECTURE => "Vorlesung"
                 }
-            },   @for(d <- l.getDocents) {
+            }<br/>
+                Dozenten: @for(d <- l.getDocents) {
                 @{
                     d.getLastName + " "
                 }
@@ -20,8 +21,9 @@
             <br>
                 Teilnehmer: @l.calculateNumberOfParticipants()
                 @l.getParticipants.map{ p=>
+                        <br/>
                    Name: @p.getName
-
+                        <br/>
                    Studenten: @p.getStudents.size
 
                 }
