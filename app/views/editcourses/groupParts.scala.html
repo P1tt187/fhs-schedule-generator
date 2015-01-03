@@ -1,0 +1,59 @@
+@(course:models.persistence.participants.Course)
+
+@import models.persistence.participants.Group
+
+@if(course.getGroups != null) {
+  @defining(course.getGroups.toList.groupBy(_.getGroupType)) { coursesGroups =>
+    @coursesGroups.keySet.toList.sortBy( gt=> -coursesGroups(gt)(0).getSize ).par.map { groupType=>
+    <div class="panel panel-primary" >
+      <div class="panel-heading"><h4 class="panel-title text-center"> <a  href="#parent@groupType" data-toggle="collapse" aria-expanded="false" aria-controls="parent@groupType">
+                        Einteilung: @groupType, @coursesGroups(groupType).size Gruppen je @{ course.getSize / coursesGroups(groupType).size } Studenten
+      </a> </h4> </div>
+      <div class="panel-collapse collapse" id="parent@groupType">
+        <div class="panel-body">
+        <form method="POST" action="@routes.CEditCourses.removeGroupTypeFromGroup(course.getId,groupType)">
+          <button class="btn btn-danger btn-sm" type="submit"><span class="glyphicon glyphicon-trash"></span> </button>
+        </form>
+        @defining(coursesGroups(groupType).sortBy(_.getGroupIndex)) { groups=>
+          <table class="table table-responsive table-striped">
+            <thead>
+              <tr>
+                @for(i<-1 to groups.size){
+                  <th class="text-center text-info">
+                                                    Gruppe: @i: @groups(i-1).getStudents.size Studenten
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+            @defining(groups.map{g:Group=> (g, g.getStudents.toList.sortBy(s=>(s.getLastName,s.getFirstName)))}.toMap) { groupWithStudents=>
+              @for(i <- 0 to (groups.maxBy(_.getStudents.size).getStudents.size - 1)) {
+                <tr>
+                @groups.map { group =>
+                  @defining(groupWithStudents(group).lift(i)){ studentOption =>
+                    <td class="text-center @if(studentOption.nonEmpty){ @studentOption.get.getUuid }">
+                    @{
+                      studentOption match {
+                        case Some(student) => student.getFirstName + " " + student.getLastName
+                        case None => ""
+                      }
+                    }
+                  }
+                </td>
+                }
+                </tr>
+              }
+            }
+            </tbody>
+          </table>
+        }
+        </div>
+      </div>
+   <script>
+
+   </script>
+    </div>
+    <div class="clearfix"></div>
+    }.seq
+  }
+}

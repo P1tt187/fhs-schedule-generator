@@ -82,6 +82,7 @@
     url : "  @routes.CEditCourses.saveStudentData ",
     success : function ( callback ) {
     console.log ( JSON.stringify ( callback ) ) ;
+        $('.'+formData.uuid ).html(formData.firstName + " " + formData.lastName);
 
     //$ ( '#courseEditResult' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
     $ ( selfObject ).addClass ( 'has-success' ) ;
@@ -105,7 +106,9 @@
     var link = $ ( this ).data ( 'link' ) ;
     var self = this ;
     $.post ( link ).success ( function ( e ) {
+        var uuid = $(self ).parents('li' ).childs('input[name=uuid]' ).val();
     $ ( self ).parents ( 'li' ).remove ( ) ;
+        $('.'+uuid ).remove();
     $ ( '#courseSize' ).val ( $ ( '#courseSize' ).val ( ) - 1 ) ;
     } ) ;
     } ) ;

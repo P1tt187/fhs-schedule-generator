@@ -214,6 +214,18 @@ object MEditCourses {
     }
   }
 
+  def deleteGroupType(courseId:Long,groupType:String)={
+    Transactions.hibernateAction{
+      implicit session=>
+        val course = session.createCriteria(classOf[Course]).add(Restrictions.idEq(courseId)).uniqueResult().asInstanceOf[Course]
+        val removeGroups = course.getGroups.filter(_.getGroupType.equals(groupType))
+        course.getGroups.removeAll(removeGroups)
+
+        session.saveOrUpdate(course)
+
+    }
+  }
+
 }
 
 case class MCourse(longName: String, shortName: String, size: Int)

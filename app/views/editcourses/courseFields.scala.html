@@ -1,5 +1,5 @@
 @(course: models.persistence.participants.Course, allRooms:List[persistence.location.RoomEntity])
-
+@import models.persistence.participants.Group
 
 <br/>
 
@@ -185,7 +185,8 @@ console.log ( JSON.stringify ( callback ) ) ;
 
 $ ( '#addGroupResult' ).empty ( ).append ( '<div class="alert alert-success">Erfolg <span class="glyphicon glyphicon-thumbs-up"></span></div>' ) ;
 
-$ ( '#bigGroupContainer' ).append ( '<div class="clearfix"></div>' +  callback.htmlresult ) ;
+//$ ( '#bigGroupContainer' ).append ( '<div class="clearfix"></div>' +  callback.htmlresult ) ;
+    location.reload(true);
 
 },
 
@@ -207,15 +208,6 @@ console.debug ( JSON.stringify ( formData ) ) ;
 
 <div id="bigGroupContainer">
 
-@if(course.getGroups != null) {
-    @defining(course.getGroups.toList.groupBy(_.getGroupType)) { coursesGroups =>
-            @coursesGroups.keySet.toList.sortBy( gt=> -coursesGroups(gt)(0).getSize ).par.map { groupType=>
-                @for(group <- coursesGroups(groupType).sortBy(_.getGroupIndex)) {
-                    @groupFields(group)
-                }
-                <div class="clearfix"></div>
-            }.seq
-    }
-}
+@groupParts(course)
 
 </div>

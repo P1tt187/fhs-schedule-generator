@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 /**
  * <p> Groups are Participants for Exercise </p>
@@ -22,7 +23,7 @@ public class Group extends Participant implements Comparable<Group> {
      * parent course
      */
     @JsonIdentityInfo(generator = ObjectIdGenerators.UUIDGenerator.class, property = "@group-course")
-    @ManyToOne(targetEntity = Course.class)
+    @ManyToOne(targetEntity = Course.class, optional = false)
     private Course course;
 
     /**

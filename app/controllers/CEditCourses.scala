@@ -2,19 +2,18 @@ package controllers
 
 import java.util
 
+import models.Transactions
+import models.fhs.pages.editcourses.MEditCourses._
+import models.fhs.pages.editcourses.{MCourse, MEditCourses}
+import models.persistence.participants.{Course, Group, Student}
+import play.api._
+import play.api.data.Forms._
+import play.api.data._
+import play.api.libs.json._
 import play.api.mvc._
 import views.html.editcourses._
-import models.fhs.pages.editcourses.MEditCourses._
-import play.api.libs.json._
-import models.persistence.participants.{Student, Course, Group}
+
 import scala.collection.JavaConversions._
-import models.Transactions
-
-import play.api._
-
-import play.api.data._
-import play.api.data.Forms._
-import models.fhs.pages.editcourses.{MEditCourses, MCourse}
 
 /**
  * @author fabian 
@@ -38,9 +37,9 @@ object CEditCourses extends Controller {
 
 
   def getCourseFields(courseId: Long) = Action {
-    implicit request=>
-      val session = request.session+((NAV + ".edidcourse") -> courseId.toString)
-      Ok(Json.stringify(Json.obj("htmlresult" -> courseFields(findCourse(courseId),findRooms).toString()))).withSession(session)
+    implicit request =>
+      val session = request.session + ((NAV + ".edidcourse") -> courseId.toString)
+      Ok(Json.stringify(Json.obj("htmlresult" -> courseFields(findCourse(courseId), findRooms).toString()))).withSession(session)
   }
 
   def addCourse = Action {
@@ -72,7 +71,7 @@ object CEditCourses extends Controller {
     val subjects = findSubjectsWithCourse(courseId)
     if (subjects.isEmpty) {
       removeCourse(courseId)
-      Ok( "ok")
+      Ok("ok")
     } else {
       val errorSubjects = subjects.map(s => s.getName).mkString(",")
       BadRequest(errorSubjects)
@@ -90,7 +89,7 @@ object CEditCourses extends Controller {
         course.setShortName((jsVal \ "courseShortName").as[String])
         course.setSize((jsVal \ "courseSize").as[String].toInt)
         val classRoomId = (jsVal \ "classRoom").as[String].toLong
-        val classRoom = if(classRoomId != -1l){
+        val classRoom = if (classRoomId != -1l) {
           findRoom(classRoomId)
         } else {
           null
@@ -123,7 +122,7 @@ object CEditCourses extends Controller {
           group.setGroupType(groupType)
 
           group.setCourse(course)
-          group.setStudents(new util.HashSet[Student](studentLists(i-1)) )
+          group.setStudents(new util.HashSet[Student](studentLists(i - 1)))
           group.setSize(group.getStudents.size())
 
           group.setGroupIndex(numberOfExistingGroups + i)
@@ -144,8 +143,9 @@ object CEditCourses extends Controller {
           implicit em =>
             em.merge(course)
         }
+        Ok(Json.stringify(Json.obj("htmlresult" -> "success")))
 
-        Ok(Json.stringify(Json.obj("htmlresult" -> result.map(g => groupFields(g).toString()).foldLeft("")(_ + _))))
+        // Ok(Json.stringify(Json.obj("htmlresult" -> result.map(g => groupFields(g).toString()).foldLeft("")(_ + _))))
       }
       catch {
         case ex: Exception => Logger.error("saveGroupData", ex)
@@ -153,7 +153,10 @@ object CEditCourses extends Controller {
       }
   }
 
-
+  def removeGroupTypeFromGroup(courseId: Long, groupType: String) = Action {
+    deleteGroupType(courseId, groupType)
+    Redirect(routes.CEditCourses.page())
+  }
 
   def updateGroup = Action(parse.json) {
     implicit request =>
@@ -199,7 +202,7 @@ object CEditCourses extends Controller {
   }
 
 
-  def generateStudentsForCourse(courseId:Long)= Action{
+  def generateStudentsForCourse(courseId: Long) = Action {
     val course = findCourse(courseId)
 
     deleteStudentsFromCourse(course)
@@ -214,12 +217,12 @@ object CEditCourses extends Controller {
     smaller.grouped(quot) ++ bigger.grouped(quot + 1)
   }
 
-  def saveStudentData() = Action(parse.json){
-    implicit request=>
+  def saveStudentData() = Action(parse.json) {
+    implicit request =>
       val js = request.body
       val id = (js \ "id").as[Long]
       val uuid = (js \ "uuid").as[String]
-      val firstName = (js\"firstName").as[String]
+      val firstName = (js \ "firstName").as[String]
       val lastName = (js \ "lastName").as[String]
 
       val student = findStudentById(id)
@@ -229,22 +232,19 @@ object CEditCourses extends Controller {
 
       updateStudent(student)
 
-      Ok(Json.stringify(Json.obj("htmlresult"->"ok")))
+      Ok(Json.stringify(Json.obj("htmlresult" -> "ok")))
   }
 
-  def getStudentFields(courseId:Long) = Action {
+  def getStudentFields(courseId: Long) = Action {
     val students = findStudentsForCourse(courseId)
-    Ok(Json.stringify(Json.obj("htmlresult"->studentFields(students).toString())))
+    Ok(Json.stringify(Json.obj("htmlresult" -> studentFields(students).toString())))
   }
 
-  def deleteStudent(studentId:Long) = Action {
+  def deleteStudent(studentId: Long) = Action {
 
     MEditCourses.deleteStudent(studentId)
 
     Redirect(routes.CEditCourses.page())
   }
 
-  def getGroup(groupId: Long) = Action {
-    Ok(Json.stringify(Json.obj("htmlresult" -> groupFields(findGroup(groupId)).toString())))
-  }
 }
