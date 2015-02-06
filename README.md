@@ -26,7 +26,9 @@ FLUSH PRIVILEGES;
 * done
 
 #Usage
+
 The Programm will authentificate you against your localhost ssh-server
+
 1. log in
 2. define the timeslots
 3. define rooms and its availability
