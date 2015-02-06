@@ -21,6 +21,7 @@ FLUSH PRIVILEGES;
 
 ```Shell
 ./activator
+~run
 ```
 * done
 
@@ -38,3 +39,4 @@ The Programm will authentificate you against your localhost ssh-server
 
 #TODOS
 * add tests
+* internationalization
