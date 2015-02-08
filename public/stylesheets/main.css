@@ -75,3 +75,7 @@ ul.nav li.dropdown:hover > ul.dropdown-submenu {
 .radioSpacing{
     margin-right: 10px;
 }
+
+.roomCollision {
+    background-color: #FCF8E3;
+}

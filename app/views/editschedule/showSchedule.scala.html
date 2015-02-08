@@ -245,10 +245,12 @@
     //assistent stuff
     $('.listElement' ).mousedown(function(){
     $('.bg-success' ).removeClass('bg-success');
+    $('.roomCollision' ).removeClass('roomCollision');
         var currentData = $(this ).find('.lectureform' ).serializeObject();
 
         $('.connected' ).each(function(index, element){
             this.collision = false;
+            this.halfCollision=false;
             var self=this;
 
            $(element ).find('.lectureform').each(function(i,theForm){
@@ -257,12 +259,8 @@
                 var collisionDuration = currentData['duration']==formData['duration']|| currentData['duration']=='@EDuration.WEEKLY' || formData['duration']=='@EDuration.WEEKLY';
                 var collisionDocent = false;
 
-                if(! $.isArray(currentData['docents' ])){
-                currentData['docents' ]=[currentData['docents' ]];
-                }
-                if(! $.isArray(formData['docents' ])){
-                formData['docents' ]=[formData['docents' ]];
-                }
+                currentData['docents' ]=wrapArray(currentData['docents' ]);
+                formData['docents' ]=wrapArray(formData['docents' ]);
 
                 currentData['docents' ].forEach(function(d){
                     if( $.inArray(d,formData['docents' ])!=-1){
@@ -273,19 +271,25 @@
                 //$(currentData['docents' ] ).not(formData['docents'] ).length==0 ||  $(formData['docents' ] ).not( currentData['docents'] ).length==0;
                 var collisionRoom = currentData['room' ] == formData['room'];
                 //console.log('current room: ' +currentData['room' ] + " formRoom: " + formData['room']);
-                if( collisionDuration && (collisionRoom||collisionDocent)){
+                if( collisionDuration && collisionDocent){
                 self.collision = true;
+                }
+                if(collisionDuration && collisionRoom){
+                self.halfCollision = true;
                 }
             });
 
-            if(!this.collision){
+            if(!this.collision && !this.halfCollision){
             $(element ).addClass('bg-success');
+            } else if(this.halfCollision){
+                $(element ).addClass('roomCollision');
             }
 
         });
 
     } ).mouseup(function(){
         $('.bg-success' ).removeClass('bg-success');
+        $('.roomCollision' ).removeClass('roomCollision');
     });
 
     $('.durationSwitcher').on('click',
