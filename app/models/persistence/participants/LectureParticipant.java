@@ -18,6 +18,9 @@ public class LectureParticipant {
     @Column(name = "COURSENAME")
     private String courseName;
 
+    @Column(name="GROUPTYPE")
+    private String groupType;
+
     /**
      * groupindex, if this is a group
      */
@@ -58,6 +61,14 @@ public class LectureParticipant {
         this.groupIndex = groupIndex;
     }
 
+    public String getGroupType() {
+        return groupType;
+    }
+
+    public void setGroupType(String groupType) {
+        this.groupType = groupType;
+    }
+
     public String getShortName() {
         StringBuffer sb = new StringBuffer();
         sb.append(courseName);
@@ -65,6 +76,17 @@ public class LectureParticipant {
             sb.append(" ");
             sb.append(groupIndex);
         }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("LectureParticipant{");
+        sb.append("courseName='").append(courseName).append('\'');
+        sb.append(", groupType='").append(groupType).append('\'');
+        sb.append(", groupIndex=").append(groupIndex);
+        sb.append(", ignoreGroupIndex=").append(ignoreGroupIndex);
+        sb.append('}');
         return sb.toString();
     }
 

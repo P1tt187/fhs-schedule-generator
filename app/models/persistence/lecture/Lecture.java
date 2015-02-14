@@ -14,10 +14,7 @@ import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.math.BigInteger;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author fabian
@@ -26,6 +23,11 @@ import java.util.Set;
 @Entity
 @Table(name = "TBLLECTURE")
 public class Lecture extends AbstractLecture {
+
+
+    /** individual id of every lecture */
+    @Column(name="UUID")
+    private String uuid = UUID.randomUUID().toString();
 
     /**
      * name of the lecture
@@ -150,6 +152,14 @@ public class Lecture extends AbstractLecture {
 
     public void setAlternativeLectureRooms(Set<LectureRoom> alternativeLectureRooms) {
         this.alternativeLectureRooms = alternativeLectureRooms;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public Set<LectureParticipant> getLectureParticipants() {
@@ -354,34 +364,18 @@ public class Lecture extends AbstractLecture {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Lecture)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         Lecture lecture = (Lecture) o;
 
-        if (docents != null ? !docents.equals(lecture.docents) : lecture.docents != null) return false;
-        if (duration != lecture.duration) return false;
-        if (name != null ? !name.equals(lecture.name) : lecture.name != null) return false;
-        if (lectureParticipants != null ? !(lectureParticipants.containsAll(lecture.lectureParticipants) && lectureParticipants.size() == lecture.lectureParticipants.size()) : lecture.lectureParticipants != null)
-            return false;
+        if (!uuid.equals(lecture.uuid)) return false;
 
-        if (lectureRoom != null ? !lectureRoom.equals(lecture.lectureRoom) : lecture.lectureRoom != null) return false;
-        if (difficultLevel != null ? !difficultLevel.equals(lecture.difficultLevel) : lecture.difficultLevel != null)
-            return false;
-        return !(expectedParticipants != null ? !expectedParticipants.equals(lecture.expectedParticipants) : lecture.expectedParticipants != null);
-
+        return true;
     }
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (participants != null ? participants.hashCode() : 0);
-        result = 31 * result + (docents != null ? docents.hashCode() : 0);
-        result = 31 * result + (duration != null ? duration.hashCode() : 0);
-        result = 31 * result + (kind != null ? kind.hashCode() : 0);
-        result = 31 * result + (lectureRoom != null ? lectureRoom.hashCode() : 0);
-        result = 31 * result + (expectedParticipants != null ? expectedParticipants.hashCode() : 0);
-        result = 31 * result + (difficultLevel != null ? difficultLevel.hashCode() : 0);
-        return result;
+        return uuid.hashCode();
     }
 
     @Override

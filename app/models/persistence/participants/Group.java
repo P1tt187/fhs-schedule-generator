@@ -73,6 +73,7 @@ public class Group extends Participant implements Comparable<Group> {
         lp.setGroupIndex(groupIndex);
         boolean ignoreValue = ignoreGroupIndex != null ? ignoreGroupIndex : false;
         lp.setIgnoreGroupIndex(ignoreValue);
+        lp.setGroupType(groupType);
 
         return lp;
     }

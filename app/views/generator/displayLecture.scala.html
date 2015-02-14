@@ -23,12 +23,19 @@
         } " >
         </span>
     </div>
-
+    @if(lecture.getKind == ELectureKind.EXERCISE ) {
+        <div>
+            @lecture.getLectureParticipants.head.getGroupType
+        </div>
+    }
     <div style="font-size: 90%">
     @for(participant <- lecture.getLectureParticipants.toList.sortBy(_.getCourseName)) {
+        <div class="pull-left" style="padding-right: 1em">
         @participant.getShortName
+        </div>
     }
     </div>
+    <div class="clearfix"></div>
     <div class="pull-right">
     @lecture.getDocents.map(_.getLastName).mkString(", ")
     </div>
