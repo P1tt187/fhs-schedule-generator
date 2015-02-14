@@ -2,6 +2,7 @@ package controllers
 
 import java.util
 
+import controllers.traits.TController
 import models.Transactions
 import models.fhs.pages.editcourses.MEditCourses._
 import models.fhs.pages.editcourses.{MCourse, MEditCourses}
@@ -19,7 +20,7 @@ import scala.collection.JavaConversions._
  * @author fabian 
  *         on 14.03.14.
  */
-object CEditCourses extends Controller {
+object CEditCourses extends TController {
 
   val NAV = "EDITCOURSES"
 

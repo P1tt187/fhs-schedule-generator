@@ -5,6 +5,7 @@ import java.nio.charset.Charset
 import java.nio.file._
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import controllers.traits.TController
 import models.Transactions
 import models.export.JsonContainer
 import models.fhs.pages.JavaList
@@ -31,7 +32,7 @@ import scala.collection.JavaConversions._
  * @author fabian 
  *         on 24.03.14.
  */
-object CExporter extends Controller {
+object CExporter extends TController {
 
   val NAV = "Exporter"
 

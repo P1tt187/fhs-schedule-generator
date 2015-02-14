@@ -4,6 +4,7 @@ import models.Transactions
 import models.fhs.pages.JavaList
 import models.fhs.pages.editdocents.MDocentTimeWhish
 import models.fhs.pages.roomdefinition.MTtimeslotCritDefine
+import models.persistence.criteria.TimeSlotCriteria
 import models.persistence.docents.Docent
 import models.persistence.enumerations.EDuration
 import models.persistence.lecture.Lecture
@@ -239,43 +240,36 @@ object MGenerator {
 
 object TimeRange {
 
-  implicit val TimeRangeOrdering = Ordering.by((range: TimeRange) => (range.startHour, range.startMinute, range.startHour, range.stopMinute))
+  //implicit val TimeRangeOrdering = Ordering.by((range: TimeRange) => (range.startHour, range.startMinute, range.startHour, range.stopMinute))
+
+  implicit def timeSlot2TimeRange(timeSlot:TimeSlot):TimeRange={
+    TimeRange(timeSlot.getStartHour,timeSlot.getStartMinute,timeSlot.getStopHour,timeSlot.getStopMinute)
+  }
+
+  implicit def timeSlot2TimeRange(timeSlot:TimeSlotTemplate):TimeRange={
+    TimeRange(timeSlot.getStartHour,timeSlot.getStartMinute,timeSlot.getStopHour,timeSlot.getStopMinute)
+  }
+
+  implicit def timeSlot2TimeRange(timeSlot:TimeSlotCriteria):TimeRange={
+    TimeRange(timeSlot.getStartHour,timeSlot.getStartMinute,timeSlot.getStopHour,timeSlot.getStopMinute)
+  }
+
+  implicit def timeSlot2TimeRange(timeSlot:MDocentTimeWhish):TimeRange={
+    TimeRange(timeSlot.startHour,timeSlot.startMinute,timeSlot.stopHour,timeSlot.stopMinute)
+  }
+
+  implicit def timeSlot2TimeRange(timeSlot:MTtimeslotCritDefine):TimeRange={
+    TimeRange(timeSlot.startHour,timeSlot.startMinutes,timeSlot.stopHour,timeSlot.stopMinutes)
+  }
+
 }
 
-case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int) extends Ordered[TimeSlot] {
+case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int) extends Ordered[TimeRange] {
 
 
   override def toString = "" + startHour.formatted("%02d") + ":" + startMinute.formatted("%02d") + "-" + stopHour.formatted("%02d") + ":" + stopMinute.formatted("%02d")
 
-  override def compare(that: TimeSlot): Int = {
-    if (startHour.compareTo(that.getStartHour) != 0) {
-      return startHour.compareTo(that.getStartHour)
-    }
-    if (startMinute.compareTo(that.getStartMinute) != 0) {
-      return startMinute.compareTo(that.getStartMinute)
-    }
-    if (stopHour.compareTo(that.getStopHour) != 0) {
-      return stopHour.compareTo(that.getStopHour)
-    }
-
-    stopMinute.compareTo(that.getStopMinute)
-  }
-
-  def compare(that: TimeSlotTemplate): Int = {
-    if (startHour.compareTo(that.getStartHour) != 0) {
-      return startHour.compareTo(that.getStartHour)
-    }
-    if (startMinute.compareTo(that.getStartMinute) != 0) {
-      return startMinute.compareTo(that.getStartMinute)
-    }
-    if (stopHour.compareTo(that.getStopHour) != 0) {
-      return stopHour.compareTo(that.getStopHour)
-    }
-
-    stopMinute.compareTo(that.getStopMinute)
-  }
-
-  def compare(that: MDocentTimeWhish): Int = {
+  override def compare(that: TimeRange): Int = {
     if (startHour.compareTo(that.startHour) != 0) {
       return startHour.compareTo(that.startHour)
     }
@@ -289,19 +283,7 @@ case class TimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute
     stopMinute.compareTo(that.stopMinute)
   }
 
-  def compare(that: MTtimeslotCritDefine): Int = {
-    if (startHour.compareTo(that.startHour) != 0) {
-      return startHour.compareTo(that.startHour)
-    }
-    if (startMinute.compareTo(that.startMinutes) != 0) {
-      return startMinute.compareTo(that.startMinutes)
-    }
-    if (stopHour.compareTo(that.stopHour) != 0) {
-      return stopHour.compareTo(that.stopHour)
-    }
 
-    stopMinute.compareTo(that.stopMinutes)
-  }
 }
 
 case class GeneratorForm(id: Long, threads: Int, time: Int, randomRatio: Int, maxIterationDeep: Int)

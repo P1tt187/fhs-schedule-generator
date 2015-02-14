@@ -1,6 +1,7 @@
 package controllers
 
 import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
+import controllers.traits.TController
 import models.Transactions
 import models.fhs.pages._
 import models.fhs.pages.editschedule.MEditSchedule._
@@ -26,7 +27,7 @@ import scala.concurrent.duration._
  * @author fabian 
  *         on 03.06.14.
  */
-object CEditSchedule extends Controller {
+object CEditSchedule extends TController {
 
   val NAV = "EDIT_SCHEDULE"
 

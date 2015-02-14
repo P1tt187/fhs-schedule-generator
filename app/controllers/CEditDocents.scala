@@ -1,5 +1,6 @@
 package controllers
 
+import controllers.traits.TController
 import models.fhs.pages.editdocents.MEditDocents._
 import models.fhs.pages.editdocents._
 import models.fhs.pages.generator.MGenerator
@@ -16,7 +17,7 @@ import views.html.editdocents._
  * @author fabian 
  *         on 13.04.14.
  */
-object CEditDocents extends Controller {
+object CEditDocents extends TController {
 
   val NAV = "DOCENTS"
 
@@ -93,11 +94,6 @@ object CEditDocents extends Controller {
   }
 
 
-  private def timeRange = {
-    val allTimeSlots = MTimeslotDisplay.findAllTimeslots
-    val timeRanges = MGenerator.findTimeRanges(allTimeSlots)
-    (allTimeSlots, timeRanges)
-  }
 
   def sendDocentFields(id: Long) = Action {
     implicit request =>

@@ -3,7 +3,7 @@
 # ~~~~
 
 # Home page
-GET         /                                                                                         controllers.CIndex.index
+GET         /                                                                                         controllers.CIndex.page
 POST        /loginUser                                                                                controllers.CIndex.doLogin
 POST        /logoutUser                                                                               controllers.CIndex.doLogout
 

@@ -3,6 +3,7 @@ package controllers
 import akka.actor.Props
 import akka.pattern.ask
 import akka.util.Timeout
+import controllers.traits.TController
 import logic.blaimport.{BlaImportActor, ImportFailure, ImportFile, ImportFinished}
 import models.fhs.pages.blaimport.{MBLAFileUpload, OldCourses}
 import play.api.Logger
@@ -23,7 +24,7 @@ import scala.util.{Failure, Success}
  * @author fabian
  *         on 07.02.14.
  */
-object CBLAFileUpload extends Controller {
+object CBLAFileUpload extends TController{
 
   val NAV = "PLFILEUPLOAD"
 

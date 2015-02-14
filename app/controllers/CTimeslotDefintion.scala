@@ -1,5 +1,6 @@
 package controllers
 
+import controllers.traits.TController
 import models.Transactions
 import models.fhs.pages.generator.MGenerator
 import models.fhs.pages.timeslot.{MTimeslotDefine, MTimeslotDisplay}
@@ -17,7 +18,7 @@ import views.html.timeslotdefintiion._
  * @author fabian
  *         on 23.01.14.
  */
-object CTimeslotDefintion extends Controller {
+object CTimeslotDefintion extends TController {
 
   val NAV = "timeslotdefinition"
 
@@ -34,9 +35,8 @@ object CTimeslotDefintion extends Controller {
     )(MTimeslotDefine.apply)(MTimeslotDefine.unapply)
   )
 
-  @Transactional(readOnly = true)
-  def page =
-    Action {
+
+  def page() = Action {
       implicit request=>
 
       val allTimeSlots = MTimeslotDisplay.findAllTimeslots

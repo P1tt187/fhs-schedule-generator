@@ -1,9 +1,11 @@
 package controllers
 
 import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
+import controllers.traits.TController
 import models.Transactions
 import models.fhs.pages.editsubjects.MEditSubjects._
 import models.fhs.pages.editsubjects.MSemester
+import models.fhs.pages.generator.TimeRange
 import models.persistence.Semester
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCriteria, TimeSlotCriteria}
 import models.persistence.docents.Docent
@@ -11,7 +13,7 @@ import models.persistence.enumerations.EDuration
 import models.persistence.location.{HouseEntity, RoomAttributesEntity, RoomEntity}
 import models.persistence.participants.Course
 import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
-import models.persistence.template.WeekdayTemplate
+import models.persistence.template.{TimeSlotTemplate, WeekdayTemplate}
 import org.hibernate.criterion.Restrictions
 import play.api.Play.current
 import play.api._
@@ -30,7 +32,7 @@ import scala.concurrent.duration._
  * @author fabian 
  *         on 05.03.14.
  */
-object CEditSubjects extends Controller {
+object CEditSubjects extends TController {
 
   val NAV = "EDITSUBJECTS"
 
@@ -88,9 +90,9 @@ object CEditSubjects extends Controller {
     subjectClone.setId(-1l)
     subjectClone.setName("*" + subjectClone.getName)
 
-    val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes : List[GroupType]) = loadCachedData()
+    val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes: List[GroupType], allTimeSlots:List[TimeSlotTemplate], timeRanges:List[TimeRange]) = loadCachedData()
 
-    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subjectClone, docents, courses, houses, rooms,groupTypes).toString().trim())))
+    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subjectClone, docents, courses, houses, rooms, groupTypes, allTimeSlots, timeRanges).toString().trim())))
 
 
   }
@@ -135,7 +137,7 @@ object CEditSubjects extends Controller {
       }
 
 
-      val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes:List[GroupType]) = loadCachedData()
+      val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes: List[GroupType], allTimeSlots:List[TimeSlotTemplate], timeRanges:List[TimeRange]) = loadCachedData()
 
       val selectedSubject = if (idString == "null") {
         "-1"
@@ -143,11 +145,11 @@ object CEditSubjects extends Controller {
         idString
       }
 
-      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms, groupTypes).toString().trim()))).withSession(request.session + ("subjectFields" -> selectedSubject))
+      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms, groupTypes, allTimeSlots, timeRanges).toString().trim()))).withSession(request.session + ("subjectFields" -> selectedSubject))
 
   }
 
-  private def loadCachedData(): (List[Docent], List[Course], List[HouseEntity], List[RoomEntity], List[GroupType]) = {
+  private def loadCachedData(): (List[Docent], List[Course], List[HouseEntity], List[RoomEntity], List[GroupType], List[TimeSlotTemplate], List[TimeRange]) = {
     val docents = Cache.getOrElse("docents") {
       val docent = findDocents()
       Cache.set("docents", docent, expiration = TIME_TO_LIFE)
@@ -173,12 +175,17 @@ object CEditSubjects extends Controller {
       room
     }
 
-    val groupTypes = Cache.getOrElse("groupTypes"){
+    val groupTypes = Cache.getOrElse("groupTypes") {
       val groupType = findGroupTypes()
       Cache.set("groupTypes", groupType, expiration = TIME_TO_LIFE)
       groupType
     }
-    (docents, courses, houses, rooms, groupTypes)
+    val (allTimeslots, timeRanges) = Cache.getOrElse("timeSlotsAndRanges") {
+      val (allTimeslot, timeRang) = timeRange
+      Cache.set("timeSlotsAndRanges", (allTimeslot, timeRang), expiration = TIME_TO_LIFE)
+      (allTimeslot, timeRang)
+    }
+    (docents, courses, houses, rooms, groupTypes, allTimeslots, timeRanges)
   }
 
   def getNamesField(semester: Long, subjectType: String, filterDocentId: Long, filterCourseId: Long, filterActive: String) = Action {
@@ -326,7 +333,7 @@ object CEditSubjects extends Controller {
 
         val oldCriteriaContainer = subject.getCriteriaContainer
 
-        if (!roomAttributes.isEmpty) {
+        if (roomAttributes.nonEmpty) {
           setRoomAttributesForCriteria(roomAttributes, criteriaContainer)
         }
 
@@ -340,9 +347,9 @@ object CEditSubjects extends Controller {
 
         Logger.debug("save subject " + subject.getId)
 
-        Transactions.hibernateAction{
-          implicit s=>
-            if(subject.getId!=null){
+        Transactions.hibernateAction {
+          implicit s =>
+            if (subject.getId != null) {
               s.saveOrUpdate(oldCriteriaContainer)
               s.delete(oldCriteriaContainer)
             }
@@ -350,7 +357,7 @@ object CEditSubjects extends Controller {
             s.saveOrUpdate(subject)
         }
 
-        Ok(Json.stringify(Json.obj("result" -> "succsess")))
+        Ok(Json.stringify(Json.obj("result" -> "success")))
       }
       catch {
         case e: Exception =>

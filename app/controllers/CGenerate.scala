@@ -6,6 +6,7 @@ import akka.actor.{PoisonPill, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
+import controllers.traits.TController
 import exceptions.errortypes.EErrorType
 import exceptions.errortypes.EErrorType._
 import exceptions.{DocentsNotAtSameTimeAvailableException, NoGroupFoundException, NoRoomException}
@@ -41,7 +42,7 @@ import scala.concurrent.duration._
  * @author fabian 
  *         on 20.03.14.
  */
-object CGenerate extends Controller {
+object CGenerate extends TController {
 
   private lazy val schedule = scala.collection.mutable.Map[UserName,Schedule]()
 

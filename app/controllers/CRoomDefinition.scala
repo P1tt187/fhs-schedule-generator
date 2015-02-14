@@ -2,10 +2,9 @@ package controllers
 
 import java.util
 
+import controllers.traits.TController
 import models._
-import models.fhs.pages.generator.MGenerator
 import models.fhs.pages.roomdefinition.{MRoomdefintion, MTtimeslotCritDefine}
-import models.fhs.pages.timeslot.MTimeslotDisplay
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, TimeSlotCriteria}
 import models.persistence.enumerations.EDuration
 import models.persistence.location.RoomEntity
@@ -24,7 +23,7 @@ import scala.collection.JavaConversions._
  * @author fabian
  *         on 04.02.14.
  */
-object CRoomDefinition extends Controller {
+object CRoomDefinition extends TController with Controller {
 
   val NAV = "ROOMDEFINITION"
 
@@ -48,13 +47,7 @@ object CRoomDefinition extends Controller {
   )
 
 
-  private def timeRange = {
-    val allTimeSlots = MTimeslotDisplay.findAllTimeslots
-    val timeRanges = MGenerator.findTimeRanges(allTimeSlots)
-    (allTimeSlots, timeRanges)
-  }
-
-  def page = Action {
+  def page() = Action {
     implicit request =>
       val rooms = MRoomdefintion.findAllRooms()
 
@@ -165,12 +158,7 @@ object CRoomDefinition extends Controller {
           Logger.debug("" + houseDO + " " + roomDO)
           Transactions {
             implicit entitiManager =>
-
-              /*  if (roomDO.getId == null) {
-                  entitiManager.persist(roomDO)
-                } else {*/
               entitiManager.merge(roomDO)
-            //}
           }
 
           Ok(Json.stringify(Json.obj("invalid" -> false, "result" -> "ok")))

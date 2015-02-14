@@ -1,76 +1,96 @@
-@(startHour:Int,startMinute:Int,stopHour:Int,stopMinute:Int,day:Int, duration:models.persistence.enumerations.EDuration)
+@(existingTimeCriterias:List[models.persistence.criteria.TimeSlotCriteria], allTimeSlots:List[models.persistence.template.TimeSlotTemplate], timeRanges:List[models.fhs.pages.generator.TimeRange])
 
 @import models.persistence.enumerations.EDuration
+@import models.fhs.pages.generator.TimeRange._
 
-<div class="form-group">
-    <label class="control-label">Wochentag</label>
-    <select name="weekday" class="form-control">
-        @for((value,displayname)<-CTimeslotDefintion.WEEKDAYS){
-        <option value="@value" @if(value.toInt == day){selected }>@displayname</option>
+
+@days= @{
+    CTimeslotDefintion.WEEKDAYS.filterNot{
+        case (sortIndexString,dayname)=>
+            val sortIndex=sortIndexString.toInt
+            allTimeSlots.find(_.getParent.getSortIndex == sortIndex).isEmpty
+    }.sortBy(_._1)
+}
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped table-condensed">
+        <thead>
+            <tr>
+                <th class="text-center text-info" >Uhrzeit</th>
+
+
+                @for(day <- days) {
+                    <th class="text-info text-center" style="min-width : 100px ;"> @day._2</th>
+                }
+            </tr>
+
+        </thead>
+        <tbody>
+        @for(range<-timeRanges.sorted){
+            <tr>
+                <td class="text-center"  style="vertical-align: middle; width : 8% ; ">
+                @range.toString
+                </td>
+                @for(day <- days) {
+                    <td>
+                    @if(allTimeSlots.find(slot=> range.compare(slot) == 0 && slot.getParent.getSortIndex == day._1.toInt).nonEmpty) {
+                        @defining(existingTimeCriterias.find( tc=> range.compare(tc) ==0 && tc.getWeekday.getSortIndex == day._1.toInt )) { matchingCrit =>
+                            <form class="subform form-inline @if(matchingCrit.nonEmpty){ @{ matchingCrit.get.getDuration match {
+                                case EDuration.EVEN => "bg-warning"
+                                case EDuration.UNEVEN => "bg-primary"
+                                case EDuration.WEEKLY => "bg-info"
+                                case _ => "bg-danger"
+
+                            }
+                            } } "  >
+                                <div class="container center-block ">
+                                    <div class="form-group" >
+                                        <div class="radio">
+                                            <label>
+                                                <input class="form-control weekly" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDuration.WEEKLY" @if(matchingCrit.nonEmpty && matchingCrit.get.getDuration == EDuration.WEEKLY){checked}> w
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input class="form-control even" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDuration.EVEN" @if(matchingCrit.nonEmpty && matchingCrit.get.getDuration == EDuration.EVEN){checked}> g
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input class="form-control uneven" name="timerange" type="radio" value="@{""+range.startHour + "-" + range.startMinute + "," + range.stopHour + "-" + range.stopMinute},@day._1,@EDuration.UNEVEN" @if(matchingCrit.nonEmpty && matchingCrit.get.getDuration == EDuration.UNEVEN){checked}> ug
+                                            </label>
+                                        </div>
+                                        <div class="radio">
+                                            <label>
+                                                <input class="form-control unavailable" name="timerange" type="radio" value="unavailable" @if(matchingCrit.isEmpty){checked}> N
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </form>
+                        }
+                    }
+                    </td>
+                }
+
+            </tr>
         }
-    </select>
+        </tbody>
+    </table>
 </div>
-<div class="form-group">
-    <label class="control-label">Art der Woche</label>
-    <select name="tcritDuration" class="form-control">
-        <option @if(duration == EDuration.WEEKLY){selected} value="@EDuration.WEEKLY">Wöchentlich</option>
-        <option @if(duration == EDuration.EVEN){selected} value="@EDuration.EVEN">Gerade</option>
-        <option @if(duration == EDuration.UNEVEN){selected} value="@EDuration.UNEVEN">Ungerade</option>
-    </select>
-</div>
-<div class='form-group'>
-    <button type='button' class='btn-sm btn btn-danger removeTimeCritBtn'> <span class='glyphicon glyphicon-minus'></span> </button>
-</div>
-    <div class="clearfix"></div>
-    <div class="form-group">
-        <fieldset>
-        <legend class="control-label">Von</legend>
-        <div class="form-group">
-            <label class="control-label">Stunde</label>
-            <select class="form-control" name="startHour">
-                @for(index<- 0 to 23){
-                    <option value="@index" @if(startHour == index){selected } > @index.formatted("%02d") </option>
-                }
-            </select>
-        </div>
-        <div class="form-group">
-            <label class="control-label">Minute</label>
-            <select class="form-control" name="startMinute">
-                @for(index<- 0 to 59 by 5){
-                <option value="@index" @if(index == startMinute){selected }> @index.formatted("%02d") </option>
-                }
-            </select>
-        </div>
-        </fieldset>
-    </div>
-
-    <div class="form-group">
-        <fieldset>
-        <legend class="control-label">Bis</legend>
-        <div class="form-group">
-            <label class="control-label">Stunde</label>
-            <select class="form-control" name="stopHour">
-            @for(index<- 0 to 23){
-                <option value="@index" @if(stopHour == index){selected } > @index.formatted("%02d") </option>
-            }
-            </select>
-        </div>
-        <div class="form-group">
-            <label class="control-label">Minute</label>
-            <select class="form-control" name="stopMinute">
-            @for(index<- 0 to 59 by 5){
-                <option value="@index" @if(index == stopMinute){selected }> @index.formatted("%02d") </option>
-            }
-            </select>
-        </div>
-        </fieldset>
-    </div>
 <script>
-$ ( '.removeTimeCritBtn' ).on ( 'click', function ( ) {
-console.log ( 'remove  pressed' ) ;
-var form = $ ( this ).parent ( ).parent ( ) ;
-$ ( form ).empty ( ).remove ( ) ;
-
-} ) ;
-
+/**register event handlers to change background in table*/
+$('.weekly' ).on('click', function(){
+$(this ).parents('form' ).removeClass('bg-primary').removeClass('bg-warning' ).addClass('bg-info');
+});
+$('.even' ).on('click', function(){
+$(this ).parents('form' ).removeClass('bg-primary').removeClass('bg-info' ).addClass('bg-warning');
+});
+$('.uneven' ).on('click', function(){
+$(this ).parents('form' ).removeClass('bg-info').removeClass('bg-warning' ).addClass('bg-primary');
+});
+$('.unavailable' ).on('click', function(){
+$(this ).parents('form' ).removeClass('bg-primary').removeClass('bg-warning' ).removeClass('bg-info');
+});
 </script>

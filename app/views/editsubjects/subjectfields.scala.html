@@ -1,4 +1,4 @@
-@(lectureType: String, subject: models.persistence.subject.AbstractSubject, docents: List[models.persistence.docents.Docent], courses: List[models.persistence.participants.Course], houses:List[models.persistence.location.HouseEntity], rooms:List[models.persistence.location.RoomEntity], groupTypes:List[String])
+@(lectureType: String, subject: models.persistence.subject.AbstractSubject, docents: List[models.persistence.docents.Docent], courses: List[models.persistence.participants.Course], houses:List[models.persistence.location.HouseEntity], rooms:List[models.persistence.location.RoomEntity], groupTypes:List[String], allTimeSlots:List[models.persistence.template.TimeSlotTemplate], timeRange:List[models.fhs.pages.generator.TimeRange])
 
 @import models.fhs.pages.roomdefinition.MRoomdefintion
 @import models.persistence.criteria.{RoomCriteria, TimeSlotCriteria}
@@ -60,7 +60,7 @@
     </div>
     @if(lectureType.equals(CEditSubjects.EXERCISE)) {
         <div class="form-group">
-            <label class="control-label" for="groupTypeInput"><br/>Gruppentyp</label>
+            <label class="control-label" for="groupTypeInput"><br/>Gruppeneinteilung</label>
             <select class="form-control" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="">
                 @groupTypes.map{ gt=>
                     <option  @if(gt.equals(subject.asInstanceOf[ExerciseSubject].getGroupType)){selected} value="@gt">@gt</option>
@@ -186,23 +186,6 @@
         </div>
     </div>
 </div>
-    <div class="col-md-4">
-        <div class="panel panel-warning">
-            <div class="panel-heading">
-                <h4 class="panel-title">Platziere zu festem Zeitpunkt</h4>
-            </div>
-            <div class="panel-body">
-                <button type="button" id="addTcritBtn" class="btn btn-success btn-sm"> <span class="glyphicon glyphicon-plus"></span> </button>
-                <div id="timeCritContainer">
-                @for(tcrit<-subject.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).map{ case tc:TimeSlotCriteria=>tc}){
-                    <div class="timeCritsForm panel panel-info">
-                        @timecrits(tcrit.getStartHour,tcrit.getStartMinute,tcrit.getStopHour,tcrit.getStopMinute,tcrit.getWeekday.getSortIndex, tcrit.getDuration)
-                    </div>
-                }
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div class="clearfix"></div>
     <div class="form-group">
@@ -220,6 +203,8 @@
 
     </div>
 
+
+
     <div class="clearfix" ></div>
 
     <br/>
@@ -233,18 +218,32 @@
     </div>
 
 </form>
-
 <div class="clearfix"></div>
 
 <div id="result" ></div>
+
+<div class="col-md-12">
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h4 class="panel-title">Platziere zu festem Zeitpunkt (Optional)</h4>
+        </div>
+        <div class="panel-body">
+
+            <div id="timeCritContainer">
+            @defining(subject.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[TimeSlotCriteria]).map{ case tc:TimeSlotCriteria=>tc}.toList){ existingTimeCriterias =>
+                @timecrits(existingTimeCriterias,allTimeSlots,timeRange)
+            }
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <span id="synonymTemplate" class="sr-only">
 @synonyms("*",subject.getName,"")
 </span>
 
-<span id="tcritTemplate" class="sr-only">
-@timecrits(0,0,0,0,1,EDuration.WEEKLY)
-</span>
 
 <script type="text/javascript">
 
@@ -254,11 +253,6 @@
         $('#synonymContainer' ).append(addString);
     });
 
-    $('#addTcritBtn' ).on('click',function(){
-       var addString = "<div class='timeCritsForm panel panel-info'> " + $('#tcritTemplate' ).html() + "</div>";
-       $('#timeCritContainer' ).append(addString);
-        initSelect();
-    });
 
     $('#deleteSubjectModalBtn' ).on('click', function(){
       $('#subjectPlaceholder' ).html( $('#nameInput' ).val());
@@ -272,11 +266,11 @@
     cache : false,
     type : "GET",
     url:"@routes.CEditSubjects.deleteSubject(lectureType,subject.getId)",
-   success : function(){
-   getNameField();
-   $('#deleteSubjectModal').modal('toggle' );
-   }
-   });
+      success : function(){
+       getNameField();
+       $('#deleteSubjectModal').modal('toggle' );
+      }
+     });
   });
 
 $('#cloneSubjectBtn' ).on('click', function(){
@@ -354,23 +348,34 @@ return ;
     });
 
     var timeCritBuffer = [];
-    $('.timeCritsForm' ).each(function(index,value){
-        var startH = $(value ).find('select[name=startHour]' ).val();
-        var startM = $(value ).find('select[name=startMinute]' ).val();
-        var stopH = $(value ).find('select[name=stopHour]' ).val();
-        var stopM = $(value ).find('select[name=stopMinute]' ).val();
-        var dur = $(value ).find('select[name=tcritDuration]' ).val();
-        var wd = $(value ).find('select[name=weekday]' ).val();
-        timeCritBuffer.push(
-        {
-            startHour: Number(startH),
-            startMinute:Number(startM),
-            stopHour:Number(stopH),
-            stopMinute:Number(stopM),
-            duration:dur,
-            weekday:Number(wd)
-        });
-    });
+
+$('.subform' ).each(function(index, value){
+    var subFormData = $(value ).serializeObject();
+    if(subFormData['timerange' ].indexOf('unavailable')==-1){
+        var splittedData = subFormData['timerange' ].split(',');
+        var startRange = splittedData[0].split('-');
+        var startHour = Number(startRange[0]);
+        var startMinute = Number(startRange[1]);
+
+        var stopRange = splittedData[1].split('-');
+        var stopHour = Number(stopRange[0]);
+        var stopMinute = Number(stopRange[1]);
+
+        var dayIndex = Number(splittedData[2]);
+        var duration = splittedData[3];
+
+        var timeCrit = {
+        "startHour":startHour,
+        "startMinute":startMinute,
+        "stopHour":stopHour,
+        "stopMinute": stopMinute,
+        "weekday": dayIndex,
+        "duration": duration
+        };
+    timeCritBuffer.push(timeCrit);
+    }
+});
+
 
 var data = $ ( '#subjectForm' ).serializeObject ( ) ;
 data[ 'subjectType' ] = '  @lectureType '.trim();
@@ -382,48 +387,22 @@ data[ 'timecriterias' ] = timeCritBuffer;
     data[ 'activeCheckbox' ] = $.parseJSON(data[ 'activeCheckbox' ]);
 /** make sure that arrays are arrays */
 
+data['alternativeRooms']=data['alternativeRooms'] || [];
+data[ 'alternativeRooms' ] = wrapArray(data[ 'alternativeRooms' ] || []);
+data[ 'selectCourse' ] = wrapArray(data[ 'selectCourse' ] || []) ;
+data['houseCriteria']=wrapArray(data['houseCriteria'] || []);
+data['roomCriteria']=wrapArray(data.roomCriteria||[]);
+data['roomAttributes']=wrapArray(data['roomAttributes']||[]);
 
-if(data['alternativeRooms']==null){
-data['alternativeRooms']=[];
-}
-
-if ( ! $.isArray ( data[ 'alternativeRooms' ] ) ) {
-data[ 'alternativeRooms' ] =[ data[ 'alternativeRooms' ] ] ;
-}
-
-if ( ! $.isArray ( data[ 'selectCourse' ] ) ) {
-data[ 'selectCourse' ] =[ data[ 'selectCourse' ] ] ;
-}
-
-if(data['houseCriteria']==null){
-    data['houseCriteria']=[];
-}
-if(! $.isArray(data['houseCriteria'])){
-    data['houseCriteria']=[data.houseCriteria];
-}
-
-if(data['roomCriteria']==null){
-data['roomCriteria']=[];
-}
-if(! $.isArray(data['roomCriteria'])){
-data['roomCriteria']=[data.roomCriteria];
-}
-
-if(data['roomAttributes']==null){
-    data['roomAttributes']=[];
-}
-if(! $.isArray(data['roomAttributes'])){
-    data['roomAttributes']=[data['roomAttributes']];
-}
 
 if ( data[ 'selectDocents' ] == null ) {
 $ ( '#docents' ).addClass ( 'has-error' ) ;
 appendError ( ) ;
 return ;
 }
-if ( ! $.isArray ( data[ 'selectDocents' ] ) ) {
-data[ 'selectDocents' ] =[ data[ 'selectDocents' ] ] ;
-}
+
+data[ 'selectDocents' ] =wrapArray(data[ 'selectDocents' ]||[]);
+
 
 if ( data[ 'selectCourse' ] == null ) {
 $ ( '#courses' ).addClass ( 'has-error' ) ;
@@ -476,4 +455,5 @@ $ ( '#' + response.result ).addClass ( 'has-error' ) ;
 console.debug ( JSON.stringify ( data ) ) ;
 
 } ) ;
+
 </script>

@@ -2,6 +2,7 @@ package controllers
 
 
 import com.decodified.scalassh._
+import controllers.traits.TController
 import models.fhs.pages.index._
 import play.api.Logger
 import play.api.data.Forms._
@@ -13,7 +14,7 @@ import play.api.mvc._
  * @author fabian
  *         on 22.01.14.
  */
-object CIndex extends Controller {
+object CIndex extends TController {
 
   val NAV = "index"
 
@@ -26,8 +27,7 @@ object CIndex extends Controller {
     )(MUser.apply)(MUser.unapply)
   )
 
-  def index =
-    Action {
+  def page() = Action {
       implicit request =>
         Ok(views.html.index.index("Home"))
     }
@@ -61,7 +61,7 @@ object CIndex extends Controller {
 
             results.right.toOption match {
               case None =>
-                Redirect(routes.CIndex.index()).withSession(session + (WRONG_LOGIN -> "true"))
+                Redirect(routes.CIndex.page()).withSession(session + (WRONG_LOGIN -> "true"))
               case Some(resultString) =>
                 Logger.debug("loginresult: " + resultString)
 
@@ -69,7 +69,7 @@ object CIndex extends Controller {
                 val isAdmin = MIndex.ADMINS.contains(user)
                 val isDeveloper=MIndex.DEVELOPERS.contains(user)
 
-                Redirect(routes.CIndex.index()).withSession(session +
+                Redirect(routes.CIndex.page()).withSession(session +
                   (WRONG_LOGIN -> "false") + (CURRENT_USER -> mUser.username) + (IS_ADMIN -> isAdmin.toString) + (IS_DOCENT -> isDocent.toString) + (IS_DEVELOPER -> isDeveloper.toString))
             }
 
@@ -89,7 +89,7 @@ object CIndex extends Controller {
 
   def doLogout() = Action {
     implicit request =>
-      Redirect(routes.CIndex.index()).withNewSession
+      Redirect(routes.CIndex.page()).withNewSession
   }
 
 }
