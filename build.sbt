@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   cache,
   filters,
   "org.webjars" %% "webjars-play" % "2.3.0",
-  "org.webjars" % "bootstrap" % "3.2.0",
+  "org.webjars" % "bootstrap" % "3.3.2",
   "org.hibernate" % "hibernate-core" % "4.2.3.Final",
   "org.hibernate" % "hibernate-entitymanager" % "4.2.3.Final",
   //"mysql" % "mysql-connector-java" % "5.1.21",
