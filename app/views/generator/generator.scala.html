@@ -118,7 +118,7 @@
 
 
                 var time =  @flash.get("endTime").getOrElse(Calendar.getInstance().getTimeInMillis.toString)  - @flash.get("startTime").getOrElse(Calendar.getInstance().getTimeInMillis.toString) ;
-                var w = @{ Calendar.getInstance().getTimeInMillis - flash.get("startTime").getOrElse(Calendar.getInstance().getTimeInMillis.toString).toLong  };
+                var startTime = @flash.get("startTime").getOrElse(Calendar.getInstance().getTimeInMillis.toString) ;
 
                 var showSchedule = function(){
                 $.getJSON("generatorGetSchedule/" + $('#selectCourseFilter').val() + "/" + $('#selectDocentFilter' ).val() + "/" + $('#selectDuration' ).val() + "/" + $('#selectRoomFilter' ).val(), function(data){
@@ -134,8 +134,8 @@
             $ ( '.progress-bar' ).removeClass ( 'progress-bar-warning' ).addClass ( 'progress-bar-success' ) ;
             } ;
 
-            var addProgress= function(progressValue){
-                w+= progressValue;
+            var addProgress= function(){
+                var w= new Date( ).getTime() - startTime;
                 if(w>time){
                     w=time;
                 }
@@ -164,7 +164,7 @@
             showSchedule();
             } else {
             setTimeout ( poll, 2000 ) ;
-            addProgress(2000);
+            addProgress();
             }
             }
             } ) ;
