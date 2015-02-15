@@ -15,6 +15,7 @@ import models.persistence.criteria.DocentTimeWish
 import models.persistence.docents.Docent
 import models.persistence.enumerations.EDuration
 import models.persistence.lecture.Lecture
+import models.persistence.scheduletree.{TimeSlot, Weekday}
 import models.persistence.template.TimeSlotTemplate
 import play.api.Logger
 
@@ -101,6 +102,13 @@ class ScheduleGeneratorActor extends Actor {
 
               schedule.setRateSum(rate.values.sum)
 
+              val placedLectures = schedule.getRoot.getChildren.flatMap{
+                case wd:Weekday=> wd.getChildren.flatMap{
+                  case ts:TimeSlot=> ts.getLectures
+                }
+              }.toSet
+
+              require(lectures.size == placedLectures.size, "expected lectures: " + lectures.size + " got: " + placedLectures.size)
               theSender ! ScheduleAnswer(schedule)
             case None => theSender ! InplacebleSchedule(lectures.sortBy(_.getDifficulty.multiply(BigInteger.valueOf(-1))).take(20))
           }
