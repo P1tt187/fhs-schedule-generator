@@ -381,7 +381,7 @@ object CEditCourses extends TController {
 
   def getCourseFields(courseId: Long) = Action {
     implicit request =>
-      val session = request.session + ((NAV + ".edidcourse") -> courseId.toString)
+      val session = request.session + ((NAV + ".editcourse") -> courseId.toString)
       Ok(Json.stringify(Json.obj("htmlresult" -> courseFields(findCourse(courseId), findRooms).toString()))).withSession(session)
   }
 
