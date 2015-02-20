@@ -29,7 +29,7 @@
                     <label for="courseSelect" class="control-label">Kurs Auswählen</label>
                     <select id="courseSelect" class="form-control">
                     @for(course <- courses) {
-                        <option @if(course.getId.toString.equals(session.get(CEditCourses.NAV+".edidcourse").getOrElse("-1"))){selected } value="@course.getId">@course.getShortName</option>
+                        <option @if(course.getId.toString.equals(session.get(CEditCourses.NAV+".editcourse").getOrElse("-1"))){selected } value="@course.getId">@course.getShortName</option>
                     }
                     </select>
                 </div>
