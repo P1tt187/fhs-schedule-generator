@@ -22,12 +22,13 @@ libraryDependencies ++= Seq(
   "com.jcraft" % "jzlib" % "1.1.3"
 )
 
-//scalaVersion := "2.11.1"
+scalaVersion := "2.11.5"
 
 scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitConversions")
 
 javaOptions ++=Seq("-Dhttp.port=disabled","-Dhttps.port=9443","-Dhttps.keyStore=/opt/sgd/sslkeystore","-Dhttps.keyStorePassword=sgenerator")
 
+scapegoatConsoleOutput := false
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb)
 
