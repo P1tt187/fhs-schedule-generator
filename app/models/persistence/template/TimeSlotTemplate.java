@@ -349,6 +349,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by fabian on 07.02.14.
@@ -468,11 +469,10 @@ public class TimeSlotTemplate extends AbstractEntity implements Comparable<TimeS
     }
 
     @Override
-    public int compareTo(TimeSlotTemplate that) {
-        if (that == null) {
-            return -1;
+    public int compareTo(@NotNull TimeSlotTemplate that) {
+        if (this.equals(that)) {
+            return 0;
         }
-
         WeekdayTemplate thisWeekday = parent;
         WeekdayTemplate thatWeekday = that.parent;
 
@@ -498,5 +498,33 @@ public class TimeSlotTemplate extends AbstractEntity implements Comparable<TimeS
 
         return this.stopMinute.compareTo(that.stopMinute);
 
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TimeSlotTemplate that = (TimeSlotTemplate) o;
+
+        if (parent != null ? !parent.equals(that.parent) : that.parent != null) return false;
+        if (startHour != null ? !startHour.equals(that.startHour) : that.startHour != null) return false;
+        if (startMinute != null ? !startMinute.equals(that.startMinute) : that.startMinute != null) return false;
+        if (stopHour != null ? !stopHour.equals(that.stopHour) : that.stopHour != null) return false;
+        if (stopMinute != null ? !stopMinute.equals(that.stopMinute) : that.stopMinute != null) return false;
+        if (unpopular != null ? !unpopular.equals(that.unpopular) : that.unpopular != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = parent != null ? parent.hashCode() : 0;
+        result = 31 * result + (startHour != null ? startHour.hashCode() : 0);
+        result = 31 * result + (startMinute != null ? startMinute.hashCode() : 0);
+        result = 31 * result + (stopHour != null ? stopHour.hashCode() : 0);
+        result = 31 * result + (stopMinute != null ? stopMinute.hashCode() : 0);
+        result = 31 * result + (unpopular != null ? unpopular.hashCode() : 0);
+        return result;
     }
 }
