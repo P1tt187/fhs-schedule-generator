@@ -1,0 +1,46 @@
+@(existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay])
+@import models.fhs.pages.roomdefinition.MRoomdefintion
+
+<div class="table-responsive">
+
+    <table class="table table-striped table-hover table-condensed text-center" >
+      <thead>
+        <tr class="text-info">
+          <th>Haus</th>
+          <th>Nummer</th>
+          <th>Kapazität</th>
+          @for(e <- MRoomdefintion.ATTRIBUTES) {
+            <th>@e</th>
+          }
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      @for(roomEntity <- existingRooms) {
+        <tr >
+          <td>
+          @roomEntity.house
+          </td>
+          <td>
+          @roomEntity.number
+          </td>
+          <td>
+          @roomEntity.capacity
+          </td>
+          @for(e <- MRoomdefintion.ATTRIBUTES) {
+            <td>
+              <span class="glyphicon  @if(roomEntity.roomAttributes.filter(_.getAttribute.equalsIgnoreCase(e))) { glyphicon-ok } else { glyphicon-remove } " ></span>
+            </td>
+          }
+          <td>
+            <button role="button" class="btn btn-sm btn-warning" onclick="$ ( location ).attr ( 'href', ' @routes.CRoomDefinition.editRoom(roomEntity.id) ');"><span class="glyphicon glyphicon-pencil"></span> </button>
+          </td>
+          <td>
+            <button role="button" class="btn btn-sm btn-danger" onclick="$ ( location ).attr ( 'href', ' @routes.CRoomDefinition.deleteRoom(roomEntity.id) ');"><span class="glyphicon glyphicon-trash"></span></button>
+          </td>
+        </tr>
+      }
+      </tbody>
+    </table>
+</div>

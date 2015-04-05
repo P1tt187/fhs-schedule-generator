@@ -1,0 +1,72 @@
+@(existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay], allTimeSlots : List[persistence.template.TimeSlotTemplate], timeRanges: List[fhs.pages.generator.TimeRange])
+
+@import models.persistence.enumerations.EDuration
+@import models.fhs.pages.roomdefinition.MRoomdefintion
+
+@for(roomEntity <- existingRooms.filterNot(_.timeCriterias.isEmpty).sortBy(r =>(r.house,r.number))) {
+  <div class="col-md-6">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          @roomEntity.house @roomEntity.number
+        </h3>
+      </div>
+
+      <div class="panel-body">
+        <div class="table-responsive">
+
+        @defining(CTimeslotDefintion.WEEKDAYS.filterNot{
+          case (sortIndexString,dayname)=>
+            val sortIndex=sortIndexString.toInt
+            roomEntity.timeCriterias.find(tc=> tc.weekdayIndex == sortIndex).isEmpty
+        }.sortBy(_._1)) { days =>
+          <table class="table table-bordered table-striped table-hover table-condensed text-center" >
+            <thead>
+              <tr>
+                <th class="text-info text-center" >Uhrzeit</th>
+                @for(day <- days) {
+                  <th class="text-info text-center" > @day._2</th>
+                }
+                </tr>
+            </thead>
+            <tbody>
+            @for(range <- MRoomdefintion.findTimeRanges(roomEntity.timeCriterias).sorted){
+              <tr>
+                <td style=" vertical-align : middle ; width : 8% ;">
+                @range.toString
+                </td>
+
+                @for(day <- days) {
+                  <td >
+                  @for(tcrit<-roomEntity.timeCriterias.filter(slot=> range.compare(slot) == 0 && slot.weekdayIndex == day._1.toInt)){
+                    <div class=" text-center @{
+                      tcrit.duration match {
+                        case EDuration.WEEKLY => "bg-info"
+                        case EDuration.EVEN => "bg-warning"
+                        case EDuration.UNEVEN => "bg-primary"
+                        case other => other.name()
+                      }
+                    }
+                    "> @{
+                      tcrit.duration match {
+                        case EDuration.WEEKLY => "w"
+                        case EDuration.EVEN => "g"
+                        case EDuration.UNEVEN => "ug"
+                        case other => other.name()
+                      }
+                    } </div>
+                  }
+                  </td>
+                }
+
+              </tr>
+            }
+
+            </tbody>
+          </table>
+        }
+        </div>
+      </div>
+    </div>
+  </div>
+}
