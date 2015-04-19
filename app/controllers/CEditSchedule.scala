@@ -348,7 +348,7 @@ import models.Transactions
 import models.fhs.pages._
 import models.fhs.pages.editschedule.MEditSchedule._
 import models.fhs.pages.generator.MGenerator.{findCourses, findSemesterById, _}
-import models.fhs.pages.generator.TimeRange
+import models.fhs.pages.basicstuctures.TimeRange
 import models.persistence.enumerations.EDuration
 import models.persistence.lecture.{AbstractLecture, Lecture}
 import models.persistence.location.RoomEntity

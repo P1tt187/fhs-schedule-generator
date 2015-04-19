@@ -1,4 +1,4 @@
-@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], allRooms:List[persistence.location.RoomEntity], allCourses:List[persistence.participants.Course], allDocents:List[persistence.docents.Docent], semesterId:Long)
+@(title:String,timeRanges: List[models.fhs.pages.basicstuctures.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], allRooms:List[persistence.location.RoomEntity], allCourses:List[persistence.participants.Course], allDocents:List[persistence.docents.Docent], semesterId:Long)
 @import models.persistence.enumerations.EDuration
 @import models.persistence.scheduletree.Weekday
 
@@ -73,7 +73,7 @@
     </div>
     <br/>
 
-<div class="table-responsive">
+<div class="">
     <table class="table table-bordered table-striped table-condensed">
         <thead>
             <tr>

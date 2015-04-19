@@ -347,7 +347,7 @@ import controllers.traits.TController
 import models.Transactions
 import models.fhs.pages.editsubjects.MEditSubjects._
 import models.fhs.pages.editsubjects.MSemester
-import models.fhs.pages.generator.TimeRange
+import models.fhs.pages.basicstuctures.TimeRange
 import models.persistence.Semester
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCriteria, TimeSlotCriteria}
 import models.persistence.docents.Docent

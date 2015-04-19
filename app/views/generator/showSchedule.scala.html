@@ -1,4 +1,4 @@
-@(title:String,timeRanges: List[models.fhs.pages.generator.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], rate:Int, alternatives:Map[java.util.UUID,persistence.Schedule],semester:models.persistence.Semester)(implicit session:Session)
+@(title:String,timeRanges: List[models.fhs.pages.basicstuctures.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], rate:Int, alternatives:Map[java.util.UUID,persistence.Schedule],semester:models.persistence.Semester)(implicit session:Session)
 
 @import models.persistence.scheduletree.Weekday
 @import models.persistence.enumerations.EDuration

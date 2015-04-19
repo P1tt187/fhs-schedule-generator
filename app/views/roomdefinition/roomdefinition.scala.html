@@ -1,9 +1,9 @@
-@(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion], weekdays: Seq[(String, String)], existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay], allTimeSlots : List[persistence.template.TimeSlotTemplate], timeRanges: List[fhs.pages.generator.TimeRange] )(implicit session:Session)
+@(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion], weekdays: Seq[(String, String)], existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay], allTimeSlots : List[persistence.template.TimeSlotTemplate], timeRanges: List[fhs.pages.basicstuctures.TimeRange] )(implicit session:Session)
 
 @import models.fhs.pages.roomdefinition._
 @import models.persistence.enumerations.EDuration
 @import views.html.helper._
-@import models.fhs.pages.generator.TimeRange._
+@import models.fhs.pages.basicstuctures.TimeRange._
 
 @defaultRoom = @{MRoomdefintion(None,0,"","",List[String](),List[MTtimeslotCritDefine]())}
 

@@ -17,9 +17,9 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.21",
   "org.mariadb.jdbc" % "mariadb-java-client" % "1.1.7",
   "uk.com.robust-it" % "cloning" % "1.9.0",
-  "com.decodified" %% "scala-ssh" % "0.7.0",
-  "org.bouncycastle" % "bcprov-jdk16" % "1.46",
-  "com.jcraft" % "jzlib" % "1.1.3"
+  "com.decodified" %% "scala-ssh" % "0.7.0"
+  //"org.bouncycastle" % "bcprov-jdk16" % "1.46",
+  //"com.jcraft" % "jzlib" % "1.1.3"
 )
 
 scalaVersion := "2.11.5"
