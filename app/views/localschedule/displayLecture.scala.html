@@ -1,0 +1,50 @@
+@(lecture: models.persistence.lecture.Lecture)
+
+@import models.persistence.enumerations.{EDuration, ELectureKind}
+@import play.api.Play.current
+
+  <div class="panel panel-info small smalltext @lecture.getLectureParticipants.map(p=> p.getCourseName).mkString(" ") hidden lecture">
+    <div class="panel-body @{
+      lecture.getDuration match {
+        case EDuration.EVEN => "bg-warning"
+        case EDuration.UNEVEN => "bg-primary"
+        case EDuration.WEEKLY => "bg-info"
+        case other => "bg-danger " + other
+      }
+    }" >
+      <div class=""> <strong>  @lecture.getShortName("*") </strong></div>
+      <div class="pull-right">
+        <span class="glyphicon @{
+          lecture.getKind match {
+            case ELectureKind.EXERCISE => "glyphicon-hdd"
+            case ELectureKind.LECTURE => "glyphicon-book"
+          }
+        } " >
+        </span>
+      </div>
+      @if(lecture.getKind == ELectureKind.EXERCISE ) {
+        <div>
+        @lecture.getLectureParticipants.head.getGroupType
+        </div>
+      }
+      <div style="font-size: 90%">
+      @for(participant <- lecture.getLectureParticipants.toList.sortBy(_.getCourseName)) {
+        <div class="pull-left" style="padding-right: 1em">
+        @participant.getShortName
+        </div>
+      }
+      </div>
+      <div class="clearfix"></div>
+      <div class="pull-right">
+      @lecture.getDocents.map(_.getLastName).mkString(", ")
+      </div>
+      <div> @lecture.getLectureRoom.getHouse @lecture.getLectureRoom.getNumber </div>
+      <div> @lecture.getAlternativeLectureRooms.map{ lr=>
+        <span class="label label-warning">@lr.getHouse @lr.getNumber</span>
+      }</div>
+      @if(!lecture.getNotOptimalPlaced.isEmpty && current.configuration.getString("schedule.show.outOfWishTime").getOrElse("OFF").equalsIgnoreCase("ON")) {
+
+        <span class="label label-danger">@lecture.getNotOptimalPlaced</span>
+      }
+      </div>
+  </div>
