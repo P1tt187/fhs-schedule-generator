@@ -3,7 +3,8 @@
 @import models.persistence.enumerations.{EDuration, ELectureKind}
 @import play.api.Play.current
 
-  <div class="panel panel-info small smalltext @lecture.getLectureParticipants.map(p=> p.getCourseName).mkString(" ") hidden lecture">
+  <div class="panel panel-info small smalltext ">
+    <div class="panel-heading"><strong>  @lecture.getShortName("*") </strong></div>
     <div class="panel-body @{
       lecture.getDuration match {
         case EDuration.EVEN => "bg-warning"
@@ -12,7 +13,7 @@
         case other => "bg-danger " + other
       }
     }" >
-      <div class=""> <strong>  @lecture.getShortName("*") </strong></div>
+
       <div class="pull-right">
         <span class="glyphicon @{
           lecture.getKind match {
@@ -28,11 +29,9 @@
         </div>
       }
       <div style="font-size: 90%">
-      @for(participant <- lecture.getLectureParticipants.toList.sortBy(_.getCourseName)) {
-        <div class="pull-left" style="padding-right: 1em">
-        @participant.getShortName
-        </div>
-      }
+        @if(lecture.getKind == ELectureKind.EXERCISE) {
+          @lecture.getLectureParticipants.map(_.getGroupIndex).toSet.mkString(" ")
+        }
       </div>
       <div class="clearfix"></div>
       <div class="pull-right">
