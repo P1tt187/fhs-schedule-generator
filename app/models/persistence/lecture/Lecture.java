@@ -683,7 +683,7 @@ public class Lecture extends AbstractLecture {
 
     @JsonIgnore
     public String getShortName() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < name.length(); i++) {
             if (Character.isUpperCase(name.charAt(i)) || Character.isDigit(name.charAt(i)) || name.charAt(i) == '/' || name.charAt(i) == ' ' || name.charAt(i) == '+' || name.charAt(i) == '-') {

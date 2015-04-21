@@ -4,7 +4,11 @@
 @import play.api.Play.current
 
   <div class="panel panel-info small smalltext ">
-    <div class="panel-heading"><strong>  @lecture.getShortName("*") </strong></div>
+    <div class="panel-heading">
+      @lecture.getLectureParticipants.map { p=>
+        <strong class="hidden lecturetitle @p.getCourseName">  @lecture.getShortName(p.getCourseName)</strong>
+      }
+      </div>
     <div class="panel-body @{
       lecture.getDuration match {
         case EDuration.EVEN => "bg-warning"
@@ -35,7 +39,7 @@
       </div>
       <div class="clearfix"></div>
       <div class="pull-right">
-      @lecture.getDocents.map(_.getLastName).mkString(", ")
+      @lecture.getDocents.map{ d=> @d.getLastName <br/>}
       </div>
       <div> @lecture.getLectureRoom.getHouse @lecture.getLectureRoom.getNumber </div>
       <div> @lecture.getAlternativeLectureRooms.map{ lr=>

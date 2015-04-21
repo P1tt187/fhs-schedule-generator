@@ -1,0 +1,59 @@
+@(isOnline: Boolean, days: Seq[(String, String)], timeRanges: List[models.fhs.pages.basicstuctures.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], semester: models.persistence.Semester)
+
+@import models.fhs.pages.JavaList
+@import models.persistence.enumerations.EDuration
+@import models.persistence.lecture.Lecture
+@import models.persistence.scheduletree.Weekday
+
+<ul class="nav nav-tabs">
+@days.map { day =>
+    @defining(if(isOnline){"mobile-online-pane" + day._1} else{"mobile-local-pane" + day._1}) { dayIdName =>
+        <li role="presentation" @if(day._1 == days.head._1) {
+            class="active"}><a aria-controls="@dayIdName" role="tab" data-toggle="tab" href="#@dayIdName"> @day._2.substring(0, 2) </a> </li>
+    }
+    }
+</ul>
+
+<div class="clearfix"></div>
+<div class="tab-content">
+@days.map { day =>
+        @defining(if(isOnline){"mobile-online-pane" + day._1} else{"mobile-local-pane" + day._1}){ dayIdName =>
+    <div class="tab-pane fade @if(day._1 == days.head._1) { in  active}" id="@dayIdName">
+        <div class="panel panel-info">
+            <div class="panel-heading"><div class="text-center"> @day._2 </div></div>
+            <div class="panel-body">
+            @timeRanges.sorted.map { range =>
+                <div class="row table-bordered">
+                    <div class="col-xs-3" > @range.toString </div>
+                    <div class="col-xs-8">
+
+                    @defining(timeslots.toSet.filter(slot => range.compare(slot) == 0 && slot.getParent.asInstanceOf[Weekday].getSortIndex.toInt == day._1.toInt)) { relevantSlots =>
+                        @defining(relevantSlots.flatMap(_.getLectures.asInstanceOf[JavaList[Lecture]].toList).toList.sortBy { l => (if(l.getDuration == EDuration.WEEKLY) {
+                            0
+                        } else {
+                            -relevantSlots.map(_.getLectures.count(_.getDocents.contains(l.getDocents.head))).sum
+                        }, l.getDocents.head.getLastName)
+                        }) { lectures =>
+                            <ul class="list-unstyled list-inline ">
+                                @for(idx <- 0 to (lectures.length - 1)) {
+                                    <li data-uuid="@lectures(idx).getUuid" class="listElement hidden @if(isOnline) {
+                                        lecture @lectures(idx).getLectureParticipants.map(p => p.getCourseName).mkString(" ")
+                                    } else {
+                                        @lectures(idx).getUuid localLecture
+                                    }" style="min-width: 170px ; max-width: 220px">
+                                    @displayLecture(lectures(idx))
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    }
+
+                    </div>
+                </div>
+            }
+            </div>
+        </div>
+    </div>
+  }
+}
+</div>
