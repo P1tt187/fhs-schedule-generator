@@ -5,6 +5,10 @@
 @import models.persistence.lecture.Lecture
 @import models.persistence.scheduletree.Weekday
 
+<div class="text-center">
+    <h4> @semester.getName </h4>
+</div>
+
 <ul class="nav nav-tabs">
 @days.map { day =>
     @defining(if(isOnline){"mobile-online-pane" + day._1} else{"mobile-local-pane" + day._1}) { dayIdName =>

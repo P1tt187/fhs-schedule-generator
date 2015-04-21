@@ -40,6 +40,9 @@
                         }
                     </select>
                 </div>
+                <!--div class="form-group">
+                    <a class="btn btn-info btn-sm" href="#" download="settings.json" id="exportbtn"> <span class="glyphicon glyphicon-download"></span> </a>
+                </div-->
             </div>
         <div class="clearfix"></div>
         <div class="tab-content">
@@ -109,6 +112,11 @@
            $('#uneven').removeClass('hidden');
            }
 
+           });
+
+           $('#exportbtn').click(function(){
+           var uuids = JSON.parse( localStorage.getItem('localLectures')||'[]');
+           this.href="data:text/plain;charset=UTF-8," + encodeURIComponent(JSON.stringify(uuids));
            });
       </script>
     }
