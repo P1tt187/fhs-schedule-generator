@@ -1,12 +1,18 @@
-@(lecture: models.persistence.lecture.Lecture)
+@(lecture: models.persistence.lecture.Lecture, isOnline:Boolean)
 
 @import models.persistence.enumerations.{EDuration, ELectureKind}
 @import play.api.Play.current
 
   <div class="panel panel-info small smalltext ">
     <div class="panel-heading">
-      @lecture.getLectureParticipants.map { p=>
-        <strong class="hidden lecturetitle @p.getCourseName">  @lecture.getShortName(p.getCourseName)</strong>
+      @if(isOnline) {
+        @lecture.getLectureParticipants.map { p =>
+          <strong class="hidden lecturetitle @p.getCourseName">  @lecture.getShortName(p.getCourseName)</strong>
+        }
+      } else {
+        @lecture.getLectureParticipants.map(p=> lecture.getShortName(p.getCourseName)).toSet.map{ lectureName:String =>
+          <p><strong>@lectureName</strong></p>
+        }
       }
       </div>
     <div class="panel-body @{

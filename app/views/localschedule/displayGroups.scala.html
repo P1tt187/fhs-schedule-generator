@@ -1,0 +1,54 @@
+@(courses:List[persistence.participants.Course])
+
+@import models.persistence.participants.Group
+
+@courses.par.map{ c=>
+<div class="hidden groupcontainer @c.getShortName">
+@defining(c.getGroups.toList){ allGroups =>
+  @defining(allGroups.map(_.getGroupType).toSet.toList.sortBy{
+    groupType:String=>
+      -c.getGroups.filter(_.getGroupType.equals(groupType)).map(_.getSize.toInt).sum
+  }){ sortedGroupTypes =>
+    @sortedGroupTypes.map{ groupType:String =>
+      <div class="panel panel-primary">
+        <div class="panel-heading text-center">
+          @groupType
+        </div>
+        <div class="panel-body">
+        @defining(allGroups.filter(_.getGroupType.equals(groupType)).sortBy(_.getGroupIndex)) { filteredGroups=>
+          <table class="table table-bordered table-striped table-condensed">
+            <thead>
+              <tr>
+                @filteredGroups.map { group =>
+                  <th class="text-center">Gruppe @group.getGroupIndex</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+            @defining(filteredGroups.map(_.getStudents.size()).max-1) { maxRows =>
+              @for(gidx <- 0 to maxRows) {
+                <tr>
+                @for(idx <- 0 to filteredGroups.size - 1) {
+                  <td class="text-center">
+                  @defining(filteredGroups(idx).getStudents.toList.sortBy(st=>(st.getLastName,st.getFirstName)).lift(gidx)){ student=>
+                    @if(student.nonEmpty){
+                      @student.get.getFirstName
+                      @student.get.getLastName
+                    }
+                  }
+                  </td>
+                }
+                </tr>
+              }
+            }
+            </tbody>
+          </table>
+        }
+        </div>
+      </div>
+
+    }
+  }
+}
+</div>
+}.seq

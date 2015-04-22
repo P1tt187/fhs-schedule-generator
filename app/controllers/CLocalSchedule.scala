@@ -347,50 +347,56 @@ import models.Transactions
 import models.fhs.pages.JavaList
 import models.persistence.Schedule
 import models.persistence.lecture.Lecture
+import models.persistence.participants.Course
 import models.persistence.scheduletree.{TimeSlot, Weekday}
-import play.api.Logger
-import play.api.data.Forms._
-import play.api.data._
+import org.hibernate.FetchMode
+import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
 import play.api.mvc._
-import scala.collection.JavaConversions._
 import views.html.localschedule._
+
+import scala.collection.JavaConversions._
 
 /**
  * @author fabian 
  * @since 19.04.15.
  */
-object CLocalSchedule extends TController{
+object CLocalSchedule extends TController {
 
   val NAV = "localSchedule"
 
-  def page = Action{
-    implicit requet=>
+  def page = Action {
+    implicit requet =>
 
-    val (allTimeslots,timerages) = timeRange
+      val (allTimeslots, timerages) = timeRange
 
-    val schedule = Transactions.hibernateAction{
-      implicit s=>
-        s.createCriteria(classOf[Schedule]).uniqueResult().asInstanceOf[Schedule]
-    }
+      val schedule = Transactions.hibernateAction {
+        implicit s =>
+          s.createCriteria(classOf[Schedule]).uniqueResult().asInstanceOf[Schedule]
+      }
 
       val semester = schedule.getSemester
 
-    val timeslots = schedule.getRoot.getChildren.flatMap{
-      case wd:Weekday=>
-        wd.getChildren.asInstanceOf[JavaList[TimeSlot]].toList
-    }.toList
+      val timeslots = schedule.getRoot.getChildren.flatMap {
+        case wd: Weekday =>
+          wd.getChildren.asInstanceOf[JavaList[TimeSlot]].toList
+      }.toList
 
-   val courseNames = timeslots.flatMap{
-     ts=>
-       ts.getLectures.flatMap{
-         case lecture:Lecture=>
-           lecture.getLectureParticipants.map{
-             participant=> participant.getCourseName
-           }
-       }
-   }.toSet.toList.sorted
+      val courseNames = timeslots.flatMap {
+        ts =>
+          ts.getLectures.flatMap {
+            case lecture: Lecture =>
+              lecture.getLectureParticipants.map {
+                participant => participant.getCourseName
+              }
+          }
+      }.toSet.toList.sorted
 
-    Ok(  localschedule ("Lokaler Stundenplan",courseNames,timerages,timeslots, semester))
+      val courses = Transactions.hibernateAction {
+        implicit s =>
+          s.createCriteria(classOf[Course]).add(Restrictions.in("shortName", courseNames)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).setFetchMode("groups", FetchMode.JOIN).list().asInstanceOf[JavaList[Course]].toList.sortBy(_.getShortName)
+      }
+
+      Ok(localschedule("Lokaler Stundenplan", courseNames, timerages, timeslots, semester, courses))
   }
 
 }
