@@ -1,0 +1,104 @@
+@(content: Html)
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title>Stundenplan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
+  <meta charset="utf-8">
+
+  <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/jquery-ui.min.css")">
+  <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/jquery-ui.structure.min.css")">
+  <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/jquery-ui.theme.min.css")">
+
+  <link rel="stylesheet" type="text/css" media="screen" href="@routes.WebJarAssets.at( WebJarAssets.locate("css/bootstrap.min.css") )">
+  <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-theme.min.css")">
+
+
+
+  <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+  <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-select.min.css")">
+  <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/datepicker.css")">
+
+  <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+
+    <!--[if lt IE 9]>
+        <script src="@routes.Assets.at("javascripts/IE9.js")" type="text/javascript"></script>
+
+        <![endif]-->
+
+        <!--[ IF IE ]>
+        <script src ="@routes.Assets.at("javascripts/jquery-1.11.1.min.js")" type="text/javascript"></script>
+        <![ENDIF]-->
+
+        <!--[IF !IE] -->
+        <script src="@routes.Assets.at("javascripts/jquery-2.1.0.min.js")" type="text/javascript"></script>
+    <!--<![ENDIF]-->
+
+  <script src="@routes.Assets.at("javascripts/bootstrap-datepicker.js")" type="text/javascript"></script>
+  <script src="@routes.WebJarAssets.at(WebJarAssets.locate("js/bootstrap.js"))" type="text/javascript"></script>
+  <script src="@routes.Assets.at("javascripts/modernizr.custom.60350.js")" type="text/javascript"></script>
+
+  <script src="@routes.Assets.at("javascripts/bootstrap-select.min.js")" type="text/javascript"></script>
+
+  <script src="@routes.Assets.at("javascripts/bootstrap.file-input.js")" type="text/javascript"></script>
+  <script src="@routes.Assets.at("javascripts/jquery.serializeObject.js")" type="text/javascript"></script>
+  <script src="@routes.Assets.at("javascripts/jquery.sortable.js")" type="text/javascript"></script>
+  <script src="@routes.Assets.at("javascripts/jquery-ui.min.js")" type="text/javascript"></script>
+  <script src="@routes.Assets.at("javascripts/main.js")" type="text/javascript"></script>
+</head>
+<body>
+<article>
+    @content
+</article>
+    <footer id="footer">
+        <div class="container text-muted text-center" >
+            Author: Fabian Markert
+            <ul class="list-unstyled list-inline">
+                <li><a href="https://github.com/P1tt187">github</a> </li>
+                <li><a href="https://plus.google.com/+FabianMarkert">Google Plus</a> </li>
+            </ul>
+        </div>
+    </footer>
+    <script >
+
+        var initSelect = function ( ) {
+        $ ( "input" ).addClass ( 'form-control' ) ;
+        $ ( "select" ).each ( function ( index, value ) {
+        if ( $ ( value ).parents ( '.sr-only' ).length == 0 ) {
+        $ ( value ).attr ( 'data-live-search', true ).addClass ( 'form-control' ).selectpicker ( {
+        //'selectedText' : 'cat',
+        'style' : 'btn btn-primary btn-sm'
+        } ).addClass ( 'form-control' ) ;
+        }
+
+
+        if ( ! Modernizr.inputtypes.date ) {
+        $ ( "input[type='date']" ).datepicker ( {
+        format : "yyyy-mm-dd"
+        } ) ;
+        }
+
+        if ( ! Modernizr.inputtypes.number ) {
+        $ ( "input[type='number']" ).spinner ( ) ;
+        }
+        } ) ;
+
+
+        } ;
+
+        $ ( window ).on ( 'load', function ( ) {
+
+        initSelect ( ) ;
+        $ ( "input[type='file']" ).bootstrapFileInput ( ) ;
+        } ) ;
+
+        $ ( ".dropdown-submenu" ).on ( "mouseover", function ( e ) {
+        this.dropdown ( ) ;
+        } ) ;
+
+        </script>
+    <script src="@routes.Assets.at("javascripts/coffee-script.js")" type="text/javascript"></script>
+</body>
+</html>

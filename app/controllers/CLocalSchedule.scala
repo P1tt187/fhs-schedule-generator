@@ -356,6 +356,8 @@ import views.html.localschedule._
 
 import scala.collection.JavaConversions._
 
+import play.api.Play.current
+
 /**
  * @author fabian 
  * @since 19.04.15.
@@ -406,6 +408,8 @@ object CLocalSchedule extends TController {
               }
           }
       }.toMap
+
+      println(current.getFile("/public/"))
 
       Ok(localschedule("Lokaler Stundenplan", courseNames, timerages, timeslots, semester, courses, lectureShortCuts))
   }

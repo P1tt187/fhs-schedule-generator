@@ -3,15 +3,15 @@
 
 @import models.persistence.scheduletree.Weekday
 
-@main(title,CLocalSchedule.NAV){
-<div class="clearfix"></div><div class="clearfix"></div><br/><br/><br/><br/><br/>
+@localmain{
+<div class="clearfix"></div><div class="clearfix"></div>
     @defining(CTimeslotDefintion.WEEKDAYS.filter{
         case (sortIndexString,dayname)=>
             val sortIndex=sortIndexString.toInt
             !timeslots.find(_.getParent.asInstanceOf[Weekday].getSortIndex.toInt == sortIndex).isEmpty
     }.sortBy(_._1)) { days=>
 
-        <nav class="navbar navbar-default ">
+        <nav class="navbar navbar-fixed-top navbar-inverse ">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
@@ -69,10 +69,10 @@
             </div>
             <div class="tab-pane fade" id="shortcut-pane">
                 <table class="table table-bordered table-striped table-condensed">
-                    <caption class="caption text-center">Abkürzungsverzeichnis der Lehrveranstaltungen</caption>
+                    <caption class="caption text-center"><h4> Abkürzungsverzeichnis der Lehrveranstaltungen </h4></caption>
 
                     <tbody>
-                    @lectureShortCuts.map{ case (key,value) =>
+                    @lectureShortCuts.toList.sortBy(_._1).map{ case (key,value) =>
                         <tr>
                             <td class="text-right" style="width: 45%">@key</td>
                             <td class="text-left">@value</td>

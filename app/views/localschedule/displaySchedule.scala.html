@@ -41,11 +41,11 @@
   <caption class="caption text-center"> <h3> @semester.getName </h3></caption>
   <thead>
     <tr>
-      <th class="text-info text-center" >Uhrzeit</th>
+      <th class="text-info text-center" style="width: 8%">Uhrzeit</th>
 
 
       @for(day <- days) {
-        <th class="text-info text-center" > @day._2</th>
+        <th style="width: @{100f/days.size -8}%" class="text-info text-center" > @day._2</th>
       }
 
     </tr>
