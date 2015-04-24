@@ -396,7 +396,18 @@ object CLocalSchedule extends TController {
           s.createCriteria(classOf[Course]).add(Restrictions.in("shortName", courseNames)).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).setFetchMode("groups", FetchMode.JOIN).list().asInstanceOf[JavaList[Course]].toList.sortBy(_.getShortName)
       }
 
-      Ok(localschedule("Lokaler Stundenplan", courseNames, timerages, timeslots, semester, courses))
+      val lectureShortCuts:Map[String,String] = timeslots.flatMap{
+        ts=>
+          ts.getLectures.flatMap{
+            case lecture:Lecture =>
+              lecture.getShortCuts.map{
+               case (key,value)=>
+                  (value,lecture.getLectureSynonyms()(key))
+              }
+          }
+      }.toMap
+
+      Ok(localschedule("Lokaler Stundenplan", courseNames, timerages, timeslots, semester, courses, lectureShortCuts))
   }
 
 }

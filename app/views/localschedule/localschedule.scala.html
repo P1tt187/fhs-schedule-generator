@@ -1,4 +1,4 @@
-@(title:String,courseNames:List[String],timeRanges: List[models.fhs.pages.basicstuctures.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], semester:models.persistence.Semester, courses:List[persistence.participants.Course])(implicit session:Session)
+@(title:String,courseNames:List[String],timeRanges: List[models.fhs.pages.basicstuctures.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], semester:models.persistence.Semester, courses:List[persistence.participants.Course],lectureShortCuts:Map[String,String])(implicit session:Session)
 
 
 @import models.persistence.scheduletree.Weekday
@@ -27,6 +27,7 @@
                     <ul class="nav navbar-nav nav-tabs">
                         <li role="presentation" class="active"><a aria-controls="online-pane" role="tab" data-toggle="tab" href="#online-pane"> Stundenplan </a> </li>
                         <li role="presentation" ><a aria-controls="local-pane" role="tab" data-toggle="tab" href="#local-pane"> Persönlicher Plan </a> </li>
+                        <li role="presentation" ><a aria-controls="shortcut-pane" role="tab" data-toggle="tab" href="#shortcut-pane"> Abkürzungsverzeichnis </a> </li>
                         <li role="presentation" ><a aria-controls="group-pane" role="tab" data-toggle="tab" href="#group-pane"> Gruppen </a> </li>
                     </ul>
                 </div>
@@ -65,6 +66,20 @@
                 <div class="visible-xs visible-sm">
                 @displayMobileSchedule(false,days,timeRanges,timeslots,semester)
                 </div>
+            </div>
+            <div class="tab-pane fade" id="shortcut-pane">
+                <table class="table table-bordered table-striped table-condensed">
+                    <caption class="caption text-center">Abkürzungsverzeichnis der Lehrveranstaltungen</caption>
+
+                    <tbody>
+                    @lectureShortCuts.map{ case (key,value) =>
+                        <tr>
+                            <td class="text-right" style="width: 45%">@key</td>
+                            <td class="text-left">@value</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
             </div>
             <div class="tab-pane fade" id="group-pane">
                @displayGroups(courses)
