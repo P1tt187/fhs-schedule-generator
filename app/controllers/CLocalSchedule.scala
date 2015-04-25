@@ -356,7 +356,6 @@ import views.html.localschedule._
 
 import scala.collection.JavaConversions._
 
-import play.api.Play.current
 
 /**
  * @author fabian 
@@ -373,7 +372,7 @@ object CLocalSchedule extends TController {
 
       val schedule = Transactions.hibernateAction {
         implicit s =>
-          s.createCriteria(classOf[Schedule]).uniqueResult().asInstanceOf[Schedule]
+          s.createCriteria(classOf[Schedule]).setFirstResult(0).setMaxResults(1).uniqueResult().asInstanceOf[Schedule]
       }
 
       val semester = schedule.getSemester
@@ -409,7 +408,6 @@ object CLocalSchedule extends TController {
           }
       }.toMap
 
-      println(current.getFile("/public/"))
 
       Ok(localschedule("Lokaler Stundenplan", courseNames, timerages, timeslots, semester, courses, lectureShortCuts))
   }

@@ -58,6 +58,7 @@ GET         /exportData                                                         
 GET         /data.json                                                                                controllers.CExporter.export
 POST        /uploadJson                                                                               controllers.CExporter.uploadFile
 GET         /exportSchedule/:semesterId                                                               controllers.CExporter.createSpiritSchedule(semesterId:Long)
+GET         /exportHTMLSchedule/:semesterId                                                           controllers.CExporter.exportHTMLSchedule(semesterId:Long)
 
 GET         /editDocents                                                                              controllers.CEditDocents.page
 POST        /addNewDocent                                                                             controllers.CEditDocents.saveNewDocent

@@ -34,12 +34,18 @@
                 </select>
             </div>
             <div class="form-group">
+                <select class="form-control" id="selectExportFormat">
+                    <option value="exportSchedule">JSON</option>
+                    <option value="exportHTMLSchedule">HTML</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <button type="button" class="btn btn-primary" id="downloadScheduleBtn" ><span class="glyphicon glyphicon-download"></span> </button>
             </div>
 
             <script>
             $ ( '#downloadScheduleBtn' ).on ( 'click', function ( ) {
-            $ ( location ).attr ( 'href', 'exportSchedule/' + $ ( '#selectSemester' ).val ( ) ) ;
+            $ ( location ).attr ( 'href', $('#selectExportFormat').val() + '/' + $ ( '#selectSemester' ).val ( ) ) ;
             } ) ;
 
             </script>

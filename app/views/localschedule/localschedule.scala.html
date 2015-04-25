@@ -29,12 +29,13 @@
                         <li role="presentation" ><a aria-controls="local-pane" role="tab" data-toggle="tab" href="#local-pane"> Persönlicher Plan </a> </li>
                         <li role="presentation" ><a aria-controls="shortcut-pane" role="tab" data-toggle="tab" href="#shortcut-pane"> Abkürzungsverzeichnis </a> </li>
                         <li role="presentation" ><a aria-controls="group-pane" role="tab" data-toggle="tab" href="#group-pane"> Gruppen </a> </li>
+                        <li role="presentation"> <a aria-controls="block-pane" role="tab" data-toggle="tab" href="#block-pane"> Blockveranstaltungen </a> </li>
                     </ul>
                 </div>
             </div>
         </nav>
+<br/>
 
-        <div> Es ist die <strong id="weekNumber"></strong> Kalenderwoche, eine <span class="hidden text-warning" id="even"><strong>gerade</strong></span> <span class="hidden text-primary" id="uneven"><strong>ungerade</strong></span> Woche</div>
             <div class="form-inline">
                 <div class="form-group">
                     <select id="courseSelect">
@@ -43,6 +44,7 @@
                         }
                     </select>
                 </div>
+                <div> Es ist die <strong id="weekNumber"></strong> Kalenderwoche, eine <span class="hidden text-warning" id="even"><strong>gerade</strong></span> <span class="hidden text-primary" id="uneven"><strong>ungerade</strong></span> Woche</div>
                 <!--div class="form-group">
                     <a class="btn btn-info btn-sm" href="#" download="settings.json" id="exportbtn"> <span class="glyphicon glyphicon-download"></span> </a>
                 </div-->
@@ -83,6 +85,15 @@
             </div>
             <div class="tab-pane fade" id="group-pane">
                @displayGroups(courses)
+            </div>
+            <div class="tab-pane fade" id="block-pane">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="block/bindex.html">
+                        <div class="alert alert-danger">
+                            <span class="glyphicon glyphicon-alert"></span> Die Datei bindex.html wurde nicht gefunden!
+                        </div>
+                    </iframe>
+                </div>
             </div>
         </div>
       <script>
