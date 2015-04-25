@@ -366,6 +366,7 @@ import models.persistence.subject.AbstractSubject
 import models.persistence.template.WeekdayTemplate
 import org.hibernate.FetchMode
 import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
+import play.api.Play
 import play.api.Play.current
 import play.api.libs.json._
 import play.api.mvc._
@@ -677,7 +678,7 @@ object CExporter extends TController {
       Files.createDirectory(tmpAssetsPath)
       Files.createDirectory(tmpBlockPath)
 
-      val assetsPath = current.getFile("/public/").toPath
+      val assetsPath = Play.application.getFile("/public/").toPath
 
       Files.walkFileTree(assetsPath, new DirectoryCopyHelper(assetsPath, tmpAssetsPath))
 
