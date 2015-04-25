@@ -352,6 +352,31 @@ var wrapArray= function(value){
     return $.isArray(value)?value:[value];
 };
 
+var initSelect = function ( ) {
+    $ ( "input" ).addClass ( 'form-control' ) ;
+    $ ( "select" ).each ( function ( index, value ) {
+        if ( $ ( value ).parents ( '.sr-only' ).length == 0 ) {
+            $ ( value ).attr ( 'data-live-search', true ).addClass ( 'form-control' ).selectpicker ( {
+                //'selectedText' : 'cat',
+                'style' : 'btn btn-primary btn-sm'
+            } ).addClass ( 'form-control' ) ;
+        }
+
+
+        if ( ! Modernizr.inputtypes.date ) {
+            $ ( "input[type='date']" ).datepicker ( {
+                format : "yyyy-mm-dd"
+            } ) ;
+        }
+
+        if ( ! Modernizr.inputtypes.number ) {
+            $ ( "input[type='number']" ).spinner ( ) ;
+        }
+    } ) ;
+
+
+} ;
+
 Date.prototype.getWeek = function() {
     var onejan = new Date(this.getFullYear(),0,1);
     var today = new Date(this.getFullYear(),this.getMonth(),this.getDate());

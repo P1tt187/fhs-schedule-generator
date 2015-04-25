@@ -155,30 +155,7 @@
 
         <script >
 
-        var initSelect = function ( ) {
-        $ ( "input" ).addClass ( 'form-control' ) ;
-        $ ( "select" ).each ( function ( index, value ) {
-        if ( $ ( value ).parents ( '.sr-only' ).length == 0 ) {
-        $ ( value ).attr ( 'data-live-search', true ).addClass ( 'form-control' ).selectpicker ( {
-        //'selectedText' : 'cat',
-        'style' : 'btn btn-primary btn-sm'
-        } ).addClass ( 'form-control' ) ;
-        }
 
-
-        if ( ! Modernizr.inputtypes.date ) {
-        $ ( "input[type='date']" ).datepicker ( {
-        format : "yyyy-mm-dd"
-        } ) ;
-        }
-
-        if ( ! Modernizr.inputtypes.number ) {
-        $ ( "input[type='number']" ).spinner ( ) ;
-        }
-        } ) ;
-
-
-        } ;
 
         $ ( window ).on ( 'load', function ( ) {
 

@@ -16,8 +16,7 @@
     @exportList = @{
         List(
             (CBLAFileUpload.NAV, routes.CBLAFileUpload.page, "Bla Datei Importieren"),
-            (CExporter.NAV, routes.CExporter.page, "JSON Im-/Export"),
-            (CLocalSchedule.NAV, routes.CLocalSchedule.page, "Lokaler Stundenplan")
+            (CExporter.NAV, routes.CExporter.page, "Export")
         )
     }
 
@@ -48,6 +47,9 @@
             @for(element <- exportList) {
                 <li role="presentation" class='@if(nav == element._1) {active}'><a href="@element._2" > @element._3</a> </li>
             }
+                @if(session.get(IS_DEVELOPER).getOrElse("false").toBoolean){
+                <li role="presentation"> <a href="@routes.CLocalSchedule.page">Lokaler Stundenplan</a> </li>
+                }
             </ul>
         </li>
 

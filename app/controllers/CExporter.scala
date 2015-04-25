@@ -667,7 +667,7 @@ object CExporter extends TController {
       val indexFile = Files.createFile(Paths.get(path.toString, "index.html"))
       val (courseNames, timerages, timeslots, courses, lectureShortCuts) = collectScheduleData(schedule)
 
-      val content = List(views.html.localschedule.localschedule("", courseNames, timerages, timeslots, semester, courses, lectureShortCuts).toString/*.replaceAll("\\s+", " ")*/)
+      val content = List(views.html.localschedule.localschedule("", courseNames, timerages, timeslots, semester, courses, lectureShortCuts).toString().trim())
 
       Files.write(indexFile, content, Charset.forName("UTF-8"), StandardOpenOption.WRITE)
 
