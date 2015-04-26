@@ -2,6 +2,7 @@
 
 
 @import models.persistence.scheduletree.Weekday
+@import models.persistence.enumerations.EDuration
 
 @localmain{
 
@@ -41,17 +42,26 @@
             <span class="glyphicon"></span>
             <div class="form-inline">
                 <div class="form-group">
+                    <label for="courseSelect" class="control-label">Kurs</label>
                     <select id="courseSelect">
                         @courseNames.map{ name=>
                             <option value="@name">@name</option>
                         }
                     </select>
                 </div>
-                <div> Es ist die <strong id="weekNumber"></strong> Kalenderwoche, eine <span class="hidden text-warning" id="even"><strong>gerade</strong></span> <span class="hidden text-primary" id="uneven"><strong>ungerade</strong></span> Woche</div>
+                <div class="form-group">
+                    <label for="weekSelect" class="control-label"> Art der Woche </label>
+                    <select id="weekSelect">
+                        <option value="all">Alle</option>
+                        <option value="@EDuration.EVEN">gerade</option>
+                        <option value="@EDuration.UNEVEN">ungerade</option>
+                    </select>
+                </div>
                 <!--div class="form-group">
                     <a class="btn btn-info btn-sm" href="#" download="settings.json" id="exportbtn"> <span class="glyphicon glyphicon-download"></span> </a>
                 </div-->
             </div>
+        <div> Es ist die <strong id="weekNumber"></strong> Kalenderwoche, eine <span class="hidden text-warning" id="even"><strong>gerade</strong></span> <span class="hidden text-primary" id="uneven"><strong>ungerade</strong></span> Woche</div>
         <div class="clearfix"></div>
         <div class="tab-content">
             <div class="tab-pane fade in active" id="news-pane">
@@ -104,16 +114,26 @@
             </div>
         </div>
       <script>
-      var courseChange = function(){
+          /** Selects course or week */
+          /***************************/
+          var courseChange = function(){
           $('.lecture').addClass("hidden");
           $('.lecturetitle').addClass("hidden");
           $('.groupcontainer').addClass("hidden");
           $('.' + $('#courseSelect').val()).removeClass('hidden');
+          var selectedWeek = $('#weekSelect').val();
+            if(selectedWeek == '@EDuration.EVEN' ){
+               $('.@EDuration.UNEVEN').addClass('hidden');
+             } if(selectedWeek == '@EDuration.UNEVEN' ){
+               $('.@EDuration.EVEN').addClass('hidden');
+             }
           };
           $('#courseSelect').change(courseChange);
+          $('#weekSelect').change(courseChange);
          // $('#courseSelect').val($('#courseSelect').first().val());
-          courseChange();
 
+
+          /***************************/
           /**store to personal schedule*/
           $('.lecture').click(function(){
           $(this).children().first().removeClass('panel-info').addClass('panel-success');
@@ -156,10 +176,12 @@
            $('#weekNumber').html(weeknumber);
            if(weeknumber % 2 == 0){
            $('#even').removeClass('hidden');
+           $('#weekSelect').val('@EDuration.EVEN');
            } else {
            $('#uneven').removeClass('hidden');
+           $('#weekSelect').val('@EDuration.UNEVEN');
            }
-
+            courseChange();
            $('#news-content').FeedEk({
             FeedUrl: 'https://studip.fh-schmalkalden.de/rss.php?id=a88776e9ec68c2990f6cbb5ff8609752',
             ShowDesc: true,

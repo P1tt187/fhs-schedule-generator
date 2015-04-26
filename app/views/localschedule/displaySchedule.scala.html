@@ -69,10 +69,10 @@
             <ul class="list-unstyled list-inline ">
               @for(idx<- 0 to (lectures.length - 1)){
                 <li data-uuid="@lectures(idx).getUuid" class="listElement hidden @if(isOnline){
-                  lecture @lectures(idx).getLectureParticipants.map(p=> p.getCourseName).mkString(" ")
+                  lecture @lectures(idx).getLectureParticipants.map(p=> p.getCourseName).mkString(" ") @lectures(idx).getDuration
                 } else{
                   @lectures(idx).getUuid localLecture
-                }" style="min-width : 170px ; max-width : 220px">
+                } " style="min-width : 170px ; max-width : 220px">
                 @displayLecture(lectures(idx),isOnline)
                 </li>
               }
