@@ -685,7 +685,9 @@ object CExporter extends TController {
         val assetsUri = URI.create("jar:file:" + current.getFile("/lib/schedule-generator.schedule-generator-1.0-SNAPSHOT-assets.jar").toPath.toString + "!/public/")
         println(assetsUri)
         val assetsFileSystem = new ZipFileSystemProvider().newFileSystem(assetsUri, Map[String, String]())
-        Files.walkFileTree(assetsFileSystem.getPath("/public/"), new ZIPFileExtractHelper(tmpAssetsPath, assetsFileSystem))
+        Files.walkFileTree(assetsFileSystem.getPath("/public/"), new ZIPFileExtractHelper(tmpAssetsPath, assetsFileSystem,assetsFileSystem.getPath("/")))
+        Files.walkFileTree(tmpAssetsPath.resolve("public"), new DirectoryCopyHelper(tmpAssetsPath.resolve("public"),tmpAssetsPath) )
+        Files.walkFileTree(tmpAssetsPath.resolve("public"), new DeleteDirectoryHelper())
         assetsFileSystem.close()
       }
 
