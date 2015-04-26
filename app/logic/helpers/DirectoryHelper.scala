@@ -399,3 +399,22 @@ class DeleteDirectoryHelper extends SimpleFileVisitor[Path] {
     FileVisitResult.CONTINUE
   }
 }
+
+class ZIPFileExtractHelper (toPath:Path,fs: FileSystem) extends SimpleFileVisitor[Path] {
+  private val copyOption = StandardCopyOption.REPLACE_EXISTING
+  private val rootDir = fs.getPath("/")
+
+  override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult = {
+    val dirToCreate = toPath.resolve(rootDir.relativize(dir).toString)
+    if(!Files.exists(dirToCreate) ){
+      Files.createDirectory(dirToCreate)
+    }
+    FileVisitResult.CONTINUE
+  }
+
+  override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
+    val targetFile = toPath.resolve( rootDir.relativize(file).toString )
+    Files.copy(file,targetFile,copyOption)
+    FileVisitResult.CONTINUE
+  }
+}

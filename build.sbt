@@ -1,3 +1,5 @@
+import sbt._
+import Keys._
 
 name := """schedule-generator"""
 
@@ -31,5 +33,4 @@ scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitCon
 scapegoatConsoleOutput := false
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb)
-
 

@@ -345,11 +345,11 @@ package controllers
 import java.net.URI
 import java.nio.charset.Charset
 import java.nio.file._
-import java.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.sun.nio.zipfs.ZipFileSystemProvider
 import controllers.traits.TController
-import logic.helpers.{DeleteDirectoryHelper, DirectoryCopyHelper, ZIPFileDirectoryCopyHelper}
+import logic.helpers.{DeleteDirectoryHelper, DirectoryCopyHelper, ZIPFileDirectoryCopyHelper, ZIPFileExtractHelper}
 import models.Transactions
 import models.export.JsonContainer
 import models.fhs.pages.JavaList
@@ -673,14 +673,23 @@ object CExporter extends TController {
       Files.write(indexFile, content, Charset.forName("UTF-8"), StandardOpenOption.WRITE)
 
       val tmpAssetsPath = Paths.get(path.toString, "assets")
-      val tmpBlockPath = Paths.get(path.toString,"block")
+      val tmpBlockPath = Paths.get(path.toString, "block")
 
       Files.createDirectory(tmpAssetsPath)
       Files.createDirectory(tmpBlockPath)
 
-      val assetsPath = Play.application.getFile("/public/").toPath
+      if (Play.isDev) {
+        val assetsPath = current.getFile("/public").toPath
+        Files.walkFileTree(assetsPath, new DirectoryCopyHelper(assetsPath, tmpAssetsPath))
+      } else {
+        val assetsUri = URI.create("jar:file:" + current.getFile("/lib/schedule-generator.schedule-generator-1.0-SNAPSHOT-assets.jar").toPath.toString + "!/public/")
+        println(assetsUri)
+        val assetsFileSystem = new ZipFileSystemProvider().newFileSystem(assetsUri, Map[String, String]())
+        Files.walkFileTree(assetsFileSystem.getPath("/public/"), new ZIPFileExtractHelper(tmpAssetsPath, assetsFileSystem))
+        assetsFileSystem.close()
+      }
 
-      Files.walkFileTree(assetsPath, new DirectoryCopyHelper(assetsPath, tmpAssetsPath))
+
 
       Files.walkFileTree(path, new ZIPFileDirectoryCopyHelper(path, zipFs))
 
