@@ -7,11 +7,11 @@
     <div class="panel-heading">
       @if(isOnline) {
         @lecture.getLectureParticipants.map { p =>
-          <strong class="hidden lecturetitle @p.getCourseName">  @lecture.getShortName(p.getCourseName)</strong>
+         <small> <strong class="hidden lecturetitle @p.getCourseName">  @lecture.getShortName(p.getCourseName)</strong></small>
         }
       } else {
         @lecture.getLectureParticipants.map(p=> lecture.getShortName(p.getCourseName)).toSet.map{ lectureName:String =>
-          <p><strong>@lectureName</strong></p>
+          <p><small><strong>@lectureName</strong></small></p>
         }
       }
       </div>
@@ -35,21 +35,17 @@
       </div>
       @if(lecture.getKind == ELectureKind.EXERCISE ) {
         <div>
-        @lecture.getLectureParticipants.head.getGroupType
+          <small>@lecture.getLectureParticipants.map(_.getGroupIndex).toSet.mkString(" ")  @lecture.getLectureParticipants.head.getGroupType</small>
         </div>
       }
-      <div style="font-size: 90%">
-        @if(lecture.getKind == ELectureKind.EXERCISE) {
-          @lecture.getLectureParticipants.map(_.getGroupIndex).toSet.mkString(" ")
-        }
-      </div>
+
       <div class="clearfix"></div>
       <div class="pull-right">
-      @lecture.getDocents.map{ d=> @d.getLastName <br/>}
+      <small>@lecture.getDocents.map{ d=> @d.getLastName <br/>}</small>
       </div>
-      <div> @lecture.getLectureRoom.getHouse @lecture.getLectureRoom.getNumber </div>
-      <div> @lecture.getAlternativeLectureRooms.map{ lr=>
-        <span class="label label-warning">@lr.getHouse @lr.getNumber</span>
+      <div class="pull-left"> <small>@lecture.getLectureRoom.getHouse @lecture.getLectureRoom.getNumber</small> </div>
+      <div class="pull-left"> @lecture.getAlternativeLectureRooms.map{ lr=>
+        <small><span class="label label-warning">@lr.getHouse @lr.getNumber</span></small>
       }</div>
       @if(!lecture.getNotOptimalPlaced.isEmpty && current.configuration.getString("schedule.show.outOfWishTime").getOrElse("OFF").equalsIgnoreCase("ON")) {
 

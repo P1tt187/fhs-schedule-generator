@@ -147,7 +147,9 @@
             $('.localLecture').click(function(){
             $(this).addClass('hidden');
             var uuids = JSON.parse( localStorage.getItem('localLectures')||'[]');
-            uuids.splice(uuids.indexOf($(this).data('uuid')),1);
+            var removeUuid = $(this).data('uuid');
+            uuids.splice(uuids.indexOf(removeUuid),1);
+           // $('.' + removeUuid).addClass('panel-info').removeClass('panel-success');
             localStorage.setItem('localLectures',JSON.stringify(uuids)) ;
             });
 

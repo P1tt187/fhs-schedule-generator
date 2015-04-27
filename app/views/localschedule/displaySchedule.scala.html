@@ -66,14 +66,14 @@
             -relevantSlots.map(_.getLectures.count(_.getDocents.contains(l.getDocents.head))).sum
           }, l.getDocents.head.getLastName)
           }) { lectures =>
-            <ul class="list-unstyled list-inline ">
+            <ul class="list-unstyled list-inline">
               @for(idx<- 0 to (lectures.length - 1)){
-                <li data-uuid="@lectures(idx).getUuid" class="listElement hidden @if(isOnline){
+                <li data-uuid="@lectures(idx).getUuid" class="col-md-6 listElement hidden @if(isOnline){
                   lecture @lectures(idx).getLectureParticipants.map(p=> p.getCourseName).mkString(" ") @lectures(idx).getDuration
                 } else{
                   @lectures(idx).getUuid localLecture
-                } " style="min-width : 170px ; max-width : 220px">
-                @displayLecture(lectures(idx),isOnline)
+                } " style="/*min-width : 40% ; max-width : 49%*/">
+                   @displayLecture(lectures(idx),isOnline)
                 </li>
               }
             </ul>
