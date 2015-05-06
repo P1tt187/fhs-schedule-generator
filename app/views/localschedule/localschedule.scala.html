@@ -127,6 +127,9 @@
              } if(selectedWeek == '@EDuration.UNEVEN' ){
                $('.@EDuration.EVEN').addClass('hidden');
              }
+           if(typeof localStorage !== "undefined"){
+           localStorage.setItem('lastCourse',$('#courseSelect').val()) ;
+           }
           };
           $('#courseSelect').change(courseChange);
           $('#weekSelect').change(courseChange);
@@ -166,7 +169,9 @@
            $(window).on('load',function(){
                if(typeof localStorage !== "undefined"){
                var lastMenu = localStorage.getItem("lastMenu")||"nothing";
+               var lastCourse = localStorage.getItem("lastCourse")||$('#courseSelect').first().val();
                $('#'+lastMenu + ' a').tab('show');
+               $('#courseSelect').val(lastCourse);
 
                var uuids = JSON.parse( localStorage.getItem('localLectures')||'[]');
                uuids.forEach(function(element){
@@ -174,7 +179,7 @@
                });
            }
 
-           var weeknumber = new Date().getWeek()+1;
+           var weeknumber = new Date().getWeek();
            $('#weekNumber').html(weeknumber);
            if(weeknumber % 2 == 0){
            $('#even').removeClass('hidden');
