@@ -1,9 +1,11 @@
 import sbt._
 import Keys._
+import com.typesafe.sbt.SbtNativePackager._
+import NativePackagerKeys._
 
 name := """schedule-generator"""
 
-version := "1.0-SNAPSHOT"
+version := "1.0"
 
 libraryDependencies ++= Seq(
   javaJdbc,
@@ -33,4 +35,21 @@ scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitCon
 scapegoatConsoleOutput := false
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb)
+
+
+maintainer in Linux := "Fabian Markert <f.markert87@gmail.com>"
+
+packageSummary in Linux := "This Programm is designed to generate Schedules for Students."
+
+packageDescription := "The main goal is to make it easy to generate a regular Schedule for the Students of faculty informatik from the University of Applied Science Schmalkalden"
+
+rpmRelease := "1"
+
+rpmVendor := "http://www.fh-schmalkalden.de"
+
+rpmUrl := Some("https://github.com/P1tt187/fhs-schedule-generator")
+
+rpmLicense := Some("GPL v3")
+
+
 
