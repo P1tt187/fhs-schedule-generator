@@ -1,6 +1,6 @@
-import sbt._
-import Keys._
 import com.typesafe.sbt.packager.archetypes.ServerLoader
+import sbt.Keys._
+import sbt._
 
 
 name := """schedule-generator"""
@@ -46,7 +46,7 @@ packageSummary := "This Programm is designed to generate Schedules for Students.
 
 packageDescription := "The main goal is to make it easy to generate a regular Schedule for the Students of faculty informatik from the University of Applied Science Schmalkalden"
 
-rpmRelease := "1"
+rpmRelease := Option(sys.props("rpm.buildNumber")) getOrElse "1"
 
 rpmVendor := "http://www.fh-schmalkalden.de"
 
@@ -57,5 +57,10 @@ rpmLicense := Some("GPL v3")
 serverLoading in Rpm := ServerLoader.Systemd
 
 
+linuxPackageMappings += {
+  val pidLocation = target.value / "RUNNING_PID"
+  IO.touch(pidLocation)
+  packageMapping((pidLocation, "/usr/share/schedule-generator/RUNNING_PID")) withUser ("schedule-generator") withGroup ("schedule-generator")
+}
 
 
