@@ -58,9 +58,8 @@ serverLoading in Rpm := ServerLoader.Systemd
 
 
 linuxPackageMappings += {
-  val pidLocation = target.value / "RUNNING_PID"
-  IO.touch(pidLocation)
-  packageMapping((pidLocation, "/usr/share/schedule-generator/RUNNING_PID")) withUser ("schedule-generator") withGroup ("schedule-generator")
+  val location = target.value
+  packageMapping((location, "/usr/share/schedule-generator/")) withUser ("schedule-generator") withGroup ("schedule-generator")
 }
 
 
