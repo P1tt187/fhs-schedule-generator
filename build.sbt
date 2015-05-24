@@ -1,4 +1,5 @@
 import com.typesafe.sbt.packager.archetypes.ServerLoader
+import com.typesafe.sbt.packager.linux.LinuxSymlink
 import sbt.Keys._
 import sbt._
 
@@ -62,4 +63,5 @@ linuxPackageMappings += {
   packageMapping((location, "/usr/share/schedule-generator/")) withUser ("schedule-generator") withGroup ("schedule-generator")
 }
 
+linuxPackageSymlinks ++= Seq(LinuxSymlink("/usr/share/schedule-generator/RUNNING_PID","/run/schedule-generator/RUNNING_PID"))
 
