@@ -63,5 +63,5 @@ linuxPackageMappings += {
   packageMapping((location, "/usr/share/schedule-generator/")) withUser ("schedule-generator") withGroup ("schedule-generator")
 }
 
-linuxPackageSymlinks ++= Seq(LinuxSymlink("/usr/share/schedule-generator/RUNNING_PID","/run/schedule-generator/RUNNING_PID"))
+//linuxPackageSymlinks ++= Seq(LinuxSymlink("/usr/share/schedule-generator/RUNNING_PID","/run/schedule-generator/RUNNING_PID"))
 
