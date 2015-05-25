@@ -368,7 +368,7 @@
             success: function (data) {
                 $("#" + id).empty();
                 $.each(data.responseData.feed.entries, function (e, item) {
-                    s += '<div class="panel panel-info"> <div class="panel-heading"><h4 class="panel-title"> <a href="' + item.link + '" target="' + def.TitleLinkTarget + '" >' + item.title + "</a></h4></div>";
+                    s += '<div class="panel panel-info"> <div class="panel-heading"><h4 class="panel-title"> <a href="' + item.link + '" target="' + def.TitleLinkTarget + '" >' + item.title + " " + item.author +"</a></h4></div>";
                     s += '<div class="panel-body">';
                     if (def.ShowPubDate){
                         dt= new Date(item.publishedDate);
