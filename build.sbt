@@ -1,5 +1,6 @@
 import com.typesafe.sbt.packager.archetypes.ServerLoader
 import com.typesafe.sbt.packager.linux.LinuxSymlink
+import com.typesafe.sbt.packager.rpm.RpmDependencies
 import sbt.Keys._
 import sbt._
 
@@ -22,7 +23,8 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.21",
   "org.mariadb.jdbc" % "mariadb-java-client" % "1.1.7",
   "uk.com.robust-it" % "cloning" % "1.9.0",
-  "com.decodified" %% "scala-ssh" % "0.7.0"
+  "com.decodified" %% "scala-ssh" % "0.7.0",
+  "com.typesafe" % "config" % "1.2.0"
   //"org.bouncycastle" % "bcprov-jdk16" % "1.46",
   //"com.jcraft" % "jzlib" % "1.1.3"
 )
@@ -57,6 +59,7 @@ rpmLicense := Some("GPL v3")
 
 serverLoading in Rpm := ServerLoader.Systemd
 
+rpmRequirements+= "mariadb-server"
 
 linuxPackageMappings += {
   val location = target.value
