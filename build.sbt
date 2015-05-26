@@ -63,5 +63,7 @@ linuxPackageMappings += {
   packageMapping((location, "/usr/share/schedule-generator/")) withUser ("schedule-generator") withGroup ("schedule-generator")
 }
 
+dockerExposedPorts in Docker := Seq(9000, 9443)
+
 //linuxPackageSymlinks ++= Seq(LinuxSymlink("/usr/share/schedule-generator/RUNNING_PID","/run/schedule-generator/RUNNING_PID"))
 
