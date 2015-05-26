@@ -67,7 +67,7 @@ linuxPackageMappings += {
   packageMapping((location, "/usr/share/schedule-generator/")) withUser ("schedule-generator") withGroup ("schedule-generator")
 }
 
-dockerCommands+=Cmd("FROM","dockerfile/mariadb:latest")
+dockerCommands+=Cmd("FROM","library/mariadb")
 
 dockerExposedPorts in Docker := Seq(9000, 9443)
 
