@@ -1,6 +1,7 @@
 import com.typesafe.sbt.packager.archetypes.ServerLoader
 import com.typesafe.sbt.packager.linux.LinuxSymlink
 import com.typesafe.sbt.packager.rpm.RpmDependencies
+import com.typesafe.sbt.packager.docker._
 import sbt.Keys._
 import sbt._
 
@@ -65,6 +66,8 @@ linuxPackageMappings += {
   val location = target.value
   packageMapping((location, "/usr/share/schedule-generator/")) withUser ("schedule-generator") withGroup ("schedule-generator")
 }
+
+dockerCommands+=Cmd("FROM","dockerfile/mariadb:latest")
 
 dockerExposedPorts in Docker := Seq(9000, 9443)
 
