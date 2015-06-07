@@ -346,7 +346,7 @@ import akka.actor.Actor
 import models.persistence.scheduletree._
 import models.Transactions
 import models.persistence.location.RoomEntity
-import org.hibernate.criterion.CriteriaSpecification
+import org.hibernate.criterion.{Restrictions, CriteriaSpecification}
 import models.fhs.pages.JavaList
 import scala.collection.JavaConversions._
 import models.persistence.template.{TimeSlotTemplate, WeekdayTemplate}
@@ -385,7 +385,7 @@ class ScheduleGeneratorSlave extends Actor {
 
     val rooms = Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[RoomEntity]).setCacheable(true).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).setFetchMode("house.rooms", FetchMode.JOIN).list().asInstanceOf[JavaList[RoomEntity]].toList
+        session.createCriteria(classOf[RoomEntity]).setCacheable(true).add(Restrictions.or( Restrictions.eq("disabled",false), Restrictions.isNull("disabled"))).setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY).setFetchMode("house.rooms", FetchMode.JOIN).list().asInstanceOf[JavaList[RoomEntity]].toList
     }
 
     val weekdays: List[Weekday] = Transactions.hibernateAction {

@@ -375,6 +375,7 @@ object CRoomDefinition extends TController with Controller {
       "capacity" -> number,
       "house" -> nonEmptyText,
       "number" -> nonEmptyText,
+      "disabled" -> boolean,
       "attributes" -> list(nonEmptyText),
       "timeCriterias" -> list(mapping(
         "startHour" -> number(min = 0, max = 23),
@@ -438,6 +439,7 @@ object CRoomDefinition extends TController with Controller {
 
       val json = request.body
 
+      Logger.debug(json.toString())
       val roomDefinition = json.as[MRoomdefintion]
 
 
@@ -456,7 +458,7 @@ object CRoomDefinition extends TController with Controller {
           val houseDO = MRoomdefintion.findOrCreateHouseEntityByName(room.house)
 
           val roomDO = room.id match {
-            case None => new RoomEntity(room.capacity, room.number, houseDO)
+            case None => new RoomEntity(room.capacity, room.number, houseDO, room.disabled)
             case Some(id) => val roomEntity = MRoomdefintion.findRoomById(id)
 
               val criteriaContainer = roomEntity.getCriteriaContainer
@@ -473,6 +475,7 @@ object CRoomDefinition extends TController with Controller {
               roomEntity.setCapacity(room.capacity)
               roomEntity.setNumber(room.number)
               roomEntity.setHouse(houseDO)
+              roomEntity.setDisabled(room.disabled)
               roomEntity
           }
           Logger.debug("houseDO:" + houseDO)

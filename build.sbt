@@ -8,7 +8,7 @@ import sbt._
 
 name := """schedule-generator"""
 
-version := "1.0"
+version := "1.1.0"
 
 libraryDependencies ++= Seq(
   javaJdbc,
@@ -30,13 +30,13 @@ libraryDependencies ++= Seq(
   //"com.jcraft" % "jzlib" % "1.1.3"
 )
 
-scalaVersion := "2.11.5"
+//scalaVersion := "2.11.5"
 
 scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitConversions")
 
 //javaOptions ++=Seq("-Dhttp.port=disabled","-Dhttps.port=9443","-Dhttps.keyStore=/opt/sgd/sslkeystore","-Dhttps.keyStorePassword=sgenerator")
 
-scapegoatConsoleOutput := false
+//scapegoatConsoleOutput := false
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb).enablePlugins(JDKPackagerPlugin).enablePlugins(DockerPlugin).enablePlugins(RpmPlugin).enablePlugins(JDebPackaging)
 

@@ -359,12 +359,12 @@ import scala.collection.JavaConversions._
  * @author fabian
  *         on 04.02.14.
  */
-case class MRoomdefintion(id: Option[Long], capacity: Int, house: String, number: String, attributes: List[String], timeCriterias: List[MTtimeslotCritDefine])
+case class MRoomdefintion(id: Option[Long], capacity: Int, house: String, number: String, disabled: Boolean, attributes: List[String], timeCriterias: List[MTtimeslotCritDefine])
 
-case class MRoomdisplay(id: Long, capacity: Int, house: String, number: String, roomAttributes: List[RoomAttributesEntity], timeCriterias: List[MTimeslotDisplay])
+case class MRoomdisplay(id: Long, capacity: Int, house: String, number: String, disabled: Boolean,roomAttributes: List[RoomAttributesEntity], timeCriterias: List[MTimeslotDisplay])
 
-case class TimeCritTimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int){
-  def compare(that:MTimeslotDisplay):Int = {
+case class TimeCritTimeRange(startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int) {
+  def compare(that: MTimeslotDisplay): Int = {
     if (startHour.compareTo(that.startHour) != 0) {
       return startHour.compareTo(that.startHour)
     }
@@ -382,7 +382,7 @@ case class TimeCritTimeRange(startHour: Int, startMinute: Int, stopHour: Int, st
 }
 
 object TimeCritTimeRange {
-  implicit val TimeCritTimeRangeOrdering = Ordering.by{(range:TimeCritTimeRange) => (range.startHour,range.startMinute,range.stopHour,range.stopMinute) }
+  implicit val TimeCritTimeRangeOrdering = Ordering.by { (range: TimeCritTimeRange) => (range.startHour, range.startMinute, range.stopHour, range.stopMinute) }
 }
 
 object MRoomdefintion {
@@ -393,11 +393,11 @@ object MRoomdefintion {
    * predefinded constants for the attribute
    */
   //final val ATTRIBUTES: Array[String] = Array[String]("Seminar-Room", "PC-Pool", "Beamer", "Whiteboard", "Blackboard", "Overhead")
-  lazy val ATTRIBUTES=current.configuration.getString("roomattributes").getOrElse("").split(",")
+  lazy val ATTRIBUTES = current.configuration.getString("roomattributes").getOrElse("").split(",")
 
 
   @tailrec
-  def findTimeRanges(timeslotCriterias: List[MTimeslotDisplay], timeRanges: List[TimeCritTimeRange]=List[TimeCritTimeRange]()): List[TimeCritTimeRange] = {
+  def findTimeRanges(timeslotCriterias: List[MTimeslotDisplay], timeRanges: List[TimeCritTimeRange] = List[TimeCritTimeRange]()): List[TimeCritTimeRange] = {
     timeslotCriterias.headOption match {
       case None => timeRanges
       case Some(timeslot) =>
@@ -445,7 +445,15 @@ object MRoomdefintion {
         val criterias = room.getCriteriaContainer.getCriterias.map {
           case tcrit: TimeSlotCriteria => MTtimeslotCritDefine(tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute, List(tcrit.getWeekday.getSortIndex), tcrit.getDuration.name)
         }.toList.sortBy(_.weekdays.sum)
-        MRoomdefintion(Some(id), room.getCapacity, room.getHouse.getName, room.getNumber, attributes, criterias)
+        MRoomdefintion(Some(id), room.getCapacity, room.getHouse.getName, room.getNumber,javaBooleanToScalaBoolean(room.isDisabled), attributes, criterias)
+    }
+  }
+
+  implicit def javaBooleanToScalaBoolean(theValue:java.lang.Boolean):Boolean ={
+    if (theValue!=null){
+      scala.Boolean.unbox(theValue)
+    } else {
+      false
     }
   }
 
@@ -467,7 +475,7 @@ object MRoomdefintion {
         val timeslotCrit = element.getCriteriaContainer.getCriterias map {
           case tcrit: TimeSlotCriteria => MTimeslotDisplay(tcrit.getId, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute, tcrit.getWeekday.getName, tcrit.getWeekday.getSortIndex, tcrit.getDuration)
         }
-        MRoomdisplay(element.getId, element.getCapacity, element.getHouse.getName, element.getNumber, element.getRoomAttributes.toList, timeslotCrit.toList.sortBy(_.weekdayIndex))
+        MRoomdisplay(element.getId, element.getCapacity, element.getHouse.getName, element.getNumber, javaBooleanToScalaBoolean(element.isDisabled), element.getRoomAttributes.toList, timeslotCrit.toList.sortBy(_.weekdayIndex))
     }.sortBy(_.house)
   }
 

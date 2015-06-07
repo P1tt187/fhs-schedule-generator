@@ -354,7 +354,8 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * Created by fabian on 31.01.14.
+ * @author fabian
+ *         on 31.01.14.
  */
 @Entity
 @Table(name = "TBLROOM")
@@ -411,9 +412,22 @@ public class RoomEntity extends AbstractEntity implements Comparable<RoomEntity>
     /**
      * contains all criterias
      */
-
     @ManyToOne(cascade = CascadeType.ALL, targetEntity = CriteriaContainer.class)
     private CriteriaContainer criteriaContainer;
+
+    /**
+     * disables room for generator
+     */
+    @Column(name = "DISABLED")
+    private Boolean disabled;
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public Boolean isDisabled() {
+        return disabled;
+    }
 
     public Integer getCapacity() {
         return capacity;
@@ -445,21 +459,21 @@ public class RoomEntity extends AbstractEntity implements Comparable<RoomEntity>
      * default constructor
      */
     public RoomEntity() {
-        this(null, null, null);
+        this(null, null, null, false);
     }
 
     /**
      * parameter constructor
      */
-    public RoomEntity(Integer capacity, String number, HouseEntity house) {
+    public RoomEntity(Integer capacity, String number, HouseEntity house, Boolean disabled) {
         this.capacity = capacity;
         this.number = number;
         this.house = house;
-
+        this.disabled = disabled;
     }
 
 
-    public LectureRoom roomEntity2LectureRoom(){
+    public LectureRoom roomEntity2LectureRoom() {
         LectureRoom lectureRoom = new LectureRoom();
         lectureRoom.setHouse(this.house.getName());
         lectureRoom.setNumber(this.number);
@@ -477,7 +491,7 @@ public class RoomEntity extends AbstractEntity implements Comparable<RoomEntity>
 
         if (house != null ? !house.equals(that.house) : that.house != null) return false;
         if (number != null ? !number.equals(that.number) : that.number != null) return false;
-        if (roomAttributes != null ? !(roomAttributes.containsAll(that.roomAttributes) && this.roomAttributes.size() == that.roomAttributes.size() ) : that.roomAttributes != null)
+        if (roomAttributes != null ? !(roomAttributes.containsAll(that.roomAttributes) && this.roomAttributes.size() == that.roomAttributes.size()) : that.roomAttributes != null)
             return false;
 
         return true;
@@ -500,6 +514,7 @@ public class RoomEntity extends AbstractEntity implements Comparable<RoomEntity>
         sb.append(", number='").append(number).append('\'');
         sb.append(", house=").append(house);
         sb.append(", roomAttributes=").append(roomAttributes);
+        sb.append(", disabled=").append(disabled);
         sb.append('}');
         return sb.toString();
     }

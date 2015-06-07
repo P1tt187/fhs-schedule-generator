@@ -9,6 +9,7 @@
           <th>Haus</th>
           <th>Nummer</th>
           <th>Kapazität</th>
+          <th>Aktiviert</th>
           @for(e <- MRoomdefintion.ATTRIBUTES) {
             <th>@e</th>
           }
@@ -27,6 +28,9 @@
           </td>
           <td>
           @roomEntity.capacity
+          </td>
+          <td>
+            <span class="glyphicon @if(!roomEntity.disabled){glyphicon-ok} else {glyphicon-remove}"></span>
           </td>
           @for(e <- MRoomdefintion.ATTRIBUTES) {
             <td>
