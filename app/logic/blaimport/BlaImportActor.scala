@@ -342,25 +342,32 @@
 
 package logic.blaimport
 
-import akka.actor.Actor
 import java.io.File
-import java.util.Scanner
-import play.api.Logger
-import models.persistence.subject.{ExerciseSubject, AbstractSubject, LectureSubject}
-import models.Transactions
-import models.persistence.participants.{Group, Course}
-import org.hibernate.criterion.Restrictions
 import java.util
-import scala.collection.JavaConversions._
+import java.util.Scanner
+
+import akka.actor.Actor
+import models.Transactions
 import models.persistence.Semester
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer}
-import models.persistence.enumerations.EDuration
 import models.persistence.docents.Docent
+import models.persistence.enumerations.EDuration
+import models.persistence.participants.{Course, Group}
+import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
+import org.hibernate.criterion.Restrictions
+import play.api.Logger
+
+import scala.collection.JavaConversions._
 
 /**
  * @author fabian
  *         on 14.02.14.
  */
+
+object BlaImportActor {
+  val EMPTY_NAME: String = "noname"
+}
+
 class BlaImportActor extends Actor {
 
   type CourseOfStudies = String
@@ -395,6 +402,8 @@ class BlaImportActor extends Actor {
     case unkownCommand => throw new IllegalArgumentException("unknown command " + unkownCommand)
   }
 
+
+
   def parseFile(file: File) = {
 
     def Scanner = new Scanner(file, "ISO-8859-1")
@@ -418,10 +427,10 @@ class BlaImportActor extends Actor {
         }
       }
       //Logger.debug("shortName: " + shortName + " courseSize: " + courses(shortName))
-      if (course.getSize != courses.getOrElse(shortName,1)) {
+      if (course.getSize != courses.getOrElse(shortName, 1)) {
         Transactions.hibernateAction {
           implicit s =>
-            course.setSize( courses.getOrElse(shortName, 1 ).toInt)
+            course.setSize(courses.getOrElse(shortName, 1).toInt)
             s.saveOrUpdate(course)
         }
       }
@@ -430,13 +439,22 @@ class BlaImportActor extends Actor {
     }
 
     def findDocent(lastname: String): Docent = {
+
+      def getStringOrDefault(theString: String, defaultString: String) = {
+        if (theString.nonEmpty) {
+          theString
+        } else {
+          defaultString
+        }
+      }
+
       var docent: Docent = Transactions.hibernateAction {
         implicit session =>
-          session.createCriteria(classOf[Docent]).add(Restrictions.eq("lastName", lastname)).uniqueResult().asInstanceOf[Docent]
+          session.createCriteria(classOf[Docent]).add(Restrictions.eq("lastName", getStringOrDefault(lastname, BlaImportActor.EMPTY_NAME))).uniqueResult().asInstanceOf[Docent]
       }
       if (docent == null) {
         docent = new Docent
-        docent.setLastName(lastname)
+        docent.setLastName(getStringOrDefault(lastname,BlaImportActor.EMPTY_NAME))
         val criteriaContainer = new CriteriaContainer
         criteriaContainer.setCriterias(List[AbstractCriteria]())
         docent.setCriteriaContainer(criteriaContainer)
@@ -605,17 +623,18 @@ class BlaImportActor extends Actor {
 
             val metaInfo = subjectMetaInformation(subjectName)
 
-			/** the BA or MA part is missing, example: gemeinsam mit I4 */
+            /** the BA or MA part is missing, example: gemeinsam mit I4 */
             var connectedParticipants = part(4).substring("gemeinsam mit ".length).toUpperCase.trim
             if (!connectedParticipants.startsWith("BA") && !connectedParticipants.startsWith("MA")) {
               connectedParticipants = "BA" + connectedParticipants
             }
+
             /** used when semestervalue is missing, example: BAI but expected is BAI2 */
             if (!connectedParticipants.matches("^[a-zA-Z]+\\d$")) {
               connectedParticipants += metaInfo.semesterValue.head
             }
 
-			/** the subject has a diffrent name */
+            /** the subject has a diffrent name */
             if (connectedParticipants.contains("(")) {
               val synonym = connectedParticipants.substring(connectedParticipants.indexOf("(") + 1, connectedParticipants.indexOf(")")).trim
               connectedParticipants = connectedParticipants.substring(0, connectedParticipants.indexOf("(") - 1).trim

@@ -8,7 +8,8 @@ resolvers ++= Seq(
   Resolver.sonatypeRepo("snapshots"),
   "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/",
   "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
-  "spray repo" at "http://repo.spray.io"
+  "spray repo" at "http://repo.spray.io",
+  "jitpack.io" at "https://jitpack.io/"
 )
 
 
