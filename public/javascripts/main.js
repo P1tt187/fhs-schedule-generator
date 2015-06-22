@@ -355,11 +355,11 @@ var wrapArray= function(value){
 var initSelect = function ( ) {
     $ ( "input" ).addClass ( 'form-control' ) ;
     $ ( "select" ).each ( function ( index, value ) {
-        if ( $ ( value ).parents ( '.sr-only' ).length == 0 ) {
+        if ( $ ( value ).parents ( '.sr-only .nondefault' ).length == 0 ) {
             $ ( value ).attr ( 'data-live-search', true ).addClass ( 'form-control' ).selectpicker ( {
                 //'selectedText' : 'cat',
                 'style' : 'btn btn-primary btn-sm'
-            } ).addClass ( 'form-control' ) ;
+            } ) ;
         }
 
 
