@@ -1,6 +1,7 @@
 @(title: String, nav: String)(content: Html)(implicit session: Session)
 
 @import helper._
+@import informations._
 
 <!DOCTYPE html>
 
@@ -16,8 +17,9 @@
         <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/jquery-ui.theme.min.css")">
 
         <link rel="stylesheet" type="text/css" media="screen" href="@routes.WebJarAssets.at( WebJarAssets.locate("css/bootstrap.min.css") )">
-        <link rel="stylesheet" type="text/css" media="screen" href="@routes.WebJarAssets.at( WebJarAssets.locate("css/bootstrap-theme.min.css") )">
-        <!--link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-theme.min.css")"-->
+       @* <link rel="stylesheet" type="text/css" media="screen" href="@routes.WebJarAssets.at( WebJarAssets.locate("css/bootstrap-theme.min.css") )">*@
+
+        <link rel="stylesheet" type="text/css" media="screen" href="@routes.Assets.at("stylesheets/bootstrap-theme.min.css")">
 
 
 
@@ -119,6 +121,10 @@
 
         <footer id="footer">
             <div class="container text-muted" >
+                <div class="text-center text-info">
+                    Version: @BuildInfo.version
+                </div>
+                <div class="clearfix"></div>
                 <ul class="list-unstyled list-inline">
                     <li>
                         <a href="http://www.playframework.com">www.playframework.com</a>
@@ -150,6 +156,13 @@
                     <li>
                         <a href="https://code.google.com/p/ie7-js/"> ie7-js </a>
                     </li>
+                </ul>
+            </div>
+            <div class="container text-muted text-info text-center" >
+                Author: Fabian Markert
+                <ul class="list-unstyled list-inline">
+                    <li><a href="https://github.com/P1tt187">github</a> </li>
+                    <li><a href="https://plus.google.com/+FabianMarkert">Google Plus</a> </li>
                 </ul>
             </div>
         </footer>

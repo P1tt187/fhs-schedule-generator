@@ -60,7 +60,7 @@
     </div>
     @if(lectureType.equals(CEditSubjects.EXERCISE)) {
         @defining(subject.asInstanceOf[ExerciseSubject]) { exercise =>
-            <div class="form-group">
+            <div class="form-group @if(!groupTypes.exists(_.equals(exercise.getGroupType))){ has-error}">
                 <label class="control-label" for="groupTypeInput"><br/>Gruppeneinteilung</label>
                 <select class="form-control @if(!groupTypes.exists(_.equals(exercise.getGroupType))){ nondefault}" id="groupTypeInput" name="groupTypeInput" type="text" placeholder="Gruppentyp" value="">
                 @groupTypes.map { gt =>

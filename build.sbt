@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   cache,
   filters,
   "org.webjars" %% "webjars-play" % "2.3.0-3",
-  "org.webjars" % "bootstrap" % "3.3.2",
+  "org.webjars" % "bootstrap" % "3.3.5",
   "org.hibernate" % "hibernate-core" % "4.3.8.Final",
   "org.hibernate" % "hibernate-entitymanager" % "4.3.8.Final",
   //"org.hibernate.javax.persistence" % "hibernate-jpa-2.0-api" % "1.0.1.Final",
@@ -38,7 +38,11 @@ scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitCon
 
 //scapegoatConsoleOutput := false
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb).enablePlugins(JDKPackagerPlugin).enablePlugins(DockerPlugin).enablePlugins(RpmPlugin).enablePlugins(JDebPackaging)
+lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(SbtWeb).enablePlugins(JDKPackagerPlugin).enablePlugins(DockerPlugin).enablePlugins(RpmPlugin).enablePlugins(JDebPackaging).enablePlugins(BuildInfoPlugin).
+  settings(
+    buildInfoKeys := Seq[BuildInfoKey](name, version),
+    buildInfoPackage := "informations"
+  )
 
 jdkPackagerTool := Some(file("/usr/lib/jvm/default/bin/javapackager"))
 
