@@ -13,6 +13,9 @@
         <div class="panel-body">
           <form class="form-inline" id="form@groupType">
               <div class="form-group">
+                  <button type="button" data-container="body" class="btn btn-sm btn-info" data-toggle="popover" title="Hilfe" data-content="Gedacht für Übungen, welche üblicherweise in den großen Hörsäälen stattfinden.Wenn nur eine Übungsgruppe in der Einteilung vorhanden ist sollte dieser Hacken gesetzt sein."><span class="glyphicon glyphicon-question-sign"></span> </button>
+              </div>
+              <div class="form-group">
                 <div class="checkbox">
                   <label>
                     <input type="checkbox" value="true" name="ignoreGroupIndex" @if(coursesGroups(groupType).head.isIgnoreGroupIndex){checked}/> Gruppenindex verbergen
@@ -122,4 +125,9 @@
    </script>
     }.seq
   }
+    <script>
+    $(function () {
+    $('[data-toggle="popover"]').popover()
+});
+    </script>
 }

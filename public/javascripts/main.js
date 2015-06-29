@@ -410,3 +410,4 @@ Date.prototype.getWeek = function( ) {
 /** prevent stupid IE behaviour */
 if (!window.console) window.console = {};
 if (!window.console.log) window.console.log = function () { };
+
