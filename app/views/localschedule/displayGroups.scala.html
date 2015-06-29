@@ -4,7 +4,7 @@
 @courses.par.map{ c=>
 <div class="hidden groupcontainer @c.getShortName">
 @defining(c.getGroups.toList){ allGroups =>
-  @defining(allGroups.map(_.getGroupType).toSet.toList.sortBy{
+  @defining(allGroups.filter(_.isIgnoreGroupIndex == false).map(_.getGroupType).toSet.toList.sortBy{
     groupType:String=>
       -c.getGroups.filter(_.getGroupType.equals(groupType)).map(_.getSize.toInt).sum
   }){ sortedGroupTypes =>
