@@ -43,7 +43,7 @@ POST        /submitCourseData                                                   
 POST        /submitStudentData                                                                        controllers.CEditCourses.saveStudentData
 POST        /submitNewGroup                                                                           controllers.CEditCourses.saveGroupData
 POST        /generateStudentsForCourse/:courseId                                                      controllers.CEditCourses.generateStudentsForCourse(courseId:Long)
-POST        /updateGroup                                                                              controllers.CEditCourses.updateGroup
+POST        /updateGroup/:courseId/:grouptype                                                         controllers.CEditCourses.updateGroup(courseId:Long,grouptype:String)
 POST        /deleteCourse:courseId                                                                    controllers.CEditCourses.deleteCourse(courseId:Long)
 
 GET         /generator                                                                                controllers.CGenerate.page()

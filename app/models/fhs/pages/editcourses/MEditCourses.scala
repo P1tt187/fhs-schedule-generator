@@ -350,11 +350,12 @@ import models.persistence.participants.{Course, Group, Participant, Student}
 import models.persistence.subject.AbstractSubject
 import org.hibernate.FetchMode
 import org.hibernate.criterion.{CriteriaSpecification, Order, Projections, Restrictions}
+import play.api.Logger
 import play.api.Play._
 
 import scala.collection.JavaConversions._
 import scala.util.Random
-
+import play.api.libs.json.Json
 
 /**
  * @author fabian 
@@ -568,6 +569,37 @@ object MEditCourses {
     }
   }
 
+  def findMultipleStudentsById(studentIds:List[Long])= {
+    Transactions.hibernateAction{
+      implicit s=>
+        s.createCriteria(classOf[Student]).add(Restrictions.in("id",studentIds)).list().toList.asInstanceOf[List[Student]]
+    }
+  }
+
+  def updateGroups(groups:List[Group]): Unit ={
+    Transactions.hibernateAction{
+      implicit s=>
+        Logger.debug("updateGroups")
+        groups.foreach{
+          g=>
+            g.getStudents.foreach{
+              st=>
+                s.saveOrUpdate(st)
+            }
+            s.saveOrUpdate(g)
+        }
+    }
+  }
+
 }
 
 case class MCourse(longName: String, shortName: String, size: Int)
+
+/** transport class for students
+  * contains id and groupindex
+  */
+case class MStudent(id:Long, groupindex:Int)
+
+object MStudent {
+  implicit val studentFormat = Json.format[MStudent]
+}

@@ -347,7 +347,7 @@ import java.util
 import controllers.traits.TController
 import models.Transactions
 import models.fhs.pages.editcourses.MEditCourses._
-import models.fhs.pages.editcourses.{MCourse, MEditCourses}
+import models.fhs.pages.editcourses.{MCourse, MEditCourses,MStudent}
 import models.persistence.participants.{Course, Group, Student}
 import play.api._
 import play.api.data.Forms._
@@ -501,27 +501,26 @@ object CEditCourses extends TController {
     Redirect(routes.CEditCourses.page())
   }
 
-  def updateGroup = Action(parse.json) {
+  def updateGroup(courseId:Long, groupType:String) = Action(parse.json) {
     implicit request =>
       try {
+
+        val course = findCourse(courseId)
+
         val jsVal = request.body
 
-        val group = findGroup((jsVal \ "groupId").as[Long])
-
-        val groupType = (jsVal \ "grouptype").as[String]
-
+        val studentInput = (jsVal \ "students").as[JsArray].value.map( element=> element.as[MStudent] ).toList
         val ignoreGroupIndex = (jsVal \ "ignoreGroupIndex").as[Boolean]
 
-        group.setGroupType(groupType)
+        val groups = course.getGroups.filter(_.getGroupType.equals(groupType))
 
-        group.setIgnoreGroupIndex(ignoreGroupIndex)
-        Logger.debug("update-group: " + ignoreGroupIndex)
-
-        Transactions {
-          implicit em =>
-            em.merge(group)
+        groups.foreach{ g=>
+         val students = findMultipleStudentsById(studentInput.filter(_.groupindex == g.getGroupIndex.toInt).map(_.id))
+          g.setStudents(Set[Student]() ++ students)
+          g.setIgnoreGroupIndex(ignoreGroupIndex)
         }
 
+        updateGroups(groups.toList)
         Ok(Json.stringify(Json.obj("result" -> "success")))
       }
       catch {

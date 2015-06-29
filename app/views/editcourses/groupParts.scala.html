@@ -11,6 +11,62 @@
       </a> </h4> </div>
       <div class="panel-collapse collapse" id="parent@groupType">
         <div class="panel-body">
+          <form class="form-inline" id="form@groupType">
+              <div class="form-group">
+                <div class="checkbox">
+                  <label>
+                    <input type="checkbox" value="true" name="ignoreGroupIndex" @if(coursesGroups(groupType).head.isIgnoreGroupIndex){checked}/> Gruppenindex verbergen
+                  </label>
+                </div>
+                  <div class="form-group">
+                      <button type="submit" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-ok"></span> </button>
+                  </div>
+              </div>
+          </form>
+            <script>
+                $('#form@groupType').on('submit',function(e){
+                e.preventDefault( );
+
+                var studentBuffer = [];
+                $('.subform@groupType').each(function(index, value){
+                    var formData = $(value).serializeObject();
+                    formData['id'] = Number(formData['id']);
+                    formData['groupindex'] = $(value).parents('.@groupType').data('groupindex');
+                    studentBuffer.push(formData);
+                 });
+
+                 var formData = $(this).serializeObject();
+                 formData['ignoreGroupIndex'] = formData['ignoreGroupIndex'] == 'true';
+                 formData['students'] = studentBuffer;
+                $.ajax ( {
+                cache : false,
+                type : "POST",
+                dataType : "json",
+                data : JSON.stringify ( formData ),
+                context : this,
+                contentType : "application/json; charset=utf-8",
+                url : "@routes.CEditCourses.updateGroup(course.getId,groupType)",
+                success : function ( callback ) {
+                console.log ( JSON.stringify ( callback ) ) ;
+
+                //$ ( '#bigGroupContainer' ).append ( '<div class="clearfix"></div>' +  callback.htmlresult ) ;
+                    location.reload(true);
+
+                },
+
+                error : function ( callback ) {
+                // error handler
+                console.log ( JSON.stringify ( callback ) ) ;
+                $ ( '#addGroupResult' ).empty ( ).append ( '<div class="alert alert-danger">Fehler '+callback.responseText+'<span class="glyphicon glyphicon-thumbs-down"></span></div>' ) ;
+
+
+
+                }
+                } ) ;
+
+                console.debug ( JSON.stringify ( formData ) ) ;
+                });
+            </script>
         <form method="POST" action="@routes.CEditCourses.removeGroupTypeFromGroup(course.getId,groupType)">
           <button class="btn btn-danger btn-sm" type="submit"><span class="glyphicon glyphicon-trash"></span> </button>
         </form>
@@ -20,7 +76,7 @@
               <tr>
                 @for(i<-1 to groups.size){
                   <th class="text-center text-info">
-                                                    Gruppe: @i: @groups(i-1).getStudents.size Studenten
+                           Gruppe: @i: @groups(i-1).getStudents.size Studenten
                   </th>
                 }
               </tr>
@@ -31,13 +87,20 @@
                 <tr>
                 @groups.map { group =>
                   @defining(groupWithStudents(group).lift(i)){ studentOption =>
-                    <td class="text-center @if(studentOption.nonEmpty){ @studentOption.get.getUuid }">
-                    @{
-                      studentOption match {
-                        case Some(student) => student.getFirstName + " " + student.getLastName
-                        case None => ""
-                      }
-                    }
+                    <td class="text-center ">
+                      <ul class="list-unstyled @groupType" data-groupindex="@group.getGroupIndex">
+                        <li class="table-bordered">
+                            <div class="@if(studentOption.nonEmpty){ @studentOption.get.getUuid }">
+                                @studentOption match {
+                                    case Some(student) => {
+                                        @student.getFirstName  @student.getLastName
+                                    <form class='hidden subform@groupType'> <input type='number' name='id' value='@student.getId'></form>
+                                    }
+                                    case None =>{}
+                                }
+                            </div>
+                        </li>
+                      </ul>
                   }
                 </td>
                 }
@@ -49,11 +112,14 @@
         }
         </div>
       </div>
-   <script>
 
-   </script>
     </div>
     <div class="clearfix"></div>
+    <script>
+    $('.@groupType').sortable({
+    connectWith:'.@groupType'
+    });
+   </script>
     }.seq
   }
 }

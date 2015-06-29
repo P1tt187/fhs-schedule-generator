@@ -83,3 +83,7 @@ ul.nav li.dropdown:hover > ul.dropdown-submenu {
 @-moz-document url-prefix() {
     fieldset { display: table-cell; }
 }
+
+.minheight {
+    min-height: 20px;
+}
