@@ -13,7 +13,7 @@
         <div class="panel-body">
           <form class="form-inline" id="form@groupType">
               <div class="form-group">
-                  <button type="button" data-container="body" class="btn btn-sm btn-info" data-toggle="popover" title="Hilfe" data-content="Gedacht für Übungen, welche üblicherweise in den großen Hörsäälen stattfinden.Wenn nur eine Übungsgruppe in der Einteilung vorhanden ist sollte dieser Hacken gesetzt sein."><span class="glyphicon glyphicon-question-sign"></span> </button>
+                  <button type="button"  class="help-ignore-groupindex-button btn btn-sm btn-info" data-toggle="popover" title="Hilfe" ><span class="glyphicon glyphicon-question-sign"></span> </button>
               </div>
               <div class="form-group">
                 <div class="checkbox">
@@ -21,10 +21,14 @@
                     <input type="checkbox" value="true" name="ignoreGroupIndex" @if(coursesGroups(groupType).head.isIgnoreGroupIndex){checked}/> Gruppenindex verbergen
                   </label>
                 </div>
+                  </div>
                   <div class="form-group">
                       <button type="submit" class="btn btn-success btn-sm"><span class="glyphicon glyphicon-ok"></span> </button>
                   </div>
-              </div>
+                  <div class="form-group">
+                      <button type="button"  class="help-groupmanagement btn btn-sm btn-info" data-toggle="popover" title="Hilfe" ><span class="glyphicon glyphicon-question-sign"></span> </button>
+                  </div>
+
           </form>
             <script>
                 $('#form@groupType').on('submit',function(e){
@@ -125,9 +129,25 @@
    </script>
     }.seq
   }
+    @helpcontent()
     <script>
     $(function () {
-    $('[data-toggle="popover"]').popover()
-});
+    $('.help-ignore-groupindex-button').popover({
+    html:true,
+      content:function(){
+      return $('#help-ignore-groupindex').html();
+      }
+    });
+
+    $('.help-groupmanagement').popover({
+    html:true,
+      content:function(){
+      return $('#help-groupmanagement').html();
+      }
+    });
+   });
+
+
     </script>
+
 }
