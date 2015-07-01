@@ -343,10 +343,12 @@
 package controllers
 
 import java.util
+import javax.inject.Inject
 
-import controllers.traits.TController
+import controllers.traits.{ TController}
 import models._
 import models.fhs.pages.roomdefinition.{MRoomdefintion, MTtimeslotCritDefine}
+import models.fhs.pages.timeslot.MTimeslotDisplay
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, TimeSlotCriteria}
 import models.persistence.enumerations.EDuration
 import models.persistence.location.RoomEntity
@@ -354,6 +356,7 @@ import org.hibernate.criterion.Restrictions
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
+import play.api.i18n.MessagesApi
 import play.api.libs.json._
 import play.api.mvc._
 import views.html.roomdefinition._
@@ -365,9 +368,10 @@ import scala.collection.JavaConversions._
  * @author fabian
  *         on 04.02.14.
  */
-object CRoomDefinition extends TController with Controller {
 
-  val NAV = "ROOMDEFINITION"
+
+class CRoomDefinition @Inject() (val messagesApi: MessagesApi) extends TController with Controller {
+
 
   val roomDefForm: Form[MRoomdefintion] = Form(
     mapping(
@@ -396,7 +400,7 @@ object CRoomDefinition extends TController with Controller {
 
       val (allTimeStots, timeRanges) = timeRange
 
-      Ok(roomdefinition("Räume", roomDefForm, CTimeslotDefintion.WEEKDAYS, rooms, allTimeStots, timeRanges))
+      Ok(roomdefinition("Räume", roomDefForm, MTimeslotDisplay.WEEKDAYS, rooms, allTimeStots, timeRanges))
   }
 
   def getCriteriaFields(index: Int) = Action {
@@ -415,7 +419,7 @@ object CRoomDefinition extends TController with Controller {
       val (allTimeStots, timeRanges) = timeRange
 
       val filledForm = roomDefForm.fill(room)
-      Ok(roomdefinition("Räume", filledForm, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms(), allTimeStots, timeRanges))
+      Ok(roomdefinition("Räume", filledForm, MTimeslotDisplay.WEEKDAYS, MRoomdefintion.findAllRooms(), allTimeStots, timeRanges))
   }
 
   def deleteRoom(id: Long) = Action {
@@ -449,7 +453,7 @@ object CRoomDefinition extends TController with Controller {
       roomResult.fold(
         errors => {
           val (allTimeStots, timeRanges) = timeRange
-          BadRequest(Json.stringify(Json.obj("invalid" -> true, "result" -> roomdefinition("Räume", errors, CTimeslotDefintion.WEEKDAYS, MRoomdefintion.findAllRooms(), allTimeStots, timeRanges).toString())))
+          BadRequest(Json.stringify(Json.obj("invalid" -> true, "result" -> roomdefinition("Räume", errors, MTimeslotDisplay.WEEKDAYS, MRoomdefintion.findAllRooms(), allTimeStots, timeRanges).toString())))
         },
         room => {
           Logger.info("submit room - " + room.timeCriterias.toString)

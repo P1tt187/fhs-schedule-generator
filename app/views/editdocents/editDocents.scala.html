@@ -1,11 +1,11 @@
-@(title: String, newDocentsForm: Form[models.fhs.pages.editdocents.MDocent],expireDateForm:Form[fhs.pages.editdocents.MExpireDate], existingDocents: List[models.persistence.docents.Docent])(implicit flash: Flash, session:Session)
+@(title: String, newDocentsForm: Form[models.fhs.pages.editdocents.MDocent],expireDateForm:Form[fhs.pages.editdocents.MExpireDate], existingDocents: List[models.persistence.docents.Docent])(implicit flash: Flash, session:Session, messages:Messages)
 
 
 @import views.html.helper._
+@import navigation.ENavigation._
 
 
-
-@main(title, CEditDocents.NAV) {
+@main(title, EDITDOCENTS) {
 
     <div class="col-md-12">
 

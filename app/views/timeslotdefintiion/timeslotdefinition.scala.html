@@ -1,8 +1,10 @@
-@(message: String, errorIds: List[String], timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: Seq[(String, String)], timeslots: List[models.persistence.template.TimeSlotTemplate], timeRanges: List[models.fhs.pages.basicstuctures.TimeRange])(implicit session:Session)
+@(message: String, errorIds: List[String], timeslotForm: Form[models.fhs.pages.timeslot.MTimeslotDefine], weekdays: Seq[(String, String)], timeslots: List[models.persistence.template.TimeSlotTemplate], timeRanges: List[models.fhs.pages.basicstuctures.TimeRange])(implicit session:Session,messages:Messages)
 
+    @import models.fhs.pages.timeslot.MTimeslotDisplay
 
-@import views.html.helper._
+    @import views.html.helper._
 
+    @import navigation.ENavigation._
 
 
     @errorWeekdaySelect = @{
@@ -10,7 +12,7 @@
     }
 
 
-@main(message, controllers.CTimeslotDefintion.NAV) {
+@main(message, TIMESLOTDEFINITION) {
     <div class="page-header">
         <h1>Zeitslot Hinzufügen</h1>
     </div>
@@ -69,7 +71,7 @@
         <div class="row-fluid">
             <div class="col-md-7">
                 <div class="table-responsive">
-                @defining(CTimeslotDefintion.WEEKDAYS.filterNot{
+                @defining(MTimeslotDisplay.WEEKDAYS.filterNot{
                     case (sortIndexString,dayname)=>
                         val sortIndex=sortIndexString.toInt
                         timeslots.find(_.getParent.getSortIndex == sortIndex).isEmpty

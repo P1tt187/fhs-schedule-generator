@@ -1,6 +1,8 @@
-@(message: String, course:List[models.persistence.participants.Course])(implicit flash: Flash, session: Session)
+@(message: String, course:List[models.persistence.participants.Course])(implicit flash: Flash, session: Session, messages:Messages)
 
-@main(message, CBLAFileUpload.NAV) {
+@import navigation.ENavigation._
+
+@main(message, BLAFILEUPLOAD) {
 
     <script >
     var error = undefined ;

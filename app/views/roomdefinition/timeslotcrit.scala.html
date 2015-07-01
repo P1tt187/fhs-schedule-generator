@@ -1,5 +1,6 @@
 @(sortIndex: Int)
 
+@import models.fhs.pages.timeslot.MTimeslotDisplay
 @import models.persistence.enumerations.EDuration
 
     @hours = @{
@@ -19,7 +20,7 @@
 
 
     @weedayOption = @{
-        CTimeslotDefintion.WEEKDAYS map {
+        MTimeslotDisplay.WEEKDAYS map {
            case(weekdaySortIndex, dayName) =>
                 new Html("'<option  value=\"" + weekdaySortIndex + "\">" + dayName + "</option>'+ ")
         }

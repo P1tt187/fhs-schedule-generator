@@ -342,15 +342,19 @@
 
 package controllers
 
-import controllers.traits.TController
+import javax.inject.Inject
+
+import controllers.traits.{ TController}
 import models.Transactions
 import models.fhs.pages.generator.MGenerator
-import models.fhs.pages.timeslot.{MTimeslotDefine, MTimeslotDisplay}
+import models.fhs.pages.timeslot._
+import models.fhs.pages.timeslot.MTimeslotDisplay._
 import models.persistence.template.{TimeSlotTemplate, WeekdayTemplate}
 import org.hibernate.criterion.Restrictions
 import play.api._
 import play.api.data.Forms._
 import play.api.data._
+import play.api.i18n.MessagesApi
 import play.api.mvc._
 import play.db.jpa._
 import views.html.timeslotdefintiion._
@@ -360,11 +364,9 @@ import views.html.timeslotdefintiion._
  * @author fabian
  *         on 23.01.14.
  */
-object CTimeslotDefintion extends TController {
 
-  val NAV = "timeslotdefinition"
 
-  val WEEKDAYS = Seq(("1", "Montag"), ("2", "Dienstag"), ("3", "Mittwoch"), ("4", "Donnerstag"), ("5", "Freitag"), ("6", "Samstag"), ("0", "Sonntag"))
+class CTimeslotDefintion @Inject() (val messagesApi: MessagesApi) extends TController {
 
   val timeslotForm: Form[MTimeslotDefine] = Form(
     mapping(

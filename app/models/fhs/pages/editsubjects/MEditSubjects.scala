@@ -363,6 +363,9 @@ import scala.collection.JavaConversions._
  */
 
 object MEditSubjects {
+  val LECTURE = "lecture"
+  val EXERCISE = "exercise"
+
   def findSemesters() = {
     Transactions.hibernateAction {
       implicit session =>

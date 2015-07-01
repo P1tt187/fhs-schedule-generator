@@ -1,12 +1,12 @@
-@(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm], courses:List[models.persistence.participants.Course] , docents:List[persistence.docents.Docent], rooms:List[persistence.location.RoomEntity])(implicit flash: Flash, session:Session)
+@(message: String, semesters: List[models.persistence.Semester], formGenerator: Form[models.fhs.pages.generator.GeneratorForm], courses:List[models.persistence.participants.Course] , docents:List[persistence.docents.Docent], rooms:List[persistence.location.RoomEntity])(implicit flash: Flash, session:Session, messages:Messages)
 
 @import java.util.Calendar
 
 @import models.persistence.enumerations.EDuration
 @import views.html.helper._
+@import navigation.ENavigation._
 
-
-    @main(message, CGenerate.NAV) {
+    @main(message,GENERATOR) {
 
         <div class="page-header">
             <h1>Stundenplan Generieren</h1>

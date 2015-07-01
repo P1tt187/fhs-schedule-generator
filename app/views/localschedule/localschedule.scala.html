@@ -1,12 +1,12 @@
 @(title:String,courseNames:List[String],timeRanges: List[models.fhs.pages.basicstuctures.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], semester:models.persistence.Semester, courses:List[persistence.participants.Course],lectureShortCuts:Map[String,String])(implicit session:Session)
 
-
+@import models.fhs.pages.timeslot.MTimeslotDisplay
 @import models.persistence.scheduletree.Weekday
 @import models.persistence.enumerations.EDuration
 
 @localmain{
 
-    @defining(CTimeslotDefintion.WEEKDAYS.filter{
+    @defining(MTimeslotDisplay.WEEKDAYS.filter{
         case (sortIndexString,dayname)=>
             val sortIndex=sortIndexString.toInt
             !timeslots.find(_.getParent.asInstanceOf[Weekday].getSortIndex.toInt == sortIndex).isEmpty

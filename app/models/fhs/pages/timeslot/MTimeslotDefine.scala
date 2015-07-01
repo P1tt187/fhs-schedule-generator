@@ -369,6 +369,8 @@ case class MTimeslotDisplay(id: Long, startHour: Int, startMinutes: Int, stopHou
 
 object MTimeslotDisplay {
 
+  val WEEKDAYS = Seq(("1", "Montag"), ("2", "Dienstag"), ("3", "Mittwoch"), ("4", "Donnerstag"), ("5", "Freitag"), ("6", "Samstag"), ("0", "Sonntag"))
+
   def findAllTimeslots = {
     val timeslots = Transactions.hibernateAction {
       implicit session =>

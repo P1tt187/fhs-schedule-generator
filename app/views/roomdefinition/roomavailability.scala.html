@@ -2,6 +2,7 @@
 
 @import models.persistence.enumerations.EDuration
 @import models.fhs.pages.roomdefinition.MRoomdefintion
+  @import models.fhs.pages.timeslot.MTimeslotDisplay
 
 @for(roomEntity <- existingRooms.filterNot(_.timeCriterias.isEmpty).sortBy(r =>(r.house,r.number))) {
   <div class="col-md-6">
@@ -15,7 +16,7 @@
       <div class="panel-body">
         <div class="table-responsive">
 
-        @defining(CTimeslotDefintion.WEEKDAYS.filterNot{
+        @defining(MTimeslotDisplay.WEEKDAYS.filterNot{
           case (sortIndexString,dayname)=>
             val sortIndex=sortIndexString.toInt
             roomEntity.timeCriterias.find(tc=> tc.weekdayIndex == sortIndex).isEmpty

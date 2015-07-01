@@ -342,7 +342,9 @@
 
 package controllers
 
-import controllers.traits.TController
+import javax.inject.Inject
+
+import controllers.traits.{ TController}
 import models.fhs.pages.editdocents.MEditDocents._
 import models.fhs.pages.editdocents._
 import models.fhs.pages.generator.MGenerator
@@ -351,17 +353,19 @@ import models.persistence.docents.Docent
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
+import play.api.i18n._
 import play.api.libs.json._
 import play.api.mvc._
+
 import views.html.editdocents._
 
 /**
  * @author fabian 
  *         on 13.04.14.
  */
-object CEditDocents extends TController {
 
-  val NAV = "DOCENTS"
+
+class CEditDocents @Inject() (val messagesApi: MessagesApi) extends TController {
 
   val newDocentForm: Form[MDocent] = Form(
     mapping(
@@ -507,7 +511,7 @@ object CEditDocents extends TController {
         null
       }
 
-      Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots, expireDate)(flashing, session).toString))
+      Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots, expireDate)(flashing, session,request2Messages).toString))
 
 
   }

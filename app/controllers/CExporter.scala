@@ -345,10 +345,11 @@ package controllers
 import java.net.URI
 import java.nio.charset.Charset
 import java.nio.file._
+import javax.inject.Inject
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sun.nio.zipfs.ZipFileSystemProvider
-import controllers.traits.TController
+import controllers.traits.{ TController}
 import logic.helpers.{DeleteDirectoryHelper, DirectoryCopyHelper, ZIPFileDirectoryCopyHelper, ZIPFileExtractHelper}
 import models.Transactions
 import models.export.JsonContainer
@@ -368,6 +369,7 @@ import org.hibernate.FetchMode
 import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
 import play.api.Play
 import play.api.Play.current
+import play.api.i18n.MessagesApi
 import play.api.libs.json._
 import play.api.mvc._
 import views.html.exporter._
@@ -379,9 +381,10 @@ import scala.collection.JavaConversions._
  * @author fabian 
  *         on 24.03.14.
  */
-object CExporter extends TController {
 
-  val NAV = "Exporter"
+class  CExporter @Inject() (val messagesApi: MessagesApi) extends TController {
+
+
 
   def page = Action {
     implicit request =>

@@ -1,6 +1,8 @@
-@(message: String, semesters: List[persistence.Semester])(implicit session: Session)
+@(message: String, semesters: List[persistence.Semester])(implicit session: Session, messages:Messages)
 
-    @main(message, CExporter.NAV) {
+    @import navigation.ENavigation._
+
+    @main(message, EXPORTER) {
 
         @if(session.get(IS_DEVELOPER).getOrElse("false").toBoolean) {
             <div class="page-header">

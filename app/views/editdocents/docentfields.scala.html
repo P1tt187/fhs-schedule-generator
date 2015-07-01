@@ -1,4 +1,4 @@
-@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.basicstuctures.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate],expireDate:java.util.Calendar)(implicit flash:Flash,session:Session)
+@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.basicstuctures.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate],expireDate:java.util.Calendar)(implicit flash:Flash,session:Session, messages:Messages)
 @import java.text.SimpleDateFormat
 @import java.util.Calendar
 

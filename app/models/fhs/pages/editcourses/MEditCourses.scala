@@ -342,7 +342,6 @@
 
 package models.fhs.pages.editcourses
 
-import controllers.CEditCourses
 import models.Transactions
 import models.fhs.pages.JavaList
 import models.persistence.location.{LectureRoom, RoomEntity}
@@ -362,6 +361,12 @@ import play.api.libs.json.Json
  *         on 14.03.14.
  */
 object MEditCourses {
+
+  def cut[A](xs: Seq[A], n: Int) = {
+    val (quot, rem) = (xs.size / n, xs.size % n)
+    val (smaller, bigger) = xs.splitAt(xs.size - rem * (quot + 1))
+    smaller.grouped(quot) ++ bigger.grouped(quot + 1)
+  }
 
   lazy val firstNames = current.configuration.getString("firstNames").getOrElse("").split(",").toList
   lazy val lastNames = current.configuration.getString("lastNames").getOrElse("").split(",").toList
@@ -482,7 +487,7 @@ object MEditCourses {
         groupTypes.foreach {
           gType =>
             val groups = course.getGroups.filter(_.getGroupType.equals(gType))
-            val parts = CEditCourses.cut(students.toSeq.sortBy(s => (s.getLastName, s.getFirstName)), groups.size).toList
+            val parts = cut(students.toSeq.sortBy(s => (s.getLastName, s.getFirstName)), groups.size).toList
 
             (0 to groups.size - 1).foreach {
               i =>

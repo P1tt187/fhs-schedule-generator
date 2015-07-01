@@ -342,8 +342,10 @@
 
 package controllers
 
+import javax.inject.Inject
+
 import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
-import controllers.traits.TController
+import controllers.traits.{ TController}
 import models.Transactions
 import models.fhs.pages.editsubjects.MEditSubjects._
 import models.fhs.pages.editsubjects.MSemester
@@ -362,8 +364,10 @@ import play.api._
 import play.api.cache.Cache
 import play.api.data.Forms._
 import play.api.data._
+import play.api.i18n.MessagesApi
 import play.api.libs.json._
 import play.api.mvc._
+
 import views.html.editsubjects._
 
 import scala.collection.JavaConversions._
@@ -374,12 +378,12 @@ import scala.concurrent.duration._
  * @author fabian 
  *         on 05.03.14.
  */
-object CEditSubjects extends TController {
 
-  val NAV = "EDITSUBJECTS"
+class CEditSubjects @Inject() (val messagesApi: MessagesApi) extends TController {
 
-  val LECTURE = "lecture"
-  val EXERCISE = "exercise"
+
+
+
 
   val TIME_TO_LIFE = 30 seconds
 

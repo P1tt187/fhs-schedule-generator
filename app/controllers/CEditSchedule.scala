@@ -342,8 +342,10 @@
 
 package controllers
 
+import javax.inject.Inject
+
 import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
-import controllers.traits.TController
+import controllers.traits.{ TController}
 import models.Transactions
 import models.fhs.pages._
 import models.fhs.pages.editschedule.MEditSchedule._
@@ -358,8 +360,10 @@ import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
 import play.api.Logger
 import play.api.Play.current
 import play.api.cache.Cache
+import play.api.i18n.MessagesApi
 import play.api.libs.json._
 import play.api.mvc._
+
 import views.html.editschedule.{editschedule, showSchedule}
 
 import scala.collection.JavaConversions._
@@ -369,9 +373,10 @@ import scala.concurrent.duration._
  * @author fabian 
  *         on 03.06.14.
  */
-object CEditSchedule extends TController {
 
-  val NAV = "EDIT_SCHEDULE"
+class CEditSchedule @Inject() (val messagesApi: MessagesApi) extends TController {
+
+
 
   lazy val TIME_TO_LIFE = 10 minutes
 

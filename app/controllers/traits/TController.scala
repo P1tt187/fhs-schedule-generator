@@ -346,14 +346,14 @@ import models.fhs.pages.generator.MGenerator
 import models.fhs.pages.timeslot.MTimeslotDisplay
 import play.api.mvc._
 
+import play.api.i18n. I18nSupport
+
 /**
  * @author fabian
  * @since 13.02.15.
  *        Trait for central functions of every controller
  */
-trait TController extends Controller  {
-
-  val NAV:String
+trait TController extends Controller with I18nSupport{
 
   /** landing metod of every controller */
   def page():Action[_]
@@ -366,3 +366,4 @@ trait TController extends Controller  {
   }
 
 }
+

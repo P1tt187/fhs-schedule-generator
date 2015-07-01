@@ -343,12 +343,13 @@
 package controllers
 
 import java.util.{Calendar, UUID}
+import javax.inject.Inject
 
 import akka.actor.{PoisonPill, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
-import controllers.traits.TController
+import controllers.traits.{ TController}
 import exceptions.errortypes.EErrorType
 import exceptions.errortypes.EErrorType._
 import exceptions.{DocentsNotAtSameTimeAvailableException, NoGroupFoundException, NoRoomException}
@@ -367,10 +368,12 @@ import play.api.Logger
 import play.api.Play.current
 import play.api.data.Forms._
 import play.api.data._
+import play.api.i18n.MessagesApi
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json._
 import play.api.mvc._
+
 import views.html.generator._
 import views.html.generator.errorpages._
 
@@ -384,7 +387,9 @@ import scala.concurrent.duration._
  * @author fabian 
  *         on 20.03.14.
  */
-object CGenerate extends TController {
+
+
+class CGenerate @Inject() (val messagesApi: MessagesApi) extends TController {
 
   private lazy val schedule = scala.collection.mutable.Map[UserName,Schedule]()
 
@@ -415,9 +420,6 @@ object CGenerate extends TController {
       "maxIterationDeep" -> number(min = 0)
     )(GeneratorForm.apply)(GeneratorForm.unapply)
   )
-
-
-  val NAV = "GENERATOR"
 
   def loadScheduleForSemester(id: Long) = Action {
     implicit request =>
@@ -459,7 +461,7 @@ object CGenerate extends TController {
         case None => form.fill(GeneratorForm(-1, 2, 10, 10, 50))
       }
 
-      Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses(), findDocents(), findRooms())(flashing, request.session))
+      Ok(generator("Generator", findSemesters(), chooseSemesterForm, findCourses(), findDocents(), findRooms())(flashing, request.session,request2Messages))
   }
 
   def saveSchedule() = Action {

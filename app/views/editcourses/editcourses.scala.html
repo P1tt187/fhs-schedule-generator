@@ -1,9 +1,9 @@
-@(message: String, courses: List[models.persistence.participants.Course], courseForm:Form[fhs.pages.editcourses.MCourse])(implicit flash: Flash, session:Session)
+@(message: String, courses: List[models.persistence.participants.Course], courseForm:Form[fhs.pages.editcourses.MCourse])(implicit flash: Flash, session:Session, messages:Messages)
 
 @import views.html.helper._
+@import navigation.ENavigation._
 
-
-@main(message, CEditCourses.NAV) {
+@main(message, EDITCOURSES) {
 
     <div class="page-header">
         <h3> Kurs hinzufügen </h3>

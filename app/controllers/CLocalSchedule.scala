@@ -342,15 +342,20 @@
 
 package controllers
 
-import controllers.traits.TController
+import javax.inject.Inject
+
+import controllers.traits.{ TController}
 import models.Transactions
 import models.fhs.pages.JavaList
+import models.fhs.pages.generator.MGenerator
+import models.fhs.pages.timeslot.MTimeslotDisplay
 import models.persistence.Schedule
 import models.persistence.lecture.Lecture
 import models.persistence.participants.Course
 import models.persistence.scheduletree.{TimeSlot, Weekday}
 import org.hibernate.FetchMode
 import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
+import play.api.i18n.MessagesApi
 import play.api.mvc._
 import views.html.localschedule._
 
@@ -361,14 +366,18 @@ import scala.collection.JavaConversions._
  * @author fabian 
  * @since 19.04.15.
  */
-object CLocalSchedule extends TController {
+class CLocalSchedule @Inject() (val messagesApi: MessagesApi) extends TController{
 
-  val NAV = "localSchedule"
+
 
   def page = Action {
     implicit requet =>
 
-      val (allTimeslots, timerages) = timeRange
+      val (allTimeslots, timerages) ={
+        val allTimeSlots = MTimeslotDisplay.findAllTimeslots
+        val timeRanges = MGenerator.findTimeRanges(allTimeSlots).sorted
+        (allTimeSlots, timeRanges)
+      }
 
       val schedule = Transactions.hibernateAction {
         implicit s =>

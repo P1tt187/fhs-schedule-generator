@@ -1,6 +1,8 @@
-@(message: String)(implicit session: Session)
+@(message: String)(implicit session: Session,messages:Messages)
 
-    @main(message, controllers.CIndex.NAV) {
+@import navigation.ENavigation._
+
+    @main(message, INDEX) {
         <div class="page-header">
             <h1>
                 Willkommen

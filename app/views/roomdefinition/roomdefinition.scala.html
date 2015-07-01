@@ -1,21 +1,23 @@
-@(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion], weekdays: Seq[(String, String)], existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay], allTimeSlots : List[persistence.template.TimeSlotTemplate], timeRanges: List[fhs.pages.basicstuctures.TimeRange] )(implicit session:Session)
+@(title: String, roomDefForm: Form[models.fhs.pages.roomdefinition.MRoomdefintion], weekdays: Seq[(String, String)], existingRooms: List[models.fhs.pages.roomdefinition.MRoomdisplay], allTimeSlots : List[persistence.template.TimeSlotTemplate], timeRanges: List[fhs.pages.basicstuctures.TimeRange] )(implicit session:Session,messages:Messages)
 
 @import models.fhs.pages.roomdefinition._
+@import models.fhs.pages.timeslot.MTimeslotDisplay._
 @import models.persistence.enumerations.EDuration
 @import views.html.helper._
 @import models.fhs.pages.basicstuctures.TimeRange._
+@import navigation.ENavigation._
 
 @defaultRoom = @{MRoomdefintion(None,0,"","",false,List[String](),List[MTtimeslotCritDefine]())}
 
 @days= @{
-    CTimeslotDefintion.WEEKDAYS.filterNot{
+    WEEKDAYS.filterNot{
         case (sortIndexString,dayname)=>
             val sortIndex=sortIndexString.toInt
             allTimeSlots.find(_.getParent.getSortIndex == sortIndex).isEmpty
     }.sortBy(_._1)
 }
 
-@main(title, CRoomDefinition.NAV) {
+@main(title, ROOMDEFINITION) {
 
     <div class="page-header">
         <h1> Räume </h1>

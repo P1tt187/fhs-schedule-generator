@@ -1,9 +1,10 @@
-@(message: String, semesters: List[models.persistence.Semester], docents:List[models.persistence.docents.Docent], courses:List[models.persistence.participants.Course], semesterForm:Form[models.fhs.pages.editsubjects.MSemester])(implicit session:Session)
+@(message: String, semesters: List[models.persistence.Semester], docents:List[models.persistence.docents.Docent], courses:List[models.persistence.participants.Course], semesterForm:Form[models.fhs.pages.editsubjects.MSemester])(implicit session:Session, messages:Messages)
 
 @import views.html.helper._
 
+@import navigation.ENavigation._
 
-@main(message, CEditSubjects.NAV) {
+@main(message, EDITSUBJECTS) {
     <div class="page-header">
         <h3>Semester hinzufügen </h3>
     </div>

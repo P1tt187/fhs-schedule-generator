@@ -1,41 +1,43 @@
-@(nav: String)(implicit session: Session)
+@(nav: navigation.ENavigation)(implicit session: Session)
+
+@import navigation.ENavigation._
 
     @navList = @{
         List(
-            (CEditCourses.NAV, routes.CEditCourses.page, "Kurse & Gruppen"),
-            (CEditSubjects.NAV, routes.CEditSubjects.page, "Fächer Editieren")
+            (EDITCOURSES, routes.CEditCourses.page, "Kurse & Gruppen"),
+            (EDITSUBJECTS, routes.CEditSubjects.page, "Fächer Editieren")
         )
     }
 
     @docentMenu = @{
         List(
-            (CEditDocents.NAV, routes.CEditDocents.page, "Dozenten")
+            (EDITDOCENTS, routes.CEditDocents.page, "Dozenten")
         )
     }
 
     @exportList = @{
         List(
-            (CBLAFileUpload.NAV, routes.CBLAFileUpload.page, "Bla Datei Importieren"),
-            (CExporter.NAV, routes.CExporter.page, "Export")
+            (BLAFILEUPLOAD, routes.CBLAFileUpload.page, "Bla Datei Importieren"),
+            (EXPORTER, routes.CExporter.page, "Export")
         )
     }
 
     @baseDataList = @{
         List(
-            (CTimeslotDefintion.NAV, routes.CTimeslotDefintion.page, "Zeitslots Definieren"),
-            (CRoomDefinition.NAV, routes.CRoomDefinition.page, "Räume erstellen")
+            (TIMESLOTDEFINITION, routes.CTimeslotDefintion.page, "Zeitslots Definieren"),
+            (ROOMDEFINITION, routes.CRoomDefinition.page, "Räume erstellen")
         )
     }
 
     @scheduleList = @{
         List(
-            (CEditSchedule.NAV, routes.CEditSchedule.page, "Stundenplan bearbeiten")
+            (EDITSCHEDULE, routes.CEditSchedule.page, "Stundenplan bearbeiten")
         )
     }
 
     @scheduleDocentList = @{
         List(
-            (CGenerate.NAV, routes.CGenerate.page, "Generator")
+            (GENERATOR, routes.CGenerate.page, "Generator")
         )
     }
 

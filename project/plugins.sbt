@@ -9,12 +9,13 @@ resolvers ++= Seq(
   "Typesafe Snapshots Repository" at "http://repo.typesafe.com/typesafe/snapshots/",
   "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
   "spray repo" at "http://repo.spray.io",
-  "jitpack.io" at "https://jitpack.io/"
+  "jitpack.io" at "https://jitpack.io/",
+  "scalaz-bintray" at "https://dl.bintray.com/scalaz/releases"
 )
 
 
 // The Play plugin
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.9")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.4.1")
 
 //addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "0.94.6")
 

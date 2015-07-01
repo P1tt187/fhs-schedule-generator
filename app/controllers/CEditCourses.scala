@@ -343,17 +343,21 @@
 package controllers
 
 import java.util
+import javax.inject._
 
-import controllers.traits.TController
+import controllers.traits.{ TController}
 import models.Transactions
 import models.fhs.pages.editcourses.MEditCourses._
 import models.fhs.pages.editcourses.{MCourse, MEditCourses,MStudent}
 import models.persistence.participants.{Course, Group, Student}
+import navigation.ENavigation
 import play.api._
 import play.api.data.Forms._
 import play.api.data._
+import play.api.i18n._
 import play.api.libs.json._
 import play.api.mvc._
+
 import views.html.editcourses._
 
 import scala.collection.JavaConversions._
@@ -362,9 +366,9 @@ import scala.collection.JavaConversions._
  * @author fabian 
  *         on 14.03.14.
  */
-object CEditCourses extends TController {
+class CEditCourses @Inject() (val messagesApi: MessagesApi) extends TController {
 
-  val NAV = "EDITCOURSES"
+
 
   val courseForm = Form[MCourse](
     mapping("longName" -> nonEmptyText,
@@ -381,7 +385,7 @@ object CEditCourses extends TController {
 
   def getCourseFields(courseId: Long) = Action {
     implicit request =>
-      val session = request.session + ((NAV + ".editcourse") -> courseId.toString)
+      val session = request.session + ((ENavigation.EDITCOURSES.name() + ".editcourse") -> courseId.toString)
       Ok(Json.stringify(Json.obj("htmlresult" -> courseFields(findCourse(courseId), findRooms).toString()))).withSession(session)
   }
 
@@ -553,11 +557,7 @@ object CEditCourses extends TController {
     Redirect(routes.CEditCourses.page())
   }
 
-  def cut[A](xs: Seq[A], n: Int) = {
-    val (quot, rem) = (xs.size / n, xs.size % n)
-    val (smaller, bigger) = xs.splitAt(xs.size - rem * (quot + 1))
-    smaller.grouped(quot) ++ bigger.grouped(quot + 1)
-  }
+
 
   def saveStudentData() = Action(parse.json) {
     implicit request =>
@@ -590,3 +590,4 @@ object CEditCourses extends TController {
   }
 
 }
+

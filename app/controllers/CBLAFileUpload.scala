@@ -342,20 +342,24 @@
 
 package controllers
 
+import javax.inject.Inject
+
 import akka.actor.Props
 import akka.pattern.ask
 import akka.util.Timeout
-import controllers.traits.TController
+import controllers.traits.{ TController}
 import logic.blaimport.{BlaImportActor, ImportFailure, ImportFile, ImportFinished}
 import models.fhs.pages.blaimport.{MBLAFileUpload, OldCourses}
 import play.api.Logger
 import play.api.Play.current
 import play.api.data.Forms._
 import play.api.data._
+import play.api.i18n.MessagesApi
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.json._
 import play.api.mvc._
+
 import views.html.blaimport._
 
 import scala.concurrent.Future
@@ -366,9 +370,11 @@ import scala.util.{Failure, Success}
  * @author fabian
  *         on 07.02.14.
  */
-object CBLAFileUpload extends TController{
 
-  val NAV = "PLFILEUPLOAD"
+
+class CBLAFileUpload @Inject() (val messagesApi: MessagesApi) extends TController{
+
+
 
   implicit val timeout = Timeout(5 minutes)
   private var result: Future[Any] = null
@@ -458,3 +464,4 @@ object CBLAFileUpload extends TController{
     Redirect(routes.CBLAFileUpload.page)
   }
 }
+

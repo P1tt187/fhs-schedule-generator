@@ -1,6 +1,8 @@
-@(title: String, schedules: Set[persistence.Semester])(implicit session:Session)
+@(title: String, schedules: Set[persistence.Semester])(implicit session:Session, messages:Messages)
 
-@main(title, CEditSchedule.NAV) {
+    @import navigation.ENavigation._
+
+@main(title, EDITSCHEDULE) {
 
     <div class="page-header">
         <h1>@title</h1>
