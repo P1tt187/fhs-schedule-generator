@@ -363,6 +363,7 @@ import play.api.Logger
 
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
+
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
@@ -551,7 +552,7 @@ class ScheduleGeneratorActor extends Actor {
             if (timeWishes.isEmpty) {
               false
             } else {
-              val numberOfLectures = lectures.map {
+              val numberOfLectures = lectures.toStream.map {
                 l =>
                   if (!l.getDocents.find(_.compareTo(d) == 0).isEmpty) {
                     l.getDuration match {

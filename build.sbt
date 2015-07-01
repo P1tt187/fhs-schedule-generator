@@ -25,14 +25,17 @@ libraryDependencies ++= Seq(
   "org.mariadb.jdbc" % "mariadb-java-client" % "1.1.7",
   "uk.com.robust-it" % "cloning" % "1.9.0",
   "com.decodified" %% "scala-ssh" % "0.7.0",
-  "com.typesafe" % "config" % "1.2.0"
+  "com.typesafe" % "config" % "1.2.0",
+  "net.java.dev.jna" % "jna" % "3.4.0"
   //"org.bouncycastle" % "bcprov-jdk16" % "1.46",
   //"com.jcraft" % "jzlib" % "1.1.3"
 )
 
-scalaVersion := "2.10.5"
+scalaVersion := "2.11.7"
 
-scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitConversions")
+ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
+
+scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitConversions","-target:jvm-1.8")
 
 //javaOptions ++=Seq("-Dhttp.port=disabled","-Dhttps.port=9443","-Dhttps.keyStore=/opt/sgd/sslkeystore","-Dhttps.keyStorePassword=sgenerator")
 
