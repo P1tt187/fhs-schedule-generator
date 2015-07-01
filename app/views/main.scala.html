@@ -76,9 +76,9 @@
                         </ul>
                     }
                     @if(session.get(CURRENT_USER).getOrElse("-1") == "-1") {
-                        @form(action = routes.CLogin.doLogin, 'class -> "navbar-form navbar-right") {
-                            <input class="form-control input-sm" placeholder="Nutzer" type="text" name="@CIndex.loginForm("username").name" >
-                            <input class="form-control input-sm" placeholder="Passwort" type="password" name="@CIndex.loginForm("password").name" >
+                        @form(action = routes.CIndex.doLogin, 'class -> "navbar-form navbar-right") {
+                            <input class="form-control input-sm" placeholder="Nutzer" type="text" name="@CLogin.loginForm("username").name" >
+                            <input class="form-control input-sm" placeholder="Passwort" type="password" name="@CLogin.loginForm("password").name" >
                             <button type="submit" class="btn btn-sm btn-success navbar-btn"><span class="glyphicon glyphicon-log-in"></span> </button>
                         }
                     } else {
@@ -89,7 +89,7 @@
                                 </a>
                             </li>
                             <li>
-                                <form class="navbar-form" action="@routes.CLogin.doLogout" method="post">
+                                <form class="navbar-form" action="@routes.CIndex.doLogout" method="post">
                                     <button type="submit" class="btn btn-danger navbar-btn btn-sm"><span class="glyphicon glyphicon-log-out"></span> </button>
                                 </form>
                             </li>

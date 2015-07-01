@@ -562,7 +562,7 @@ class ScheduleGeneratorActor extends Actor {
                   } else {
                     0
                   }
-              }.sum
+              } .sum
               val numberOfAvailableTimes = timeWishes.map {
                 tw =>
                   if (templates.find(compareTimeSlotTemplate(_, tw)).isEmpty) {

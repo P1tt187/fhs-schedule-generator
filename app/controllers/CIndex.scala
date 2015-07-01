@@ -343,12 +343,15 @@
 package controllers
 
 
+import javax.inject.Inject
+
 import com.decodified.scalassh._
 import controllers.traits.TController
 import models.fhs.pages.index._
 import play.api.Logger
 import play.api.data.Forms._
 import play.api.data._
+import play.api.i18n.MessagesApi
 import play.api.mvc._
 
 
@@ -356,18 +359,19 @@ import play.api.mvc._
  * @author fabian
  *         on 22.01.14.
  */
-object CIndex extends TController {
 
-  val NAV = "index"
-
-
-
+object CLogin{
   val loginForm = Form(
     mapping(
       "username" -> nonEmptyText,
       "password" -> nonEmptyText
     )(MUser.apply)(MUser.unapply)
   )
+}
+
+class CIndex  @Inject() (val messagesApi: MessagesApi) extends TController {
+
+  import CLogin._
 
   def page() = Action {
       implicit request =>

@@ -1,8 +1,9 @@
+
 @(title:String,timeRanges: List[models.fhs.pages.basicstuctures.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], rate:Int, alternatives:Map[java.util.UUID,persistence.Schedule],semester:models.persistence.Semester)(implicit session:Session)
 
 @import models.persistence.scheduletree.Weekday
 @import models.persistence.enumerations.EDuration
-
+@import models.fhs.pages.timeslot.MTimeslotDisplay
 
 <div class="page-header">
     <h1>@title</h1>
@@ -66,7 +67,7 @@
             <th class="text-info text-center" >Uhrzeit</th>
 
             @days= @{
-                CTimeslotDefintion.WEEKDAYS.filter{
+                MTimeslotDisplay.WEEKDAYS.filter{
                     case (sortIndexString,dayname)=>
                             val sortIndex=sortIndexString.toInt
                     !timeslots.find(_.getParent.asInstanceOf[Weekday].getSortIndex.toInt == sortIndex).isEmpty

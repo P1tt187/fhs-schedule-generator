@@ -7,7 +7,7 @@
 @import models.fhs.pages.roomdefinition._
 @import models.persistence.enumerations._
 @import views.html.helper._
-
+@import models.fhs.pages.timeslot.MTimeslotDisplay
     @disableTimeWishFields = @{
         expireDate!=null&& Calendar.getInstance().after(expireDate)&& !session.get(IS_ADMIN).getOrElse("false").toBoolean
     }
@@ -108,7 +108,7 @@
                     }
 
                     @days= @{
-                        CTimeslotDefintion.WEEKDAYS.filterNot{
+                        MTimeslotDisplay.WEEKDAYS.filterNot{
                             case (sortIndexString,dayname)=>
                                 val sortIndex=sortIndexString.toInt
                                 allTimeSlots.find(_.getParent.getSortIndex == sortIndex).isEmpty

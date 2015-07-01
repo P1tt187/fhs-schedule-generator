@@ -1,5 +1,6 @@
 @(students: List[models.persistence.participants.Student])
 @import models.persistence.participants.Student
+@import models.fhs.pages.editcourses.MEditCourses
 
 <br/>
 <div class="row-fluid">
@@ -18,7 +19,7 @@
             </tr>
         </thead>
         <tbody >
-            @defining(if(students.isEmpty){List[Seq[Student]](Seq[Student]())}else {CEditCourses.cut(students.sortBy(s => (if(s.getLastName != null) {
+            @defining(if(students.isEmpty){List[Seq[Student]](Seq[Student]())}else {MEditCourses.cut(students.sortBy(s => (if(s.getLastName != null) {
                 s.getLastName
             } else {
                 ""

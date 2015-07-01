@@ -4,7 +4,7 @@
 @import models.persistence.criteria.{RoomCriteria, TimeSlotCriteria}
 @import models.persistence.enumerations.EDuration
 @import models.persistence.subject.ExerciseSubject
-
+@import models.fhs.pages.editsubjects.MEditSubjects
 
 <form role="form" id="subjectForm" class="form-inline">
 
@@ -58,7 +58,7 @@
         <label class="control-label" for="expectedParticipantsInput">Erwartete Teilnehmerzahl <br/> (optional) </label>
         <input id="expectedParticipantsInput" name="expectedParticipants" class="form-control" type="number" min="0" placeholder="Anzahl" value="@if(subject.getExpectedParticipants!=null){@subject.getExpectedParticipants}">
     </div>
-    @if(lectureType.equals(CEditSubjects.EXERCISE)) {
+    @if(lectureType.equals(MEditSubjects.EXERCISE)) {
         @defining(subject.asInstanceOf[ExerciseSubject]) { exercise =>
             <div class="form-group @if(!groupTypes.exists(_.equals(exercise.getGroupType))){ has-error}">
                 <label class="control-label" for="groupTypeInput"><br/>Gruppeneinteilung</label>

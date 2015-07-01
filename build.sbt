@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
   javaWs,
   cache,
   filters,
-  "org.webjars" %% "webjars-play" % "2.3.0-3",
+  "org.webjars" %% "webjars-play" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.5",
   "org.hibernate" % "hibernate-core" % "4.3.8.Final",
   "org.hibernate" % "hibernate-entitymanager" % "4.3.8.Final",
@@ -30,7 +30,7 @@ libraryDependencies ++= Seq(
   //"com.jcraft" % "jzlib" % "1.1.3"
 )
 
-//scalaVersion := "2.11.5"
+scalaVersion := "2.10.5"
 
 scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitConversions")
 
@@ -43,6 +43,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala).enablePlugins(Sb
     buildInfoKeys := Seq[BuildInfoKey](name, version),
     buildInfoPackage := "informations"
   )
+
+routesGenerator := InjectedRoutesGenerator
 
 jdkPackagerTool := Some(file("/usr/lib/jvm/default/bin/javapackager"))
 

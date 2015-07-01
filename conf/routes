@@ -4,8 +4,8 @@
 
 # Home page
 GET         /                                                                                         controllers.CIndex.page
-POST        /loginUser                                                                                controllers.CLogin.doLogin
-POST        /logoutUser                                                                               controllers.CLogin.doLogout
+POST        /loginUser                                                                                controllers.CIndex.doLogin
+POST        /logoutUser                                                                               controllers.CIndex.doLogout
 
 GET         /defineTimeslots                                                                          controllers.CTimeslotDefintion.page
 POST        /submitTimeslot                                                                           controllers.CTimeslotDefintion.submit

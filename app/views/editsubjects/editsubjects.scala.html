@@ -1,8 +1,8 @@
 @(message: String, semesters: List[models.persistence.Semester], docents:List[models.persistence.docents.Docent], courses:List[models.persistence.participants.Course], semesterForm:Form[models.fhs.pages.editsubjects.MSemester])(implicit session:Session, messages:Messages)
 
-@import views.html.helper._
-
-@import navigation.ENavigation._
+    @import views.html.helper._
+    @import navigation.ENavigation._
+    @import models.fhs.pages.editsubjects.MEditSubjects
 
 @main(message, EDITSUBJECTS) {
     <div class="page-header">
@@ -34,10 +34,10 @@
                     <div class="form-group">
                         <label class="control-label" for="selectLectureType">Typ</label>
                         <select class="form-control" id="selectLectureType" title="Vorlesung oder Übung">
-                            <option value="@CEditSubjects.LECTURE">
+                            <option value="@MEditSubjects.LECTURE">
                                 Vorlesung
                             </option>
-                            <option value="@CEditSubjects.EXERCISE">
+                            <option value="@MEditSubjects.EXERCISE">
                                 Übung
                             </option>
                         </select>

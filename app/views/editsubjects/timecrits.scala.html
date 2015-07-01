@@ -1,11 +1,12 @@
+
 @(existingTimeCriterias:List[models.persistence.criteria.TimeSlotCriteria], allTimeSlots:List[models.persistence.template.TimeSlotTemplate], timeRanges:List[models.fhs.pages.basicstuctures.TimeRange])
 
 @import models.persistence.enumerations.EDuration
 @import models.fhs.pages.basicstuctures.TimeRange._
-
+@import models.fhs.pages.timeslot.MTimeslotDisplay
 
 @days= @{
-    CTimeslotDefintion.WEEKDAYS.filterNot{
+    MTimeslotDisplay.WEEKDAYS.filterNot{
         case (sortIndexString,dayname)=>
             val sortIndex=sortIndexString.toInt
             allTimeSlots.find(_.getParent.getSortIndex == sortIndex).isEmpty
