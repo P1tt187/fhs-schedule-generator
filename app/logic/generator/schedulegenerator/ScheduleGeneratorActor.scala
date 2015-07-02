@@ -564,7 +564,7 @@ class ScheduleGeneratorActor extends Actor {
                     0
                   }
               } .sum
-              val numberOfAvailableTimes = timeWishes.map {
+              val numberOfAvailableTimes = timeWishes.toStream.map {
                 tw =>
                   if (templates.find(compareTimeSlotTemplate(_, tw)).isEmpty) {
                     0

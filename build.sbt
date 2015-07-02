@@ -8,7 +8,7 @@ import sbt._
 
 name := """schedule-generator"""
 
-version := "1.2.0"
+version := "1.2.1"
 
 libraryDependencies ++= Seq(
   javaJdbc,
