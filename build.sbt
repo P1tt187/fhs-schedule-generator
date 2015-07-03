@@ -4,7 +4,8 @@ import com.typesafe.sbt.packager.rpm.RpmDependencies
 import com.typesafe.sbt.packager.docker._
 import sbt.Keys._
 import sbt._
-
+import play.Play.autoImport._
+import PlayKeys._
 
 name := """schedule-generator"""
 
@@ -35,7 +36,7 @@ scalaVersion := "2.11.7"
 
 ivyScala := ivyScala.value map { _.copy(overrideScalaVersion = true) }
 
-scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitConversions","-target:jvm-1.8")
+scalacOptions ++= Seq("-feature", "-language:postfixOps", "-language:implicitConversions")
 
 //javaOptions ++=Seq("-Dhttp.port=disabled","-Dhttps.port=9443","-Dhttps.keyStore=/opt/sgd/sslkeystore","-Dhttps.keyStorePassword=sgenerator")
 
@@ -79,6 +80,8 @@ linuxPackageMappings += {
 dockerCommands+=Cmd("FROM","library/mariadb")
 
 dockerExposedPorts in Docker := Seq(9000, 9443)
+
+PlayKeys.externalizeResources := false
 
 //linuxPackageSymlinks ++= Seq(LinuxSymlink("/usr/share/schedule-generator/RUNNING_PID","/run/schedule-generator/RUNNING_PID"))
 
