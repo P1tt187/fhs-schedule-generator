@@ -1,3 +1,5 @@
+@import java.text.SimpleDateFormat
+@import java.util.Calendar
 @(title:String,courseNames:List[String],timeRanges: List[models.fhs.pages.basicstuctures.TimeRange], timeslots: List[models.persistence.scheduletree.TimeSlot], semester:models.persistence.Semester, courses:List[persistence.participants.Course],lectureShortCuts:Map[String,String])(implicit session:Session)
 
 @import models.fhs.pages.timeslot.MTimeslotDisplay
@@ -61,6 +63,7 @@
                     <a class="btn btn-info btn-sm" href="#" download="settings.json" id="exportbtn"> <span class="glyphicon glyphicon-download"></span> </a>
                 </div-->
             </div>
+            <div>Stand: <strong><span class="text-danger"> @{ new SimpleDateFormat("dd.MM.yyyy").format(Calendar.getInstance().getTime) } </span></strong> </div>
         <div> Es ist die <strong id="weekNumber"></strong> Kalenderwoche, eine <span class="hidden text-warning" id="even"><strong>gerade</strong></span> <span class="hidden text-primary" id="uneven"><strong>ungerade</strong></span> Woche</div>
         <div class="clearfix"></div>
         <div class="tab-content">
