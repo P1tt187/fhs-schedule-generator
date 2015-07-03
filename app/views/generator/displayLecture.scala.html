@@ -23,7 +23,7 @@
         } " >
         </span>
     </div>
-    @if(lecture.getKind == ELectureKind.EXERCISE ) {
+    @if(lecture.getKind == ELectureKind.EXERCISE && !lecture.getLectureParticipants.head.isIgnoreGroupIndex) {
         <div>
             @lecture.getLectureParticipants.head.getGroupType
         </div>

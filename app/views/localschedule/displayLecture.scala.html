@@ -33,7 +33,7 @@
         } " >
         </span>
       </div>
-      @if(lecture.getKind == ELectureKind.EXERCISE ) {
+      @if(lecture.getKind == ELectureKind.EXERCISE && !lecture.getLectureParticipants.head.isIgnoreGroupIndex) {
         <div>
           <small>@lecture.getLectureParticipants.map(_.getGroupIndex).toSet.mkString(" ")  @lecture.getLectureParticipants.head.getGroupType</small>
         </div>
