@@ -373,6 +373,7 @@ import play.api.i18n.MessagesApi
 import play.api.libs.json._
 import play.api.mvc._
 import views.html.exporter._
+import informations.BuildInfo
 
 import scala.collection.JavaConversions._
 
@@ -685,7 +686,7 @@ class  CExporter @Inject() (val messagesApi: MessagesApi) extends TController {
         val assetsPath = current.getFile("/public").toPath
         Files.walkFileTree(assetsPath, new DirectoryCopyHelper(assetsPath, tmpAssetsPath))
       } else {
-        val assetsUri = URI.create("jar:file:" + current.getFile("/lib/schedule-generator.schedule-generator-1.0-SNAPSHOT-assets.jar").toPath.toString + "!/public/")
+        val assetsUri = URI.create("jar:file:" + current.getFile("/lib/schedule-generator.schedule-generator-" + BuildInfo.version + "-assets.jar").toPath.toString + "!/public/")
         println(assetsUri)
         val assetsFileSystem = new ZipFileSystemProvider().newFileSystem(assetsUri, Map[String, String]())
         Files.walkFileTree(assetsFileSystem.getPath("/public/"), new ZIPFileExtractHelper(tmpAssetsPath, assetsFileSystem,assetsFileSystem.getPath("/")))
