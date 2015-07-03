@@ -4,21 +4,21 @@
 
 @if(course.getGroups != null) {
   @defining(course.getGroups.toList.groupBy(_.getGroupType)) { coursesGroups =>
-    @coursesGroups.keySet.toList.sortBy( gt=> -coursesGroups(gt)(0).getSize ).par.map { groupType=>
+    @coursesGroups.keySet.toList.sortBy( gt=> -coursesGroups(gt)(0).getSize ).par.map { groupTypes=>
     <div class="panel panel-primary" >
-      <div class="panel-heading"><h4 class="panel-title text-center"> <a  href="#parent@groupType" data-toggle="collapse" aria-expanded="false" aria-controls="parent@groupType">
-                        Einteilung: @groupType, @coursesGroups(groupType).size Gruppen je @{ course.getSize / coursesGroups(groupType).size } Studenten
+      <div class="panel-heading"><h4 class="panel-title text-center"> <a  href="#parent@groupTypes" data-toggle="collapse" aria-expanded="false" aria-controls="parent@groupTypes">
+                        Einteilung: @groupTypes, @coursesGroups(groupTypes).size Gruppen je @{ course.getSize / coursesGroups(groupTypes).size } Studenten
       </a> </h4> </div>
-      <div class="panel-collapse collapse" id="parent@groupType">
+      <div class="panel-collapse collapse" id="parent@groupTypes">
         <div class="panel-body">
-            <form class="form-inline" id="form@groupType">
+            <form class="form-inline" id="form@groupTypes">
                 <div class="form-group">
                     <button type="button" class="help-ignore-groupindex-button btn btn-sm btn-info" data-toggle="popover" title="Hilfe" ><span class="glyphicon glyphicon-question-sign"></span> </button>
                 </div>
                 <div class="form-group">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" value="true" name="ignoreGroupIndex" @if(coursesGroups(groupType).head.isIgnoreGroupIndex) {checked}/> Gruppenindex verbergen
+                            <input type="checkbox" value="true" name="ignoreGroupIndex" @if(coursesGroups(groupTypes).head.isIgnoreGroupIndex) {checked}/> Gruppenindex verbergen
                         </label>
                     </div>
                 </div>
@@ -30,14 +30,14 @@
                 </div>
             </form>
             <script>
-                $('#form@groupType').on('submit',function(e){
+                $('#form@groupTypes').on('submit',function(e){
                 e.preventDefault( );
 
                 var studentBuffer = [];
-                $('.subform@groupType').each(function(index, value){
+                $('.subform@groupTypes').each(function(index, value){
                     var formData = $(value).serializeObject();
                     formData['id'] = Number(formData['id']);
-                    formData['groupindex'] = $(value).parents('.@groupType').data('groupindex');
+                    formData['groupindex'] = $(value).parents('.@groupTypes').data('groupindex');
                     studentBuffer.push(formData);
                  });
 
@@ -51,7 +51,7 @@
                 data : JSON.stringify ( formData ),
                 context : this,
                 contentType : "application/json; charset=utf-8",
-                url : "@routes.CEditCourses.updateGroup(course.getId,groupType)",
+                url : "@routes.CEditCourses.updateGroup(course.getId,groupTypes)",
                 success : function ( callback ) {
                 console.log ( JSON.stringify ( callback ) ) ;
 
@@ -70,10 +70,10 @@
                 console.debug ( JSON.stringify ( formData ) ) ;
                 });
             </script>
-        <form method="POST" action="@routes.CEditCourses.removeGroupTypeFromGroup(course.getId,groupType)">
+        <form method="POST" action="@routes.CEditCourses.removeGroupTypeFromGroup(course.getId,groupTypes)">
           <button class="btn btn-danger btn-sm" type="submit"><span class="glyphicon glyphicon-trash"></span> </button>
         </form>
-        @defining(coursesGroups(groupType).sortBy(_.getGroupIndex)) { groups=>
+        @defining(coursesGroups(groupTypes).sortBy(_.getGroupIndex)) { groups=>
           <table class="table table-responsive table-striped">
             <thead>
               <tr>
@@ -91,13 +91,13 @@
                 @groups.map { group =>
                   @defining(groupWithStudents(group).lift(i)){ studentOption =>
                     <td class="text-center ">
-                      <ul class="list-unstyled @groupType" data-groupindex="@group.getGroupIndex">
+                      <ul class="list-unstyled @groupTypes" data-groupindex="@group.getGroupIndex">
                         <li class="table-bordered">
                             <div class="@if(studentOption.nonEmpty){ @studentOption.get.getUuid }">
                                 @studentOption match {
                                     case Some(student) => {
                                         @student.getFirstName  @student.getLastName
-                                    <form class='hidden subform@groupType'> <input type='number' name='id' value='@student.getId'></form>
+                                    <form class='hidden subform@groupTypes'> <input type='number' name='id' value='@student.getId'></form>
                                     }
                                     case None =>{}
                                 }
@@ -119,8 +119,8 @@
     </div>
     <div class="clearfix"></div>
     <script>
-    $('.@groupType').sortable({
-    connectWith:'.@groupType'
+    $('.@groupTypes').sortable({
+    connectWith:'.@groupTypes'
     });
    </script>
     }.seq

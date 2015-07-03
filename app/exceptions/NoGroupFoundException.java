@@ -345,6 +345,9 @@ package exceptions;
 
 import models.persistence.subject.ExerciseSubject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author fabian
  *         on 21.03.14.
@@ -371,24 +374,24 @@ public class NoGroupFoundException extends Exception {
         super(message, cause, enableSuppression, writableStackTrace);
     }
     /** group type that causes the error */
-    private String groupType;
+    private List<String> groupTypes;
 
-    public String getGroupType() {
-        return groupType;
+    public List<String> getGroupTypes() {
+        return new ArrayList<>(groupTypes);
     }
 
-    public void setGroupType(String groupType) {
-        this.groupType = groupType;
+    public void setGroupTypes(List<String> groupTypes) {
+        this.groupTypes = groupTypes;
     }
 
-    /** the subject that causes the error*/
-    private ExerciseSubject subject;
+    /** the subjects that causes the error*/
+    private List<ExerciseSubject> subjects;
 
-    public ExerciseSubject getSubject() {
-        return subject;
+    public List<ExerciseSubject> getSubjects() {
+        return new ArrayList<>(subjects) ;
     }
 
-    public void setSubject(ExerciseSubject subject) {
-        this.subject = subject;
+    public void setSubjects(List<ExerciseSubject> subject) {
+        this.subjects = subject;
     }
 }

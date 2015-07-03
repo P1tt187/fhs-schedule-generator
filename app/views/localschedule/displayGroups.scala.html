@@ -5,21 +5,21 @@
 <div class="hidden groupcontainer @c.getShortName">
 @defining(c.getGroups.toList){ allGroups =>
   @defining(allGroups.filter(_.isIgnoreGroupIndex == false).map(_.getGroupType).toSet.toList.sortBy{
-    groupType:String=>
-      -c.getGroups.filter(_.getGroupType.equals(groupType)).map(_.getSize.toInt).sum
+    groupTypes:String=>
+      -c.getGroups.filter(_.getGroupType.equals(groupTypes)).map(_.getSize.toInt).sum
   }){ sortedGroupTypes =>
-    @sortedGroupTypes.map{ groupType:String =>
+    @sortedGroupTypes.map{ groupTypes:String =>
       <div class="panel panel-primary">
         <div class="panel-heading text-center">
           <h4 class="panel-title">
-          <button class="btn btn-default" role="button" data-toggle="collapse" data-target="#@{ c.getShortName + groupType }" aria-expanded="false" aria-controls="@{ c.getShortName + groupType }"
-          href="#@{ c.getShortName + groupType }">
-          @groupType
+          <button class="btn btn-default" role="button" data-toggle="collapse" data-target="#@{ c.getShortName + groupTypes }" aria-expanded="false" aria-controls="@{ c.getShortName + groupTypes }"
+          href="#@{ c.getShortName + groupTypes }">
+          @groupTypes
           </button>
           </h4>
         </div>
-        <div class="panel-body panel-collapse collapse" id="@{ c.getShortName + groupType }" >
-        @defining(allGroups.filter(_.getGroupType.equals(groupType)).sortBy(_.getGroupIndex)) { filteredGroups=>
+        <div class="panel-body panel-collapse collapse" id="@{ c.getShortName + groupTypes }" >
+        @defining(allGroups.filter(_.getGroupType.equals(groupTypes)).sortBy(_.getGroupIndex)) { filteredGroups=>
           <table class="table table-bordered table-striped table-condensed">
             <thead>
               <tr>

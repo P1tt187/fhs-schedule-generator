@@ -348,12 +348,14 @@ package models
  */
 
 import javax.persistence.{EntityManager, Persistence}
+
 import org.hibernate.Session
+import play.db.jpa.Transactional
 
 object Transactions {
 
   val emf = Persistence.createEntityManagerFactory("defaultPersistenceUnit")
-
+  @Transactional
   def apply[A](action: EntityManager => A): A = {
     val entityManager = emf.createEntityManager()
 
@@ -377,6 +379,7 @@ object Transactions {
     }
   }
 
+  @Transactional
   def hibernateAction[A](action: Session => A): A = {
     val session = emf.createEntityManager().getDelegate.asInstanceOf[Session]
 

@@ -346,7 +346,6 @@ import java.math.BigInteger
 import java.util
 
 import akka.actor.Actor
-import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
 import exceptions.NoGroupFoundException
 import models.Transactions
 import models.fhs.pages.JavaList
@@ -372,10 +371,13 @@ class LectureGeneratorActor extends Actor {
   private var addedLectures = 0
   private var addedExercises = 0
 
+  private val invalidExerciseSubjects = mutable.Buffer[ExerciseSubject]()
+
 
   override def receive = {
 
     case GenerateLectures(subjects) =>
+      invalidExerciseSubjects.clear()
 
       val lectures = subjects.par.flatMap {
         subject =>
@@ -395,13 +397,13 @@ class LectureGeneratorActor extends Actor {
                 lecture.setLectureParticipants(lectureSubject.getCourses.map(_.participant2LectureParticipant()))
 
                 lecture.setAlternativeRooms(subject.getAlternativRooms)
-                lecture.setAlternativeLectureRooms(Set[LectureRoom]() ++  subject.getAlternativRooms.map(_.roomEntity2LectureRoom()))
+                lecture.setAlternativeLectureRooms(Set[LectureRoom]() ++ subject.getAlternativRooms.map(_.roomEntity2LectureRoom()))
 
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(lectureSubject.getName)
                 lecture.setCriteriaContainer(subject.getCriteriaContainer)
-                lecture.setLectureSynonyms( new util.HashMap[String,String](lectureSubject.getSubjectSynonyms))
-                lecture.setShortCuts(new util.HashMap[String,String](lectureSubject.getShortCuts))
+                lecture.setLectureSynonyms(new util.HashMap[String, String](lectureSubject.getSubjectSynonyms))
+                lecture.setShortCuts(new util.HashMap[String, String](lectureSubject.getShortCuts))
                 lecture.setKind(ELectureKind.LECTURE)
                 lecture.setExpectedParticipants(lectureSubject.getExpectedParticipants)
                 lecture.setDifficultLevel(BigInteger.valueOf(lectureSubject.getUnits.toLong))
@@ -441,12 +443,7 @@ class LectureGeneratorActor extends Actor {
 
 
               if (!multipleCourseGroups.map(_.isEmpty).forall(result => !result)) {
-                val e = new NoGroupFoundException("No group found for type: " + exerciseSubject.getGroupType + " " + exerciseSubject.getCourses.map(_.getShortName))
-                e.setGroupType(exerciseSubject.getGroupType)
-                e.setSubject(exerciseSubject)
-                Logger.error("error", e)
-                sender ! akka.actor.Status.Failure(e)
-                throw e
+                invalidExerciseSubjects += exerciseSubject
               }
 
               def initExerciseLecture(groups: List[Group]): Lecture = {
@@ -459,8 +456,8 @@ class LectureGeneratorActor extends Actor {
                 lecture.setCriteriaContainer(exerciseSubject.getCriteriaContainer)
                 lecture.setDuration(EDuration.WEEKLY)
                 lecture.setName(exerciseSubject.getName)
-                lecture.setLectureSynonyms(new util.HashMap[String,String](exerciseSubject.getSubjectSynonyms))
-                lecture.setShortCuts(new util.HashMap[String,String](exerciseSubject.getShortCuts))
+                lecture.setLectureSynonyms(new util.HashMap[String, String](exerciseSubject.getSubjectSynonyms))
+                lecture.setShortCuts(new util.HashMap[String, String](exerciseSubject.getShortCuts))
                 lecture.setKind(ELectureKind.EXERCISE)
                 lecture.setExpectedParticipants(exerciseSubject.getExpectedParticipants)
                 lecture.setDifficultLevel(BigInteger.valueOf(exerciseSubject.getUnits.toLong))
@@ -501,9 +498,20 @@ class LectureGeneratorActor extends Actor {
           result
       }.toList
 
-      Logger.debug("lecture: " + addedLectures + " exercises: " + addedExercises)
+      if (invalidExerciseSubjects.nonEmpty) {
 
-      sender ! LectureAnswer(Random.shuffle(lectures))
+        val invalidGroupTypes = invalidExerciseSubjects.map(_.getGroupType)
+        val e = new NoGroupFoundException("No group found for type: " + invalidGroupTypes.mkString(","))
+        e.setGroupTypes(invalidGroupTypes)
+        e.setSubjects(invalidExerciseSubjects)
+        Logger.error("error", e)
+        sender ! akka.actor.Status.Failure(e)
+        throw e
+      } else {
+        Logger.debug("lecture: " + addedLectures + " exercises: " + addedExercises)
+
+        sender ! LectureAnswer(Random.shuffle(lectures))
+      }
     case _ =>
   }
 

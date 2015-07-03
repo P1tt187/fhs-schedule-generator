@@ -627,7 +627,7 @@ class CGenerate @Inject() (val messagesApi: MessagesApi) extends TController {
           lectureFuture.onFailure {
             case ex: NoGroupFoundException =>
               errorType = NO_GROUP_TYPE
-              errorMessage = ex.getGroupType + " " + ex.getSubject.getName
+              errorMessage = ex.getGroupTypes.toList.zip(ex.getSubjects.map( sub=> sub.getName + " - " + sub.getDocents.map(_.getLastName).mkString(" ") + " - " + sub.getCourses.map(_.getShortName).mkString(" ") ).toList).mkString(";")
               actorFinished = true
           }
           end = endTime

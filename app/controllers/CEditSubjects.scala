@@ -342,14 +342,14 @@
 
 package controllers
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 
 import com.rits.cloning.{Cloner, ObjenesisInstantiationStrategy}
-import controllers.traits.{ TController}
+import controllers.traits.TController
 import models.Transactions
+import models.fhs.pages.basicstuctures.TimeRange
 import models.fhs.pages.editsubjects.MEditSubjects._
 import models.fhs.pages.editsubjects.MSemester
-import models.fhs.pages.basicstuctures.TimeRange
 import models.persistence.Semester
 import models.persistence.criteria.{AbstractCriteria, CriteriaContainer, RoomCriteria, TimeSlotCriteria}
 import models.persistence.docents.Docent
@@ -367,7 +367,7 @@ import play.api.data._
 import play.api.i18n.MessagesApi
 import play.api.libs.json._
 import play.api.mvc._
-
+import play.db.jpa.Transactional
 import views.html.editsubjects._
 
 import scala.collection.JavaConversions._
@@ -378,11 +378,8 @@ import scala.concurrent.duration._
  * @author fabian 
  *         on 05.03.14.
  */
-
-class CEditSubjects @Inject() (val messagesApi: MessagesApi) extends TController {
-
-
-
+@Singleton
+class CEditSubjects @Inject()(val messagesApi: MessagesApi) extends TController {
 
 
   val TIME_TO_LIFE = 30 seconds
@@ -400,6 +397,7 @@ class CEditSubjects @Inject() (val messagesApi: MessagesApi) extends TController
     implicit request =>
       Ok(views.html.editsubjects.editsubjects("Fächer editieren", findSemesters(), findDocents(), findCourses(), semesterForm))
   }
+
 
   def addSemester = Action {
     implicit request =>
@@ -436,7 +434,7 @@ class CEditSubjects @Inject() (val messagesApi: MessagesApi) extends TController
     subjectClone.setId(-1l)
     subjectClone.setName("*" + subjectClone.getName)
 
-    val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes: List[GroupType], allTimeSlots:List[TimeSlotTemplate], timeRanges:List[TimeRange]) = loadCachedData()
+    val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes: List[GroupType], allTimeSlots: List[TimeSlotTemplate], timeRanges: List[TimeRange]) = loadCachedData()
 
     Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subjectClone, docents, courses, houses, rooms, groupTypes, allTimeSlots, timeRanges).toString().trim())))
 
@@ -483,7 +481,7 @@ class CEditSubjects @Inject() (val messagesApi: MessagesApi) extends TController
       }
 
 
-      val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes: List[GroupType], allTimeSlots:List[TimeSlotTemplate], timeRanges:List[TimeRange]) = loadCachedData()
+      val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes: List[GroupType], allTimeSlots: List[TimeSlotTemplate], timeRanges: List[TimeRange]) = loadCachedData()
 
       val selectedSubject = if (idString == "null") {
         "-1"
