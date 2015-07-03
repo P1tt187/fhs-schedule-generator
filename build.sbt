@@ -13,14 +13,14 @@ version := "1.2.1"
 
 libraryDependencies ++= Seq(
   javaJdbc,
-  javaJpa.exclude("org.hibernate.javax.persistence", "hibernate-jpa-2.0-api"),
+  javaJpa, //.exclude("org.hibernate.javax.persistence", "hibernate-jpa-2.0-api"),
   javaWs,
   cache,
   filters,
   "org.webjars" %% "webjars-play" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.5",
-  "org.hibernate" % "hibernate-core" % "4.3.8.Final",
-  "org.hibernate" % "hibernate-entitymanager" % "4.3.8.Final",
+  "org.hibernate" % "hibernate-core" % "4.3.9.Final",
+  "org.hibernate" % "hibernate-entitymanager" % "4.3.9.Final",
   //"org.hibernate.javax.persistence" % "hibernate-jpa-2.0-api" % "1.0.1.Final",
   "mysql" % "mysql-connector-java" % "5.1.21",
   "org.mariadb.jdbc" % "mariadb-java-client" % "1.1.7",
