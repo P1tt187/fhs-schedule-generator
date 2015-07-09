@@ -169,6 +169,8 @@
            }
            });
 
+           $('[data-dayindex="' + new Date().getDay() + '"]').tab('show');
+
            $(window).on('load',function(){
                if(typeof localStorage !== "undefined"){
                var lastMenu = localStorage.getItem("lastMenu")||"nothing";

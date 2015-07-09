@@ -13,7 +13,7 @@
 @days.map { day =>
     @defining(if(isOnline){"mobile-online-pane" + day._1} else{"mobile-local-pane" + day._1}) { dayIdName =>
         <li role="presentation" @if(day._1 == days.head._1) {
-            class="active"}><a aria-controls="@dayIdName" role="tab" data-toggle="tab" href="#@dayIdName"> @day._2.substring(0, 2) </a> </li>
+            class="active"} data-dayindex="@day._1"><a aria-controls="@dayIdName" role="tab" data-toggle="tab" href="#@dayIdName"> @day._2.substring(0, 2) </a> </li>
     }
     }
 </ul>
