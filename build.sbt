@@ -9,7 +9,7 @@ import PlayKeys._
 
 name := """schedule-generator"""
 
-version := "1.2.1"
+version := "1.2.2"
 
 libraryDependencies ++= Seq(
   javaJdbc,
@@ -19,7 +19,8 @@ libraryDependencies ++= Seq(
   filters,
   "org.webjars" %% "webjars-play" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.5",
-  "org.hibernate" % "hibernate-core" % "4.3.9.Final",
+  "org.webjars.bower" % "bootstrap-select" % "1.7.3",
+  "org.hibernate" % "hibernate-core" % "4.3.10.Final",
   "org.hibernate" % "hibernate-entitymanager" % "4.3.10.Final",
   //"org.hibernate.javax.persistence" % "hibernate-jpa-2.0-api" % "1.0.1.Final",
   "mysql" % "mysql-connector-java" % "5.1.21",

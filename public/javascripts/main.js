@@ -358,8 +358,10 @@ var initSelect = function ( ) {
         if ( $ ( value ).parents ( '.sr-only .nondefault' ).length == 0 ) {
             $ ( value ).attr ( 'data-live-search', true ).addClass ( 'form-control' ).selectpicker ( {
                 //'selectedText' : 'cat',
-                'style' : 'btn btn-primary btn-sm'
+                'style' : 'btn btn-primary btn-sm',
+                'showSubtext':true
             } ) ;
+         //   $(value).children('option').first().attr('selected','selected');
         }
 
 

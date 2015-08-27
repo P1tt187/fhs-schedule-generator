@@ -7,7 +7,7 @@
         <label for="nameField" class="control-label">
         Bezeichnung
         </label>
-        <select class="form-control" id="nameField" title="Bezeichnung">
+        <select class="form-control" id="nameField">
             @lectureNames.par.map { element =>
                 <option @if(element.id == session.get("subjectFields").getOrElse("-1").toLong){selected} value="@element.id">@element.name ( @element.participants )</option>
             }.toList
@@ -26,26 +26,23 @@
 <div id="inputContainer" class="panel-body">
 
 </div>
-
+<iframe class="hidden" id="subjectFieldContent"></iframe>
 </div>
 
 <script type="text/javascript">
 $('#newSubjectBtn' ).on('click',function(){
-$.getJSON ( '/subjects/' +  $ ( '#selectSemester' ).val ( ) + '/@lectureType/null'
-, function ( data ) {
-$ ( '#inputContainer' ).empty ( ).append ( data.htmlresult ) ;
-reenableSelectBoxes ( ) ;
-} ) ;
+    $('#subjectFieldContent').attr('src','/subjects/' +  $ ( '#selectSemester' ).val ( ) + '/@lectureType/null');
+
 });
 
+var updateInputContainer = function(data){
+$('#inputContainer' ).empty().append ( data ) ;
+reenableSelectBoxes ( ) ;
+}
 
 var fillInputContainer = function ( ) {
-
-$.getJSON ( '/subjects/' +  $ ( '#selectSemester' ).val ( ) + '/@lectureType/' +$('#nameField' ).val ( )
-, function ( data ) {
-$ ( '#inputContainer' ).empty ( ).append ( data.htmlresult ) ;
-reenableSelectBoxes ( ) ;
-} ) ;
+    $('#inputContainer').empty ( );
+    $('#subjectFieldContent').attr('src', '/subjects/' +  $ ( '#selectSemester' ).val ( ) + '/@lectureType/' +$('#nameField' ).val ( ));
 }
 
 $ ( '#nameField' ).on ( 'change', fillInputContainer ) ;

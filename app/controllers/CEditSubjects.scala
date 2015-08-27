@@ -365,9 +365,10 @@ import play.api.cache.Cache
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n.MessagesApi
+import play.api.libs.iteratee.Enumerator
 import play.api.libs.json._
 import play.api.mvc._
-import play.db.jpa.Transactional
+import play.api.libs.Comet
 import views.html.editsubjects._
 
 import scala.collection.JavaConversions._
@@ -385,6 +386,7 @@ class CEditSubjects @Inject()(val messagesApi: MessagesApi) extends TController 
   val TIME_TO_LIFE = 30 seconds
 
   type GroupType = String
+  type CourseName = String
 
 
   val semesterForm: Form[MSemester] = Form(
@@ -434,9 +436,9 @@ class CEditSubjects @Inject()(val messagesApi: MessagesApi) extends TController 
     subjectClone.setId(-1l)
     subjectClone.setName("*" + subjectClone.getName)
 
-    val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes: List[GroupType], allTimeSlots: List[TimeSlotTemplate], timeRanges: List[TimeRange]) = loadCachedData()
+    val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes: List[GroupType], allTimeSlots: List[TimeSlotTemplate], timeRanges: List[TimeRange], groupTypeMap:Map[GroupType,List[CourseName]]) = loadCachedData()
 
-    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subjectClone, docents, courses, houses, rooms, groupTypes, allTimeSlots, timeRanges).toString().trim())))
+    Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subjectClone, docents, courses, houses, rooms, groupTypes, allTimeSlots, timeRanges,groupTypeMap).toString().trim())))
 
 
   }
@@ -481,7 +483,7 @@ class CEditSubjects @Inject()(val messagesApi: MessagesApi) extends TController 
       }
 
 
-      val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes: List[GroupType], allTimeSlots: List[TimeSlotTemplate], timeRanges: List[TimeRange]) = loadCachedData()
+      val (docents: List[Docent], courses: List[Course], houses: List[HouseEntity], rooms: List[RoomEntity], groupTypes: List[GroupType], allTimeSlots: List[TimeSlotTemplate], timeRanges: List[TimeRange],groupTypeMap:Map[GroupType,List[CourseName]]) = loadCachedData()
 
       val selectedSubject = if (idString == "null") {
         "-1"
@@ -489,11 +491,14 @@ class CEditSubjects @Inject()(val messagesApi: MessagesApi) extends TController 
         idString
       }
 
-      Ok(Json.stringify(Json.obj("htmlresult" -> subjectfields(subjectType, subject, docents, courses, houses, rooms, groupTypes, allTimeSlots, timeRanges).toString().trim()))).withSession(request.session + ("subjectFields" -> selectedSubject))
+      val html=subjectfields(subjectType, subject, docents, courses, houses, rooms, groupTypes, allTimeSlots, timeRanges,groupTypeMap)
+
+      val content = Enumerator(html.toString())
+      Ok.chunked(content &> Comet(callback = "parent.updateInputContainer"))//.withSession(request.session + ("subjectFields" -> selectedSubject))
 
   }
 
-  private def loadCachedData(): (List[Docent], List[Course], List[HouseEntity], List[RoomEntity], List[GroupType], List[TimeSlotTemplate], List[TimeRange]) = {
+  private def loadCachedData(): (List[Docent], List[Course], List[HouseEntity], List[RoomEntity], List[GroupType], List[TimeSlotTemplate], List[TimeRange], Map[GroupType,List[CourseName]]) = {
     val docents = Cache.getOrElse("docents") {
       val docent = findDocents()
       Cache.set("docents", docent, expiration = TIME_TO_LIFE)
@@ -524,12 +529,22 @@ class CEditSubjects @Inject()(val messagesApi: MessagesApi) extends TController 
       Cache.set("groupTypes", groupType, expiration = TIME_TO_LIFE)
       groupType
     }
+
+    val groupTypeMap = Cache.getOrElse("groupTypeMap") {
+      val groupTypeMap = groupTypes.map {
+        gt =>
+          (gt, findCourseNamesForGroupType(gt))
+      }.toMap
+      Cache.set("groupTypeMap", groupTypeMap, expiration = TIME_TO_LIFE)
+      groupTypeMap
+    }
+
     val (allTimeslots, timeRanges) = Cache.getOrElse("timeSlotsAndRanges") {
       val (allTimeslot, timeRang) = timeRange
       Cache.set("timeSlotsAndRanges", (allTimeslot, timeRang), expiration = TIME_TO_LIFE)
       (allTimeslot, timeRang)
     }
-    (docents, courses, houses, rooms, groupTypes, allTimeslots, timeRanges)
+    (docents, courses, houses, rooms, groupTypes, allTimeslots, timeRanges, groupTypeMap)
   }
 
   def getNamesField(semester: Long, subjectType: String, filterDocentId: Long, filterCourseId: Long, filterActive: String) = Action {
@@ -537,9 +552,11 @@ class CEditSubjects @Inject()(val messagesApi: MessagesApi) extends TController 
       //Logger.debug("" +MEditSubjects.findLectureSubjectsForSemester(semester.replaceAll(Pattern.quote("+"),"/").trim))
       subjectType match {
         case LECTURE =>
-          Ok(Json.stringify(Json.obj("html" -> namefield(findLectureSubjectsForSemester(semester, filterDocentId, filterCourseId, filterActive), LECTURE).toString())))
+          val content = Enumerator(namefield(findLectureSubjectsForSemester(semester, filterDocentId, filterCourseId, filterActive), LECTURE).toString())
+          Ok.chunked(content &> Comet(callback="parent.namedataContent"))
         case EXERCISE =>
-          Ok(Json.stringify(Json.obj("html" -> namefield(findExerciseSubjectsForSemester(semester, filterDocentId, filterCourseId, filterActive), EXERCISE).toString())))
+          val content = Enumerator(namefield(findExerciseSubjectsForSemester(semester, filterDocentId, filterCourseId, filterActive), EXERCISE).toString())
+          Ok.chunked(content &> Comet(callback="parent.namedataContent"))
       }
   }
 

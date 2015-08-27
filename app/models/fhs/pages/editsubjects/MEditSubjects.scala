@@ -369,7 +369,7 @@ object MEditSubjects {
   def findSemesters() = {
     Transactions.hibernateAction {
       implicit session =>
-        session.createCriteria(classOf[Semester]).list().asInstanceOf[java.util.List[Semester]].toList
+        session.createCriteria(classOf[Semester]).addOrder(Order.desc("id")).list().asInstanceOf[java.util.List[Semester]].toList
     }
   }
 
@@ -500,7 +500,9 @@ object MEditSubjects {
     subject.setCriteriaContainer(criteriaContainer)
     subject.setDocents(Set[Docent]())
     subject.setUnits(0.0f)
-
+    subject.setShortCuts(Map[String,String]())
+    subject.setSubjectSynonyms(Map[String,String]())
+    subject.setAlternativRooms(List[RoomEntity]())
     subject match {
       case _: LectureSubject =>
       case exerciseSubject: ExerciseSubject => exerciseSubject.setGroupType("")
@@ -593,6 +595,19 @@ object MEditSubjects {
             session.createCriteria(classOf[RoomEntity]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[RoomEntity]
         }
     }
+  }
+
+  def findCourseNamesForGroupType(groupName:String):List[String] = {
+
+    Transactions.hibernateAction({
+      implicit s=>
+        val criterion = s.createCriteria(classOf[Course])
+
+        criterion.createCriteria("groups").add(Restrictions.eq("groupType", groupName))
+
+        criterion.list().asInstanceOf[JavaList[Course]].map(_.getShortName).toSet.toList
+    })
+
   }
 
 }

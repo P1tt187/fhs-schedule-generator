@@ -370,6 +370,7 @@ import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
 import play.api.Play
 import play.api.Play.current
 import play.api.i18n.MessagesApi
+import play.api.libs.iteratee.{Enumerator, Enumeratee}
 import play.api.libs.json._
 import play.api.mvc._
 import views.html.exporter._
@@ -431,7 +432,7 @@ class  CExporter @Inject() (val messagesApi: MessagesApi) extends TController {
    * @param id - the id of the Schedule
    */
   def createSpiritSchedule(id: Long) = Action {
-
+  import scala.concurrent.ExecutionContext.Implicits.global
     def timeSlotToString(timeSlot: TimeSlot) = {
       val sb = new StringBuilder
 
@@ -607,11 +608,12 @@ class  CExporter @Inject() (val messagesApi: MessagesApi) extends TController {
         }
         zipFs.close()
         Files.delete(path)
-        val fileContent = Paths.get(path.getParent.toString, ("/" + fileName + ".zip").replaceAll(" ", "")).toFile
+        val responseFile = Paths.get(path.getParent.toString, ("/" + fileName + ".zip").replaceAll(" ", "")).toFile
+        val fileContent = Enumerator.fromFile(responseFile)
+        responseFile.deleteOnExit()
 
-        fileContent.deleteOnExit()
-
-        Ok.sendFile(content = fileContent, fileName = _ => semester.getName.replaceAll("/", "") + ".zip")
+        //Ok.sendFile(content = fileContent, fileName = _ => semester.getName.replaceAll("/", "") + ".zip")
+        Ok.stream(fileContent).withHeaders(CONTENT_TYPE -> "application/zip", CONTENT_LENGTH -> responseFile.length().toString, CONTENT_DISPOSITION -> ("attachment; filename=\"" + semester.getName.replaceAll("/", "") + ".zip" + "\""))
     }
 
 
@@ -659,7 +661,10 @@ class  CExporter @Inject() (val messagesApi: MessagesApi) extends TController {
   }
 
   def exportHTMLSchedule(id: Long) = Action {
+
     implicit request =>
+      import scala.concurrent.ExecutionContext.Implicits.global
+
       val semester = findSemester(id)
       val schedule = findScheduleForSemester(semester)
       val fileName = "schedule" + semester.getName.replaceAll("/", "") + System.currentTimeMillis()
@@ -701,9 +706,11 @@ class  CExporter @Inject() (val messagesApi: MessagesApi) extends TController {
 
       zipFs.close()
       Files.walkFileTree(path, new DeleteDirectoryHelper)
-      val fileContent = Paths.get(path.getParent.toString, ("/" + fileName + ".zip").replaceAll(" ", "")).toFile
-
-      Ok.sendFile(fileContent, fileName = _ => semester.getName.replaceAll("/", "") + ".zip")
+      val responseFile = Paths.get(path.getParent.toString, ("/" + fileName + ".zip").replaceAll(" ", "")).toFile
+      val fileContent = Enumerator.fromFile(responseFile)
+      responseFile.deleteOnExit()
+      //Ok.sendFile(fileContent, fileName = _ => semester.getName.replaceAll("/", "") + ".zip")
+      Ok.stream(fileContent).withHeaders(CONTENT_TYPE -> "application/zip", CONTENT_LENGTH -> responseFile.length().toString, CONTENT_DISPOSITION -> ("attachment; filename=\"" + semester.getName.replaceAll("/", "") + ".zip" + "\""))
   }
 
   /**
