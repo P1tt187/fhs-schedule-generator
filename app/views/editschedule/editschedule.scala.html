@@ -31,17 +31,25 @@
     <div id="scheduleContainer">
 
     </div>
+    <iframe class="hidden" id="appendScheduleContainer"></iframe>
 
     <script>
 
         var changeScheduleContainer = function(){
             $('#activityContainer' ).removeClass('hidden');
-           appendHTML("/sendEditableSchedule/" + $('#selectSemester' ).val(), "#scheduleContainer" );
+            $("#scheduleContainer").empty();
+            $('#appendScheduleContainer').attr('src',"/sendEditableSchedule/" + $('#selectSemester' ).val());
+           //appendHTML("/sendEditableSchedule/" + $('#selectSemester' ).val(), "#scheduleContainer" );
 
         };
-            $(window ).on('load' , function(){
-            changeScheduleContainer();
-            } ) ;
+
+        var updateScheduleContainerContent = function(data){
+            $("#scheduleContainer").html(data);
+        }
+
+        $(window ).on('load' , function(){
+           changeScheduleContainer();
+        } ) ;
 
 
         $('#selectSemester' ).on('change', changeScheduleContainer);

@@ -361,6 +361,8 @@ import play.api.Logger
 import play.api.Play.current
 import play.api.cache.Cache
 import play.api.i18n.MessagesApi
+import play.api.libs.Comet
+import play.api.libs.iteratee.{Enumerator, Enumeratee}
 import play.api.libs.json._
 import play.api.mvc._
 
@@ -424,7 +426,10 @@ class CEditSchedule @Inject() (val messagesApi: MessagesApi) extends TController
       }.toList
 
       val session = request.session
-      Ok(Json.obj("htmlresult" -> showSchedule(schedule.getSemester.getName, timeRanges, timeSlots, rooms, courses, docents, semesterId).toString().trim))
+
+      val htmlContent = Enumerator(showSchedule(schedule.getSemester.getName, timeRanges, timeSlots, rooms, courses, docents, semesterId).toString().trim)
+
+      Ok.chunked( htmlContent &> Comet(callback = "parent.updateScheduleContainerContent") )
         .withSession(session + ("editschedule" -> semesterId.toString))
   }
 
