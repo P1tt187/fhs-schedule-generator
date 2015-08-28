@@ -454,7 +454,7 @@ class CEditDocents @Inject() (val messagesApi: MessagesApi) extends TController 
       }
 
       val (allTimeSlots, timeRanges) = timeRange
-      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots, expireDate).toString().trim)))
+      Ok(Json.stringify(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots, expireDate, findSemesters()).toString().trim)))
         .withSession(session + ("docentName" -> docent.getLastName))
   }
 
@@ -511,16 +511,13 @@ class CEditDocents @Inject() (val messagesApi: MessagesApi) extends TController 
         null
       }
 
-      Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots, expireDate)(flashing, session,request2Messages).toString))
+      Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots, expireDate,findSemesters())(flashing, session,request2Messages).toString))
 
 
   }
 
   def saveExpireDate = Action {
     implicit request =>
-
-
-
       val result = expireDateForm.bindFromRequest()
       Logger.debug("expireform:" + result)
 
@@ -557,8 +554,12 @@ class CEditDocents @Inject() (val messagesApi: MessagesApi) extends TController 
           Redirect(routes.CEditDocents.page)
         }
       )
+  }
 
-
+  def calculaterequiredSWS(semesterId:Long, docentId:Long) = Action {
+    implicit request =>
+      val sws = calculateNeededSws(semesterId,docentId)
+      Ok( Json.obj( "htmlresult" -> sws) )
   }
 
 }

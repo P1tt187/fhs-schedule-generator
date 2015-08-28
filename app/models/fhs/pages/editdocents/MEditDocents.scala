@@ -342,20 +342,21 @@
 
 package models.fhs.pages.editdocents
 
-import java.util.{Date, Calendar}
+import java.util.{Calendar, Date}
 
 import models.Transactions
 import models.fhs.pages.JavaList
 import models.fhs.pages.roomdefinition.MRoomdefintion
-import models.persistence.TimewishExpireDate
 import models.persistence.criteria._
 import models.persistence.docents.Docent
 import models.persistence.enumerations.{EDocentTimeKind, EDuration}
 import models.persistence.location.{HouseEntity, RoomEntity}
-import models.persistence.subject.AbstractSubject
+import models.persistence.participants.Group
+import models.persistence.subject.{AbstractSubject, ExerciseSubject, LectureSubject}
 import models.persistence.template.WeekdayTemplate
+import models.persistence.{Semester, TimewishExpireDate}
 import org.hibernate.FetchMode
-import org.hibernate.criterion.{CriteriaSpecification, Restrictions}
+import org.hibernate.criterion.{CriteriaSpecification, Order, Restrictions}
 
 import scala.collection.JavaConversions._
 
@@ -495,7 +496,7 @@ object MEditDocents {
       val attributes = mDocent.roomAttr.map {
         attribute =>
           val roomCriteria = new RoomCriteria
-          val attr=  MRoomdefintion.findOrCreateRoomAttribute(attribute)
+          val attr = MRoomdefintion.findOrCreateRoomAttribute(attribute)
           roomCriteria.setRoomAttributes(List(attr))
           roomCriteria
       }
@@ -526,7 +527,7 @@ object MEditDocents {
     val convertedTimeslotCriterias = timeslotCriterias.map {
       tcrit =>
         MDocentTimeWhish(tcrit.getTimeKind.name(), tcrit.getDuration.name(), tcrit.getWeekday.getSortIndex, tcrit.getStartHour, tcrit.getStartMinute, tcrit.getStopHour, tcrit.getStopMinute)
-    }.sortBy(crit=> (crit.timeKind.length, crit.weekday,crit.startHour,crit.startMinute,crit.stopHour,crit.stopMinute))
+    }.sortBy(crit => (crit.timeKind.length, crit.weekday, crit.startHour, crit.startMinute, crit.stopHour, crit.stopMinute))
 
     val roomCriterias = docent.getCriteriaContainer.getCriterias.filter(_.isInstanceOf[RoomCriteria]).toList.asInstanceOf[List[RoomCriteria]]
     val houseCriterias = roomCriterias.filter(_.getHouse != null).map {
@@ -547,21 +548,21 @@ object MEditDocents {
         rCrit.getRoom.getId.toLong
     }
 
-    MExistingDocent(docent.getId, docent.getLastName,docent.getUserId,docent.getComments, convertedTimeslotCriterias, houseCriterias, roomAttributes, roomCrits)
+    MExistingDocent(docent.getId, docent.getLastName, docent.getUserId, docent.getComments, convertedTimeslotCriterias, houseCriterias, roomAttributes, roomCrits)
   }
 
-  def findExpireDate()={
-    Transactions.hibernateAction{
-      implicit s=>
+  def findExpireDate() = {
+    Transactions.hibernateAction {
+      implicit s =>
         s.createCriteria(classOf[TimewishExpireDate]).uniqueResult().asInstanceOf[TimewishExpireDate]
     }
   }
 
-  def persistExpireDate(ted:TimewishExpireDate){
+  def persistExpireDate(ted: TimewishExpireDate) {
     val oldExpireDate = findExpireDate()
-    Transactions.hibernateAction{
-      implicit s=>
-        if(oldExpireDate!=null){
+    Transactions.hibernateAction {
+      implicit s =>
+        if (oldExpireDate != null) {
           s.saveOrUpdate(oldExpireDate)
           s.delete(oldExpireDate)
         }
@@ -569,25 +570,67 @@ object MEditDocents {
     }
   }
 
-  implicit def timeWishExpireDate2MExpireDate(ted:TimewishExpireDate):MExpireDate={
+  implicit def timeWishExpireDate2MExpireDate(ted: TimewishExpireDate): MExpireDate = {
     MExpireDate(ted.getExpiredate.getTime)
   }
 
-  implicit def mExpireDate2TimewishExpireDate(med:MExpireDate):TimewishExpireDate={
+  implicit def mExpireDate2TimewishExpireDate(med: MExpireDate): TimewishExpireDate = {
     val result = new TimewishExpireDate
     val date = Calendar.getInstance()
     date.setTime(med.date)
     result.setExpiredate(date)
     result
   }
+
+  def findSemesters(): List[Semester] = {
+    Transactions.hibernateAction {
+      implicit s =>
+        s.createCriteria(classOf[Semester]).addOrder(Order.desc("id")).list().asInstanceOf[JavaList[Semester]].toList
+    }
+  }
+
+  def findSemesterById(id: Long): Semester = {
+    Transactions.hibernateAction {
+      implicit s =>
+        s.createCriteria(classOf[Semester]).add(Restrictions.idEq(id)).uniqueResult().asInstanceOf[Semester]
+    }
+  }
+
+  def calculateNeededSws(semesterId: Long, docentId: Long): Float = {
+
+    Transactions.hibernateAction {
+      implicit s =>
+        val criterion = s.createCriteria(classOf[AbstractSubject])
+        criterion.createCriteria("docents").add(Restrictions.idEq(docentId))
+        criterion.createCriteria("semester").add(Restrictions.idEq(semesterId))
+        criterion.add(Restrictions.eq("active",true))
+        val allSubjects = criterion.list().asInstanceOf[JavaList[AbstractSubject]].toList
+
+        allSubjects.map {
+          case ls: LectureSubject => ls.getUnits * 2
+          case es: ExerciseSubject =>
+            val groups = s.createCriteria(classOf[Group]).setFetchMode("students", FetchMode.SELECT)
+              .add(Restrictions.in("course", es.getCourses)).add(Restrictions.eq("groupType", es.getGroupType)).list().asInstanceOf[JavaList[Group]].toSet
+            val numberOfGroups = groups.map(_.getGroupIndex).size
+            val groupFactor = if (numberOfGroups > 0) {
+              numberOfGroups.toFloat
+            } else {
+              1f
+            }
+            es.getUnits * 2f * groupFactor
+        }.sum
+
+    }
+
+  }
 }
 
-case class MDocent(lastName: String, userId:String)
+case class MDocent(lastName: String, userId: String)
 
-case class MExpireDate(date:Date)
+case class MExpireDate(date: Date)
 
-case class MExistingDocent(id: Long, lastName: String,userId:String,comments:String, timeslots: List[MDocentTimeWhish], houseCriterias: List[Long], roomAttr: List[String], roomCrit: List[Long])
+case class MExistingDocent(id: Long, lastName: String, userId: String, comments: String, timeslots: List[MDocentTimeWhish], houseCriterias: List[Long], roomAttr: List[String], roomCrit: List[Long])
 
-case class MDocentTimeWhish(timeKind: String, duration:String, weekday: Int, startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)
+case class MDocentTimeWhish(timeKind: String, duration: String, weekday: Int, startHour: Int, startMinute: Int, stopHour: Int, stopMinute: Int)
 
 

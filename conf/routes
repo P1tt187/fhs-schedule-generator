@@ -66,7 +66,7 @@ GET         /docentFields/:id                                                   
 POST        /saveEditedDocentData                                                                     controllers.CEditDocents.editDocent
 GET         /deleteDocent/:id                                                                         controllers.CEditDocents.deleteDocent(id:Long)
 POST        /editExpireDate                                                                           controllers.CEditDocents.saveExpireDate
-
+GET         /calulateRquiredSWS/:semesterId/:docentId                                                 controllers.CEditDocents.calculaterequiredSWS(semesterId:Long, docentId:Long)
 
 GET         /editSchedule                                                                             controllers.CEditSchedule.page()
 GET         /sendEditableSchedule/:semesterId                                                         controllers.CEditSchedule.findAndSendSchedule(semesterId:Long)

@@ -1,4 +1,4 @@
-@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.basicstuctures.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate],expireDate:java.util.Calendar)(implicit flash:Flash,session:Session, messages:Messages)
+@(existingDocentForm: Form[fhs.pages.editdocents.MExistingDocent], houses: List[persistence.location.HouseEntity], rooms: List[persistence.location.RoomEntity], timeRanges:List[models.fhs.pages.basicstuctures.TimeRange],allTimeSlots:List[models.persistence.template.TimeSlotTemplate],expireDate:java.util.Calendar, semesters:List[models.persistence.Semester])(implicit flash:Flash,session:Session, messages:Messages)
 @import java.text.SimpleDateFormat
 @import java.util.Calendar
 
@@ -27,6 +27,17 @@
             <a class="btn btn-danger btn-sm" role="button" href="@routes.CEditDocents.deleteDocent(existingDocentForm.value.getOrElse(defaultDocent).id) "><span class="glyphicon glyphicon-trash"></span> </a>
         </div>
     }
+  <div class="form-group">
+    <div class="form-group">
+      <label for="calculateSWS" class="control-label">Semester</label>
+      <select id="calculateSWS">
+        @semesters.map{ semester =>
+          <option value="@semester.getId">@semester.getName</option>
+        }
+      </select>
+    </div>
+    <div> Dozenten SWS: <strong><span id="docentSws">0</span></strong> Benötigte SWS: <strong> <span id="neededSws">0</span></strong> Differenz: <strong><span id="diffSws">0</span></strong> </div>
+  </div>
     <br/>
     <div class="form-group">
         <label class="control-label" for="favoriteFacility">Bevorzugte Gebäude</label>
@@ -225,25 +236,66 @@
 
  initSelect();
 
- $('#submitBtn' ).click(function(){
-     $('#editDocentForm' ).submit();
- });
+var calculateSemesterSWS = function(){
+ appendHTML("/calulateRquiredSWS/" + $('#calculateSWS').val() + "/" + $('#selectDocent').val(),'#neededSws' );
+}
+calculateSemesterSWS();
 
- $('#resetBtn' ).click(function(){
- getDocentFields ( ) ;
- });
+var calculateDocentSWS = function (){
+  var sum = 0;
+  $('.subform' ).each(function(index, value){
+      var subFormData = $(value ).serializeObject();
+     if(subFormData['timerange' ].indexOf('N')==-1) {
+        if(subFormData.duration == "@EDuration.WEEKLY") {
+         sum+=2;
+        }
+        else {
+        sum+=1
+       }
+      }
+    });
+      $('#docentSws').html(sum);
+  }
+  calculateDocentSWS();
 
-$('.wish' ).on('click', function(){
-    $(this ).parents('form' ).removeClass('bg-success' ).removeClass('bg-warning' ).addClass('bg-success');
-});
- $('.avail' ).on('click', function(){
-    $(this ).parents('form' ).removeClass('bg-success' ).removeClass('bg-warning' ).addClass('bg-warning');
-});
- $('.unavail' ).on('click', function(){
-    $(this ).parents('form' ).removeClass('bg-success' ).removeClass('bg-warning' );
-});
+  var calculateDiff =function(){
+    var neededSws = Number($('#neededSws').html());
+    var docentSws = Number($('#docentSws').html());
+    var diffSws = docentSws - neededSws ;
+     $('#diffSws').removeClass('text-success').removeClass('text-danger').html(diffSws);
+     if(diffSws>0){
+     $('#diffSws').addClass('text-success');
+     }
+     if(diffSws<0){
+     $('#diffSws').addClass('text-danger')
+     }
+  }
+  $('#calculateSWS').change(calculateSemesterSWS);
 
-$('#@existingDocentForm("lastName").id').attr('required','required');
+  $('#neededSws').bind("DOMSubtreeModified",calculateDiff);
+  $('#docentSws').bind("DOMSubtreeModified",calculateDiff);
+
+  $('.subform input').change(calculateDocentSWS);
+
+   $('#submitBtn' ).click(function(){
+       $('#editDocentForm' ).submit();
+   });
+
+   $('#resetBtn' ).click(function(){
+   getDocentFields ( ) ;
+   });
+
+  $('.wish' ).on('click', function(){
+      $(this ).parents('form' ).removeClass('bg-success' ).removeClass('bg-warning' ).addClass('bg-success');
+  });
+   $('.avail' ).on('click', function(){
+      $(this ).parents('form' ).removeClass('bg-success' ).removeClass('bg-warning' ).addClass('bg-warning');
+  });
+   $('.unavail' ).on('click', function(){
+      $(this ).parents('form' ).removeClass('bg-success' ).removeClass('bg-warning' );
+  });
+
+  $('#@existingDocentForm("lastName").id').attr('required','required');
 
 $ ( '#editDocentForm' ).on ( 'submit', function ( e ) {
 e.preventDefault ( ) ;
