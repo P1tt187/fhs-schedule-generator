@@ -619,9 +619,17 @@ object MEditDocents {
             }
             es.getUnits * 2f * groupFactor
         }.sum
-
     }
+  }
 
+  def calculateDocentSwsForStatistic(docent:Docent):Float={
+    val docentWishTime = docent.getCriteriaContainer.getCriterias.toList.filter(_.isInstanceOf[DocentTimeWish]).asInstanceOf[List[DocentTimeWish]]
+    docentWishTime.map{ d=>
+      d.getDuration match {
+        case EDuration.WEEKLY => 2f
+        case _ => 1f
+      }
+    }.sum
   }
 }
 

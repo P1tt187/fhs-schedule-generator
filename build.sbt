@@ -11,6 +11,8 @@ name := """schedule-generator"""
 
 version := "1.2.2"
 
+val hibernateVersion= "4.3.10.Final"
+
 libraryDependencies ++= Seq(
   javaJdbc,
   javaJpa, //.exclude("org.hibernate.javax.persistence", "hibernate-jpa-2.0-api"),
@@ -20,8 +22,8 @@ libraryDependencies ++= Seq(
   "org.webjars" %% "webjars-play" % "2.4.0-1",
   "org.webjars" % "bootstrap" % "3.3.5",
   "org.webjars.bower" % "bootstrap-select" % "1.7.3",
-  "org.hibernate" % "hibernate-core" % "4.3.10.Final",
-  "org.hibernate" % "hibernate-entitymanager" % "4.3.10.Final",
+  "org.hibernate" % "hibernate-core" % hibernateVersion,
+  "org.hibernate" % "hibernate-entitymanager" % hibernateVersion,
   //"org.hibernate.javax.persistence" % "hibernate-jpa-2.0-api" % "1.0.1.Final",
   "mysql" % "mysql-connector-java" % "5.1.21",
   "org.mariadb.jdbc" % "mariadb-java-client" % "1.1.7",

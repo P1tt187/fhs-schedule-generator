@@ -344,25 +344,33 @@ package controllers.traits
 
 import models.fhs.pages.generator.MGenerator
 import models.fhs.pages.timeslot.MTimeslotDisplay
+import play.api.i18n.I18nSupport
+import play.api.libs.Comet
+import play.api.libs.iteratee.Enumerator
+import play.api.libs.json.Json
 import play.api.mvc._
-
-import play.api.i18n. I18nSupport
+import play.twirl.api.Html
 
 /**
  * @author fabian
  * @since 13.02.15.
  *        Trait for central functions of every controller
  */
-trait TController extends Controller with I18nSupport{
+trait TController extends Controller with I18nSupport {
 
   /** landing metod of every controller */
-  def page():Action[_]
+  def page(): Action[_]
 
   /** all timeslots and timeranges */
   def timeRange = {
     val allTimeSlots = MTimeslotDisplay.findAllTimeslots
     val timeRanges = MGenerator.findTimeRanges(allTimeSlots).sorted
     (allTimeSlots, timeRanges)
+  }
+
+  def enumeratorContent(targetContainer: String, targetContent: Html) = {
+    val content = Enumerator(Json.obj("container" -> targetContainer, "content" -> targetContent.toString()).toString())
+    content &> Comet(callback = "parent.appendJson")
   }
 
 }

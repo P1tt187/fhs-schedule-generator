@@ -1,0 +1,34 @@
+@(semester:models.persistence.Semester, docents:List[models.persistence.docents.Docent])
+<div class="table-responsive">
+  <table class="table table-striped table-hover table-condensed text-cente">
+    <caption class="text-center text-primary"> @semester.getName </caption>
+    <thead>
+      <tr class="text-info">
+        <th>
+          Dozent
+        </th>
+        <th class="text-center">
+          benötigte SWS
+        </th>
+        <th class="text-center">
+          eingegebene SWS
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      @docents.map{ d=>
+        <tr>
+          <td>
+            @d.getLastName
+          </td>
+          <td class="text-center">
+            @chunkedContent(d.getLastName + "neededSws", routes.CEditDocents.calculateSwsForStatistic(semester.getId, d.getId, d.getLastName + "neededSws"))
+          </td>
+          <td class="text-center">
+            @chunkedContent(d.getLastName + "givenSws", routes.CEditDocents.calculateGivenSws(d.getId, d.getLastName + "givenSws"))
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

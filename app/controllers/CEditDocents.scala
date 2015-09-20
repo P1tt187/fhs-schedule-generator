@@ -344,19 +344,18 @@ package controllers
 
 import javax.inject.Inject
 
-import controllers.traits.{ TController}
+import controllers.traits.TController
 import models.fhs.pages.editdocents.MEditDocents._
 import models.fhs.pages.editdocents._
-import models.fhs.pages.generator.MGenerator
-import models.fhs.pages.timeslot.MTimeslotDisplay
 import models.persistence.docents.Docent
 import play.api.Logger
+import play.api.cache.Cached
 import play.api.data.Forms._
 import play.api.data._
 import play.api.i18n._
 import play.api.libs.json._
 import play.api.mvc._
-
+import play.twirl.api.Html
 import views.html.editdocents._
 
 /**
@@ -365,7 +364,7 @@ import views.html.editdocents._
  */
 
 
-class CEditDocents @Inject() (val messagesApi: MessagesApi) extends TController {
+class CEditDocents @Inject()(cached: Cached)(val messagesApi: MessagesApi) extends TController {
 
   val newDocentForm: Form[MDocent] = Form(
     mapping(
@@ -430,15 +429,15 @@ class CEditDocents @Inject() (val messagesApi: MessagesApi) extends TController 
 
       val docentList = getDocentList
       val expireDate = findExpireDate()
+      val semesters = findSemesters()
       val currentExpireDateForm = if (expireDate != null) {
         expireDateForm.fill(expireDate)
       } else {
         expireDateForm
       }
 
-      Ok(editDocents("Dozenten", newDocentForm, currentExpireDateForm, docentList))
+      Ok(editDocents("Dozenten", newDocentForm, currentExpireDateForm, docentList, semesters))
   }
-
 
 
   def sendDocentFields(id: Long) = Action {
@@ -511,7 +510,7 @@ class CEditDocents @Inject() (val messagesApi: MessagesApi) extends TController 
         null
       }
 
-      Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots, expireDate,findSemesters())(flashing, session,request2Messages).toString))
+      Ok(Json.obj("htmlresult" -> docentfields(existingDocentForm.fill(docent), findHouses(), findAllRooms(), timeRanges, allTimeSlots, expireDate, findSemesters())(flashing, session, request2Messages).toString))
 
 
   }
@@ -523,7 +522,7 @@ class CEditDocents @Inject() (val messagesApi: MessagesApi) extends TController 
 
       result.fold(
         error => {
-          BadRequest(editDocents("Dozenten", newDocentForm, error, getDocentList))
+          BadRequest(editDocents("Dozenten", newDocentForm, error, getDocentList, findSemesters()))
         },
         mExpireDate => {
           persistExpireDate(mExpireDate)
@@ -546,7 +545,7 @@ class CEditDocents @Inject() (val messagesApi: MessagesApi) extends TController 
 
       docentResult.fold(
         errors => {
-          BadRequest(editDocents("Dozenten", errors, expireDateForm, findAllDocents()))
+          BadRequest(editDocents("Dozenten", errors, expireDateForm, findAllDocents(), findSemesters()))
         },
         mDocent => {
           persistNewDocent(docentResult.get)
@@ -556,10 +555,33 @@ class CEditDocents @Inject() (val messagesApi: MessagesApi) extends TController 
       )
   }
 
-  def calculaterequiredSWS(semesterId:Long, docentId:Long) = Action {
-    implicit request =>
-      val sws = calculateNeededSws(semesterId,docentId)
-      Ok( Json.obj( "htmlresult" -> sws) )
+  def getStatisticFields(semesterId: Long, targetContainer: String) = Action {
+    val semester = findSemesterById(semesterId)
+    val docentList = findAllDocents()
+    Ok.chunked(enumeratorContent(targetContainer, docentStatistics(semester, docentList)))
   }
 
+  def calculateSwsForStatistic(semesterId: Long, docentId: Long, targetContainer: String) = Action {
+    implicit request =>
+      val sws = calculateNeededSws(semesterId, docentId)
+      Ok.chunked(enumeratorContent(targetContainer, Html(sws.toString)))
+  }
+
+  def calculaterequiredSWS(semesterId: Long, docentId: Long) =
+    cached("calculaterequiredSWS" + semesterId + "-" + docentId) {
+      Action {
+        implicit request =>
+          val sws = calculateNeededSws(semesterId, docentId)
+          Ok(Json.obj("htmlresult" -> sws))
+      }
+    }
+
+  def calculateGivenSws(docentId: Long, targetContainer: String) =
+    cached("calculateGivenSws" + docentId) {
+      Action {
+        val docent = findDocentById(docentId)
+        val sws = calculateDocentSwsForStatistic(docent)
+        Ok.chunked(enumeratorContent(targetContainer, Html(sws.toString)))
+      }
+    }
 }

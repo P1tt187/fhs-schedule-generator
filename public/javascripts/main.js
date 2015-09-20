@@ -348,6 +348,12 @@ appendHTML = function (url, appendContainer) {
     });
 };
 
+var appendJson;
+appendJson= function(value){
+    var jsonObject = JSON.parse( value)
+    $('#' + jsonObject.container).html(jsonObject.content);
+};
+
 var wrapArray= function(value){
     return $.isArray(value)?value:[value];
 };

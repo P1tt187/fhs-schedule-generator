@@ -84,7 +84,7 @@
                     $('#showGroupLabels').change(function(){
                         if($(this).is( ":checked" )){
                             @groupTypes.map { gt =>
-                                $('#groupTypeInput option[value=@gt]').data('subtext',"<span class='label label-warning'> @courses.map(_.getName).diff(groupTypeMap(gt)).sorted.mkString(" ") </span>");
+                                $('#groupTypeInput option[value=@gt]').data('subtext',"<span class='label label-warning'> @groupTypeMap(gt).sorted.mkString(" ") </span>");
                             }
                         } else {
                             $('#groupTypeInput option').data('subtext',"");
