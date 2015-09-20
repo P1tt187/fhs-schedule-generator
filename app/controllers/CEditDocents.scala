@@ -426,7 +426,6 @@ class CEditDocents @Inject()(cached: Cached)(val messagesApi: MessagesApi) exten
 
   def page = Action {
     implicit request =>
-
       val docentList = getDocentList
       val expireDate = findExpireDate()
       val semesters = findSemesters()
@@ -555,33 +554,27 @@ class CEditDocents @Inject()(cached: Cached)(val messagesApi: MessagesApi) exten
       )
   }
 
-  def getStatisticFields(semesterId: Long, targetContainer: String) = Action {
-    val semester = findSemesterById(semesterId)
-    val docentList = findAllDocents()
-    Ok.chunked(enumeratorContent(targetContainer, docentStatistics(semester, docentList)))
-  }
+  def getStatisticFields(semesterId: Long, targetContainer: String) =
 
-  def calculateSwsForStatistic(semesterId: Long, docentId: Long, targetContainer: String) = Action {
+      Action {
+        val semester = findSemesterById(semesterId)
+        val docentList = findAllDocents()
+
+        val docentStatisticList = docentList.par.map {
+          d =>
+            val neededSws = calculateNeededSws(semesterId, d.getId)
+            val givenSws = calculateDocentSwsForStatistic(d)
+            (d, neededSws, givenSws)
+        }.toList
+
+        Ok.chunked(enumeratorContent(targetContainer, docentStatistics(semester, docentStatisticList)))
+
+    }
+
+  def calculaterequiredSWS(semesterId:Long, docentId:Long) = Action {
     implicit request =>
-      val sws = calculateNeededSws(semesterId, docentId)
-      Ok.chunked(enumeratorContent(targetContainer, Html(sws.toString)))
+      val sws = calculateNeededSws(semesterId,docentId)
+      Ok( Json.obj( "htmlresult" -> sws) )
   }
 
-  def calculaterequiredSWS(semesterId: Long, docentId: Long) =
-    cached("calculaterequiredSWS" + semesterId + "-" + docentId) {
-      Action {
-        implicit request =>
-          val sws = calculateNeededSws(semesterId, docentId)
-          Ok(Json.obj("htmlresult" -> sws))
-      }
-    }
-
-  def calculateGivenSws(docentId: Long, targetContainer: String) =
-    cached("calculateGivenSws" + docentId) {
-      Action {
-        val docent = findDocentById(docentId)
-        val sws = calculateDocentSwsForStatistic(docent)
-        Ok.chunked(enumeratorContent(targetContainer, Html(sws.toString)))
-      }
-    }
 }

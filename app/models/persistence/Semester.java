@@ -370,13 +370,6 @@ public class Semester extends AbstractEntity {
     }
 
     @Override
-    public String toString() {
-        return "Semester{" +
-                "name='" + name + '\'' +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -391,5 +384,13 @@ public class Semester extends AbstractEntity {
     @Override
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Semester{");
+        sb.append("name='").append(name).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -2,8 +2,8 @@
 @(title: String, newDocentsForm: Form[models.fhs.pages.editdocents.MDocent],expireDateForm:Form[fhs.pages.editdocents.MExpireDate], existingDocents: List[models.persistence.docents.Docent], semesters:List[models.persistence.Semester])(implicit flash: Flash, session:Session, messages:Messages)
 
 
-@import views.html.helper._
 @import navigation.ENavigation._
+@import views.html.helper._
 
 
 @main(title, EDITDOCENTS) {
@@ -106,6 +106,14 @@
             $ ( '#selectDocent' ).on ( 'change', getDocentFields ) ;
 
             $('#semester-select-statistic').on('change', function(e){
+            var progressString = '<div class="col-md-5">' +
+                                    '<div class="progress">' +
+                                      '<div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width: 100%">' +
+                                       ' <span class="sr-only">100% Complete (warning)</span>' +
+                                      '</div>'+
+                                    '</div>'+
+                                  '</div>';
+            $('#docent-statistic-fields').html(progressString);
                 $('#docent-statistic-fieldsIframe').attr('src','/docentStatisticFields/' + $('#semester-select-statistic').val() + "/docent-statistic-fields");
             });
         </script>

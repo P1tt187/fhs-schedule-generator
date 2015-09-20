@@ -11,7 +11,7 @@ name := """schedule-generator"""
 
 version := "1.2.2"
 
-val hibernateVersion= "4.3.10.Final"
+val hibernateVersion= "4.3.11.Final"
 
 libraryDependencies ++= Seq(
   javaJdbc,
@@ -29,8 +29,8 @@ libraryDependencies ++= Seq(
   "org.mariadb.jdbc" % "mariadb-java-client" % "1.1.7",
   "uk.com.robust-it" % "cloning" % "1.9.0",
   "com.decodified" %% "scala-ssh" % "0.7.0",
-  "com.typesafe" % "config" % "1.2.0",
-  "net.java.dev.jna" % "jna" % "3.4.0"
+  "com.typesafe" % "config" % "1.2.0"
+  //"net.java.dev.jna" % "jna" % "3.4.0"
   //"org.bouncycastle" % "bcprov-jdk16" % "1.46",
   //"com.jcraft" % "jzlib" % "1.1.3"
 )

@@ -67,8 +67,6 @@ POST        /saveEditedDocentData                                               
 GET         /deleteDocent/:id                                                                         controllers.CEditDocents.deleteDocent(id:Long)
 POST        /editExpireDate                                                                           controllers.CEditDocents.saveExpireDate
 GET         /calulateRquiredSWS/:semesterId/:docentId                                                 controllers.CEditDocents.calculaterequiredSWS(semesterId:Long, docentId:Long)
-GET         /calculateSwsForStatistic/:semesterId/:docentId/:targetContainer                          controllers.CEditDocents.calculateSwsForStatistic(semesterId:Long, docentId:Long, targetContainer:String)
-GET         /calculateGivenSws/:docentId/:targetContainer                                             controllers.CEditDocents.calculateGivenSws(docentId:Long, targetContainer:String)
 GET         /docentStatisticFields/:semesterId/:targetContainer                                       controllers.CEditDocents.getStatisticFields(semesterId:Long, targetContainer:String)
 
 GET         /editSchedule                                                                             controllers.CEditSchedule.page()

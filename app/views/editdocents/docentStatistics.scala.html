@@ -1,4 +1,4 @@
-@(semester:models.persistence.Semester, docents:List[models.persistence.docents.Docent])
+@(semester:models.persistence.Semester, docents:List[(models.persistence.docents.Docent, Float, Float)])
 <div class="table-responsive">
   <table class="table table-striped table-hover table-condensed text-cente">
     <caption class="text-center text-primary"> @semester.getName </caption>
@@ -8,24 +8,32 @@
           Dozent
         </th>
         <th class="text-center">
-          benötigte SWS
+          Benötigte SWS
         </th>
         <th class="text-center">
-          eingegebene SWS
+          Eingegebene SWS
+        </th>
+        <th>
+          Differenz
         </th>
       </tr>
     </thead>
     <tbody>
-      @docents.map{ d=>
+      @docents.map{ case (d, neededSws, givenSws)=>
         <tr>
           <td>
             @d.getLastName
           </td>
           <td class="text-center">
-            @chunkedContent(d.getLastName + "neededSws", routes.CEditDocents.calculateSwsForStatistic(semester.getId, d.getId, d.getLastName + "neededSws"))
+            @neededSws
           </td>
           <td class="text-center">
-            @chunkedContent(d.getLastName + "givenSws", routes.CEditDocents.calculateGivenSws(d.getId, d.getLastName + "givenSws"))
+            @givenSws
+          </td>
+          <td>
+            <span class="@if(givenSws - neededSws >=0 || givenSws == 0f){ text-success } else {text-danger}">
+            @{ givenSws - neededSws  }
+            </span>
           </td>
         </tr>
       }
